@@ -1,0 +1,97 @@
+body { background-color:#333; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
+a { text-decoration:none; color:darkblue; }
+a:visited { color:darkblue; }
+a:hover { background-color:yellow; color:darkblue; }
+table { border-spacing:0; border:1px solid grey; border-collapse:collapse; margin:auto; }
+table td { padding:2px; vertical-align:top; }
+table th { padding:4px; vertical-align:center; font-size:75%; background-color:#ccc; }
+form { display:inline; }
+h1 { font-size:150%; display:inline; }
+h2 { font-size:100%; display:inline; }
+h3 { font-size:95%; display:inline; }
+h4 { font-size:70%; display:inline; }
+h5 { font-size:60%; display:inline; }
+img { border:1px solid black; }
+video { border:1px solid black; }
+audio { border:1px solid black; }
+.menu { background-color:#222; color:#ccc; 
+	padding:5px 0px 5px 10px; margin:0px; line-height:2; 
+	text-align:center; font-size:85% !important; }
+.menu a { background-color:#222; color:#ccc;  }
+.menu a:visited { color:#ddd !important }
+.menu a:hover { color:yellow !important }
+.menu_highlight a {
+	background-color:#200;
+	color:yellow;
+	padding:5px;
+}
+.admin {font-size:120% !important; font-weight:bold !important; background-color:blue !important;  }
+.admin a { background-color:blue !important; color:yellow !important;}
+.box { text-align:left; margin:0px; padding:5px 20px 20px 20px; }
+.white { background-color:white; color:black; }
+.grey { background-color:#333; color:#9c9; }
+.grey a { background-color:inherit; color:yellow; }
+.grey a:hover { background-color:inherit; color:white; }
+.center { text-align:center; margin:auto; }
+.nobr { white-space:nowrap; }
+.right { text-align:right; }
+.left { text-align:left; }
+.categories { padding:5px; margin:auto; text-align:left; font-size:90%; }
+.thumbnail_box {
+	background-color:#ccc;
+	border:1px solid grey;
+	display:inline-block;
+	text-align:center;
+	vertical-align:top;
+	margin:5px;
+	padding:5px;
+}
+.thumbnail_reviews {
+	background-color:white;
+	display:inline-block;
+	text-align:left;
+	vertical-align:middle;
+	margin:0px;
+	padding:1px;
+	font-size:80%;
+}
+.message { margin:0; padding:2px; text-align:left; }
+.debug { color:black; background-color:yellow; font-size:80%; }
+.notice { color:black; background-color:lightsalmon; font-size:70%; }
+.error { color:black; background-color:yellow; font-size:80%; }
+.fail { color:black; background-color:yellow; font-size:110%; }
+.mediatitle { font-size:80%; }
+.attribution { font-size:65%; }
+.reviewbutton { display:inline-block; white-space:nowrap; padding:10px !important; margin:4px; border:1px solid black; font-weight:bold; }
+.tagbutton { 
+	display:inline-block; 
+	vertical-align:middle;
+	text-align:center;
+	white-space:pre;	
+	padding:0px 0px 0px 0px;
+	border:1px solid #333;
+}
+.tagbutton:hover { 
+	border:1px solid yellow; background-color:black; 
+}
+.tagbutton a { 
+	font-size:270%; 
+}
+
+/*
+.tag1 { color:yellow; background-color:green; padding:2px; }
+.tag1 a { color:yellow; xbackground-color:green; }
+.tag1 a:hover { color:white; }
+.tag2 { color:yellow; background-color:darkgreen; padding:2px; }
+.tag2 a { color:yellow; background-color:darkgreen; }
+.tag2 a:hover { color:white; }
+.tag3 { color:yellow; background-color:#777; padding:2px; }
+.tag3 a { color:yellow; background-color:#777; }
+.tag3 a:hover { color:white; }
+.tag4 { color:yellow; background-color:darkred; padding:2px; }
+.tag4 a { color:yellow; background-color:darkred; }
+.tag4 a:hover { color:white; }
+.tag5 { color:white; background-color:red; padding:2px; }
+.tag5 a { color:white; background-color:red; }
+.tag5 a:hover { color:yellow; }
+*/

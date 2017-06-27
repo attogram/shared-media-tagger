@@ -1,5 +1,7 @@
 # Shared Media Tagger 
 
+ALPHA RELEASE
+
 * Shared Media Tagger (SMT) allows users to tag a curated set of images and media from WikiMedia Commons.
 
 
@@ -8,6 +10,15 @@
 * PHP 7 or PHP 5.3.3 or higher, installed with SQLite PDO driver
 * Web server has write access to database file  ( ./admin/db/media.sqlite )
 * Web server has internet access to the WikiMedia Commons API endpoint
+
+
+## Setup
+
+TBD..
+
+* DB web admin password: test
+** set in: ./admin/phpliteadmin.config.php
+
 
 ## License
 
