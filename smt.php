@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.3.2');
+define('__SMT__', '0.3.3');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -176,7 +176,7 @@ class smt_database_utils EXTENDS smt_utils {
 		if( !$this->db ) { $this->init_database(); }
 		$statement = $this->db->prepare($sql);
         if( !$statement ) {
-            $this->debug('::query_as_array(): ERROR PREPARE: '. $this->db->errorInfo()[2]);
+            $this->debug('::query_as_array(): ERROR PREPARE'); // '. $this->db->errorInfo()[2]);
             return array();
         }
 		while( $x = each($bind) ) {
@@ -206,7 +206,7 @@ class smt_database_utils EXTENDS smt_utils {
 		if( !$this->db ) { $this->init_database(); }
 		$statement = $this->db->prepare($sql);
         if( !$statement ) {
-			$this->error('::query_as_bool(): ERROR PREPARE: '.$this->db->errorInfo()[2]);
+			$this->error('::query_as_bool(): ERROR PREPARE'); // : '.$this->db->errorInfo()[2]);
             return FALSE;
         }
 		$this->debug('::query_as_bool(): bind: '.print_r($bind,1));
