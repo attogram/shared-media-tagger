@@ -89,7 +89,12 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 ?>
 </div>
 
-<p><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">View on Wikimedia Commons</a></p>
+<p><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">View on commons.wikimedia.org</a>
+<br /><a target="commons" href="//wikidata.org/wiki/<?php 
+	print $smt->category_urlencode($media['title']); ?>">View on wikidata.org</a>
+<br /><a target="commons" href="//en.wikipedia.org/wiki/<?php 
+	print $smt->category_urlencode($media['title']); ?>">View on en.wikipedia.org</a>
+</p>
 
 <small>
 <em>Media info:</em>
