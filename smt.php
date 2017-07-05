@@ -97,14 +97,6 @@ class smt_utils {
 		return str_pad($string, $length, ' ', STR_PAD_BOTH);		
 	}
 	
-	function display_header() {
-
-	}
-	
-	function display_footer() {
-
-	}
-	
 	//////////////////////////////////////////////////////////
 	function include_header() {
 		print '<!doctype html>
@@ -166,19 +158,10 @@ class smt_utils {
 		
 	function include_small_menu() {
 		print ''
-		. '<div class="menu" style="
-			line-height:inherit; 
-			padding:12px 0px 4px 0px; 
-			margin:0px; 
-			font-weight:bold;">'
-		  . '<a href="' . $this->url('home') . '">'
-		  . $this->site_name
-		  . '</a>'
-		  . '<div style="float:right; margin-right:10px; font-size:80% !important;">'
-		    . '<a href="' . $this->url('about') . '">' 
-			//. $this->site_name 
-			. 'About'
-			. '</a>'
+		. '<div class="menu" style="line-height:1;padding:14px 0px 6px 0px;margin:0px;font-weight:bold;">'
+		  . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+		  . '<div style="float:right; margin-right:10px; font-size:80%;">'
+		    . '<a href="' . $this->url('about') . '">About</a>'
 		    . ' &nbsp;-&nbsp; '
 		    . '<a href="' . $this->url('categories') . '">Categories</a>'
           . '</div>'
