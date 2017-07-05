@@ -1,4 +1,4 @@
-body { background-color:#333; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
+body { background-color:#222; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
 a { text-decoration:none; color:darkblue; }
 a:visited { color:darkblue; }
 a:hover { background-color:yellow; color:darkblue; }
@@ -77,21 +77,3 @@ audio { border:1px solid black; }
 .tagbutton a { 
 	font-size:270%; 
 }
-
-/*
-.tag1 { color:yellow; background-color:green; padding:2px; }
-.tag1 a { color:yellow; xbackground-color:green; }
-.tag1 a:hover { color:white; }
-.tag2 { color:yellow; background-color:darkgreen; padding:2px; }
-.tag2 a { color:yellow; background-color:darkgreen; }
-.tag2 a:hover { color:white; }
-.tag3 { color:yellow; background-color:#777; padding:2px; }
-.tag3 a { color:yellow; background-color:#777; }
-.tag3 a:hover { color:white; }
-.tag4 { color:yellow; background-color:darkred; padding:2px; }
-.tag4 a { color:yellow; background-color:darkred; }
-.tag4 a:hover { color:white; }
-.tag5 { color:white; background-color:red; padding:2px; }
-.tag5 a { color:white; background-color:red; }
-.tag5 a:hover { color:yellow; }
-*/

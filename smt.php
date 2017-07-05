@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.0');
+define('__SMT__', '0.4.1');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -166,9 +166,13 @@ class smt_utils {
 		
 	function include_small_menu() {
 		print ''
-		. '<div class="menu" style="line-height:inherit; padding:0px !important; margin:0px !important; font-weight:bold;">'
+		. '<div class="menu" style="
+			line-height:inherit; 
+			padding:12px 0px 4px 0px; 
+			margin:0px; 
+			font-weight:bold;">'
 		  . '<a href="' . $this->url('home') . '">'
-		  . 'Rate another file'
+		  . $this->site_name
 		  . '</a>'
 		  . '<div style="float:right; margin-right:10px; font-size:80% !important;">'
 		    . '<a href="' . $this->url('about') . '">' 
