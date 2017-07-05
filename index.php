@@ -18,6 +18,7 @@ if( !$image || !isset($image[0]) ) {
 $image = $image[0]; 
 
 $smt->include_header();
+$smt->include_small_menu();
 
 print '<div class="box grey center">'
 . $smt->display_tags( $image['pageid']) 

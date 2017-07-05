@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.3.3');
+define('__SMT__', '0.4.0');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -97,6 +97,13 @@ class smt_utils {
 		return str_pad($string, $length, ' ', STR_PAD_BOTH);		
 	}
 	
+	function display_header() {
+
+	}
+	
+	function display_footer() {
+
+	}
 	
 	//////////////////////////////////////////////////////////
 	function include_header() {
@@ -106,19 +113,32 @@ class smt_utils {
 <meta name="viewport" content="initial-scale=1" />
 <link rel="stylesheet" type="text/css" href="' . $this->url('css') . '">
 </head><body>';
+		if( is_readable(__DIR__.'/header.php') ) {
+			include( __DIR__.'/header.php');
+		}
 	}
 	
 	//////////////////////////////////////////////////////////
 	function include_footer() {
 		$this->include_menu();
-		print '<footer>
-<div class="menu">
-<span class="nobr">Powered by <b><a target="commons" href="https://github.com/attogram/shared-media-tagger">Shared Media Tagger v' . __SMT__ . '</a></b></span>
-<span style="float:right;padding-right:10px;display:inline-block;"><a target="admin" style="color:#333 !important;" href="' . $this->url('admin') . '">π</a></span>
-</div>
-</footer>
-</body></html>';
-
+		print '<footer>'
+		. '<div class="menu">'
+		. '<span class="nobr">Powered by <b>'
+		. '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
+		. 'Shared Media Tagger v' . __SMT__ . '</a></b></span>'
+		. '<br />'
+		. '<span class="nobr">Hosted by <b><a href="//'
+		. @$_SERVER['SERVER_NAME'] 
+		. '/">'
+		. @$_SERVER['SERVER_NAME'] 
+		. '</a>'
+		. '</b></span>'
+		. '</div>'
+		. '</footer>';
+		if( is_readable(__DIR__.'/footer.php') ) {
+			include( __DIR__.'/footer.php');
+		}
+		print '</body></html>';
 	}
 
 	//////////////////////////////////////////////////////////
@@ -144,7 +164,23 @@ class smt_utils {
 <?php
 	}  // end function include_menu()
 		
-	
+	function include_small_menu() {
+		print ''
+		. '<div class="menu" style="line-height:inherit; padding:0px !important; margin:0px !important; font-weight:bold;">'
+		  . '<a href="' . $this->url('home') . '">'
+		  . 'Rate another file'
+		  . '</a>'
+		  . '<div style="float:right; margin-right:10px; font-size:80% !important;">'
+		    . '<a href="' . $this->url('about') . '">' 
+			//. $this->site_name 
+			. 'About'
+			. '</a>'
+		    . ' &nbsp;-&nbsp; '
+		    . '<a href="' . $this->url('categories') . '">Categories</a>'
+          . '</div>'
+		. '</div>'
+		;
+	}
 } //end class smt_utils
 
 //////////////////////////////////////////////////////////
