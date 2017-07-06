@@ -35,5 +35,13 @@ print '<div class="box grey center">'
 . '</div>'
 ;
 
+if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1 ) {
+	print '<br /><br /><div style="text-align:left; display:inline-block; background-color:black;color:white; font-size:80%; border:1px solid red;">Admin:<br />'
+	. '<a href="' . $smt->url('admin') . '/media.php?dm=' . $image['pageid'] 
+	. '" onclick="return confirm(\'Confirm: Delete Media #' . $image['pageid'] . ' ?\');"'
+	. '>Delete Media #' . $image['pageid'] . '</a>'
+	. '</div>';
+}
+
 print '</div>';
 $smt->include_footer();

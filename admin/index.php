@@ -2,6 +2,8 @@
 // Shared Media Tagger
 // Admin Home
 
+setcookie('admin','1',time()+60*60,'/'); // 1 hour admin cookie
+
 $f = __DIR__.'/../smt.php'; 
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 $f = __DIR__.'/smt-admin.php'; 
