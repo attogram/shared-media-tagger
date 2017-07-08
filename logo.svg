@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 13.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 14948)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0"
+	 id="svg2211" sodipodi:version="0.32" sodipodi:docbase="f:\incoming" sodipodi:docname="Green_star_boxed.svg" inkscape:version="0.44.1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px"
+	 viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
+<sodipodi:namedview  id="base" inkscape:current-layer="g3312" inkscape:window-y="26" inkscape:window-x="-4" inkscape:window-width="1024" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="667" pagecolor="#ffffff" bordercolor="#666666" inkscape:cy="13.323066" borderopacity="1.0" objecttolerance="10.0" gridtolerance="10.0" inkscape:cx="12" guidetolerance="10.0" inkscape:zoom="11.107469">
+	</sodipodi:namedview>
+<linearGradient id="rect2220_1_" gradientUnits="userSpaceOnUse" x1="-586.0078" y1="2.9219" x2="-575.0867" y2="14.7822">
+	<stop  offset="0" style="stop-color:#D2FFCC"/>
+	<stop  offset="1" style="stop-color:#156600"/>
+</linearGradient>
+<rect id="rect2220" x="1.61" y="1.645" opacity="0.8" fill="none" stroke="url(#rect2220_1_)" stroke-width="2.9923" stroke-linejoin="round" enable-background="new    " width="20.852" height="20.833"/>
+<linearGradient id="rect3240_1_" gradientUnits="userSpaceOnUse" x1="-91.6636" y1="698.3477" x2="-73.1981" y2="716.3453" gradientTransform="matrix(1.1554 0 0 1.176 107.3026 -819.7527)">
+	<stop  offset="0" style="stop-color:#B4F1A3"/>
+	<stop  offset="0.0757" style="stop-color:#93E57D"/>
+	<stop  offset="0.1053" style="stop-color:#95E280"/>
+	<stop  offset="1" style="stop-color:#58B240"/>
+</linearGradient>
+<path id="rect3240" fill="url(#rect3240_1_)" d="M2.568,1.503h18.985c0.649,0,1.176,0.526,1.176,1.175v18.816
+	c0,0.648-0.525,1.174-1.176,1.174H2.568c-0.649,0-1.175-0.525-1.175-1.174V2.678C1.393,2.029,1.919,1.503,2.568,1.503z"/>
+<g id="g3333" transform="matrix(0.958992, 0, 0, 0.976102, 46.3587, 1.95924)">
+	<path id="path3330" fill="#3C742D" d="M-37.826,1.931c4.821-1.284,9.771,1.583,11.055,6.405c1.284,4.822-1.582,9.77-6.405,11.056
+		c-4.821,1.284-9.77-1.584-11.055-6.405c-1.255-4.714,1.458-9.574,6.13-10.977"/>
+	<path id="path3318" fill="#B2EEA2" d="M-38.533,1.295c4.821-1.284,9.771,1.583,11.055,6.405c1.283,4.822-1.583,9.771-6.405,11.055
+		c-4.821,1.286-9.77-1.583-11.054-6.405c-1.256-4.713,1.458-9.572,6.129-10.976"/>
+	<g id="g3312" transform="translate(-5.64639, -1.12928)">
+		<path id="path3278" fill="#24AB00" d="M-24.953,16.72l-3.835-2.572l-3.814,2.604l1.263-4.442l-3.658-2.821l4.617-0.172l1.553-4.35
+			l1.589,4.337l4.617,0.133l-3.63,2.851L-24.953,16.72z"/>
+		<path id="path3288" fill="#156600" d="M-28.833,4.976l0.416,1.143l-1.379,4.095l-4.036,0.141l-1.165-0.854l4.596-0.178
+			L-28.833,4.976z"/>
+		<path id="path3290" fill="#156600" d="M-23.599,10.205l-2.725-0.001l-0.904-0.896l4.592,0.12L-23.599,10.205z"/>
+		<path id="path3292" fill="#156600" d="M-31.736,16.159l-0.862,0.577l1.263-4.424l0.676,0.552L-31.736,16.159z"/>
+	</g>
+</g>
+<line fill="none" stroke="#156600" stroke-width="1.2" x1="4.313" y1="13.584" x2="8.875" y2="13.584"/>
+<line fill="none" stroke="#156600" stroke-width="1.2" x1="6.682" y1="15.917" x2="6.682" y2="11.25"/>
+<line fill="none" stroke="#24AB00" x1="4.563" y1="13.75" x2="9.125" y2="13.75"/>
+<line fill="none" stroke="#24AB00" x1="6.839" y1="16.031" x2="6.839" y2="11.469"/>
+</svg>

@@ -15,10 +15,12 @@ print '<div class="box white"><p>Media Admin:</p>';
 
 if( isset($_GET['dm']) ) {
 	print delete_media($_GET['dm']);
+	$smt->vacuum();
 }
 
 if( isset($_GET['dc']) ) {
 	print delete_media_in_category( $smt->category_urldecode($_GET['dc']));
+	$smt->vacuum();
 }
 
 // MENU ////////////////////////////////////////////
@@ -39,6 +41,7 @@ if( isset($_GET['dc']) ) {
 print '</div>';
 $smt->include_footer();
 
+// TODO: move functions into smt-admin class
 
 ////////////////////////////////////////////////////
 function delete_media_in_category( $category_name ) {

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.3');
+define('__SMT__', '0.4.4');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -103,6 +103,7 @@ class smt_utils {
 <meta charset="utf-8" />
 <meta name="viewport" content="initial-scale=1" />
 <link rel="stylesheet" type="text/css" href="' . $this->url('css') . '">
+<link href="' . $this->url('home') . 'favicon.ico" rel="icon" type="image/png" />
 </head><body>';
         if( is_readable(__DIR__.'/header.php') ) {
             include( __DIR__.'/header.php');
@@ -145,10 +146,10 @@ class smt_utils {
 
         $space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
 ?><div class="menu">
-<span class="nobr"><b><a href="<?php print $this->url('about'); ?>"><?php 
-    print $this->site_name; ?></a></b></span>
+<span class="nobr menu_highlight"><b><a href="<?php print $this->url('home'); ?>"><?php print $this->menu_play; ?></a></b></span>
 <?php print $space; ?>
-<span class="nobr menu_highlight"><b><a href="<?php print $this->url('home'); ?>">Rate a file</a></b></span>
+<span class="nobr"><b><a href="<?php print $this->url('about'); ?>">About <?php 
+    print $this->site_name; ?></a></b></span>
 <?php print $space; ?>
 <span class="nobr"><b><a href="<?php print $this->url('categories'); ?>"><?php 
     print $this->get_categories_count(); ?> Categories</a></b></span>
@@ -296,7 +297,7 @@ class smt_database EXTENDS smt_database_utils {
     var $category_count; 
 
     //////////////////////////////////////////////////////////
-    function set_site_name( $site_id=1 ) {
+    function set_site_name() {
         $r = $this->query_as_array('SELECT name FROM site WHERE id = 1');
         if( !$r || !isset($r[0]['name']) ) {
             $this->site_name = 'My Site';
@@ -627,6 +628,7 @@ class smt EXTENDS smt_site_utils {
 
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
+	var $menu_play; // text for 'rate a file' menu option
 
     //////////////////////////////////////////////////////////
     function __construct( $title='' ) {
@@ -636,7 +638,6 @@ class smt EXTENDS smt_site_utils {
         $this->debug = FALSE;
         $this->database_name = __DIR__ . '/admin/db/media.sqlite';        
         $this->title = $title;
-        $this->site = 1; // site.id 
         $this->sql_count = 0;
         $this->size_medium = 325;
         $this->size_thumb = 100;
@@ -651,7 +652,13 @@ class smt EXTENDS smt_site_utils {
             $this->debug('Site URL Not Set.  Using: ' . $this->site_url);
         }
 
-        $this->set_site_name( $this->site );
+		if( isset($setup['menu_play']) ) {
+			$this->menu_play = $setup['menu_play'];
+		} else {
+			$this->menu_play = 'Rate a file';
+		}
+
+        $this->set_site_name();
         
         $this->links = array(
             'home'       => $this->site_url . '',

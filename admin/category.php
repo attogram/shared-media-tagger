@@ -18,10 +18,12 @@ print '<div class="box white">';
 
 if( isset($_GET['i']) && $_GET['i'] ) {
 	import_images_from_category($smt);
+	$this->vacuum();
 }
 
 if( isset($_POST['cats']) && $_POST['cats'] ) {
 	import_categories($smt);
+	$this->vacuum();
 }
 
 if( isset($_GET['c']) && $_GET['c'] ) {
@@ -30,6 +32,7 @@ if( isset($_GET['c']) && $_GET['c'] ) {
 
 if( isset($_GET['d']) && $_GET['d'] ) {
 	delete_category($smt);
+	$this->vacuum();
 }
 
 if( isset($_GET['s']) && $_GET['s'] ) { 
@@ -40,7 +43,7 @@ if( isset($_GET['sc']) && $_GET['sc'] ) {
 	$smt->get_subcats( $smt->category_urldecode($_GET['sc']) );
 }
 
-	if( isset($_GET['g']) && $_GET['g']=='all' ) {
+if( isset($_GET['g']) && $_GET['g']=='all' ) {
 	$toget = array();
 	$cats = $smt->query_as_array('SELECT name, pageid, files, subcats FROM category ORDER BY name');
 	foreach( $cats as $c ) {
@@ -119,7 +122,9 @@ foreach( $cats as $c ) {
 	$common_files_count += $c['files'];
 	
 	print '<tr>'
-	. '<td><b>' . $smt->strip_prefix($c['name']) . '</b></td>';
+	. '<td><b><a href="' . $smt->url('category') . '?c=' 
+	. $smt->category_urlencode($smt->strip_prefix($c['name']))
+	. '">' . $smt->strip_prefix($c['name']) . '</a></b></td>';
 	
 	$local_files = '';
 	$lfsql = '
@@ -146,7 +151,8 @@ foreach( $cats as $c ) {
 	. '<td>' . ($c['files'] ? $c['files'] : '<span style="color:#ccc;">0</span>') . '</td>'
 	;
 	if( $c['subcats'] > 0 ) {
-		$subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->category_urlencode($c['name']) . '"">' . $c['subcats'] . '</a>';
+		$subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->category_urlencode($c['name']) . '"">+' 
+		. $c['subcats'] . '</a>';
 	} else {
 		$subcatslink = '';
 		if( $c['pageid'] > 0 ) {
