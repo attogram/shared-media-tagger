@@ -4,18 +4,18 @@
 
 $class = __DIR__.'/smt.php'; 
 if(!file_exists($class)||!is_readable($class)){ print 'Site down for maintenance'; exit; } require_once($class);
+
 $smt = new smt('About');
 
-$a = $smt->query_as_array('SELECT name, about FROM site WHERE id = :site', array(':site'=>$smt->site));
-//$smt->notice($a);
+$a = $smt->query_as_array('SELECT name, about FROM site WHERE id = 1');
 $about = @$a[0]['about'];
 $name = @$a[0]['name'];
 	
 if( $about == '' ) {
-	$about = 'Site information coming soon...';
+	$about = 'Welcome!';
 } 
 if( $name == '' ) {
-	$name = 'My Site';
+	$name = 'Shared Media Tagger';
 } 
 
 $smt->title = 'About ' . $name;

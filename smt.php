@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.4');
+define('__SMT__', '0.4.5');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -300,7 +300,7 @@ class smt_database EXTENDS smt_database_utils {
     function set_site_name() {
         $r = $this->query_as_array('SELECT name FROM site WHERE id = 1');
         if( !$r || !isset($r[0]['name']) ) {
-            $this->site_name = 'My Site';
+            $this->site_name = 'Shared Media Tagger';
             return FALSE;
         }
         $this->site_name = $r[0]['name'];
