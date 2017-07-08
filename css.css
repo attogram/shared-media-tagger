@@ -43,14 +43,13 @@ audio { border:1px solid black; }
 	display:inline-block;
 	text-align:center;
 	vertical-align:top;
-	margin:5px;
-	padding:5px;
+	margin:3px;
+	padding:3px;
 }
 .thumbnail_reviews {
-	background-color:white;
+	background-color:inherit;
 	display:inline-block;
 	text-align:left;
-	vertical-align:middle;
 	margin:0px;
 	padding:1px;
 	font-size:80%;

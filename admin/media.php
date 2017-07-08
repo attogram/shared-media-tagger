@@ -49,7 +49,7 @@ function delete_media_in_category( $category_name ) {
 		$smt->error('::delete_media_in_category: Invalid Category Name: ' . $category_name);
 		return FALSE;
 	}
-	$r = '<pre style="background-color:lightsalmon;">'
+	$r = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
 	. 'Deleting Media in <b>' . $category_name . '</b>';
 	
 	$media = $smt->get_media_in_category( $category_name );
@@ -60,7 +60,7 @@ function delete_media_in_category( $category_name ) {
 		$r .= '<br />Deleting #' . $pageid;
 		$r .= delete_media($pageid);
 	}
-	$r .= '</pre>';
+	$r .= '</div><br />';
 	return $r;
 }
 
@@ -74,7 +74,8 @@ function delete_media( $pageid ) {
 		return;
 	}
 	 
-	$r = '<pre>Deleting Media :pageid = ' . $pageid;
+	$r = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
+	. 'Deleting Media :pageid = ' . $pageid;
 	
 	$sql = array();
 	$sql[] = 'DELETE FROM media WHERE pageid = :pageid';
@@ -90,7 +91,7 @@ function delete_media( $pageid ) {
 		}
 		
 	}
-	$r .= '</pre>';
+	$r .= '</div><br />';
 	return $r;
 	
 }

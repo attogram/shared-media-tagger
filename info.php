@@ -32,7 +32,6 @@ $smt->include_menu();
   <td class="box grey center"><?php 
 
 	print $smt->display_image($media)
-	. '<br />'
 	. $smt->display_categories( $pageid )
 	. '<br />'
 	. '<a href="./?i=' . $pageid . '">Review this file:</a>' 
@@ -119,15 +118,6 @@ uploaded by: <b><a target="commons" href="https://commons.wikimedia.org/wiki/Use
 <a href="<?php 
 print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a>
 
-<?php
-if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1 ) {
-	print '<br /><br /><div style="text-align:left; display:inline-block; background-color:white;color:black; font-size:80%; border:1px solid red;">Admin:<br />'
-	. '<a href="' . $smt->url('admin') . '/media.php?dm=' . $media['pageid'] 
-	. '" onclick="return confirm(\'Confirm: Delete Media #' . $media['pageid'] . ' ?\');"'
-	. '>Delete Media #' . $media['pageid'] . '</a>'
-	. '</div>';
-}
-?>
   </td>
  </tr>
 </table>
