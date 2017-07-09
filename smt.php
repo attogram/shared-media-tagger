@@ -744,7 +744,7 @@ class smt EXTENDS smt_site_utils {
         $filename = str_replace(' ','_',$filename);
         
         $md5 = md5($filename);
-        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons    humb'
+        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
         . '/' . $md5[0] 
         . '/' . $md5[0] . $md5[1] 
         . '/' . $filename 
