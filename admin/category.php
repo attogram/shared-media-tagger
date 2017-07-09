@@ -298,7 +298,13 @@ function get_category_info($smt) {
 ///////////////////////////////////////////////////////////////////////////////
 function import_images_from_category($smt) {
 	$category_name = $smt->category_urldecode($_GET['i']);
-	print "Importing media from <b>$category_name</b>";
+	$category_name = $smt->strip_prefix($category_name);
+	
+	print 'Importing media from <b><a href="' . $smt->url('category') . '?c='
+	. $smt->category_urlencode($category_name)
+	. '">'
+	. htmlentities($category_name)
+	. '</a></b>';
 	$r = $smt->get_media_from_category( $category_name );
 	print '</div>';
 	$smt->include_footer();

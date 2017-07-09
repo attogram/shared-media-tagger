@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.5');
+define('__SMT__', '0.4.6');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -98,17 +98,24 @@ class smt_utils {
     
     //////////////////////////////////////////////////////////
     function include_header() {
-        print '<!doctype html>
-<html><head><title>' . $this->title . '</title>
-<meta charset="utf-8" />
-<meta name="viewport" content="initial-scale=1" />
-<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '">
-<link href="' . $this->url('home') . 'favicon.ico" rel="icon" type="image/png" />
-</head><body>';
-        if( is_readable(__DIR__.'/header.php') ) {
-            include( __DIR__.'/header.php');
+        print "<!doctype html>\n"
+		. '<html><head><title>' . $this->title . '</title>'
+		. '<meta charset="utf-8" />'
+		. '<meta name="viewport" content="initial-scale=1" />'
+		. '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '">'
+		. '<link href="' . $this->url('home') . 'favicon.ico" rel="icon" type="image/png" />'
+		. '</head><body>';
+
+		// Site headers
+        if( $this->is_admin() || get_class($this) == 'smt_admin') {
+			return;
+		}
+		$site_header = __DIR__.'/header.php';
+		if( is_readable($site_header) ) {
+            include($site_header);
         }
-    }
+
+	} // end function include_header()
     
     //////////////////////////////////////////////////////////
     function include_footer() {
@@ -143,35 +150,40 @@ class smt_utils {
 
     //////////////////////////////////////////////////////////
     function include_menu() {
-
         $space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
-?><div class="menu">
-<span class="nobr menu_highlight"><b><a href="<?php print $this->url('home'); ?>"><?php print $this->menu_play; ?></a></b></span>
-<?php print $space; ?>
-<span class="nobr"><b><a href="<?php print $this->url('about'); ?>">About <?php 
-    print $this->site_name; ?></a></b></span>
-<?php print $space; ?>
-<span class="nobr"><b><a href="<?php print $this->url('categories'); ?>"><?php 
-    print $this->get_categories_count(); ?> Categories</a></b></span>
-<?php print $space; ?>
-<span class="nobr"><b><a href="<?php print $this->url('reviews'); ?>"><?php 
-    print $this->get_total_review_count(); ?> Reviews</a></b> 
-<?php print $space; ?>
-<?php print $this->get_image_count(); ?> Files</span>
-<?php print $space; ?>
-<b><a href="<?php print $this->url('contact'); ?>">Contact</a></b>
-</div>
-<?php
+		print ''
+		. '<div class="menu" style="font-weight:bold;">'
+		. '<span class="nobr">'
+		. '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+		. '</span>'
+		. $space
+		. '<a href="' . $this->url('categories') . '">' . $this->get_categories_count() . '&nbsp;Categories</a>'
+		. $space
+		. '<a href="' . $this->url('reviews') . '">' . $this->get_total_review_count() . '&nbsp;Reviews</a>'
+		. $space
+		. $this->get_image_count() . '&nbsp;files'
+		. $space
+		. '<a href="'. $this->url('about') . '">About</a>'
+		. $space
+		. '<a href="' . $this->url('contact') . '">Contact</a>'
+		. '</div>'
+		;
+
     }  // end function include_menu()
         
+    //////////////////////////////////////////////////////////
     function include_small_menu() {
+		$space = ' &nbsp; &nbsp; ';
         print ''
-        . '<div class="menu" style="line-height:1;padding:14px 0px 6px 0px;margin:0px;font-weight:bold;">'
+        . '<div class="menu" style="font-weight:bold;">'
           . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
           . '<div style="float:right; margin-right:10px; font-size:80%;">'
-            . '<a href="' . $this->url('about') . '">About</a>'
-            . ' &nbsp;-&nbsp; '
+            . $space
             . '<a href="' . $this->url('categories') . '">Categories</a>'
+            . $space
+            . '<a href="' . $this->url('reviews') . '">Reviews</a>'
+            . $space
+			. '<a href="' . $this->url('about') . '">About</a>'
           . '</div>'
         . '</div>'
         ;
@@ -925,7 +937,7 @@ class smt EXTENDS smt_site_utils {
         if( !$cats ) { $r .= '<em>Uncategorized</em>'; }
         foreach($cats as $cat ) {
             $r .= ''
-			. 'Category: '
+			//. '+'
             . '<a href="' . $this->url('category') 
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
             . $this->strip_prefix($cat) . '</a><br />';
