@@ -1,3 +1,8 @@
 User-agent: *
+Disallow: tag.php
 Disallow: /tag.php
+Disallow: */tag.php
 Disallow: /*/tag.php
+Disallow: /*/*/tag.php
+Disallow: /*/*/*/tag.php
+Disallow: /*/*/*/*/tag.php
