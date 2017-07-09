@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.6');
+define('__SMT__', '0.4.7');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -126,9 +126,7 @@ class smt_utils {
         . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
         . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>'
         . '<br />'
-        . '<span class="nobr">Hosted by <b><a href="//'
-        . @$_SERVER['SERVER_NAME'] 
-        . '/">'
+        . '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
         . @$_SERVER['SERVER_NAME'] 
         . '</a>'
         . '</b></span>'
@@ -142,11 +140,15 @@ class smt_utils {
 			. '</div>';
 		}
 
-        if( is_readable(__DIR__.'/footer.php') ) {
-            include( __DIR__.'/footer.php');
-        }
+		// Site footers
+        if( !$this->is_admin() && get_class($this) == 'smt_admin') {
+			$site_header = __DIR__.'/footer.php';
+			if( is_readable($site_header) ) {
+				include($site_header);
+			}
+		}
         print '</body></html>';
-    }
+    } // end include_footer()
 
     //////////////////////////////////////////////////////////
     function include_menu() {
@@ -188,6 +190,7 @@ class smt_utils {
         . '</div>'
         ;
     }
+
 } //end class smt_utils
 
 //////////////////////////////////////////////////////////
@@ -738,7 +741,7 @@ class smt EXTENDS smt_site_utils {
         $filename = str_replace(' ','_',$filename);
         
         $md5 = md5($filename);
-        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
+        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons    humb'
         . '/' . $md5[0] 
         . '/' . $md5[0] . $md5[1] 
         . '/' . $filename 
