@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.7');
+define('__SMT__', '0.4.8');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -102,8 +102,8 @@ class smt_utils {
 		. '<html><head><title>' . $this->title . '</title>'
 		. '<meta charset="utf-8" />'
 		. '<meta name="viewport" content="initial-scale=1" />'
-		. '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '">'
-		. '<link href="' . $this->url('home') . 'favicon.ico" rel="icon" type="image/png" />'
+		. '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
+		. '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
 		. '</head><body>';
 
 		// Site headers
@@ -141,7 +141,7 @@ class smt_utils {
 		}
 
 		// Site footers
-        if( !$this->is_admin() && get_class($this) == 'smt_admin') {
+        if( !$this->is_admin() || get_class($this) !== 'smt_admin') {
 			$site_header = __DIR__.'/footer.php';
 			if( is_readable($site_header) ) {
 				include($site_header);

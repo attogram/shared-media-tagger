@@ -683,7 +683,7 @@ class smt_admin extends smt_commons_API {
             return;
         }
         setcookie('admin','1',time()+60*60,'/'); // 1 hour admin cookie
-        $this->notice('Admin cookie set');
+        //$this->notice('Admin cookie set');
     }
 
     //////////////////////////////////////////////////////////
