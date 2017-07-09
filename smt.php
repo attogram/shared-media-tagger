@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.8');
+define('__SMT__', '0.4.9');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -99,23 +99,23 @@ class smt_utils {
     //////////////////////////////////////////////////////////
     function include_header() {
         print "<!doctype html>\n"
-		. '<html><head><title>' . $this->title . '</title>'
-		. '<meta charset="utf-8" />'
-		. '<meta name="viewport" content="initial-scale=1" />'
-		. '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
-		. '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
-		. '</head><body>';
+        . '<html><head><title>' . $this->title . '</title>'
+        . '<meta charset="utf-8" />'
+        . '<meta name="viewport" content="initial-scale=1" />'
+        . '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
+        . '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
+        . '</head><body>';
 
-		// Site headers
+        // Site headers
         if( $this->is_admin() || get_class($this) == 'smt_admin') {
-			return;
-		}
-		$site_header = __DIR__.'/header.php';
-		if( is_readable($site_header) ) {
+            return;
+        }
+        $site_header = __DIR__.'/header.php';
+        if( is_readable($site_header) ) {
             include($site_header);
         }
 
-	} // end function include_header()
+    } // end function include_header()
     
     //////////////////////////////////////////////////////////
     function include_footer() {
@@ -132,50 +132,53 @@ class smt_utils {
         . '</b></span>'
         . '</div>'
         . '</footer>';
-		
-		if( $this->is_admin() ) {
-			print '<div class="menu">'
-			. '<a href="' . $this->url('admin') . '">ADMIN MENU</a>'
-			. ' &nbsp; &nbsp; <a href="' . $this->url('home') . '?logoff">logoff</a>'
-			. '</div>';
-		}
+    
+        if( $this->is_admin() ) {
+            print '<div class="menu" style="font-weight:bold;">'
+            . '<a href="' . $this->url('admin') . '">ADMIN MENU</a>'
+            . ' &nbsp; &nbsp; &nbsp; '
+            . '<a href="' . $this->url('home') . '?logoff">logoff</a>'
+            . '</div>';
+        }
 
-		// Site footers
-        if( !$this->is_admin() || get_class($this) !== 'smt_admin') {
-			$site_header = __DIR__.'/footer.php';
-			if( is_readable($site_header) ) {
-				include($site_header);
-			}
-		}
+        // Site footers
+        if( $this->is_admin() || get_class($this) == 'smt_admin') {
+            //
+        } else {
+            $site_footer = __DIR__.'/footer.php';
+            if( is_readable($site_footer) ) {
+                include($site_footer);
+            }
+        }
         print '</body></html>';
     } // end include_footer()
 
     //////////////////////////////////////////////////////////
     function include_menu() {
         $space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
-		print ''
-		. '<div class="menu" style="font-weight:bold;">'
-		. '<span class="nobr">'
-		. '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
-		. '</span>'
-		. $space
-		. '<a href="' . $this->url('categories') . '">' . $this->get_categories_count() . '&nbsp;Categories</a>'
-		. $space
-		. '<a href="' . $this->url('reviews') . '">' . $this->get_total_review_count() . '&nbsp;Reviews</a>'
-		. $space
-		. $this->get_image_count() . '&nbsp;files'
-		. $space
-		. '<a href="'. $this->url('about') . '">About</a>'
-		. $space
-		. '<a href="' . $this->url('contact') . '">Contact</a>'
-		. '</div>'
-		;
+        print ''
+        . '<div class="menu" style="font-weight:bold;">'
+        . '<span class="nobr">'
+        . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+        . '</span>'
+        . $space
+        . '<a href="' . $this->url('categories') . '">' . $this->get_categories_count() . '&nbsp;Categories</a>'
+        . $space
+        . '<a href="' . $this->url('reviews') . '">' . $this->get_total_review_count() . '&nbsp;Reviews</a>'
+        . $space
+        . $this->get_image_count() . '&nbsp;files'
+        . $space
+        . '<a href="'. $this->url('about') . '">About</a>'
+        . $space
+        . '<a href="' . $this->url('contact') . '">Contact</a>'
+        . '</div>'
+        ;
 
     }  // end function include_menu()
         
     //////////////////////////////////////////////////////////
     function include_small_menu() {
-		$space = ' &nbsp; &nbsp; ';
+        $space = ' &nbsp; &nbsp; ';
         print ''
         . '<div class="menu" style="font-weight:bold;">'
           . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
@@ -185,7 +188,7 @@ class smt_utils {
             . $space
             . '<a href="' . $this->url('reviews') . '">Reviews</a>'
             . $space
-			. '<a href="' . $this->url('about') . '">About</a>'
+            . '<a href="' . $this->url('about') . '">About</a>'
           . '</div>'
         . '</div>'
         ;
@@ -643,7 +646,7 @@ class smt EXTENDS smt_site_utils {
 
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
-	var $menu_play; // text for 'rate a file' menu option
+    var $menu_play; // text for 'rate a file' menu option
 
     //////////////////////////////////////////////////////////
     function __construct( $title='' ) {
@@ -667,11 +670,11 @@ class smt EXTENDS smt_site_utils {
             $this->debug('Site URL Not Set.  Using: ' . $this->site_url);
         }
 
-		if( isset($setup['menu_play']) ) {
-			$this->menu_play = $setup['menu_play'];
-		} else {
-			$this->menu_play = 'Rate a file';
-		}
+        if( isset($setup['menu_play']) ) {
+            $this->menu_play = $setup['menu_play'];
+        } else {
+            $this->menu_play = 'Rate a file';
+        }
 
         $this->set_site_name();
         
@@ -688,10 +691,10 @@ class smt EXTENDS smt_site_utils {
             'contact'    => $this->site_url . 'contact.php',
             'tag'        => $this->site_url . 'tag.php',
         );
-		
-		if( isset($_GET['logoff']) ) {
-			$this->admin_logoff();
-		}
+        
+        if( isset($_GET['logoff']) ) {
+            $this->admin_logoff();
+        }
     }
 
     //////////////////////////////////////////////////////////
@@ -796,8 +799,8 @@ class smt EXTENDS smt_site_utils {
         . $this->display_admin_functions( $media['pageid'] )
         //. '<br />'
         . '<div class="thumbnail_reviews left">'
-		. $this->get_reviews( $media['pageid'] ) 
-		. '</div>'
+        . $this->get_reviews( $media['pageid'] ) 
+        . '</div>'
         . '</div>';
         return $r;
     }
@@ -898,21 +901,21 @@ class smt EXTENDS smt_site_utils {
     }
 
     //////////////////////////////////////////////////////////
-	function is_admin() {
+    function is_admin() {
         if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1 ) {
             return TRUE;
         }
-		return FALSE;
-	}
+        return FALSE;
+    }
 
     //////////////////////////////////////////////////////////
-	function admin_logoff() {
-		if( !$this->is_admin() ) {
-			return;
-		}
-		unset($_COOKIE['admin']);
-		setcookie('admin', null, -1, '/');
-	}
+    function admin_logoff() {
+        if( !$this->is_admin() ) {
+            return;
+        }
+        unset($_COOKIE['admin']);
+        setcookie('admin', null, -1, '/');
+    }
 
     //////////////////////////////////////////////////////////
     function display_admin_functions( $media_id ) {
@@ -940,7 +943,7 @@ class smt EXTENDS smt_site_utils {
         if( !$cats ) { $r .= '<em>Uncategorized</em>'; }
         foreach($cats as $cat ) {
             $r .= ''
-			//. '+'
+            //. '+'
             . '<a href="' . $this->url('category') 
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
             . $this->strip_prefix($cat) . '</a><br />';
