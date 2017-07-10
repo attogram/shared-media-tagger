@@ -18,8 +18,10 @@ print '<div class="box white">';
 
 
 if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
+
 	$category_name = $smt->category_urldecode($_GET['i']);
-	$cat_url = '<a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($category_name) . '">'
+
+	$cat_url = '<a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
 	. htmlentities($smt->strip_prefix($category_name)) . '</a>';
 	
 	print '<p>Importing media from <b>' . $cat_url . '</b></p>';

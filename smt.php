@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.15');
+define('__SMT__', '0.4.16');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -226,9 +226,9 @@ class smt_database_utils EXTENDS smt_utils {
             $this->debug('::query_as_array(): ERROR PREPARE'); // '. $this->db->errorInfo()[2]);
             return array();
         }
-        while( $x = each($bind) ) {
-            $this->debug('::query_as_array(): bindParam '. $x[0] .' = ' . $x[1]);
-            $statement->bindParam( $x[0], $x[1]);
+        while( $xbind = each($bind) ) {
+            $this->debug('::query_as_array(): bindParam '. $xbind[0] .' = ' . $xbind[1]);
+            $statement->bindParam( $xbind[0], $xbind[1]);
         }    
         if( !$statement->execute() ) {
             $this->error('::query_as_array(): ERROR EXECUTE: '
@@ -237,14 +237,14 @@ class smt_database_utils EXTENDS smt_utils {
             return array();
         }
         $this->sql_count++;
-        $r = $statement->fetchAll(PDO::FETCH_ASSOC);
-        if( !$r && $this->db->errorCode() != '00000') { 
+        $response = $statement->fetchAll(PDO::FETCH_ASSOC);
+        if( !$response && $this->db->errorCode() != '00000') { 
             $this->error('::query_as_array(): ERROR FETCH: '.print_r($this->db->errorInfo(),1));
-            $r = array();
+            $response = array();
         }
-        $this->debug('::query_as_array(): OK. rowcount=' . count($r) );
-        $this->debug('query_as_array: result: ' . print_r($r,1) );
-        return $r;
+        $this->debug('::query_as_array(): OK. rowcount=' . count($response) );
+        $this->debug('query_as_array: result: ' . print_r($response,1) );
+        return $response;
     }
 
     //////////////////////////////////////////////////////////
@@ -258,9 +258,9 @@ class smt_database_utils EXTENDS smt_utils {
         }
         $this->debug('::query_as_bool(): bind: '.print_r($bind,1));
 
-        while( $x = each($bind) ) {
-            $this->debug('::query_as_bool: bindParam: ' . $x[0] . ' = ' . htmlentities($x[1]));
-            $statement->bindParam( $x[0], $x[1] );
+        while( $xbind = each($bind) ) {
+            $this->debug('::query_as_bool: bindParam: ' . $xbind[0] . ' = ' . htmlentities($xbind[1]));
+            $statement->bindParam( $xbind[0], $xbind[1] );
         }    
         
         if( !$statement->execute() ) {
@@ -314,12 +314,12 @@ class smt_database EXTENDS smt_database_utils {
 
     //////////////////////////////////////////////////////////
     function set_site_name() {
-        $r = $this->query_as_array('SELECT name FROM site WHERE id = 1');
-        if( !$r || !isset($r[0]['name']) ) {
+        $response = $this->query_as_array('SELECT name FROM site WHERE id = 1');
+        if( !$response || !isset($response[0]['name']) ) {
             $this->site_name = 'Shared Media Tagger';
             return FALSE;
         }
-        $this->site_name = $r[0]['name'];
+        $this->site_name = $response[0]['name'];
         return TRUE;
     }
 
@@ -363,29 +363,29 @@ class smt_database EXTENDS smt_database_utils {
         if( isset($this->image_count) && !$redo ) {
             return $this->image_count;
         }
-        $x = $this->query_as_array('SELECT count(pageid) AS count FROM media');
-        if( !$x ) { 
+        $response = $this->query_as_array('SELECT count(pageid) AS count FROM media');
+        if( !$response ) { 
             $this->debug('::get_image_count() ERROR query failed.'); 
             return 0; 
         }
-        return $this->image_count = $x[0]['count'];
+        return $this->image_count = $response[0]['count'];
     }
     
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
-        $c = $this->query_as_array(
+        $response = $this->query_as_array(
             'SELECT id, name, pageid, files, subcats FROM category WHERE name = :name', 
             array(':name'=>$name) 
         );
-        if( !isset($c[0]['id']) ) {
+        if( !isset($response[0]['id']) ) {
             return array();
         }
-        return $c[0];
+        return $response[0];
     }
     
     //////////////////////////////////////////////////////////
     function get_category_size( $category_name ) {
-        $c = $this->query_as_array(
+        $response = $this->query_as_array(
             'SELECT count(c2m.id) AS size 
             FROM category2media AS c2m, category AS c
             WHERE c.name = :name
@@ -393,10 +393,10 @@ class smt_database EXTENDS smt_database_utils {
             ', 
             array(':name'=>$category_name)
         );    
-        if( !isset($c[0]['size']) ) {
+        if( !isset($response[0]['size']) ) {
             return 0;
         }
-        return $c[0]['size'];        
+        return $response[0]['size'];        
     }
     
     //////////////////////////////////////////////////////////
@@ -404,27 +404,26 @@ class smt_database EXTENDS smt_database_utils {
         if( isset($this->category_count) && !$redo ) {
             return $this->category_count;
         }
-        $x = $this->query_as_array('
+        $response = $this->query_as_array('
             SELECT count( distinct(category_id) ) AS count 
             FROM category2media');
-        if( !$x ) { 
+        if( !$response ) { 
             $this->debug('::get_categories_count() ERROR query failed'); 
             return 0; 
         }
-        return $this->category_count = $x[0]['count'];        
+        return $this->category_count = $response[0]['count'];        
     }
 
     //////////////////////////////////////////////////////////
     function get_category_list() { 
-        //$this->debug("::get_category_list()");
         $sql = 'SELECT name FROM category ORDER BY name';
-        $x = $this->query_as_array( $sql );
-        $r = array();
-        if( !$x || !is_array($x) ) { return $r; } 
-        while( $y = each($x) ) { 
-            $r[] = $y['value']['name'];
+        $response = $this->query_as_array( $sql );
+        $return = array();
+        if( !$response || !is_array($response) ) { return $return; } 
+        while( $name = each($response) ) { 
+            $return[] = $name['value']['name'];
         } 
-        return $r;
+        return $return;
  
     }
 
@@ -435,19 +434,19 @@ class smt_database EXTENDS smt_database_utils {
         if( !$pageid|| !$this->is_positive_number($pageid) ) {
             return $error;
         }
-        $c = $this->query_as_array(
+        $response = $this->query_as_array(
             'SELECT category.name
             FROM category, category2media
             WHERE category2media.category_id = category.id
             AND category2media.media_pageid = :pageid',
             array(':pageid'=>$pageid)            
         );
-        if( !isset( $c[0]['name'] ) ) {
-            $this->error('::get_image_categories: ' . print_r($c,1) );
+        if( !isset( $response[0]['name'] ) ) {
+            $this->error('::get_image_categories: ' . print_r($response,1) );
             return $error;
         }
         $cats = array();
-        foreach( $c as $cat ) {
+        foreach( $response as $cat ) {
             $cats[] = $cat['name'];
         }
         return $cats;
@@ -455,15 +454,15 @@ class smt_database EXTENDS smt_database_utils {
 
     //////////////////////////////////////////////////////////
     function get_category_id_from_name( $category_name ) {
-        $c = $this->query_as_array(
+        $response = $this->query_as_array(
             'SELECT id FROM category WHERE name = :name', 
             array(':name'=>$category_name)
         );
 
-        if( !isset($c[0]['id']) ) {
+        if( !isset($response[0]['id']) ) {
             return 0;
         }
-        return $c[0]['id'];
+        return $response[0]['id'];
     }
 
     //////////////////////////////////////////////////////////
@@ -473,26 +472,26 @@ class smt_database EXTENDS smt_database_utils {
             $this->error('::get_media_in_category: No ID found for: ' . $category_name);
             return array();
         }
-        $m = $this->query_as_array(
+        $response = $this->query_as_array(
             'SELECT media_pageid 
             FROM category2media
             WHERE category_id = :category_id
             ORDER BY media_pageid',
             array(':category_id'=>$category_id)
         );
-        if( $m === FALSE ) {
+        if( $response === FALSE ) {
             $this->notice('ERROR: unable to access categor2media table.');
             return array();
         }
-        if( !$m ) {
+        if( !$response ) {
             //$this->notice('get_media_in_category: No Media Found in ' . $category_name);
             return array();
         }
-        $r = array();
-        foreach( $m as $mp ) {
-            $r[] = $mp['media_pageid'];
+        $return = array();
+        foreach( $response as $media ) {
+            $return[] = $media['media_pageid'];
         }
-        return $r;
+        return $return;
     }
 
     //////////////////////////////////////////////////////////
@@ -577,9 +576,9 @@ class smt_database EXTENDS smt_database_utils {
         if( isset($this->total_files_reviewed_count) ) {
             return $this->total_files_reviewed_count;
         }        
-        $x = $this->query_as_array('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
-        if( isset($x[0]['total']) ) {
-            return $this->total_files_reviewed_count = $x[0]['total'];
+        $response = $this->query_as_array('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
+        if( isset($response[0]['total']) ) {
+            return $this->total_files_reviewed_count = $response[0]['total'];
         }
         return $this->total_files_reviewed_count = 0;        
     }
@@ -589,9 +588,9 @@ class smt_database EXTENDS smt_database_utils {
         if( isset($this->total_review_count) ) {
             return $this->total_review_count;
         }
-        $x = $this->query_as_array('SELECT SUM(count) AS total FROM tagging');
-        if( isset($x[0]['total']) ) {
-            return $this->total_review_count = $x[0]['total'];
+        $response = $this->query_as_array('SELECT SUM(count) AS total FROM tagging');
+        if( isset($response[0]['total']) ) {
+            return $this->total_review_count = $response[0]['total'];
         }
         return $this->total_review_count = 0;
     }
@@ -762,11 +761,8 @@ class smt EXTENDS smt_site_utils {
                 $thumb_url .= '.png';
                 break;
         }
-        
-        $r = array('url'=>$thumb_url, 'width'=>$thumb_width, 'height'=>$thumb_height);
 
-        //$this->notice($r);
-        return $r;
+        return array('url'=>$thumb_url, 'width'=>$thumb_width, 'height'=>$thumb_height);
     }
     
     //////////////////////////////////////////////////////////
@@ -785,7 +781,7 @@ class smt EXTENDS smt_site_utils {
 
     //////////////////////////////////////////////////////////
     function display_thumbnail_box( $media='' ) {
-        $r = '<div class="thumbnail_box">'
+        $return = '<div class="thumbnail_box">'
         . $this->display_thumbnail($media)
         . str_replace(
             ' / ', 
@@ -798,7 +794,7 @@ class smt EXTENDS smt_site_utils {
         . $this->get_reviews( $media['pageid'] ) 
         . '</div>'
         . '</div>';
-        return $r;
+        return $return;
     }
     
     
@@ -820,7 +816,7 @@ class smt EXTENDS smt_site_utils {
             $divwidth = $this->size_medium;
         }
         
-        $r = '<div style="width:' . $divwidth . 'px; margin:auto;">'
+        $return = '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<video width="'. $divwidth . '" height="' . $height . '" poster="' . $poster 
         . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
         . '<source src="' . $url . '" type="' . $mime . '">'
@@ -828,7 +824,7 @@ class smt EXTENDS smt_site_utils {
         . $this->display_attribution( $media )
         . $this->display_admin_functions( $media['pageid'] )
         . '</div>';
-        return $r;
+        return $return;
     }
 
     //////////////////////////////////////////////////////////
@@ -849,7 +845,7 @@ class smt EXTENDS smt_site_utils {
             $divwidth = $this->size_medium;
         }
         
-        $r = '<div style="width:' . $divwidth . 'px; margin:auto;">'
+        $return = '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<audio width="'. $width . '" height="' . $height . '" poster="' . $poster 
         . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
         . '<source src="' . $url . '" type="' . $mime . '">'
@@ -857,7 +853,7 @@ class smt EXTENDS smt_site_utils {
         . $this->display_attribution( $media )
         . $this->display_admin_functions( $media['pageid'] )        
         . '</div>';
-        return $r;    
+        return $return;    
     }
     
     //////////////////////////////////////////////////////////
@@ -936,10 +932,10 @@ class smt EXTENDS smt_site_utils {
         }
         $cats = $this->get_image_categories( $media_id );
         $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
-        if( !$cats ) { $r .= '<em>Uncategorized</em>'; }
+        if( !$cats ) { $response .= '<em>Uncategorized</em>'; }
         foreach($cats as $cat ) {
             $response .= ''
-            //. '+'
+            . '+'
             . '<a href="' . $this->url('category') 
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
             . $this->strip_prefix($cat) . '</a><br />';
@@ -968,15 +964,15 @@ class smt EXTENDS smt_site_utils {
             return 'unreviewed';
         }
         $review_count = 0;
-        $r = '';
+        $response = '';
         foreach( $reviews as $review ) {
-            $r .= '<div class="tag' . $review['position'] . '">'
+            $response .= '<div class="tag' . $review['position'] . '">'
             . '+<b>' . $review['count'] . '</b> ' . $review['name'] . '</div>';
             $review_count += $review['count'];
         }
-        $r = '<div style="display:inline-block; text-align:left;">'
-        . '<em><b>' . $review_count . '</b> reviews</em>' . $r . '</div>';
-        return $r;        
+        $response = '<div style="display:inline-block; text-align:left;">'
+        . '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
+        return $response;        
     }
 
     /////////////////////////////////////////////////////////
@@ -1000,8 +996,7 @@ class smt EXTENDS smt_site_utils {
                 $licenseshortname = 'Public Domain';
                 $copyright = ''; break;
         }        
-        $r = "$copyright $artist / $licenseshortname";
-        return $r;
+        return "$copyright $artist / $licenseshortname";
     }
 
     //////////////////////////////////////////////////////////
