@@ -39,12 +39,12 @@ class smt_admin_database extends smt {
             $this->error('::save_images_to_database: no category'); 
             return FALSE; 
         }
-        $cr = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
-        if( !$cr || !isset($cr[0]['id']) ) {
+        $cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
+        if( !$cat_id || !isset($cat_id[0]['id']) ) {
             $this->error('::save_images_to_database: unable to get category id: ' . $category); 
             return FALSE;             
         }
-        $category_id = $cr[0]['id'];
+        $category_id = $cat_id[0]['id'];
         $this->notice('::save_images_to_database: ' . sizeof($images) . ' images to insert from ' 
             . $category. ' (id:' . $category_id . ')');
             
@@ -353,25 +353,20 @@ class smt_commons_API extends smt_admin_database {
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
         $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
-
 		if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; } 
-        //if( !$key ) { $this->error('::call_commons: ERROR: no key'); return FALSE; } 
-        $x = file_get_contents($url);
-        if( $x === FALSE ) {
+        $get_response = file_get_contents($url);
+        if( $get_response === FALSE ) {
             $this->error('::call_commons: ERROR: get failed');
             return FALSE;
         }
-        $this->debug('::call_commons: called: ' . $url);
-        $this->debug($x);
         $this->api_count++;
-        $raw_response = json_decode($x,TRUE); // assoc
+        $raw_response = json_decode($get_response,TRUE); // assoc
         if( !$raw_response ) {
             $this->error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error() );
             $this->error('::call_commons: ERROR: ' . $this->smt_json_last_error_msg() );
             return FALSE;
         }
         $this->commons_response = $raw_response;
-        //$this->notice('::call_commons: response:' . print_r($this->commons_response,1) );
         
         if( !$d['query'][$key] || !is_array($d['query'][$key])  ) { 
             $this->error("::call_commons: WARNING: missing key: $key");

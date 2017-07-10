@@ -201,15 +201,15 @@ function delete_category($smt) {
 		'DELETE FROM category WHERE id = :category_id',
 		'DELETE FROM category2media WHERE category_id = :category_id',
 	);
-	$r = array();
+	$response = array();
 	foreach( $sql as $s ) {
 		if( $smt->query_as_bool($s, array(':category_id'=>$category_id) ) ) {
-			$r[] = 'Delete OK  : ' . $s;
+			$response[] = 'Delete OK  : ' . $s;
 		} else {
-			$r[] = 'Delete FAIL: ' . $s;
+			$response[] = 'Delete FAIL: ' . $s;
 		}
 	}
-	$smt->notice($r);
+	$smt->notice($response);
 	return;
 }
 
