@@ -12,6 +12,9 @@ $smt->include_menu();
 $smt->include_admin_menu();
 print '<div class="box white"><p>Media Admin:</p>';
 
+if( isset($_GET['media'])  ) {
+	print multi_delete_media($_GET['media']) . '<hr />';
+}
 
 if( isset($_GET['dm']) ) {
 	print $smt->delete_media($_GET['dm']) . '<hr />';
@@ -22,6 +25,20 @@ if( isset($_GET['dc']) ) {
 	$smt->vacuum();
 }
 
+
+////////////////////////////////////////////////////
+function multi_delete_media( $list ) {
+	global $smt;
+	if( !is_array($list) ) {
+		$smt->error('multi_delete_media: No list array found');
+		return FALSE;
+	}
+	$response = '<p>Deleting &amp; Blocking ' . sizeof($list) . ' Media files:';
+	foreach( $list as $media_id ) {
+		$response .= $smt->delete_media($media_id);
+	}
+	return $response;
+}
 // MENU ////////////////////////////////////////////
 ?>
 <form action="" method="GET">

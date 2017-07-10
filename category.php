@@ -84,14 +84,19 @@ print '<div class="box white">'
 	. '</p><br clear="all" />'
 	;
 
+if( $smt->is_admin() ) {
+	print '<form action="' . $smt->url('admin') .'media.php" method="GET">';
+}
+
 foreach( $i as $media ) {
 	print $smt->display_thumbnail_box( $media );
-
 }
  
-print '<br /><br />' . $pager;
+if( $smt->is_admin() ) {
+	print '<p><input type="submit" value="Delete selected media"></p></form>';
+}
+
+print '<p>' . $pager . '</p>';
+
 print '</div>';
 $smt->include_footer();
-
-
-	
