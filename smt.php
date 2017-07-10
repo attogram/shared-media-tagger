@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.11');
+define('__SMT__', '0.4.12');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -357,7 +357,7 @@ class smt_database EXTENDS smt_database_utils {
             }
         }
         $sql = 'SELECT * FROM media ORDER BY RANDOM() LIMIT :limit';
-        return $this->query_as_array( $sql , $bind = array( 'limit'=>$limit ) );
+        return $this->query_as_array($sql, array('limit'=>$limit));
     }
     
     //////////////////////////////////////////////////////////
@@ -735,10 +735,8 @@ class smt EXTENDS smt_site_utils {
             //$this->notice("WARNING: TALL THUMB");
         }
         
-        
-        $title = $media['title'];
+        //$title = $media['title'];
         $mime = $media['mime'];
-
 
         $filename = $this->strip_prefix($media['title']);
         $filename = str_replace(' ','_',$filename);
@@ -847,7 +845,7 @@ class smt EXTENDS smt_site_utils {
             $height = $this->get_resized_height( $width, $height, $this->size_medium );
             $width = $this->size_medium; 
         }
-        $infourl = $this->url('info') . '?i=' . $media['pageid'];
+        //$infourl = $this->url('info') . '?i=' . $media['pageid'];
         $divwidth = $width = $media['thumbwidth'];
         if( $divwidth < $this->size_medium )  {
             $divwidth = $this->size_medium;

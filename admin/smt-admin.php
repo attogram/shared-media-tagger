@@ -166,17 +166,17 @@ class smt_admin_database extends smt {
     
     //////////////////////////////////////////////////////////
     function empty_media_tables() {
-        $sql = array(
+        $sqls = array(
             'DELETE FROM tagging',
             'DELETE FROM category2media',
             'DELETE FROM media',
         );
         $response = array();
-        foreach( $sql as $s ) {
-            if( $this->query_as_bool($s, $bind=array() ) ) {
-                $response[] = 'OK: ' . $s;
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql) ) {
+                $response[] = 'OK: ' . $sql;
             } else {
-                $response[] = 'FAIL: ' . $s;
+                $response[] = 'FAIL: ' . $sql;
             }
         }
         $this->vacuum();
@@ -558,34 +558,6 @@ class smt_commons_API extends smt_admin_database {
         }
         
         return $pages;
-    }
-
-    //////////////////////////////////////////////////////////
-    function get_api_image($pageids='',$titles='') {
-        $this->debug("::get_api_image($pageids)");
-        //if( !$pageids || !$this->is_number($pageids) ) {  // needs to allow  123|456|789  format
-        if( !$pageids && !$titles) { 
-            $this->debug('::get_api_image: Error: missing pageids or titles');
-            return false; 
-        } 
-        if( $pageids && $titles) { 
-            $this->debug('::get_api_image: Error: pageids AND titles');
-            return false; 
-        } 
-    
-        $call = $this->commons_api_url . '?action=query&format=json&iilimit=500'
-            . $this->prop_imageinfo
-            . '&iiurlwidth=' . $this->size_medium;
-
-        if( $pageids ){ $call .= '&pageids=' . $pageids; } 
-        if( $titles ){ $call .= '&titles=' . urlencode($titles); } 
-
-        if( !$this->call_commons($call, 'pages') ) { 
-            $this->error('::get_api_image: ERROR call');
-            return false;
-        } 
-        $this->save_images_to_database($r);
-        return $this->commons_response;
     }
 
     //////////////////////////////////////////////////////////

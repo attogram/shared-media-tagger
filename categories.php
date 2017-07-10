@@ -73,7 +73,7 @@ function print_disabled_category_table( $smt, $cats ) {
 	print '
 <table border="1">
 <tr style="background-color:lightgrey;">
- <td style="padding:4px;"><b>' . sizeof($cats) . ' ' . $title . '</b> Categories</td>
+ <td style="padding:4px;"><b>' . sizeof($cats) . '</b> Categories in curation que:</td>
 </tr>
 <tr>
 <td>';
@@ -110,8 +110,7 @@ foreach( $smt->get_tags() as $tag ) {
 	foreach( $cats as $c ) {
 		$local_url = $smt->url('category') 
 			. '?c=' . $smt->category_urlencode( $smt->strip_prefix( $c['name'] ));
-		$commons_url = 'https://commons.wikimedia.org/wiki/' 
-			. $smt->category_urlencode($c['name']);
+		//$commons_url = 'https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']);
 		print '<tr>';
 		
 
