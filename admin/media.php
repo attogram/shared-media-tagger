@@ -87,7 +87,7 @@ function delete_media( $pageid ) {
 	$bind = array(':pageid'=>$pageid);
 
 	foreach( $sql as $s ) {
-		if( $x = $smt->query_as_bool($s, $bind) ) {
+		if( $smt->query_as_bool($s, $bind) ) {
 			$r .= '<br />OK: ' . $s;
 		} else {
 			$r .= '<br />ERROR: ' . $s;

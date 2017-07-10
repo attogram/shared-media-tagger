@@ -14,7 +14,7 @@ class smt_admin_database extends smt {
         }     
         $r = $this->query_as_bool( 
             'INSERT OR IGNORE INTO category (name) VALUES (:name)', 
-            $bind = array(':name'=>$name) 
+            array(':name'=>$name) 
         ); 
         if( !$r ) {
             $this->error('::insert_category: insert into category table failed: name=' . $name);
@@ -353,8 +353,9 @@ class smt_commons_API extends smt_admin_database {
 
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
-        $this->debug("::call_commons: url=$url key=$key)");
-        if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; } 
+        $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
+
+		if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; } 
         //if( !$key ) { $this->error('::call_commons: ERROR: no key'); return FALSE; } 
         $x = file_get_contents($url);
         if( $x === FALSE ) {
@@ -364,7 +365,7 @@ class smt_commons_API extends smt_admin_database {
         $this->debug('::call_commons: called: ' . $url);
         $this->debug($x);
         $this->api_count++;
-        $d = json_decode($x,$assoc=TRUE);
+        $d = json_decode($x,TRUE); // assoc
         if( !$d ) {
             $this->error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error() );
             $this->error('::call_commons: ERROR: ' . $this->smt_json_last_error_msg() );
@@ -421,7 +422,7 @@ class smt_commons_API extends smt_admin_database {
         . '&srprop=size|snippet' // titlesnippet|timestamp|title
         . '&srlimit=500' // max 50 for bots
         . '&srsearch=' . urlencode($search);
-        $r = $this->call_commons($call, $key='search');
+        $r = $this->call_commons($call, 'search');
         //$this->notice('::find_categories: RAW return: ' . print_r($this->commons_response,1) );
         if( !$r || !is_array($r) ) {
             $this->error('::find_categories: nothing found');
@@ -440,7 +441,7 @@ class smt_commons_API extends smt_admin_database {
         $call = $this->commons_api_url . '?action=query&format=json'
         . '&prop=categoryinfo'
         . '&titles=' . urlencode($category);    // cicontinue            
-        $r = $this->call_commons($call, $key='pages');
+        $r = $this->call_commons($call, 'pages');
         //$this->notice('::get_category_info: RAW return: ' . print_r($this->commons_response,1) );
         if( !$r || !is_array($r) ) {
             $this->error('::get_category_info: nothing found');
@@ -462,7 +463,7 @@ class smt_commons_API extends smt_admin_database {
         . '&cmprop=title'
         . '&cmlimit=500'
         . '&cmtitle=' . urlencode($category) ;
-        $d = $this->call_commons($call, $key='categorymembers');
+        $d = $this->call_commons($call, 'categorymembers');
         if( !$d || !isset($this->commons_response['query']['categorymembers']) || !is_array($this->commons_response['query']['categorymembers']) ) {
             $this->error('::get_subcats: Nothing Found');
             return FALSE;
@@ -470,20 +471,19 @@ class smt_commons_API extends smt_admin_database {
         foreach( $this->commons_response['query']['categorymembers'] as $subcat ) {
             $this->insert_category( $subcat['title'] );
         }
-        
-
     }
     
     //////////////////////////////////////////////////////////
-    function get_media_from_category($category='') {
+    function get_media_from_category( $category='' ) {
         
-        $this->notice("::get_media_from_category( $category )");
+        $this->notice("::get_media_from_category( 1: $category )");
         $category = trim($category);
         if( !$category ) { return false; } 
         $category = ucfirst($category);
         if ( !preg_match('/^[Category:]/i', $category)) { 
             $category = 'Category:' . $category; 
         } 
+        $this->notice("::get_media_from_category( 2: $category )");
         
         $categorymembers = $this->get_api_categorymembers( $category );
         if( !$categorymembers ) { 
@@ -492,10 +492,9 @@ class smt_commons_API extends smt_admin_database {
         }
         
         $chunks = array_chunk( $categorymembers, 50 );
-
         foreach( $chunks as $chunk ) {
             $this->notice('::get_media_from_category: TRY CHUNK: ' . sizeof($chunk));
-            $r = $this->save_images_to_database( $this->get_api_imageinfo($chunk), $category );    
+            $this->save_images_to_database( $this->get_api_imageinfo($chunk), $category );    
         }
     
     } // end function get_media_from_category()
@@ -509,7 +508,7 @@ class smt_commons_API extends smt_admin_database {
         . '&cmprop=ids'
         . '&cmlimit=500'
         . '&cmtitle=' . urlencode($category);
-        $call = $this->call_commons($url, $key='categorymembers');
+        $call = $this->call_commons($url, 'categorymembers');
         if( !$call || !isset( $this->commons_response['query']['categorymembers']) ) { 
             $this->error('::get_api_categorymembers: ERROR: call');
             return array();
@@ -534,7 +533,7 @@ class smt_commons_API extends smt_admin_database {
         . '&iiurlwidth=' . $this->size_medium
         . '&iilimit=50'
         . '&pageids=' . implode('|',$pageids);
-        $r = $this->call_commons($call, $key='pages');
+        $r = $this->call_commons($call, 'pages');
         if( !$r || !isset($this->commons_response['query']['pages']) ) { 
             $this->error('::get_api_imageinfo: ERROR: call');
             return array();
@@ -580,7 +579,7 @@ class smt_commons_API extends smt_admin_database {
         . '&srsearch=' . urlencode($search)
         ;
 
-        $r = $this->call_commons($call, $key='search');
+        $r = $this->call_commons($call, 'search');
         $totalhits = $this->commons_response['query']['searchinfo']['totalhits'];
         $this->debug("::get_api_images_by_search: totalhits=$totalhits");
 
@@ -595,7 +594,7 @@ class smt_commons_API extends smt_admin_database {
 
         reset($category);
         while( list(,$x) = each($category) ) {
-            $ic = $this->insert_category($x);
+            $this->insert_category($x);
         }     
 
         $this->notice('Categories: ' . print_r($category,1));
@@ -604,6 +603,8 @@ class smt_commons_API extends smt_admin_database {
         $ir = $this->get_api_image(false, implode('|',$file) );
 
         $this->notice('IMPORT DONE: ' . print_r($ir,1) );
+		
+		$this->include_footer();
         exit;
     }
 
@@ -627,7 +628,7 @@ class smt_commons_API extends smt_admin_database {
         if( $pageids ){ $call .= '&pageids=' . $pageids; } 
         if( $titles ){ $call .= '&titles=' . urlencode($titles); } 
 
-        $r = $this->call_commons($call, $key='pages');
+        $r = $this->call_commons($call, 'pages');
         if( !$r ) { 
             $this->error('::get_api_image: ERROR call');
             return false;

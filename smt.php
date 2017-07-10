@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.9');
+define('__SMT__', '0.4.10');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -1023,4 +1023,3 @@ class smt EXTENDS smt_site_utils {
     }
 
 } // END class smt 
-

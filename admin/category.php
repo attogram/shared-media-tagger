@@ -16,14 +16,21 @@ print '<div class="box white">';
 
 ///////////////////////////////////////////////////////////////////////////////
 
-if( isset($_GET['i']) && $_GET['i'] ) {
-	import_images_from_category($smt);
-	$this->vacuum();
+
+if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
+	$category_name = $smt->category_urldecode($_GET['i']);
+	print 'Importing media from '
+	. ' <b><a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($category_name) . '">'
+	. htmlentities($smt->strip_prefix($category_name)) . '</a></b>';
+	$smt->get_media_from_category( $category_name );
+	print '</div>';
+	$smt->include_footer();
+	exit;
 }
 
 if( isset($_POST['cats']) && $_POST['cats'] ) {
 	import_categories($smt);
-	$this->vacuum();
+	$smt->vacuum();
 }
 
 if( isset($_GET['c']) && $_GET['c'] ) {
@@ -32,7 +39,7 @@ if( isset($_GET['c']) && $_GET['c'] ) {
 
 if( isset($_GET['d']) && $_GET['d'] ) {
 	delete_category($smt);
-	$this->vacuum();
+	$smt->vacuum();
 }
 
 if( isset($_GET['s']) && $_GET['s'] ) { 
@@ -257,9 +264,8 @@ function get_search_results($smt) {
 ///////////////////////////////////////////////////////////////////////////////
 function import_categories($smt) {
 	print '<p>Saving categories to database:</p>';
-	foreach( $_POST['cats'] as $p ) {
-		$name = $smt->category_urldecode($p);
-		$r = $smt->insert_category( $name );
+	foreach( $_POST['cats'] as $cat ) {
+		$smt->insert_category( $smt->category_urldecode($cat) );
 	}
 	print '</div>';
 	$smt->include_footer();
@@ -270,12 +276,12 @@ function import_categories($smt) {
 function get_category_info($smt) {
 	$c = urldecode($_GET['c']);
 	//print '<p>Category Info: <b>' . $c . '</b></p>';
-	$r = $smt->get_category_info($c);	
-	if( !$r ) { 
+	$cats = $smt->get_category_info($c);	
+	if( !$cats ) { 
 		$smt->error('failed to get category info'); 
 		return; 
 	}
-	foreach( $r as $c ) {
+	foreach( $cats as $c ) {
 		$title = $c['title'];
 		$pageid = $c['pageid'];
 		$files = $c['categoryinfo']['files'];
@@ -292,21 +298,4 @@ function get_category_info($smt) {
 			$smt->notice("::get_category_info: error updateing category: title:$title pageid:$pageid files:$files subcats:$subcats");
 		}
 	}
-
-}
-	
-///////////////////////////////////////////////////////////////////////////////
-function import_images_from_category($smt) {
-	$category_name = $smt->category_urldecode($_GET['i']);
-	$category_name = $smt->strip_prefix($category_name);
-	
-	print 'Importing media from <b><a href="' . $smt->url('category') . '?c='
-	. $smt->category_urlencode($category_name)
-	. '">'
-	. htmlentities($category_name)
-	. '</a></b>';
-	$r = $smt->get_media_from_category( $category_name );
-	print '</div>';
-	$smt->include_footer();
-	exit;	
-}
+}// end function get_category_info
