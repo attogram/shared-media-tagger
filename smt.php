@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.13');
+define('__SMT__', '0.4.14');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -80,9 +80,7 @@ class smt_utils {
         if( strlen($string) <= $length ) {
             return $string;
         }
-        $last = substr( $string, -8);
-        $r = substr( $string, 0, $length-11 ) . '...' . $last;
-        return $r;
+        return substr( $string, 0, $length-11 ) . '...' . substr( $string, -8);
     }
 
     //////////////////////////////////////////////////////////
@@ -533,11 +531,11 @@ class smt_database EXTENDS smt_database_utils {
             $sql .= ' WHERE tag_id = :tag_id';
             $bind[':tag_id'] = $tag_id;
         }
-        $c = $this->query_as_array($sql, $bind);
-        if( !isset($c[0]['count']) ) {
+        $count = $this->query_as_array($sql, $bind);
+        if( !isset($count[0]['count']) ) {
             return '0';
         }
-        return $c[0]['count'];
+        return $count[0]['count'];
     }
         
     /////////////////////////////////////////////////////////
@@ -937,31 +935,31 @@ class smt EXTENDS smt_site_utils {
             return FALSE;
         }
         $cats = $this->get_image_categories( $media_id );
-        $r = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
+        $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
         if( !$cats ) { $r .= '<em>Uncategorized</em>'; }
         foreach($cats as $cat ) {
-            $r .= ''
+            $response .= ''
             //. '+'
             . '<a href="' . $this->url('category') 
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
             . $this->strip_prefix($cat) . '</a><br />';
         }
-        return $r . '</div>';
+        return $response . '</div>';
     }
     
     //////////////////////////////////////////////////////////
     function display_tags( $media_id ) {
         $tags = $this->get_tags();        
-        $r = '<div style="display:block; margin:auto;">';
+        $response = '<div style="display:block; margin:auto;">';
         foreach( $tags as $tag ) {
-            $r .=  ''
+            $response .=  ''
             . '<div class="tagbutton tag' . $tag['position'] . '">'
             . '<a href="' . $this->url('tag') . '?m=' . $media_id 
                 . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">' 
             . $tag['display_name']
             . '</a></div>';
         }
-        return $r . '</div>'; 
+        return $response . '</div>'; 
     }
 
     /////////////////////////////////////////////////////////

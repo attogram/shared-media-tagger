@@ -54,50 +54,50 @@ class smt_admin_database extends smt {
         
         while( list(,$image) = each($images) ) {
 
-            $i = array();
+            $new = array();
     
-            $i[':pageid'] = @$image['pageid'];
-            $i[':title'] = @$image['title'];    
-            $i[':url'] = @$image['imageinfo'][0]['url'];
-            if( !isset($i[':url']) || $i[':url'] == '' ) {
+            $new[':pageid'] = @$image['pageid'];
+            $new[':title'] = @$image['title'];    
+            $new[':url'] = @$image['imageinfo'][0]['url'];
+            if( !isset($new[':url']) || $new[':url'] == '' ) {
                 $this->error('::save_images_to_database: ERROR SKIPPING: pageid=' 
-                    . @$i[':pageid'] . ' title=' . @$i[':title'] ); 
-                $errors[ $i[':pageid'] ] = $i[':title'];
+                    . @$new[':pageid'] . ' title=' . @$new[':title'] ); 
+                $errors[ $new[':pageid'] ] = $new[':title'];
                 continue;
             }    
             
-            $i[':descriptionurl'] = @$image['imageinfo'][0]['descriptionurl'];
-            $i[':descriptionshorturl'] = @$image['imageinfo'][0]['descriptionshorturl'];
+            $new[':descriptionurl'] = @$image['imageinfo'][0]['descriptionurl'];
+            $new[':descriptionshorturl'] = @$image['imageinfo'][0]['descriptionshorturl'];
             
-            $i[':imagedescription'] = @$image['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
-            $i[':artist'] = @$image['imageinfo'][0]['extmetadata']['Artist']['value'];
-            $i[':datetimeoriginal'] = @$image['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
-            $i[':licenseshortname'] = @$image['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
-            $i[':usageterms'] = @$image['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
-            $i[':attributionrequired'] = @$image['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
-            $i[':restrictions'] = @$image['imageinfo'][0]['extmetadata']['Restrictions']['value'];
+            $new[':imagedescription'] = @$image['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
+            $new[':artist'] = @$image['imageinfo'][0]['extmetadata']['Artist']['value'];
+            $new[':datetimeoriginal'] = @$image['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
+            $new[':licenseshortname'] = @$image['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
+            $new[':usageterms'] = @$image['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
+            $new[':attributionrequired'] = @$image['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
+            $new[':restrictions'] = @$image['imageinfo'][0]['extmetadata']['Restrictions']['value'];
             
-            $i[':licenseuri'] = @$this->open_content_license_uri( $i[':licenseshortname'] );
-            $i[':licensename'] = @$this->open_content_license_name( $i[':licenseuri'] );
+            $new[':licenseuri'] = @$this->open_content_license_uri( $new[':licenseshortname'] );
+            $new[':licensename'] = @$this->open_content_license_name( $new[':licenseuri'] );
 
-            $i[':size'] = @$image['imageinfo'][0]['size'];
-            $i[':width'] = @$image['imageinfo'][0]['width'];
-            $i[':height'] = @$image['imageinfo'][0]['height'];
-            $i[':sha1'] = @$image['imageinfo'][0]['sha1'];
-            $i[':mime'] = @$image['imageinfo'][0]['mime'];
+            $new[':size'] = @$image['imageinfo'][0]['size'];
+            $new[':width'] = @$image['imageinfo'][0]['width'];
+            $new[':height'] = @$image['imageinfo'][0]['height'];
+            $new[':sha1'] = @$image['imageinfo'][0]['sha1'];
+            $new[':mime'] = @$image['imageinfo'][0]['mime'];
             
-            $i[':thumburl'] = @$image['imageinfo'][0]['thumburl'];
-            $i[':thumbwidth'] = @$image['imageinfo'][0]['thumbwidth'];
-            $i[':thumbheight'] = @$image['imageinfo'][0]['thumbheight'];
-            $i[':thumbmime'] = @$image['imageinfo'][0]['thumbmime'];
+            $new[':thumburl'] = @$image['imageinfo'][0]['thumburl'];
+            $new[':thumbwidth'] = @$image['imageinfo'][0]['thumbwidth'];
+            $new[':thumbheight'] = @$image['imageinfo'][0]['thumbheight'];
+            $new[':thumbmime'] = @$image['imageinfo'][0]['thumbmime'];
             
-            $i[':user'] = @$image['imageinfo'][0]['user'];
-            $i[':userid'] = @$image['imageinfo'][0]['userid'];
+            $new[':user'] = @$image['imageinfo'][0]['user'];
+            $new[':userid'] = @$image['imageinfo'][0]['userid'];
             
-            $i[':duration'] = @$image['imageinfo'][0]['duration'];
-            $i[':timestamp'] = @$image['imageinfo'][0]['timestamp'];
+            $new[':duration'] = @$image['imageinfo'][0]['duration'];
+            $new[':timestamp'] = @$image['imageinfo'][0]['timestamp'];
 
-            if( isset($i['mime']) && $i['mime'] == 'application/pdf' ) { 
+            if( isset($new['mime']) && $new['mime'] == 'application/pdf' ) { 
                 $this->notice('::save_images_to_database() ERROR: skipping pdf'); 
                 continue;
             }
@@ -120,26 +120,26 @@ class smt_admin_database extends smt {
                         :user, :userid, :duration, :timestamp
                     )";
 
-            $response = $this->query_as_bool($sql, $i);
+            $response = $this->query_as_bool($sql, $new);
             
             if( $response === FALSE) { 
                 $this->error('::save_images_to_database: FAILED insert into media table'); 
                 $this->error('::save_images_to_database: SQL: ' . $sql); 
-                $this->error('::save_images_to_database: BIND i: ' . print_r($i,1) ); 
+                $this->error('::save_images_to_database: BIND i: ' . print_r($new,1) ); 
                 exit;
                 continue;
             } else { 
-                $this->notice('::: SAVED: ' . $i[':pageid'] . ' ' . $i[':title'] );
+                $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
             }
             
             // connect category
             $response = $this->query_as_bool(
                 'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
-                array('category_id'=>$category_id, 'pageid'=>$i[':pageid'])
+                array('category_id'=>$category_id, 'pageid'=>$new[':pageid'])
             );
             if( !$response ) { 
                 $this->error('::save_images_to_database: insert into category2media table failed. pageid: '
-                . $i[':pageid']);
+                . $new[':pageid']);
             }
             
         }
@@ -343,7 +343,6 @@ class smt_admin_database extends smt {
         return $response;
     }
 
-
 } // END class smt_api
 
 //////////////////////////////////////////////////////////
@@ -353,7 +352,7 @@ class smt_commons_API extends smt_admin_database {
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
         $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
-		if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; } 
+        if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; } 
         $get_response = file_get_contents($url);
         if( $get_response === FALSE ) {
             $this->error('::call_commons: ERROR: get failed');
@@ -397,7 +396,7 @@ class smt_commons_API extends smt_admin_database {
             $this->error('::call_commons: ' . print_r($this->commons_response['warnings'],1) );
             $this->error('::call_commons: url: ' . $url);
         }
-   		return TRUE;     
+           return TRUE;     
     } // end function call_commons()
 
     //////////////////////////////////////////////////////////
@@ -450,9 +449,9 @@ class smt_commons_API extends smt_admin_database {
         . '&cmlimit=500'
         . '&cmtitle=' . urlencode($category) ;
         if( !$this->call_commons($call, 'categorymembers') 
-			|| !isset($this->commons_response['query']['categorymembers']) 
-			|| !is_array($this->commons_response['query']['categorymembers']) 
-		) {
+            || !isset($this->commons_response['query']['categorymembers']) 
+            || !is_array($this->commons_response['query']['categorymembers']) 
+        ) {
             $this->error('::get_subcats: Nothing Found');
             return FALSE;
         }
@@ -497,8 +496,8 @@ class smt_commons_API extends smt_admin_database {
         . '&cmlimit=500'
         . '&cmtitle=' . urlencode($category);
         if( !$this->call_commons($url, 'categorymembers') 
-			|| !isset( $this->commons_response['query']['categorymembers']) 
-		) { 
+            || !isset( $this->commons_response['query']['categorymembers']) 
+        ) { 
             $this->error('::get_api_categorymembers: ERROR: call');
             return array();
         }
@@ -523,8 +522,8 @@ class smt_commons_API extends smt_admin_database {
         . '&iilimit=50'
         . '&pageids=' . implode('|',$pageids);
         if( !$this->call_commons($call, 'pages') 
-			|| !isset($this->commons_response['query']['pages']) 
-		) { 
+            || !isset($this->commons_response['query']['pages']) 
+        ) { 
             $this->error('::get_api_imageinfo: ERROR: call');
             return array();
         }
@@ -608,33 +607,33 @@ class smt_admin extends smt_commons_API {
     //////////////////////////////////////////////////////////
     function include_admin_menu() {
         
-        $a = $this->url('admin');
-?>
-<div class="menu admin" >
-<a href="<?php print $a; ?>">ADMIN</a>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="<?php print $a; ?>site.php">SITE</a>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="<?php print $a; ?>category.php">CATEGORY</a>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="<?php print $a; ?>media.php">MEDIA</a>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="<?php print $a; ?>database.php">DATABASE</a>
-</div>
-<?php        
+        $admin = $this->url('admin');
+		$space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+		print '<div class="menu admin">'
+		. '<a href="' . $admin . '">ADMIN</a>'
+		. $space . '<a href="' . $admin . 'site.php">SITE</a>'
+		. $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
+		. $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
+		. $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
+		. '</div>';
+       
     } //end function include_admin_menu()
 
     //////////////////////////////////////////////////////////
     // modified from: https://github.com/gbv/image-attribution - MIT License
     function open_content_license_name($uri) {
-    if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
-        return "CC0";
-    } else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
-        return "Public Domain";
-    } else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
-        $license = "CC ".strtoupper($match[1])." ".$match[4];
-        if (isset($match[6])) $license .= " ".$match[6];
-        return $license;
-    } else {
-        return;
-    }
-}
+		if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
+			return "CC0";
+		} else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
+			return "Public Domain";
+		} else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
+			$license = "CC ".strtoupper($match[1])." ".$match[4];
+			if (isset($match[6])) $license .= " ".$match[6];
+			return $license;
+		} else {
+			return;
+		}
+	}
 
     //////////////////////////////////////////////////////////
     // modified from: https://github.com/gbv/image-attribution - MIT License

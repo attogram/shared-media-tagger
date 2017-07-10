@@ -244,16 +244,14 @@ function get_search_results($smt) {
 	print '<form action="" name="cats" method="POST">'
 	. '<input type="submit" value="  save to database  "><br /><br />';
 
-	while( list(,$x) = each($cats) ) {
-		//print '<pre>' . print_r($x,1) . '<pre>';
-		print '<input type="checkbox" checked="checked" name="cats[]" value="' . urlencode($x['title']) . '"><strong>' 
-		. $x['title'] 
+	while( list(,$cat) = each($cats) ) {
+		print '<input type="checkbox" checked="checked" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>' 
+		. $cat['title'] 
 		. '</strong><small> ' 
 		. '<a target="commons" href="https://commons.wikimedia.org/wiki/' 
-			. $smt->category_urlencode($x['title']) . '">(view)</a> '
-		. ' (' . $x['snippet'] . ')'
-		. ' (' . $x['size'] . ')</small><br />';
-		//print '<input type="hidden" name="' . urlencode($x['title']) . '" value="' . urlencode($x['snippet']) . '" />';
+			. $smt->category_urlencode($cat['title']) . '">(view)</a> '
+		. ' (' . $cat['snippet'] . ')'
+		. ' (size:' . $cat['size'] . ')</small><br />';
 	}
 	print '</form>';
 	print '</div>';
@@ -274,18 +272,18 @@ function import_categories($smt) {
 
 ///////////////////////////////////////////////////////////////////////////////
 function get_category_info($smt) {
-	$c = urldecode($_GET['c']);
-	//print '<p>Category Info: <b>' . $c . '</b></p>';
-	$cats = $smt->get_category_info($c);	
+	$cat = urldecode($_GET['c']);
+	//print '<p>Category Info: <b>' . $cat . '</b></p>';
+	$cats = $smt->get_category_info($cat);	
 	if( !$cats ) { 
 		$smt->error('failed to get category info'); 
 		return; 
 	}
-	foreach( $cats as $c ) {
-		$title = $c['title'];
-		$pageid = $c['pageid'];
-		$files = $c['categoryinfo']['files'];
-		$subcats = $c['categoryinfo']['subcats'];
+	foreach( $cats as $cat ) {
+		$title = $cat['title'];
+		$pageid = $cat['pageid'];
+		$files = $cat['categoryinfo']['files'];
+		$subcats = $cat['categoryinfo']['subcats'];
 		$x = $smt->query_as_bool(
 			'UPDATE category 
 			SET pageid = :pageid, files = :files, subcats = :subcats
