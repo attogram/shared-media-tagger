@@ -154,17 +154,21 @@ class smt_admin_database extends smt {
     ////////////////////////////////////////////////////
     function delete_media( $pageid ) {
         if( !$pageid || !$this->is_positive_number($pageid) ) {
-            $this->error('Invalid PageID');
+            $this->error('delete_media: Invalid PageID');
             return FALSE;
         }
         $response = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
         . 'Deleting Media :pageid = ' . $pageid;
         
+		$media = $this->get_media($pageid);
+		if( !$media ) { 
+			$response .= '<p>Media Not Found</p></div>';
+			return $response;
+		}
         $sqls = array();
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
         $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
         $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
-        $sqls[] = 'INSERT INTO block (pageid) VALUES (:pageid)';
         $bind = array(':pageid'=>$pageid);
         foreach( $sqls as $sql ) {
             if( $this->query_as_bool($sql, $bind) ) {
@@ -173,7 +177,20 @@ class smt_admin_database extends smt {
                 $response .= '<br />ERROR: ' . $sql;
             }
         }
-        $response .= '</div><br />';
+		
+        $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
+        $bind = array(
+			':pageid'=>$pageid, 
+			':title'=>@$media[0]['title'],
+			':thumb'=>@$media[0]['thumburl'],
+		);
+		if( $this->query_as_bool($sql, $bind) ) {
+			$response .= '<br />OK: ' . $sql;
+		} else {
+			$response .= '<br />ERROR: ' . $sql;
+		}
+		
+        $response .= '</div>';
         return $response;
     }
     
@@ -312,8 +329,8 @@ class smt_admin_database extends smt {
 'block' =>
     "CREATE TABLE IF NOT EXISTS 'block' (
     'pageid' INTEGER PRIMARY KEY,
-    'reason' TEXT
-    )",
+	'title' TEXT,
+	'thumb' TEXT )",
 
 'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger', 'This is a demonstration of the Shared Media Tagger software.')",
 
@@ -349,6 +366,7 @@ class smt_admin_database extends smt {
         'DROP TABLE IF EXISTS category2media',
         'DROP TABLE IF EXISTS media',
         'DROP TABLE IF EXISTS contact',
+        'DROP TABLE IF EXISTS block',
         );
         $response = false;
         while( list(,$sql) = each($sqls) ) {

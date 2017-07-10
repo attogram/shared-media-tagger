@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.17');
+define('__SMT__', '0.4.18');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -324,6 +324,7 @@ class smt_database EXTENDS smt_database_utils {
     }
 
     //////////////////////////////////////////////////////////
+	function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
     function get_image_from_db($pageid) {
         $this->debug("smt-db:get_image_from_db($pageid)");
         if( !$pageid || !$this->is_positive_number($pageid) ) { 

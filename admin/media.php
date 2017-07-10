@@ -14,18 +14,18 @@ print '<div class="box white"><p>Media Admin:</p>';
 
 
 if( isset($_GET['dm']) ) {
-	print $smt->delete_media($_GET['dm']);
+	print $smt->delete_media($_GET['dm']) . '<hr />';
 }
 
 if( isset($_GET['dc']) ) {
-	print delete_media_in_category( $smt->category_urldecode($_GET['dc']));
+	print delete_media_in_category( $smt->category_urldecode($_GET['dc'])) . '<hr />';
 	$smt->vacuum();
 }
 
 // MENU ////////////////////////////////////////////
 ?>
 <form action="" method="GET">
-* Delete Media:
+* Delete &amp; Block Media:
 <input type="text" name="dm" value="" size="10" />
 <input type="submit" value="  Delete via pageid  "/>
 </form>
@@ -35,6 +35,8 @@ if( isset($_GET['dc']) ) {
 <input type="text" name="dc" value="" size="30" />
 <input type="submit" value="  Delete via Category Name  "/>
 </form>
+<br /><br />
+* <a target="sqlite" href="<?php print $smt->url('admin'); ?>sqladmin.php?table=block&action=row_view">View/Edit Blocked Media</a>
 <?php
 
 print '</div>';
