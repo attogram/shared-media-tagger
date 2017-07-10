@@ -14,8 +14,7 @@ print '<div class="box white"><p>Media Admin:</p>';
 
 
 if( isset($_GET['dm']) ) {
-	print delete_media($_GET['dm']);
-	$smt->vacuum();
+	print $smt->delete_media($_GET['dm']);
 }
 
 if( isset($_GET['dc']) ) {
@@ -61,40 +60,8 @@ function delete_media_in_category( $category_name ) {
 	
 	foreach( $media as $pageid ) {
 		$r .= '<br />Deleting #' . $pageid;
-		$r .= delete_media($pageid);
+		$r .= $smt->delete_media($pageid);
 	}
 	$r .= '</div><br />';
 	return $r;
-}
-
-
-////////////////////////////////////////////////////
-function delete_media( $pageid ) {
-	global $smt;
-	
-	if( !$pageid || !$smt->is_positive_number($pageid) ) {
-		$smt->error('Invalid PageID');
-		return;
-	}
-	 
-	$r = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
-	. 'Deleting Media :pageid = ' . $pageid;
-	
-	$sql = array();
-	$sql[] = 'DELETE FROM media WHERE pageid = :pageid';
-	$sql[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
-	$sql[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
-	$bind = array(':pageid'=>$pageid);
-
-	foreach( $sql as $s ) {
-		if( $smt->query_as_bool($s, $bind) ) {
-			$r .= '<br />OK: ' . $s;
-		} else {
-			$r .= '<br />ERROR: ' . $s;
-		}
-		
-	}
-	$r .= '</div><br />';
-	return $r;
-	
 }

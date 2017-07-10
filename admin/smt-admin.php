@@ -151,17 +151,30 @@ class smt_admin_database extends smt {
         return TRUE;
     }
 
-    //////////////////////////////////////////////////////////
-    function delete_image($pageid) { 
-        if( !$this->query_as_bool(
-                'DELETE FROM images WHERE pageid = :pageid LIMIT 1', 
-                array(':pageid'=>$pageid) 
-            ) ) {
-            return FALSE; } 
-        $this->debug('delete_image: DELETED ' . $pageid);
-        $this->vacuum();
-        $this->get_image_count();
-        return TRUE;
+    ////////////////////////////////////////////////////
+    function delete_media( $pageid ) {
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
+            $this->error('Invalid PageID');
+            return FALSE;
+        }
+        $response = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
+        . 'Deleting Media :pageid = ' . $pageid;
+        
+        $sqls = array();
+        $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
+        $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
+        $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
+        $sqls[] = 'INSERT INTO block (pageid) VALUES (:pageid)';
+        $bind = array(':pageid'=>$pageid);
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql, $bind) ) {
+                $response .= '<br />OK: ' . $sql;
+            } else {
+                $response .= '<br />ERROR: ' . $sql;
+            }
+        }
+        $response .= '</div><br />';
+        return $response;
     }
     
     //////////////////////////////////////////////////////////
@@ -295,6 +308,12 @@ class smt_admin_database extends smt {
     'comment' TEXT,
     'datetime' TEXT,
     'ip' TEXT )",
+    
+'block' =>
+    "CREATE TABLE IF NOT EXISTS 'block' (
+    'pageid' INTEGER PRIMARY KEY,
+    'reason' TEXT
+    )",
 
 'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger', 'This is a demonstration of the Shared Media Tagger software.')",
 
@@ -607,32 +626,32 @@ class smt_admin extends smt_commons_API {
     function include_admin_menu() {
         
         $admin = $this->url('admin');
-		$space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
-		print '<div class="menu admin">'
-		. '<a href="' . $admin . '">ADMIN</a>'
-		. $space . '<a href="' . $admin . 'site.php">SITE</a>'
-		. $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
-		. $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
-		. $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
-		. '</div>';
+        $space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+        print '<div class="menu admin">'
+        . '<a href="' . $admin . '">ADMIN</a>'
+        . $space . '<a href="' . $admin . 'site.php">SITE</a>'
+        . $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
+        . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
+        . $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
+        . '</div>';
        
     } //end function include_admin_menu()
 
     //////////////////////////////////////////////////////////
     // modified from: https://github.com/gbv/image-attribution - MIT License
     function open_content_license_name($uri) {
-		if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
-			return "CC0";
-		} else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
-			return "Public Domain";
-		} else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
-			$license = "CC ".strtoupper($match[1])." ".$match[4];
-			if (isset($match[6])) $license .= " ".$match[6];
-			return $license;
-		} else {
-			return;
-		}
-	}
+        if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
+            return "CC0";
+        } else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
+            return "Public Domain";
+        } else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
+            $license = "CC ".strtoupper($match[1])." ".$match[4];
+            if (isset($match[6])) $license .= " ".$match[6];
+            return $license;
+        } else {
+            return;
+        }
+    }
 
     //////////////////////////////////////////////////////////
     // modified from: https://github.com/gbv/image-attribution - MIT License

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.16');
+define('__SMT__', '0.4.17');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -920,7 +920,7 @@ class smt EXTENDS smt_site_utils {
         return ''
         . '<div class="attribution left" style="float:right;">'
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
-        . '" title="Delete" onclick="return confirm(\'Confirm: Delete Media #' . $media_id . ' ?\');"'
+        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #' . $media_id . ' ?\');"'
         . '>⛔</a>'
         . '</div>';
     }
