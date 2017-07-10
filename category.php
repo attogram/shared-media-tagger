@@ -49,7 +49,6 @@ if( $category_size > $page_limit ) {
 		. '&amp;c=' . $smt->category_urlencode( $smt->strip_prefix($category_name) ) . '">' 
 		. ($x+1) . '-' . $end . '</a>, ';
 	}
-
 } 
 
 $bind = array(':category_name'=>$category_name);
@@ -57,9 +56,7 @@ $bind = array(':category_name'=>$category_name);
 $i = $smt->query_as_array( $sql, $bind );
 
 if( !$i || !is_array($i) ) {
-	header("HTTP/1.0 404 Not Found");
-	print '404 Category Not Found';
-	exit;
+	$smt->fail404('404 Category Not Found');
 }
 
 $smt->include_header();
@@ -91,6 +88,8 @@ foreach( $i as $media ) {
 	print $smt->display_thumbnail_box( $media );
 
 }
+ 
+print '<br /><br />' . $pager;
 print '</div>';
 $smt->include_footer();
 

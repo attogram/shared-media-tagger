@@ -19,10 +19,15 @@ print '<div class="box white">';
 
 if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
 	$category_name = $smt->category_urldecode($_GET['i']);
-	print 'Importing media from '
-	. ' <b><a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($category_name) . '">'
-	. htmlentities($smt->strip_prefix($category_name)) . '</a></b>';
+	$cat_url = '<a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($category_name) . '">'
+	. htmlentities($smt->strip_prefix($category_name)) . '</a>';
+	
+	print '<p>Importing media from <b>' . $cat_url . '</b></p>';
+
 	$smt->get_media_from_category( $category_name );
+
+	print '<p>Imported media from <b>' . $cat_url . '</b></p>';
+
 	print '</div>';
 	$smt->include_footer();
 	exit;

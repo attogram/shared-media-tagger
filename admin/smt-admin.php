@@ -359,15 +359,14 @@ class smt_commons_API extends smt_admin_database {
             return FALSE;
         }
         $this->api_count++;
-        $raw_response = json_decode($get_response,TRUE); // assoc
-        if( !$raw_response ) {
+        $this->commons_response = json_decode($get_response,TRUE); // assoc
+        if( !$this->commons_response ) {
             $this->error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error() );
             $this->error('::call_commons: ERROR: ' . $this->smt_json_last_error_msg() );
             return FALSE;
         }
-        $this->commons_response = $raw_response;
         
-        if( !$d['query'][$key] || !is_array($d['query'][$key])  ) { 
+        if( !$this->commons_response['query'][$key] || !is_array($this->commons_response['query'][$key])  ) { 
             $this->error("::call_commons: WARNING: missing key: $key");
             //return FALSE;
         } 
