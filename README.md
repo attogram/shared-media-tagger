@@ -33,4 +33,4 @@ The Shared Media Tagger is dual licensed under
 This is an early alpha release.
 
 Dev tools:
-* https://www.codacy.com/app/attogram-project/shared-media-tagger/
+* https://www.codacy.com/app/attogram-project/shared-media-tagger

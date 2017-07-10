@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.10');
+define('__SMT__', '0.4.11');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -333,7 +333,7 @@ class smt_database EXTENDS smt_database_utils {
             return FALSE;
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
-        return $this->query_as_array( $sql , $bind = array(':pageid'=>$pageid) );
+        return $this->query_as_array( $sql, array(':pageid'=>$pageid) );
     }
 
     //////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ class smt_database EXTENDS smt_database_utils {
             WHERE t.media_pageid IS NULL
             ORDER BY RANDOM() 
             LIMIT :limit';
-        return $this->query_as_array( $sql , $bind = array( 'limit'=>$limit ) );
+        return $this->query_as_array( $sql, array('limit'=>$limit) );
     }
     
     //////////////////////////////////////////////////////////
@@ -818,7 +818,7 @@ class smt EXTENDS smt_site_utils {
             $height = $this->get_resized_height( $width, $height, $this->size_medium );
             $width = $this->size_medium; 
         }
-        $infourl = $this->url('info') . '?i=' . $media['pageid'];
+        //$infourl = $this->url('info') . '?i=' . $media['pageid'];
         $divwidth = $width = $media['thumbwidth'];
         if( $divwidth < $this->size_medium )  {
             $divwidth = $this->size_medium;

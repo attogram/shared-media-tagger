@@ -34,7 +34,9 @@ if( isset($_GET['s']) && $_GET['s'] ) {
 }
 
 $cats = $smt->query_as_array($sql, $bind);
-if( !is_array($cats) ) { $cats = array(); }
+if( !is_array($cats) ) {
+	$cats = array();
+}
 
 $active = $disabled = array();
 foreach( $cats as $cat ) {
@@ -56,9 +58,9 @@ unset($cats);
 </div> 
 
 <br />
-<?php print_category_table( $smt, $active, 'Active'); ?>
+<?php print_category_table( $smt, $active); ?>
 <br /><br />
-<?php print_disabled_category_table( $smt, $disabled, 'Disabled'); ?>
+<?php print_disabled_category_table( $smt, $disabled); ?>
 
 </div><?php
 $smt->include_footer();
@@ -66,7 +68,7 @@ exit;
 
 
 /////////////////////////////////////////////////////////////
-function print_disabled_category_table( $smt, $cats, $title='' ) {
+function print_disabled_category_table( $smt, $cats ) {
 
 	print '
 <table border="1">
@@ -87,7 +89,7 @@ function print_disabled_category_table( $smt, $cats, $title='' ) {
 
 
 /////////////////////////////////////////////////////////////
-function print_category_table( $smt, $cats, $title='' ) {
+function print_category_table( $smt, $cats ) {
 
 ?>
 <table border="1">
