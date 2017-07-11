@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.23');
+define('__SMT__', '0.4.24');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -253,7 +253,7 @@ class smt_database_utils EXTENDS smt_utils {
         if( !$this->db ) { $this->init_database(); }
         $statement = $this->db->prepare($sql);
         if( !$statement ) {
-            $this->error('::query_as_bool(): ERROR PREPARE'); // : '.$this->db->errorInfo()[2]);
+            $this->debug('::query_as_bool(): ERROR PREPARE'); // : '.$this->db->errorInfo()[2]);
             return FALSE;
         }
         $this->debug('::query_as_bool(): bind: '.print_r($bind,1));
@@ -517,7 +517,7 @@ class smt_database EXTENDS smt_database_utils {
         $tags = $this->query_as_array('
             SELECT * FROM tag ORDER BY position');
         if( !$tags ) {
-            $this->notice('Tag database not available');
+            $this->debug('Tag database not available');
             return $this->tags = array();
         }
         return $this->tags = $tags;
@@ -680,8 +680,8 @@ class smt_user EXTENDS smt_site_utils {
 			return FALSE;
 		}
 		$view = $this->query_as_bool(
-				'UPDATE user SET page_views = page_views + 1 WHERE id = :id',
-				array( ':id' => $this->user_id )
+				'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
+				array( ':id' => $this->user_id, ':last'=>gmdate('Y-m-d H:i:s') )
 		);
 		if( $view ) {
 			return TRUE;
@@ -710,7 +710,7 @@ class smt_user EXTENDS smt_site_utils {
 			return TRUE;
 		}
 		$this->user_id = 0;
-		$this->notice('new_user: FAILED to create user');
+		//$this->notice('new_user: FAILED to create user');
 		return FALSE;
 	} // end function new_user()
 

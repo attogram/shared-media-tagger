@@ -10,7 +10,6 @@ $smt = new smt('Contact');
 $smt->include_header();
 $smt->include_menu();
 
-
 print '<div class="box white">';
 
 if( isset($_POST['c']) ) {
@@ -42,7 +41,7 @@ $innertext = '* My Question or Comment:
 ';
 $footer = '
 * My Contact information:
-
+***
 
 
 ';

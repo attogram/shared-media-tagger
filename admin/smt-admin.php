@@ -353,6 +353,8 @@ class smt_admin_database_utils extends smt {
     CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
 
 
+// Default Demo Site setup
+
 'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger', 'This is a demonstration of the Shared Media Tagger software.')",
 
 'default_tag1' => "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
@@ -360,6 +362,22 @@ class smt_admin_database_utils extends smt {
 'default_tag3' => "INSERT INTO tag (id, position, name, display_name) VALUES (3, 3, '😐 Unsure', '😐')",
 'default_tag4' => "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙂 Good',   '🙂')",
 'default_tag5' => "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
+
+'c1' => "INSERT INTO category (id,name,pageid) VALUES (1,'Category:Calibration videos',8461838);",
+'c2' => "INSERT INTO category (id,name,pageid) VALUES (2,'Category:Test patterns',202140);",
+'c3' => "INSERT INTO category (id,name,pageid) VALUES (3,'Category:Audio files for calibration',14878939);",
+
+'m1' => <<<EOT
+
+INSERT INTO "media" ("pageid","title","url","descriptionurl","descriptionshorturl","imagedescription","artist","datetimeoriginal","licenseuri","licensename","licenseshortname","usageterms","attributionrequired","restrictions","size","width","height","sha1","mime","thumburl","thumbwidth","thumbheight","thumbmime","user","userid","duration","timestamp") VALUES ('45898475','File:TP-CBS-rep.png','https://upload.wikimedia.org/wikipedia/commons/b/b8/TP-CBS-rep.png','https://commons.wikimedia.org/wiki/File:TP-CBS-rep.png','https://commons.wikimedia.org/w/index.php?curid=45898475','Test pattern design used by CBS owned stations from the late 1940''s and also by stations not necessarily affiliated with the network.','<a href="//commons.wikimedia.org/w/index.php?title=User:Wbwn&amp;action=edit&amp;redlink=1" class="new" title="User:Wbwn (page does not exist)">Wbwn</a>','2015-12-25','http://creativecommons.org/licenses/by-sa/4.0/','CC BY-SA 4.0','CC BY-SA 4.0','Creative Commons Attribution-Share Alike 4.0','true','','97501','648','486','a25a3839ed8412238bbde244fed172f2f2a40269','image/png','https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/TP-CBS-rep.png/325px-TP-CBS-rep.png','325','244','image/png','Wbwn','1797161',NULL,'2015-12-26T20:09:45Z');
+
+EOT
+,
+
+'c2m1' => <<<EOT
+INSERT INTO "category2media" ("id","category_id","media_pageid") VALUES ('205','2','45898475');
+EOT
+,
 
 
 ); // end tables array
