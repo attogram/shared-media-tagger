@@ -169,6 +169,7 @@ class smt_admin_database_utils extends smt {
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
         $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
         $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
+        $sqls[] = 'DELETE FROM user_tagging WHERE media_pageid = :pageid';
         $bind = array(':pageid'=>$pageid);
         foreach( $sqls as $sql ) {
             if( $this->query_as_bool($sql, $bind) ) {
@@ -198,6 +199,7 @@ class smt_admin_database_utils extends smt {
     function empty_media_tables() {
         $sqls = array(
             'DELETE FROM tagging',
+            'DELETE FROM user_tagging',
             'DELETE FROM category2media',
             'DELETE FROM media',
             'DELETE FROM block',

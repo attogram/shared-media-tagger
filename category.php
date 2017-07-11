@@ -4,8 +4,8 @@
 
 $page_limit = 25; // # of files per page
 
-$f = __DIR__.'/smt.php'; 
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
+$init = __DIR__.'/smt.php'; 
+if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 $smt = new smt('Category');
 
 $category_name = isset($_GET['c']) ? $smt->category_urldecode($_GET['c']) : FALSE;
@@ -39,15 +39,17 @@ $sql = '
 if( $category_size > $page_limit ) {
     $offset = isset($_GET['o']) ? $_GET['o'] : 0;
     $sql .= " LIMIT $page_limit OFFSET $offset";
-    $pager = 'Show files: ';
+    $pager = '';
+	$page_count = 0;
     for( $x = 0; $x < $category_size; $x+=$page_limit ) {
-        $end = $x + $page_limit;
-        if ($end > $category_size) {
-            $end = $category_size;
-        }
-        $pager .= '<a href="?o=' . $x 
-        . '&amp;c=' . $smt->category_urlencode( $smt->strip_prefix($category_name) ) . '">' 
-        . ($x+1) . '-' . $end . '</a>, ';
+		if( $x == $offset ) {
+			$pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">&nbsp;' 
+			. ++$page_count . '&nbsp;</span>';
+			continue;
+		}
+        $pager .= '<a href="?o=' . $x . '&amp;c=' 
+		. $smt->category_urlencode($smt->strip_prefix($category_name)) 
+		. '">&nbsp;' . ++$page_count . '&nbsp;</a>';
     }
 } 
 
@@ -74,12 +76,7 @@ print '<div class="box white">'
         $category_name)
     . '</h1>'
     . '<br /><b>' . $category_size 
-    . '</b> files under review, out of '
-    . $category_info['files']
-    . ' files on '
-    . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
-    . $smt->category_urlencode($category_name) . '">Commons</a>'
-    . '<br />'
+    . '</b> files, pages: '
     . $pager
     . '</p><br clear="all" />'
     ;
@@ -96,7 +93,7 @@ if( $smt->is_admin() ) {
     print '<p><input type="submit" value="Delete selected media"></p></form>';
 }
 
-print '<p>' . $pager . '</p>';
+print '<p>pages: ' . $pager . '</p>';
 
 print '</div>';
 $smt->include_footer();

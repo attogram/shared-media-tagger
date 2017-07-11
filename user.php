@@ -10,11 +10,21 @@ $smt = new smt();
 $smt->include_header();
 $smt->include_menu();
 
-print '<div class="box white"><p>User:</p>';
+print '<div class="box white">';
 
-print '<p>ID: ' . $smt->user_id . '</p>';
+print '<p>User ID: ' . $smt->user_id . '</p>';
 
-print '<p>Tag Count: ' . $smt->get_user_tag_count( $smt->user_id ) . '</p>';
+print '<p>' . $smt->get_user_tag_count( $smt->user_id ) . ' reviews</p>';
+
+foreach( $smt->get_user_tagging($smt->user_id) as $media ) {
+	
+	print '<div style="display:inline-block;">'
+	. '+' . $media['count'] . ' ' . $smt->get_tag_name_by_id($media['tag_id'])
+	. '<br />'
+	. $smt->display_thumbnail_box($media)
+	. '</div>'
+	;
+}
 
 print '</div>';
 $smt->include_footer();

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.26');
+define('__SMT__', '0.4.27');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -167,6 +167,8 @@ class smt_utils {
         . $this->get_image_count() . '&nbsp;files'
         . $space
         . '<a href="'. $this->url('about') . '">About</a>'
+        . $space
+        . '<a href="'. $this->url('user') . '">User:' . $this->user_id . '</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
         . '</div>'
@@ -500,13 +502,30 @@ class smt_database EXTENDS smt_database_utils {
         if( isset( $this->tag_id[$name] ) ) {
             return $this->tag_id[$name];
         }
-        $tag = $this->query_as_array('SELECT id FROM tag WHERE name = :name LIMIT 1', array(':name'=>$name) );
+        $tag = $this->query_as_array(
+			'SELECT id FROM tag WHERE name = :name LIMIT 1',
+			array(':name'=>$name) 
+		);
         if( isset( $tag[0]['id'] ) ) { 
             return $this->tag_id[$name] = $tag[0]['id'];
         }
         return $this->tag_id[$name] = 0;
     }
 
+    //////////////////////////////////////////////////////////
+    function get_tag_name_by_id( $id ) {
+        if( isset( $this->tag_name[$id] ) ) {
+            return $this->tag_name[$id];
+        }
+        $tag = $this->query_as_array(
+			'SELECT name FROM tag WHERE id = :id LIMIT 1',
+			array(':id'=>$id) 
+		);
+        if( isset( $tag[0]['name'] ) ) { 
+            return $this->tag_name[$id] = $tag[0]['name'];
+        }
+        return $this->tag_name[$id] = $id;
+    }
     
     //////////////////////////////////////////////////////////
     function get_tags() {
@@ -649,7 +668,6 @@ class smt_user EXTENDS smt_site_utils {
 		$sql = 'SELECT * FROM user';
 		$sql .= ' ORDER BY ' . $orderby;
 		$sql .= ' LIMIT ' . $limit;
-		
 		$users = $this->query_as_array($sql);
 		if( isset($users[0]) ) {
 			return $users;
@@ -685,11 +703,29 @@ class smt_user EXTENDS smt_site_utils {
 			array(':user_id'=>$user_id)
 		);
 		if( isset($count[0]['sum']) ) {
-			//$this->notice('get_user_tag_count OK: ' . $count[0]['sum']);
 			return $count[0]['sum'];
 		}
-		//$this->notice('get_user_tag_count: ERROR');
 		return 0;
+	}
+
+	//////////////////////////////////////////////////////////
+	function get_user_tagging( $user_id ) {
+		$tags = $this->query_as_array(
+			'SELECT m.*, ut.tag_id, ut.count 
+			FROM user_tagging AS ut, media AS m
+			WHERE ut.user_id = :user_id
+			AND ut.media_pageid = m.pageid
+			ORDER BY ut.media_pageid
+			
+			LIMIT 100  -- TMP 
+			
+			',
+			array(':user_id'=>$user_id)
+		);
+		if( $tags ) {
+			return $tags;
+		}
+		return array();
 	}
 
 	//////////////////////////////////////////////////////////
@@ -768,7 +804,6 @@ class smt EXTENDS smt_user {
         
         $this->links = array(
             'home'       => $this->site_url . '',
-            'random'     => $this->site_url . '',
             'css'        => $this->site_url . 'css.css',
             'info'       => $this->site_url . 'info.php',
             'categories' => $this->site_url . 'categories.php',
@@ -778,6 +813,7 @@ class smt EXTENDS smt_user {
             'admin'      => $this->site_url . 'admin/',
             'contact'    => $this->site_url . 'contact.php',
             'tag'        => $this->site_url . 'tag.php',
+            'user'       => $this->site_url . 'user.php',
         );
         
 		$this->get_user();
