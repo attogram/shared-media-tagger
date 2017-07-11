@@ -14,8 +14,23 @@ ALPHA RELEASE
 
 ## Setup
 
-TBD..
+* install the source code into web-accessible area on your server
+* setup protection for admin/ directory: create admin/.htaccess and admin/.htpasswd
+* make database directory writeable: chmod 777 admin/db
+* (optional) copy _setup.sample.php to _setup.php and edit as needed
+* (optional) create extra site header/footers: header.php, footer.php
+* (optional) change db web admin password:  admin/phpliteadmin.config.php  (default password:  test)
+* Database tables are created the first time you load the admin homepage in browser:  //example.com/admin/
+* goto admin category page:  //example.com/admin/category.php
+* Set site name and description: //example.com/admin/site.php  
+* (optional) setup tags: //example.com/admin/site.php
+* Find categories from commons: search and save categories
+* [Import Category Info] to save all categories info
+* Load media: click _Import_ for each cateogry you want to import
+* once at least 1 image and 1 category are saved, the site is active!
+* more soon....
 
+Dev notes:
 * DB web admin password: test (set in: admin/phpliteadmin.config.php)
 
 
