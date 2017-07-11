@@ -12,6 +12,3 @@ $setup = array();
 //$setup['site_url'] = '//example.com/';
 //$setup['site_url'] = 'https://example.com/mysite/';
 
-// 'Rate a file' menu text
-// examples:
-//$setup['menu_play'] = 'Rate a file';

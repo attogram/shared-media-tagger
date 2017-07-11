@@ -333,6 +333,26 @@ class smt_admin_database_utils extends smt {
     'title' TEXT,
     'thumb' TEXT )",
 
+'user' =>
+	"CREATE TABLE IF NOT EXISTS 'user' (
+	'id' INTEGER PRIMARY KEY,
+	'ip' TEXT,
+	'host' TEXT,
+	'user_agent' TEXT,
+	'page_views' INTEGER,
+	'last' TEXT,
+	CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
+
+'user_tagging' =>
+	"CREATE TABLE IF NOT EXISTS 'user_tagging' (
+	'id' INTEGER PRIMARY KEY,
+	'user_id' INTEGER,
+	'tag_id' INTEGER,
+	'media_pageid' INTEGER,
+	'count' INTEGER,
+    CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
+
+
 'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger', 'This is a demonstration of the Shared Media Tagger software.')",
 
 'default_tag1' => "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
@@ -368,6 +388,8 @@ class smt_admin_database_utils extends smt {
         'DROP TABLE IF EXISTS media',
         'DROP TABLE IF EXISTS contact',
         'DROP TABLE IF EXISTS block',
+        'DROP TABLE IF EXISTS user',
+        'DROP TABLE IF EXISTS user_tagging',
         );
         $response = false;
         while( list(,$sql) = each($sqls) ) {
@@ -686,12 +708,13 @@ class smt_admin extends smt_commons_API {
     function include_admin_menu() {
         
         $admin = $this->url('admin');
-        $space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+        $space = ' &nbsp; &nbsp; ';
         print '<div class="menu admin">'
         . '<a href="' . $admin . '">ADMIN</a>'
         . $space . '<a href="' . $admin . 'site.php">SITE</a>'
         . $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
         . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
+        . $space . '<a href="' . $admin . 'user.php">USER</a>'
         . $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
         . '</div>';
        

@@ -20,7 +20,7 @@ ALPHA RELEASE
 * (optional) copy _setup.sample.php to _setup.php and edit as needed
 * (optional) create extra site header/footers: header.php, footer.php
 * (optional) change db web admin password:  admin/phpliteadmin.config.php  (default password:  test)
-* Create Database tables: autocreated on first load of admin homepag:  //example.com/admin/
+* Create Database tables: autocreated on first load of admin homepage:  //example.com/admin/
 * Set site name and description: //example.com/admin/site.php  
 * (optional) setup tags: //example.com/admin/site.php
 * goto admin category page:  //example.com/admin/category.php

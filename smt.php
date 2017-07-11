@@ -1,10 +1,10 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.21');
+define('__SMT__', '0.4.23');
 
-$f = __DIR__.'/_setup.php'; 
-if(file_exists($f) && is_readable($f)){ include_once($f); }
+$init = __DIR__.'/_setup.php'; 
+if(file_exists($init) && is_readable($init)){ include_once($init); }
 
 //////////////////////////////////////////////////////////
 // SMT Utils
@@ -639,12 +639,90 @@ class smt_site_utils EXTENDS smt_database {
 }
 
 //////////////////////////////////////////////////////////
+// SMT - User
+class smt_user EXTENDS smt_site_utils {
+
+	var $user_id;
+
+	//////////////////////////////////////////////////////////
+	function get_users() {
+		$users = $this->query_as_array('SELECT * FROM user');
+		if( isset($users[0]) ) {
+			return $users;
+		}
+		return array();
+	} // end function get_users
+
+	//////////////////////////////////////////////////////////
+	function get_user() {
+		$ip_address = @$_SERVER['REMOTE_ADDR'];
+		$host = @$_SERVER['REMOTE_HOST'];
+		if( !$host ) { 
+			$host = $ip_address;
+		}
+		$user_agent = @$_SERVER['HTTP_USER_AGENT'];
+
+		$user = $this->query_as_array(
+			'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent', 
+			array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
+		);
+		if( !isset($user[0]['id']) ) {
+			return $this->new_user($ip_address, $host, $user_agent);
+		}
+		$this->user_id = $user[0]['id'];
+		$this->save_user_view();
+		return TRUE;
+	} // end function get_user_info()
+
+	//////////////////////////////////////////////////////////
+	function save_user_view() {
+		if( !$this->user_id ) {
+			return FALSE;
+		}
+		$view = $this->query_as_bool(
+				'UPDATE user SET page_views = page_views + 1 WHERE id = :id',
+				array( ':id' => $this->user_id )
+		);
+		if( $view ) {
+			return TRUE;
+		}
+		return FALSE;
+	}
+	
+	//////////////////////////////////////////////////////////
+	function new_user( $ip_address, $host, $user_agent ) {
+		if( 
+			$this->query_as_bool(
+				'INSERT INTO user (
+					ip, host, user_agent, page_views, last
+				) VALUES (
+					:ip_address, :host, :user_agent, 1, :last
+				)',
+				array( 
+					':ip_address'=>$ip_address, 
+					':host'=>$host, 
+					':user_agent'=>$user_agent,
+					':last'=>gmdate('Y-m-d H:i:s')
+				)
+			) 
+		) {
+			$this->user_id = $this->last_insert_id;
+			return TRUE;
+		}
+		$this->user_id = 0;
+		$this->notice('new_user: FAILED to create user');
+		return FALSE;
+	} // end function new_user()
+
+	
+} // end class smt_user
+
+//////////////////////////////////////////////////////////
 // SMT - Shared Media Tagger
-class smt EXTENDS smt_site_utils {
+class smt EXTENDS smt_user {
 
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
-    var $menu_play; // text for 'rate a file' menu option
 
     //////////////////////////////////////////////////////////
     function __construct( $title='' ) {
@@ -668,12 +746,6 @@ class smt EXTENDS smt_site_utils {
             $this->debug('Site URL Not Set.  Using: ' . $this->site_url);
         }
 
-        if( isset($setup['menu_play']) ) {
-            $this->menu_play = $setup['menu_play'];
-        } else {
-            $this->menu_play = 'Rate a file';
-        }
-
         $this->set_site_name();
         
         $this->links = array(
@@ -690,6 +762,8 @@ class smt EXTENDS smt_site_utils {
             'tag'        => $this->site_url . 'tag.php',
         );
         
+		$this->get_user();
+
         if( isset($_GET['logoff']) ) {
             $this->admin_logoff();
         }
