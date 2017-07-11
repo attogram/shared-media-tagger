@@ -20,13 +20,13 @@ ALPHA RELEASE
 * (optional) copy _setup.sample.php to _setup.php and edit as needed
 * (optional) create extra site header/footers: header.php, footer.php
 * (optional) change db web admin password:  admin/phpliteadmin.config.php  (default password:  test)
-* Database tables are created the first time you load the admin homepage in browser:  //example.com/admin/
-* goto admin category page:  //example.com/admin/category.php
+* Create Database tables: autocreated on first load of admin homepag:  //example.com/admin/
 * Set site name and description: //example.com/admin/site.php  
 * (optional) setup tags: //example.com/admin/site.php
+* goto admin category page:  //example.com/admin/category.php
 * Find categories from commons: search and save categories
 * [Import Category Info] to save all categories info
-* Load media: click _Import_ for each cateogry you want to import
+* Load media: click _Import_ for each category you want to import
 * once at least 1 image and 1 category are saved, the site is active!
 * more soon....
 
