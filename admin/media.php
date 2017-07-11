@@ -13,31 +13,31 @@ $smt->include_admin_menu();
 print '<div class="box white"><p>Media Admin:</p>';
 
 if( isset($_GET['media'])  ) {
-	print multi_delete_media($_GET['media']) . '<hr />';
+    print multi_delete_media($_GET['media']) . '<hr />';
 }
 
 if( isset($_GET['dm']) ) {
-	print $smt->delete_media($_GET['dm']) . '<hr />';
+    print $smt->delete_media($_GET['dm']) . '<hr />';
 }
 
 if( isset($_GET['dc']) ) {
-	print delete_media_in_category( $smt->category_urldecode($_GET['dc'])) . '<hr />';
-	$smt->vacuum();
+    print delete_media_in_category( $smt->category_urldecode($_GET['dc'])) . '<hr />';
+    $smt->vacuum();
 }
 
 
 ////////////////////////////////////////////////////
 function multi_delete_media( $list ) {
-	global $smt;
-	if( !is_array($list) ) {
-		$smt->error('multi_delete_media: No list array found');
-		return FALSE;
-	}
-	$response = '<p>Deleting &amp; Blocking ' . sizeof($list) . ' Media files:';
-	foreach( $list as $media_id ) {
-		$response .= $smt->delete_media($media_id);
-	}
-	return $response;
+    global $smt;
+    if( !is_array($list) ) {
+        $smt->error('multi_delete_media: No list array found');
+        return FALSE;
+    }
+    $response = '<p>Deleting &amp; Blocking ' . sizeof($list) . ' Media files:';
+    foreach( $list as $media_id ) {
+        $response .= $smt->delete_media($media_id);
+    }
+    return $response;
 }
 // MENU ////////////////////////////////////////////
 ?>
@@ -63,24 +63,24 @@ $smt->include_footer();
 
 ////////////////////////////////////////////////////
 function delete_media_in_category( $category_name ) {
-	global $smt;
-	//$smt->notice('::delete_media_in_category: category_name: ' . $category_name);
+    global $smt;
+    //$smt->notice('::delete_media_in_category: category_name: ' . $category_name);
 
-	if( !$category_name || !is_string($category_name) ) {
-		$smt->error('::delete_media_in_category: Invalid Category Name: ' . $category_name);
-		return FALSE;
-	}
-	$r = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
-	. 'Deleting Media in <b>' . $category_name . '</b>';
-	
-	$media = $smt->get_media_in_category( $category_name );
-	
-	$r .= '<br /><b>' . count($media) . '</b> Media files found in Category';
-	
-	foreach( $media as $pageid ) {
-		$r .= '<br />Deleting #' . $pageid;
-		$r .= $smt->delete_media($pageid);
-	}
-	$r .= '</div><br />';
-	return $r;
+    if( !$category_name || !is_string($category_name) ) {
+        $smt->error('::delete_media_in_category: Invalid Category Name: ' . $category_name);
+        return FALSE;
+    }
+    $r = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
+    . 'Deleting Media in <b>' . $category_name . '</b>';
+    
+    $media = $smt->get_media_in_category( $category_name );
+    
+    $r .= '<br /><b>' . count($media) . '</b> Media files found in Category';
+    
+    foreach( $media as $pageid ) {
+        $r .= '<br />Deleting #' . $pageid;
+        $r .= $smt->delete_media($pageid);
+    }
+    $r .= '</div><br />';
+    return $r;
 }

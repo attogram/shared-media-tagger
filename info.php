@@ -8,14 +8,14 @@ if( !file_exists($f) || !is_readable($f) ) { print 'Site down for maintenance'; 
 $smt = new smt('Media Info');
 
 if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) ) { 
-	$smt->fail404('404 Media Not Found');
+    $smt->fail404('404 Media Not Found');
 }
 
 $pageid = (int)$_GET['i'];
 
 $media = $smt->get_image_from_db($pageid);
 if( !$media || !isset($media[0]) || !is_array($media[0]) ) {
-	$smt->fail404('404 Media Not Found');
+    $smt->fail404('404 Media Not Found');
 }
 $media = @$media[0];
 
@@ -31,27 +31,27 @@ $smt->include_menu();
  <tr>
   <td class="box grey center"><?php 
 
-	print $smt->display_image($media)
-	. $smt->display_categories( $pageid )
-	. '<br />'
-	. '<a href="./?i=' . $pageid . '">Review this file:</a>' 
-	. $smt->display_tags( $pageid )
-	;
+    print $smt->display_image($media)
+    . $smt->display_categories( $pageid )
+    . '<br />'
+    . '<a href="./?i=' . $pageid . '">Review this file:</a>' 
+    . $smt->display_tags( $pageid )
+    ;
 
 ?>
   </td>
   <td class="box white">
 <h1 style="padding-top:5px;"><a target="commons" href="<?php 
-	print $media['url']; ?>"><?php 
-	print $smt->strip_prefix($media['title']); ?></a></h1>
+    print $media['url']; ?>"><?php 
+    print $smt->strip_prefix($media['title']); ?></a></h1>
 
 <p><?php print $smt->get_reviews($pageid);?></p>
-	
+    
 <p><?php print ($media['imagedescription']); ?></p>
 
 <p><em>by:</em> <b><?php print ($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
 <?php if( $media['datetimeoriginal']) {
-	print ' / ' . $media['datetimeoriginal'];
+    print ' / ' . $media['datetimeoriginal'];
 } ?></p>
 
 <div style="border:1px solid #ccc; display:inline-block; padding:10px; background-color:#eee;">
@@ -59,13 +59,13 @@ $smt->include_menu();
 <?php
 
 $fix = array(
-	'Public domain'=>'Public Domain',
-	'CC-BY-SA-3.0'=>'CC BY-SA 3.0'
+    'Public domain'=>'Public Domain',
+    'CC-BY-SA-3.0'=>'CC BY-SA 3.0'
 );
 while( list($bad,$good) = each($fix) ) {
-	if( $media['usageterms'] == $bad ) { $media['usageterms'] = $good; }
-	if( $media['licensename'] == $bad ) { $media['licensename'] = $good; }
-	if( $media['licenseshortname'] == $bad ) { $media['licenseshortname'] = $good; }
+    if( $media['usageterms'] == $bad ) { $media['usageterms'] = $good; }
+    if( $media['licensename'] == $bad ) { $media['licensename'] = $good; }
+    if( $media['licenseshortname'] == $bad ) { $media['licenseshortname'] = $good; }
 }
 $lics = array();
 $lics[] = $media['licensename'];
@@ -74,25 +74,25 @@ $lics[] = $media['usageterms'];
 $lics = array_unique($lics);
 
 if( $media['licenseuri'] && $media['licenseuri'] != 'false' ) {
-	print '<br /><b><a target="license" href="' 
-	. $media['licenseuri'] . '">' . implode('<br />', $lics)  . '</a></b>';
+    print '<br /><b><a target="license" href="' 
+    . $media['licenseuri'] . '">' . implode('<br />', $lics)  . '</a></b>';
 } else {
-	print '<b>' . implode('<br />', $lics) . '</b>';
+    print '<b>' . implode('<br />', $lics) . '</b>';
 }
 if( $media['attributionrequired'] && $media['attributionrequired'] != 'false' ) {
-	print '<br />Attribution Required: <b>' . $media['attributionrequired'] .'</b>';
+    print '<br />Attribution Required: <b>' . $media['attributionrequired'] .'</b>';
 }
 if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
-	print '<br />Restrictions: <b>' . $media['restrictions'] .'</b>';
+    print '<br />Restrictions: <b>' . $media['restrictions'] .'</b>';
 }
 ?>
 </div>
 
 <p><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">View on commons.wikimedia.org</a>
 <br /><a target="commons" href="//wikidata.org/wiki/<?php 
-	print $smt->category_urlencode($media['title']); ?>">View on wikidata.org</a>
+    print $smt->category_urlencode($media['title']); ?>">View on wikidata.org</a>
 <br /><a target="commons" href="//en.wikipedia.org/wiki/<?php 
-	print $smt->category_urlencode($media['title']); ?>">View on en.wikipedia.org</a>
+    print $smt->category_urlencode($media['title']); ?>">View on en.wikipedia.org</a>
 </p>
 
 <small>
@@ -109,8 +109,8 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 timestamp: <b><?php print $media['timestamp']; ?></b>
 <br />
 uploaded by: <b><a target="commons" href="https://commons.wikimedia.org/wiki/User:<?php 
-	print $media['user']; ?>">User:<?php 
-	print $media['user']; ?></a></b> 
+    print $media['user']; ?>">User:<?php 
+    print $media['user']; ?></a></b> 
 
 <br />
 <br />

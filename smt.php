@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.19');
+define('__SMT__', '0.4.20');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -324,7 +324,7 @@ class smt_database EXTENDS smt_database_utils {
     }
 
     //////////////////////////////////////////////////////////
-	function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
+    function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
     function get_image_from_db($pageid) {
         $this->debug("smt-db:get_image_from_db($pageid)");
         if( !$pageid || !$this->is_positive_number($pageid) ) { 
@@ -923,8 +923,8 @@ class smt EXTENDS smt_site_utils {
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #' . $media_id . ' ?\');"'
         . '>⛔</a>'
-		. ' '
-		. '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
+        . ' '
+        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
         . '</div>';
     }
 

@@ -3,8 +3,8 @@
 // SMT-Admin
 
 //////////////////////////////////////////////////////////
-// Admin Database
-class smt_admin_database extends smt {
+// Admin Database Utils
+class smt_admin_database_utils extends smt {
 
     //////////////////////////////////////////////////////////
     function insert_category( $name='' ) { 
@@ -160,11 +160,11 @@ class smt_admin_database extends smt {
         $response = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
         . 'Deleting Media :pageid = ' . $pageid;
         
-		$media = $this->get_media($pageid);
-		if( !$media ) { 
-			$response .= '<p>Media Not Found</p></div>';
-			return $response;
-		}
+        $media = $this->get_media($pageid);
+        if( !$media ) { 
+            $response .= '<p>Media Not Found</p></div>';
+            return $response;
+        }
         $sqls = array();
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
         $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
@@ -177,19 +177,19 @@ class smt_admin_database extends smt {
                 $response .= '<br />ERROR: ' . $sql;
             }
         }
-		
+        
         $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
         $bind = array(
-			':pageid'=>$pageid, 
-			':title'=>@$media[0]['title'],
-			':thumb'=>@$media[0]['thumburl'],
-		);
-		if( $this->query_as_bool($sql, $bind) ) {
-			$response .= '<br />OK: ' . $sql;
-		} else {
-			$response .= '<br />ERROR: ' . $sql;
-		}
-		
+            ':pageid'=>$pageid, 
+            ':title'=>@$media[0]['title'],
+            ':thumb'=>@$media[0]['thumburl'],
+        );
+        if( $this->query_as_bool($sql, $bind) ) {
+            $response .= '<br />OK: ' . $sql;
+        } else {
+            $response .= '<br />ERROR: ' . $sql;
+        }
+        
         $response .= '</div>';
         return $response;
     }
@@ -200,6 +200,7 @@ class smt_admin_database extends smt {
             'DELETE FROM tagging',
             'DELETE FROM category2media',
             'DELETE FROM media',
+            'DELETE FROM block',
         );
         $response = array();
         foreach( $sqls as $sql ) {
@@ -329,8 +330,8 @@ class smt_admin_database extends smt {
 'block' =>
     "CREATE TABLE IF NOT EXISTS 'block' (
     'pageid' INTEGER PRIMARY KEY,
-	'title' TEXT,
-	'thumb' TEXT )",
+    'title' TEXT,
+    'thumb' TEXT )",
 
 'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger', 'This is a demonstration of the Shared Media Tagger software.')",
 
@@ -380,7 +381,34 @@ class smt_admin_database extends smt {
         return $response;
     }
 
-} // END class smt_api
+} // END class smt_admin_database_utils
+
+//////////////////////////////////////////////////////////
+// Wikimedia Commons Database
+class smt_admin_database extends smt_admin_database_utils {
+
+    //////////////////////////////////////////////////////////
+    function get_block_count() {
+        $count = $this->query_as_array('SELECT count(block.pageid) AS count FROM block');
+        if( isset($count[0]['count']) ) {
+            return $count[0]['count'];
+        }
+        return 0;
+    } // end function get_block_count()
+    
+    //////////////////////////////////////////////////////////
+    function is_blocked( $pageid ) {
+        $block = $this->query_as_array(
+            'SELECT pageid FROM block WHERE pageid = :pageid',
+            array(':pageid'=>$pageid)
+        );
+        if( isset($block[0]['pageid']) ) {
+            return TRUE;
+        }
+        return FALSE;
+    } // end function is_blocked()
+    
+} // end class smt_admin_database
 
 //////////////////////////////////////////////////////////
 // Wikimedia Commons API
@@ -499,19 +527,33 @@ class smt_commons_API extends smt_admin_database {
     //////////////////////////////////////////////////////////
     function get_media_from_category( $category='' ) {
         
-        $this->notice("::get_media_from_category( 1: $category )");
         $category = trim($category);
         if( !$category ) { return false; } 
         $category = ucfirst($category);
         if ( !preg_match('/^[Category:]/i', $category)) { 
             $category = 'Category:' . $category; 
         } 
-        $this->notice("::get_media_from_category( 2: $category )");
         
+        $this->notice("::get_media_from_category( $category )");
+
         $categorymembers = $this->get_api_categorymembers( $category );
         if( !$categorymembers ) { 
             $this->error('::get_media_from_category: No Media Found');
             return FALSE;
+        }
+        
+        $blocked = $this->query_as_array(
+            'SELECT pageid FROM block WHERE pageid IN (' 
+                . implode($categorymembers, ',') 
+            . ')');
+        if( $blocked ) {
+            $this->error('ERROR: ' . sizeof($blocked) . ' BLOCKED MEDIA FILES');
+            foreach( $blocked as $bpageid ) {
+                if(($key = array_search($bpageid['pageid'], $categorymembers)) !== false) {
+                    unset($categorymembers[$key]);
+                }
+                $this->error("Skipping BLOCKED Media: " . $bpageid['pageid']);
+            }
         }
         
         $chunks = array_chunk( $categorymembers, 50 );
@@ -726,4 +768,3 @@ class smt_admin extends smt_commons_API {
     }
 
 }
-
