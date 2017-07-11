@@ -30,12 +30,12 @@ print '<tr>
 foreach( $users as $user ) {
 	print '<tr>'
 	. '<td>' . $user['id'] . '</td>'
-	. '<td>?</td>'
+	. '<td>' . $smt->get_user_tag_count( $user['id'] ) . '</td>'
 	. '<td>' . $user['page_views'] . '</td>'
-	. '<td>' . $user['last'] . '</td>'
-	. '<td>' . $user['ip'] . '</td>'
-	. '<td>' . $user['host'] . '</td>'
-	. '<td>' . $user['user_agent'] . '</td>'
+	. '<td><small>' . $user['last'] . '</small></td>'
+	. '<td><small>' . $user['ip'] . '</small></td>'
+	. '<td><small>' . $user['host'] . '</small></td>'
+	. '<td><small>' . $user['user_agent'] . '</small></td>'
 
 	. '</tr>';
 }

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.24');
+define('__SMT__', '0.4.25');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -645,8 +645,12 @@ class smt_user EXTENDS smt_site_utils {
 	var $user_id;
 
 	//////////////////////////////////////////////////////////
-	function get_users() {
-		$users = $this->query_as_array('SELECT * FROM user');
+	function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
+		$sql = 'SELECT * FROM user';
+		$sql .= ' ORDER BY ' . $orderby;
+		$sql .= ' LIMIT ' . $limit;
+		
+		$users = $this->query_as_array($sql);
 		if( isset($users[0]) ) {
 			return $users;
 		}
@@ -673,6 +677,20 @@ class smt_user EXTENDS smt_site_utils {
 		$this->save_user_view();
 		return TRUE;
 	} // end function get_user_info()
+
+	//////////////////////////////////////////////////////////
+	function get_user_tag_count( $user_id ) {
+		$count = $this->query_as_array(
+			'SELECT sum(count) AS sum FROM user_tagging WHERE user_id = :user_id',
+			array(':user_id'=>$user_id)
+		);
+		if( isset($count[0]['sum']) ) {
+			//$this->notice('get_user_tag_count OK: ' . $count[0]['sum']);
+			return $count[0]['sum'];
+		}
+		//$this->notice('get_user_tag_count: ERROR');
+		return 0;
+	}
 
 	//////////////////////////////////////////////////////////
 	function save_user_view() {
