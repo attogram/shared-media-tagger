@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.20');
+define('__SMT__', '0.4.21');
 
 $f = __DIR__.'/_setup.php'; 
 if(file_exists($f) && is_readable($f)){ include_once($f); }
@@ -70,8 +70,8 @@ class smt_utils {
     }
 
     //////////////////////////////////////////////////////////
-    function is_positive_number($n='') { 
-        if ( preg_match('/^[0-9]*$/', $n )) { return TRUE; }
+    function is_positive_number( $number='') { 
+        if ( preg_match('/^[0-9]*$/', $number )) { return TRUE; }
         return FALSE;
     }
 
@@ -767,7 +767,7 @@ class smt EXTENDS smt_site_utils {
     }
     
     //////////////////////////////////////////////////////////
-    function display_thumbnail( $media='', $size='' ) {
+    function display_thumbnail( $media='' ) {
         
         $thumb = $this->get_thumbnail($media);
 

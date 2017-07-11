@@ -126,11 +126,11 @@ class smt_admin_database_utils extends smt {
                 $this->error('::save_images_to_database: FAILED insert into media table'); 
                 $this->error('::save_images_to_database: SQL: ' . $sql); 
                 $this->error('::save_images_to_database: BIND i: ' . print_r($new,1) ); 
+				$this->error("STOPPING IMPORT");
                 exit;
-                continue;
-            } else { 
-                $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
-            }
+            } 
+            
+			$this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
             
             // connect category
             $response = $this->query_as_bool(
@@ -734,19 +734,19 @@ class smt_admin extends smt_commons_API {
         // see <https://wiki.creativecommons.org/wiki/License_Versions>
         // See <https://wiki.creativecommons.org/wiki/Jurisdiction_Database>
         elseif (preg_match('/^cc([ -]by)?([ -]sa)?([ -]([1-4]\.0|2\.5))([ -]([a-z][a-z]))?$/', $license, $match)) {
-            $by      = $match[1] ? 'by' : '';
-            $sa      = $match[2] ? 'sa' : '';
-            $port    = isset($match[6]) ? $match[6] : '';
+            $byline = $match[1] ? 'by' : '';
+            $sharealike = $match[2] ? 'sa' : '';
+            $port = isset($match[6]) ? $match[6] : '';
             $version = $match[4];
             
             // just "CC" is not enough
-            if (!($by or $sa) or !$version) return;
+            if (!($byline or $sharealike) or !$version) return;
             
             // only 1.0 had pure SA-license without BY
-            if ($version == "1.0" && !$by) {
+            if ($version == "1.0" && !$byline) {
                 $condition = "sa";
             } else {
-                $condition = $sa ? "by-sa" : "by";
+                $condition = $sharealike ? "by-sa" : "by";
             }    
 
             // ported versions only existed in 2.0, 2.5, and 3.0

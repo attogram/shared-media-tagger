@@ -204,17 +204,17 @@ $smt->include_footer();
 function delete_category($smt) {
     $category_id = $_GET['d'];
     $smt->notice("Deleting category ID #$category_id");
-    $sql = array(
+    $sqls = array(
         'DELETE FROM category WHERE id = :category_id',
         'DELETE FROM category2media WHERE category_id = :category_id',
     );
     $response = array();
-    foreach( $sql as $s ) {
-        if( $smt->query_as_bool($s, array(':category_id'=>$category_id) ) ) {
-            $response[] = 'Delete OK  : ' . $s;
-        } else {
-            $response[] = 'Delete FAIL: ' . $s;
-        }
+    foreach( $sqls as $sql ) {
+        if( $smt->query_as_bool($sql, array(':category_id'=>$category_id) ) ) {
+            $response[] = 'Delete OK  : ' . $sql;
+			continue;
+        } 
+        $response[] = 'Delete FAIL: ' . $sql;
     }
     $smt->notice($response);
     return;

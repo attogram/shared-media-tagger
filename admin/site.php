@@ -110,12 +110,11 @@ function save_tag() {
         ':padding'    => @$_GET['padding'],
     );
     
-    
-    $r = $smt->query_as_bool($sql, $bind);
-    if( $r ) {
+    if( $smt->query_as_bool($sql, $bind) ) {
         $smt->notice('OK: Saved Tag ID#'.$_GET['tagid']);
         return TRUE;
     }
-    $smt->notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>' . print_r($bind,1) . ' </pre>');
+    $smt->notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>' 
+		. print_r($bind,1) . ' </pre>');
     return FALSE;
 }    

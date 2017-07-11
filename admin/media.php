@@ -70,17 +70,17 @@ function delete_media_in_category( $category_name ) {
         $smt->error('::delete_media_in_category: Invalid Category Name: ' . $category_name);
         return FALSE;
     }
-    $r = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
+    $return = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
     . 'Deleting Media in <b>' . $category_name . '</b>';
     
     $media = $smt->get_media_in_category( $category_name );
     
-    $r .= '<br /><b>' . count($media) . '</b> Media files found in Category';
+    $return .= '<br /><b>' . count($media) . '</b> Media files found in Category';
     
     foreach( $media as $pageid ) {
-        $r .= '<br />Deleting #' . $pageid;
-        $r .= $smt->delete_media($pageid);
+        $return .= '<br />Deleting #' . $pageid;
+        $return .= $smt->delete_media($pageid);
     }
-    $r .= '</div><br />';
-    return $r;
+    $return .= '</div><br />';
+    return $return;
 }
