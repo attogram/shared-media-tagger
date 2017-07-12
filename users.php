@@ -11,9 +11,9 @@ $all_users = $smt->get_users();
 $users = array();
 
 foreach( $all_users as $user ) {
-	$user['tag_count'] = $smt->get_user_tag_count( $user['id'] );
-	$user['user_tagging'] = $smt->get_user_tagging( $user['id'] );
-	$users[$user['id']] = $user;
+    $user['tag_count'] = $smt->get_user_tag_count( $user['id'] );
+    $user['user_tagging'] = $smt->get_user_tagging( $user['id'] );
+    $users[$user['id']] = $user;
 }
 
 //$smt->notice($users);
@@ -37,7 +37,7 @@ if( !$users ) {
 }
 
 foreach( $users as $user ) {
-	if( !$user['tag_count'] ) { continue; }
+    if( !$user['tag_count'] ) { continue; }
     print '<div style="display:inline-block; border:1px solid grey; padding:4px; margin:2px; ">'
     . '<h2><a href="' . $smt->url('users') . '?i=' . $user['id'] . '">'
     . '+' . $user['tag_count'] . '</h2>'

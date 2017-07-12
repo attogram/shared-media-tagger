@@ -212,7 +212,7 @@ function delete_category($smt) {
     foreach( $sqls as $sql ) {
         if( $smt->query_as_bool($sql, array(':category_id'=>$category_id) ) ) {
             $response[] = 'Delete OK  : ' . $sql;
-			continue;
+            continue;
         } 
         $response[] = 'Delete FAIL: ' . $sql;
     }

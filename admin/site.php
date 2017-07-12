@@ -115,6 +115,6 @@ function save_tag() {
         return TRUE;
     }
     $smt->notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>' 
-		. print_r($bind,1) . ' </pre>');
+        . print_r($bind,1) . ' </pre>');
     return FALSE;
 }    

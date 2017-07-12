@@ -126,11 +126,11 @@ class smt_admin_database_utils extends smt {
                 $this->error('::save_images_to_database: FAILED insert into media table'); 
                 $this->error('::save_images_to_database: SQL: ' . $sql); 
                 $this->error('::save_images_to_database: BIND i: ' . print_r($new,1) ); 
-				$this->error("STOPPING IMPORT");
+                $this->error("STOPPING IMPORT");
                 exit;
             } 
             
-			$this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
+            $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
             
             // connect category
             $response = $this->query_as_bool(
@@ -233,7 +233,7 @@ class smt_admin_database_utils extends smt {
         $this->vacuum();
         return $response;
     }
-	
+    
     //////////////////////////////////////////////////////////
     function empty_tagging_tables() {
         $sqls = array(
@@ -373,22 +373,22 @@ class smt_admin_database_utils extends smt {
     'thumb' TEXT )",
 
 'user' =>
-	"CREATE TABLE IF NOT EXISTS 'user' (
-	'id' INTEGER PRIMARY KEY,
-	'ip' TEXT,
-	'host' TEXT,
-	'user_agent' TEXT,
-	'page_views' INTEGER,
-	'last' TEXT,
-	CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
+    "CREATE TABLE IF NOT EXISTS 'user' (
+    'id' INTEGER PRIMARY KEY,
+    'ip' TEXT,
+    'host' TEXT,
+    'user_agent' TEXT,
+    'page_views' INTEGER,
+    'last' TEXT,
+    CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
 
 'user_tagging' =>
-	"CREATE TABLE IF NOT EXISTS 'user_tagging' (
-	'id' INTEGER PRIMARY KEY,
-	'user_id' INTEGER,
-	'tag_id' INTEGER,
-	'media_pageid' INTEGER,
-	'count' INTEGER,
+    "CREATE TABLE IF NOT EXISTS 'user_tagging' (
+    'id' INTEGER PRIMARY KEY,
+    'user_id' INTEGER,
+    'tag_id' INTEGER,
+    'media_pageid' INTEGER,
+    'count' INTEGER,
     CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
 
 

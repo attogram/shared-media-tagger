@@ -48,11 +48,11 @@ if( isset($_GET['a']) ) {
             print '<p>Emptying Media tables:</p>'; print_r( $smt->empty_media_tables() ); break;
         case 'ec':
             print '<p>Emptying Category tables:</p>'; print_r( $smt->empty_category_tables() ); break;
-		case 'et':
+        case 'et':
             print '<p>Emptying Tagging tables:</p>'; print_r( $smt->empty_tagging_tables() ); break;
-		case 'eu':
+        case 'eu':
             print '<p>Emptying User tables:</p>'; print_r( $smt->empty_user_tables() ); break;
-			
+            
     }
 }
 

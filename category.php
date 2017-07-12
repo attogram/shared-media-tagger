@@ -27,9 +27,10 @@ if( !$category_info ) {
 $category_size = $smt->get_category_size( $category_name );
 
 $pager = '';
+$sql_limit = '';
 if( $category_size > $page_limit ) {
     $offset = isset($_GET['o']) ? $_GET['o'] : 0;
-    $sql .= " LIMIT $page_limit OFFSET $offset";
+    $sql_limit = " LIMIT $page_limit OFFSET $offset";
     $page_count = 0;
     $pager = 'pages: ';
     for( $x = 0; $x < $category_size; $x+=$page_limit ) {
@@ -51,7 +52,7 @@ $sql = '
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name
     ORDER BY m.pageid ASC
-';
+    ' . $sql_limit;
 $bind = array(':category_name'=>$category_name);
 
 $category = $smt->query_as_array( $sql, $bind );
