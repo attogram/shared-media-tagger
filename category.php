@@ -35,31 +35,31 @@ $sql = '
     AND c.name = :category_name
     ORDER BY m.pageid ASC
 ';
+$bind = array(':category_name'=>$category_name);
 
+$category = $smt->query_as_array( $sql, $bind );
+
+if( !$category || !is_array($category) ) {
+    $smt->fail404('404 Category Not Found');
+}
+
+$pager = '';
 if( $category_size > $page_limit ) {
     $offset = isset($_GET['o']) ? $_GET['o'] : 0;
     $sql .= " LIMIT $page_limit OFFSET $offset";
-    $pager = '';
-	$page_count = 0;
+    $page_count = 0;
+    $pager = 'pages: ';
     for( $x = 0; $x < $category_size; $x+=$page_limit ) {
-		if( $x == $offset ) {
-			$pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">&nbsp;' 
-			. ++$page_count . '&nbsp;</span>';
-			continue;
-		}
+        if( $x == $offset ) {
+            $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">&nbsp;' 
+            . ++$page_count . '&nbsp;</span>';
+            continue;
+        }
         $pager .= '<a href="?o=' . $x . '&amp;c=' 
-		. $smt->category_urlencode($smt->strip_prefix($category_name)) 
-		. '">&nbsp;' . ++$page_count . '&nbsp;</a>';
+        . $smt->category_urlencode($smt->strip_prefix($category_name)) 
+        . '">&nbsp;' . ++$page_count . '&nbsp;</a>';
     }
 } 
-
-$bind = array(':category_name'=>$category_name);
-
-$i = $smt->query_as_array( $sql, $bind );
-
-if( !$i || !is_array($i) ) {
-    $smt->fail404('404 Category Not Found');
-}
 
 $smt->include_header();
 $smt->include_menu();
@@ -76,8 +76,8 @@ print '<div class="box white">'
         $category_name)
     . '</h1>'
     . '<br /><b>' . $category_size 
-    . '</b> files, pages: '
-    . $pager
+    . '</b> files'
+    . ($pager ? ', '.$pager : '')
     . '</p><br clear="all" />'
     ;
 
@@ -85,7 +85,7 @@ if( $smt->is_admin() ) {
     print '<form action="' . $smt->url('admin') .'media.php" method="GET">';
 }
 
-foreach( $i as $media ) {
+foreach( $category as $media ) {
     print $smt->display_thumbnail_box( $media );
 }
  
@@ -93,7 +93,9 @@ if( $smt->is_admin() ) {
     print '<p><input type="submit" value="Delete selected media"></p></form>';
 }
 
-print '<p>pages: ' . $pager . '</p>';
+if( $pager ) {
+    print '<p>' . $pager . '</p>';
+}
 
 print '</div>';
 $smt->include_footer();
