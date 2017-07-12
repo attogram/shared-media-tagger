@@ -233,7 +233,44 @@ class smt_admin_database_utils extends smt {
         $this->vacuum();
         return $response;
     }
-    
+	
+    //////////////////////////////////////////////////////////
+    function empty_tagging_tables() {
+        $sqls = array(
+            'DELETE FROM tagging',
+            'DELETE FROM user_tagging',
+        );
+        $response = array();
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql) ) {
+                $response[] = 'OK: ' . $sql;
+            } else {
+                $response[] = 'FAIL: ' . $sql;
+            }
+        }
+        $this->vacuum();
+        return $response;
+    }
+
+    //////////////////////////////////////////////////////////
+    function empty_user_tables() {
+        $sqls = array(
+            'DELETE FROM user',
+            'DELETE FROM tagging',
+            'DELETE FROM user_tagging',
+        );
+        $response = array();
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql) ) {
+                $response[] = 'OK: ' . $sql;
+            } else {
+                $response[] = 'FAIL: ' . $sql;
+            }
+        }
+        $this->vacuum();
+        return $response;
+    }
+        
     //////////////////////////////////////////////////////////
     function create_tables() {
         $this->debug('smt_db_init:create_database()');

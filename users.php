@@ -7,17 +7,24 @@ if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance';
 
 $smt = new smt();
 
-$users = $smt->get_users();
+$all_users = $smt->get_users();
+$users = array();
 
-$user_ids = array();
-foreach( $users as $user ) {
-    $user_ids[] = $user['id'];
+foreach( $all_users as $user ) {
+	$user['tag_count'] = $smt->get_user_tag_count( $user['id'] );
+	if( !$user['tag_count'] ) {
+		continue;
+	}
+	//$user['user_tagging'] = $smt->get_user_tagging( $user['id'] );
+	$users[$user['id']] = $user;
 }
+
+//$smt->notice($users);
 
 $user_id = FALSE;
 if( isset($_GET['i']) ) {
     $user_id = $_GET['i'];
-    if( !in_array($user_id, $user_ids) ) {
+    if( !array_key_exists($user_id, $users) ) {
         $smt->fail404('404 User Not Found');
     }
 }
@@ -32,13 +39,10 @@ if( !$users ) {
 }
 
 foreach( $users as $user ) {
-    $tag_count = $smt->get_user_tag_count( $user['id'] );
-    if( !$tag_count ) {
-        continue; // user has not tagged anything yet
-    }
+
     print '<div style="display:inline-block; border:1px solid grey; padding:4px; margin:2px; ">'
     . '<h2><a href="' . $smt->url('users') . '?i=' . $user['id'] . '">'
-    . '+' . $tag_count . '</h2>'
+    . '+' . $user['tag_count'] . '</h2>'
     . ' <small>user:' . $user['id'] . '</small>'
     . '</a>'
     . '</div>';

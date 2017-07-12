@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.35');
+define('__SMT__', '0.4.36');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -31,7 +31,10 @@ class smt_utils {
             case 'fail':   $class = 'fail';   $head = 'GURU MEDITATION FAILURE'; break;
             default: return;
         }
-        print '<div class="message ' . $class . '"><b>' . $head . '</b>: ' . print_r($message,1) . '</div>';
+		if( is_array($message) ) {
+			$message = '<pre>' . print_r($message,1) . '</pre>';
+		}
+        print '<div class="message ' . $class . '"><b>' . $head . '</b>: ' . $message . '</div>';
     }
 
     //////////////////////////////////////////////////////////

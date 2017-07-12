@@ -17,14 +17,23 @@ print '<div class="box white">';
 <p>- <a href="sqladmin.php" target="sqlite">SQLite ADMIN</a></p>
 <p>- <a href="database.php?a=c">CREATE tables</a></p>
 
+<br />
+<br />
+<br />
+<br />
+<br />
 <div style="color:darkred; background-color:lightpink; padding:10px; display:inline-block;">
 DANGER ZONE:
-<br >
+<br />
+<br />- <a onclick="return confirm('Confirm: EMPTY Tagging tables?');" href="database.php?a=et">EMPTY Tagging tables</a>
+<br />
+<br />- <a onclick="return confirm('Confirm: EMPTY User tables?');" href="database.php?a=eu">EMPTY User tables</a>
+<br />
 <br />- <a onclick="return confirm('Confirm: EMPTY Media tables?');" href="database.php?a=em">EMPTY Media tables</a>
 <br />
 <br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');" href="database.php?a=ec">EMPTY Category tables</a>
 <br />
-<br />- <a onclick="return confirm('Confirm: DROP tables?');" href="database.php?a=d">DROP tables</a>
+<br />- <a onclick="return confirm('Confirm: DROP tables?');" href="database.php?a=d">DROP ALL tables</a>
 </div>
 <?php
 
@@ -39,6 +48,11 @@ if( isset($_GET['a']) ) {
             print '<p>Emptying Media tables:</p>'; print_r( $smt->empty_media_tables() ); break;
         case 'ec':
             print '<p>Emptying Category tables:</p>'; print_r( $smt->empty_category_tables() ); break;
+		case 'et':
+            print '<p>Emptying Tagging tables:</p>'; print_r( $smt->empty_tagging_tables() ); break;
+		case 'eu':
+            print '<p>Emptying User tables:</p>'; print_r( $smt->empty_user_tables() ); break;
+			
     }
 }
 
