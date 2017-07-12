@@ -2,18 +2,22 @@
 // Shared Media File
 // Tag
 
-$media_id = isset($_GET['m']) ? $_GET['m'] : FALSE;
-$tag_id = isset($_GET['t']) ? $_GET['t'] : FALSE;
-
-if( !$media_id | !$tag_id ) {
-    print 'INVALID TAG';
-    exit;
-}
 
 $init = __DIR__.'/smt.php'; 
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 
 $smt = new smt('Tag');
+
+$media_id = isset($_GET['m']) ? $_GET['m'] : FALSE;
+
+$tag_id = isset($_GET['t']) ? $_GET['t'] : FALSE;
+
+if( !$media_id | !$tag_id ) {
+    $smt->fail404('404 Tag Not Found');
+}
+
+// TODO - check here if user already rated this media - then delete old rating, add new rating
+
 
 $where = 'WHERE tag_id=:tag_id AND media_pageid=:media_id';
 $sql = 'SELECT count FROM tagging ' . $where;
