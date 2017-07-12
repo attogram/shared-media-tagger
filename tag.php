@@ -36,12 +36,6 @@ if( !$smt->get_user(1) ) {
     $smt->fail404('404 User Not Found');
 }
 
-// Update user last time
-$res = $smt->query_as_bool(
-	'UPDATE user SET last = :last WHERE id = :user_id',
-	array(':user_id'=>$smt->user_id, ':last'=>gmdate('Y-m-d H:i:s'))
-);
-
 // has user already rated this file?
 $add_user_tag = TRUE;
 $rating = $smt->query_as_array(
@@ -62,6 +56,9 @@ if( $rating ) {  // existing user rating for this media file
         goto redirect;
     }
 
+    $smt->save_user_last_tag_time();
+    $add_user_tag = FALSE;
+
     // user_tagging: Switch old tag to new tag
     $res = $smt->query_as_bool(
         'UPDATE user_tagging
@@ -70,7 +67,6 @@ if( $rating ) {  // existing user rating for this media file
         AND media_pageid = :media_id',
         array(':tag_id'=>$tag_id, ':user_id'=>$smt->user_id, ':media_id'=>$media_id)
     );
-    $add_user_tag = FALSE;
     //$smt->debug('2NDRATE: CHANGE: USER_TAGGING: old_tag:'.$old_tag. '  new_tag:'.$tag_id.'   result='.$res);
 
     // global tagging: -1 old tag
@@ -99,6 +95,7 @@ if( $add_user_tag ) {
             . ' VALUES ( 1, :tag_id, :media_id, :user_id )', $bind);
         //$smt->debug('user tagging INSERTED. result:'.$res);
     }
+    $smt->save_user_last_tag_time();
 }
 
 // global tagging: +1 new tag

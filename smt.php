@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.3');
+define('__SMT__', '0.5.4');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -515,6 +515,14 @@ class smt_user EXTENDS smt_site_admin {
         }
         return array();
     }
+
+    //////////////////////////////////////////////////////////
+	function save_user_last_tag_time() {
+		return $this->query_as_bool(
+			'UPDATE user SET last = :last WHERE id = :user_id',
+			array(':user_id'=>$this->user_id, ':last'=>gmdate('Y-m-d H:i:s'))
+		);
+	}
 
     //////////////////////////////////////////////////////////
     function save_user_view() {
