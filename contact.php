@@ -37,11 +37,9 @@ $innertext = '* My Question or Comment:
 
 
 
-
 ';
 $footer = '
 * My Contact information:
-***
 
 
 ';
@@ -70,7 +68,7 @@ if( isset($_GET['r']) && $smt->is_positive_number($_GET['r']) ) {
 form:
 
 print $headline . '<form method="POST">
-<textarea name="c" rows="15" cols="60">' . $innertext . $footer . '</textarea>
+<textarea name="c" rows="12" cols="60">' . $innertext . $footer . '</textarea>
 <p><input type="submit" value="           Send message          "></p>
 </form><br /></div>';
 $smt->include_footer();

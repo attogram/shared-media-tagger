@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.1');
+define('__SMT__', '0.5.2');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -531,7 +531,7 @@ class smt_user EXTENDS smt_site_admin {
                 'INSERT INTO user (
                     ip, host, user_agent, page_views, last
                 ) VALUES (
-                    :ip_address, :host, :user_agent, 1, :last
+                    :ip_address, :host, :user_agent, 0, :last
                 )',
                 array( 
                     ':ip_address'=>$ip_address, 
