@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.41');
+define('__SMT__', '0.5.0');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -122,25 +122,26 @@ class smt_utils {
     function include_footer() {
         $this->include_menu();
         print '<footer>'
-        . '<div class="menu">'
-        . '<span class="nobr">Powered by <b>'
+        . '<div class="menu" style="line-height:2; font-size:70%;">'
+        . '<br />'
+		. '<span class="nobr">Powered by <b>'
         . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
         . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>'
         . '<br />'
         . '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
         . @$_SERVER['SERVER_NAME'] 
         . '</a>'
-        . '</b></span>'
-        . '</div>'
-        . '</footer>';
+        . '</b></span>';
+
     
         if( $this->is_admin() ) {
-            print '<div class="menu" style="font-weight:bold;">'
-            . '<a href="' . $this->url('admin') . '">ADMIN MENU</a>'
-            . ' &nbsp; &nbsp; &nbsp; '
-            . '<a href="' . $this->url('home') . '?logoff">logoff</a>'
-            . '</div>';
+            print '<br /><br />'
+            . 'SQL count: ' . $this->sql_count
+            . '<br /><a href="' . $this->url('home') . '?logoff">ADMIN logoff</a>'
+            ;
         }
+		
+		print '</div></footer>';
 
         // Site footers
         if( $this->is_admin() || get_class($this) == 'smt_admin') {
@@ -468,7 +469,7 @@ class smt_user EXTENDS smt_site_admin {
             return $this->new_user($ip_address, $host, $user_agent);
         }
         $this->user_id = $user[0]['id'];
-        $this->save_user_view();
+        //$this->save_user_view(); // testing
         return TRUE;
     } // end function get_user_info()
 

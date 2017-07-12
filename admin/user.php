@@ -21,7 +21,6 @@ print '<table border="1">';
 print '<tr>
 <td>ID</td>
 <td>Tags</td>
-<td>Views</td>
 <td>Last</td>
 <td>IP/Host</td>
 <td>User Agent</td>
@@ -35,8 +34,8 @@ foreach( $users as $user ) {
     . '<td>' . $user['id'] . '</td>'
     . '<td><a href="' . $smt->url('users') .'?i=' . $user['id'] . '">+' 
     . $smt->get_user_tag_count( $user['id'] ) . '</a></td>'
-    . '<td>' . $user['page_views'] . '</td>'
-    . '<td><small>' . $user['last'] . '</small></td>'
+    //. '<td>' . $user['page_views'] . '</td>'
+    . '<td class="nobr"><small>' . $user['last'] . '</small></td>'
     . '<td><small>' . $iphost . '</small></td>'
     . '<td><small>' . $user['user_agent'] . '</small></td>'
 

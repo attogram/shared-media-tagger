@@ -2,7 +2,8 @@
 
 ALPHA RELEASE
 
-* Shared Media Tagger (SMT) allows users to tag a curated set of images and media from WikiMedia Commons.
+* Shared Media Tagger is a rating site creator for images and media files, 
+fed from administrator-curated media from Wikimedia Commons.
 
 
 ## Requirements
