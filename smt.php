@@ -1,9 +1,9 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.2');
+define('__SMT__', '0.5.3');
 
-$init = __DIR__.'/_setup.php'; 
+$init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
 
 //////////////////////////////////////////////////////////
@@ -12,15 +12,15 @@ class smt_utils {
 
     var $links; // array of [page_name] = page_url
     var $debug; // debug mode TRUE / FALSE;
-    
+
     //////////////////////////////////////////////////////////
     function url( $link='' ) {
-        if( !$link || !isset($this->links[$link]) ) { 
+        if( !$link || !isset($this->links[$link]) ) {
             $this->error("::url: Link Not Found: $link");
             return FALSE;
-        } 
+        }
         return $this->links[$link];
-    } 
+    }
 
     //////////////////////////////////////////////////////////
     function log_message( $message, $type ) {
@@ -47,7 +47,7 @@ class smt_utils {
     function notice( $message='' ) {
         $this->log_message( $message, 'notice' );
     }
-    
+
     //////////////////////////////////////////////////////////
     function error( $message='' ) {
         $this->log_message( $message, 'error' );
@@ -69,11 +69,11 @@ class smt_utils {
         }
         print '<div class="box white center" style="padding:50px 0px 50px 0px;"><h1>' . $message . '</h1></div>';
         $this->include_footer();
-        exit;        
+        exit;
     }
 
     //////////////////////////////////////////////////////////
-    function is_positive_number( $number='') { 
+    function is_positive_number( $number='') {
         if ( preg_match('/^[0-9]*$/', $number )) { return TRUE; }
         return FALSE;
     }
@@ -94,9 +94,9 @@ class smt_utils {
         if( strlen($string) >= $length ) {
             return $string;
         }
-        return str_pad($string, $length, ' ', STR_PAD_BOTH);        
+        return str_pad($string, $length, ' ', STR_PAD_BOTH);
     }
-    
+
     //////////////////////////////////////////////////////////
     function include_header() {
         print "<!doctype html>\n"
@@ -117,35 +117,36 @@ class smt_utils {
         }
 
     } // end function include_header()
-    
+
     //////////////////////////////////////////////////////////
     function include_footer() {
 
-		$this->include_menu();
+        $this->include_menu();
 
-		print '<footer>'
+        print '<footer>'
         . '<div class="menu" style="line-height:2; font-size:70%;">';
-		
-		if( !@$this->setup['hide_powered_by'] ) {	
-			print '<br />'
-			. '<span class="nobr">Powered by <b>'
-			. '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
-			. 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
-		}
-		if( !@$this->setup['hide_hosted_by'] ) {
-			print '<br />'
-			. '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
-			. @$_SERVER['SERVER_NAME'] . '</a></b></span>';			
-		}
+
+        if( !@$this->setup['hide_powered_by'] ) {
+            print '<br />'
+            . '<span class="nobr">Powered by <b>'
+            . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
+            . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
+        }
+        if( !@$this->setup['hide_hosted_by'] ) {
+            print '<br />'
+            . '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
+            . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
+        }
 
         if( $this->is_admin() ) {
             print '<br /><br />'
             . 'SQL count: ' . $this->sql_count
+            . '<br />user_id: ' . $this->user_id
             . '<br /><a href="' . $this->url('home') . '?logoff">ADMIN logoff</a>'
             ;
         }
-		
-		print '</div></footer>';
+
+        print '</div></footer>';
 
         // Site footers
         if( $this->is_admin() || get_class($this) == 'smt_admin') {
@@ -178,17 +179,19 @@ class smt_utils {
         . $space
         //. '<a href="'. $this->url('user') . '">User:' . $this->user_id . '</a>'
         //. $space
-        . '<a href="'. $this->url('users') . '?i=' . $this->user_id . '">Users</a>'
+        . '<a href="'. $this->url('users')
+            . ($this->user_id ? '?i=' . $this->user_id : '')
+        . '">Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
-		. ($this->is_admin() 
-			? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>'
-			: '')
+        . ($this->is_admin()
+            ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>'
+            : '')
         . '</div>'
         ;
 
     }  // end function include_menu()
-        
+
     //////////////////////////////////////////////////////////
     function include_small_menu() {
         $space = ' &nbsp; ';
@@ -216,7 +219,7 @@ class smt_database_utils EXTENDS smt_utils {
     var $db;
     var $sql_count;
     var $last_insert_id;
-    
+
     //////////////////////////////////////////////////////////
     function init_database() {
         $this->debug('::init_database()');
@@ -244,16 +247,16 @@ class smt_database_utils EXTENDS smt_utils {
         while( $xbind = each($bind) ) {
             $this->debug('::query_as_array(): bindParam '. $xbind[0] .' = ' . $xbind[1]);
             $statement->bindParam( $xbind[0], $xbind[1]);
-        }    
+        }
         if( !$statement->execute() ) {
             $this->error('::query_as_array(): ERROR EXECUTE: '
-                //. $sql 
+                //. $sql
                 . ' == '.print_r($this->db->errorInfo(),1));
             return array();
         }
         $this->sql_count++;
         $response = $statement->fetchAll(PDO::FETCH_ASSOC);
-        if( !$response && $this->db->errorCode() != '00000') { 
+        if( !$response && $this->db->errorCode() != '00000') {
             $this->error('::query_as_array(): ERROR FETCH: '.print_r($this->db->errorInfo(),1));
             $response = array();
         }
@@ -276,10 +279,10 @@ class smt_database_utils EXTENDS smt_utils {
         while( $xbind = each($bind) ) {
             $this->debug('::query_as_bool: bindParam: ' . $xbind[0] . ' = ' . htmlentities($xbind[1]));
             $statement->bindParam( $xbind[0], $xbind[1] );
-        }    
-        
+        }
+
         if( !$statement->execute() ) {
-            $this->error('::query_as_bool: EXECUTE FAILED: ' . $sql 
+            $this->error('::query_as_bool: EXECUTE FAILED: ' . $sql
             //. '<br />errorinfo:'.print_r($this->db->errorInfo(),1)
             );
             return FALSE;
@@ -343,15 +346,15 @@ class smt_database EXTENDS smt_database_utils {
 //////////////////////////////////////////////////////////
 // SMT - Media
 class smt_media EXTENDS smt_database {
-    
+
     var $image_count;
-    
+
     //////////////////////////////////////////////////////////
     function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
     function get_image_from_db($pageid) {
         $this->debug("smt-db:get_image_from_db($pageid)");
-        if( !$pageid || !$this->is_positive_number($pageid) ) { 
-            $this->error('get_image_from_db: ERROR no id'); 
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
+            $this->error('get_image_from_db: ERROR no id');
             return FALSE;
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
@@ -365,36 +368,36 @@ class smt_media EXTENDS smt_database {
             FROM media AS m
             LEFT JOIN tagging AS t ON t.media_pageid = m.pageid
             WHERE t.media_pageid IS NULL
-            ORDER BY RANDOM() 
+            ORDER BY RANDOM()
             LIMIT :limit';
         return $this->query_as_array( $sql, array('limit'=>$limit) );
     }
-    
+
     //////////////////////////////////////////////////////////
     function get_random_media($limit=1) {
         $unreviewed = $this->get_random_unreviewed_media($limit);
         if( $unreviewed ) {
-            if( mt_rand(1,5) != 1 ) { 
+            if( mt_rand(1,5) != 1 ) {
                 return $unreviewed;
             }
         }
         $sql = 'SELECT * FROM media ORDER BY RANDOM() LIMIT :limit';
         return $this->query_as_array($sql, array('limit'=>$limit));
     }
-    
+
     //////////////////////////////////////////////////////////
     function get_image_count( $redo=FALSE ) {
         if( isset($this->image_count) && !$redo ) {
             return $this->image_count;
         }
         $response = $this->query_as_array('SELECT count(pageid) AS count FROM media');
-        if( !$response ) { 
-            $this->debug('::get_image_count() ERROR query failed.'); 
-            return 0; 
+        if( !$response ) {
+            $this->debug('::get_image_count() ERROR query failed.');
+            return 0;
         }
         return $this->image_count = $response[0]['count'];
     }
-    
+
 } // END class media
 
 //////////////////////////////////////////////////////////
@@ -457,20 +460,24 @@ class smt_user EXTENDS smt_site_admin {
     } // end function get_users
 
     //////////////////////////////////////////////////////////
-    function get_user() {
+    function get_user( $create_new=FALSE ) {
         $ip_address = @$_SERVER['REMOTE_ADDR'];
         $host = @$_SERVER['REMOTE_HOST'];
-        if( !$host ) { 
+        if( !$host ) {
             $host = $ip_address;
         }
         $user_agent = @$_SERVER['HTTP_USER_AGENT'];
 
         $user = $this->query_as_array(
-            'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent', 
+            'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent',
             array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
         );
         if( !isset($user[0]['id']) ) {
-            return $this->new_user($ip_address, $host, $user_agent);
+            if( $create_new ) {
+                return $this->new_user($ip_address, $host, $user_agent); // testing
+            }
+            $this->user_id = 0;
+            return FALSE;
         }
         $this->user_id = $user[0]['id'];
         //$this->save_user_view(); // testing
@@ -492,14 +499,14 @@ class smt_user EXTENDS smt_site_admin {
     //////////////////////////////////////////////////////////
     function get_user_tagging( $user_id ) {
         $tags = $this->query_as_array(
-            'SELECT m.*, ut.tag_id, ut.count 
+            'SELECT m.*, ut.tag_id, ut.count
             FROM user_tagging AS ut, media AS m
             WHERE ut.user_id = :user_id
             AND ut.media_pageid = m.pageid
             ORDER BY ut.media_pageid
-            
-            LIMIT 100  -- TMP 
-            
+
+            LIMIT 100  -- TMP
+
             ',
             array(':user_id'=>$user_id)
         );
@@ -523,23 +530,23 @@ class smt_user EXTENDS smt_site_admin {
         }
         return FALSE;
     }
-    
+
     //////////////////////////////////////////////////////////
     function new_user( $ip_address, $host, $user_agent ) {
-        if( 
+        if(
             $this->query_as_bool(
                 'INSERT INTO user (
                     ip, host, user_agent, page_views, last
                 ) VALUES (
                     :ip_address, :host, :user_agent, 0, :last
                 )',
-                array( 
-                    ':ip_address'=>$ip_address, 
-                    ':host'=>$host, 
+                array(
+                    ':ip_address'=>$ip_address,
+                    ':host'=>$host,
                     ':user_agent'=>$user_agent,
                     ':last'=>gmdate('Y-m-d H:i:s')
                 )
-            ) 
+            )
         ) {
             $this->user_id = $this->last_insert_id;
             return TRUE;
@@ -549,14 +556,14 @@ class smt_user EXTENDS smt_site_admin {
         return FALSE;
     } // end function new_user()
 
-    
+
 } // end class smt_user
 
 //////////////////////////////////////////////////////////
 // SMT - Category
 class smt_category EXTENDS smt_user {
-    
-    var $category_count; 
+
+    var $category_count;
 
     //////////////////////////////////////////////////////////
     function display_categories( $media_id ) {
@@ -569,8 +576,8 @@ class smt_category EXTENDS smt_user {
         foreach($cats as $cat ) {
             $response .= ''
             . '+'
-            . '<a href="' . $this->url('category') 
-            . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
+            . '<a href="' . $this->url('category')
+            . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">'
             . $this->strip_prefix($cat) . '</a><br />';
         }
         return $response . '</div>';
@@ -582,17 +589,17 @@ class smt_category EXTENDS smt_user {
             return $string;
         }
         return preg_replace(
-            array( '/^File:/', '/^Category:/' ), 
-            '', 
+            array( '/^File:/', '/^Category:/' ),
+            '',
             $string
         );
     }
-   
+
     //////////////////////////////////////////////////////////
     function category_urldecode($category) {
         return str_replace(
-            '_', 
-            ' ', 
+            '_',
+            ' ',
             urldecode($category)
         );
     }
@@ -601,10 +608,10 @@ class smt_category EXTENDS smt_user {
     function category_urlencode($category) {
         return str_replace(
             '+',
-            '_', 
+            '_',
             str_replace(
                 '%3A',
-                ':', 
+                ':',
                 urlencode($category)
             )
         );
@@ -613,57 +620,57 @@ class smt_category EXTENDS smt_user {
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
         $response = $this->query_as_array(
-            'SELECT id, name, pageid, files, subcats FROM category WHERE name = :name', 
-            array(':name'=>$name) 
+            'SELECT id, name, pageid, files, subcats FROM category WHERE name = :name',
+            array(':name'=>$name)
         );
         if( !isset($response[0]['id']) ) {
             return array();
         }
         return $response[0];
     }
-    
+
     //////////////////////////////////////////////////////////
     function get_category_size( $category_name ) {
         $response = $this->query_as_array(
-            'SELECT count(c2m.id) AS size 
+            'SELECT count(c2m.id) AS size
             FROM category2media AS c2m, category AS c
             WHERE c.name = :name
             AND c2m.category_id = c.id
-            ', 
+            ',
             array(':name'=>$category_name)
-        );    
+        );
         if( !isset($response[0]['size']) ) {
             return 0;
         }
-        return $response[0]['size'];        
+        return $response[0]['size'];
     }
-    
+
     //////////////////////////////////////////////////////////
     function get_categories_count( $redo=FALSE ) {
         if( isset($this->category_count) && !$redo ) {
             return $this->category_count;
         }
         $response = $this->query_as_array('
-            SELECT count( distinct(category_id) ) AS count 
+            SELECT count( distinct(category_id) ) AS count
             FROM category2media');
-        if( !$response ) { 
-            $this->debug('::get_categories_count() ERROR query failed'); 
-            return 0; 
+        if( !$response ) {
+            $this->debug('::get_categories_count() ERROR query failed');
+            return 0;
         }
-        return $this->category_count = $response[0]['count'];        
+        return $this->category_count = $response[0]['count'];
     }
 
     //////////////////////////////////////////////////////////
-    function get_category_list() { 
+    function get_category_list() {
         $sql = 'SELECT name FROM category ORDER BY name';
         $response = $this->query_as_array( $sql );
         $return = array();
-        if( !$response || !is_array($response) ) { return $return; } 
-        while( $name = each($response) ) { 
+        if( !$response || !is_array($response) ) { return $return; }
+        while( $name = each($response) ) {
             $return[] = $name['value']['name'];
-        } 
+        }
         return $return;
- 
+
     }
 
     //////////////////////////////////////////////////////////
@@ -678,7 +685,7 @@ class smt_category EXTENDS smt_user {
             FROM category, category2media
             WHERE category2media.category_id = category.id
             AND category2media.media_pageid = :pageid',
-            array(':pageid'=>$pageid)            
+            array(':pageid'=>$pageid)
         );
         if( !isset( $response[0]['name'] ) ) {
             $this->error('::get_image_categories: ' . print_r($response,1) );
@@ -694,7 +701,7 @@ class smt_category EXTENDS smt_user {
     //////////////////////////////////////////////////////////
     function get_category_id_from_name( $category_name ) {
         $response = $this->query_as_array(
-            'SELECT id FROM category WHERE name = :name', 
+            'SELECT id FROM category WHERE name = :name',
             array(':name'=>$category_name)
         );
 
@@ -712,7 +719,7 @@ class smt_category EXTENDS smt_user {
             return array();
         }
         $response = $this->query_as_array(
-            'SELECT media_pageid 
+            'SELECT media_pageid
             FROM category2media
             WHERE category_id = :category_id
             ORDER BY media_pageid',
@@ -741,17 +748,17 @@ class smt_tag EXTENDS smt_category {
 
     //////////////////////////////////////////////////////////
     function display_tags( $media_id ) {
-        $tags = $this->get_tags();        
+        $tags = $this->get_tags();
         $response = '<div class="nobr" style="display:block; margin:auto;">';
         foreach( $tags as $tag ) {
             $response .=  ''
             . '<div class="tagbutton tag' . $tag['position'] . '">'
-            . '<a href="' . $this->url('tag') . '?m=' . $media_id 
-                . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">' 
+            . '<a href="' . $this->url('tag') . '?m=' . $media_id
+                . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">'
             . $tag['display_name']
             . '</a></div>';
         }
-        return $response . '</div>'; 
+        return $response . '</div>';
     }
 
     /////////////////////////////////////////////////////////
@@ -768,9 +775,9 @@ class smt_tag EXTENDS smt_category {
         }
         $response = '<div style="display:inline-block; text-align:left;">'
         . '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
-        return $response;        
+        return $response;
     }
-    
+
     //////////////////////////////////////////////////////////
     function get_tag_id_by_name( $name ) {
         if( isset( $this->tag_id[$name] ) ) {
@@ -778,9 +785,9 @@ class smt_tag EXTENDS smt_category {
         }
         $tag = $this->query_as_array(
             'SELECT id FROM tag WHERE name = :name LIMIT 1',
-            array(':name'=>$name) 
+            array(':name'=>$name)
         );
-        if( isset( $tag[0]['id'] ) ) { 
+        if( isset( $tag[0]['id'] ) ) {
             return $this->tag_id[$name] = $tag[0]['id'];
         }
         return $this->tag_id[$name] = 0;
@@ -793,14 +800,14 @@ class smt_tag EXTENDS smt_category {
         }
         $tag = $this->query_as_array(
             'SELECT name FROM tag WHERE id = :id LIMIT 1',
-            array(':id'=>$tag_id) 
+            array(':id'=>$tag_id)
         );
-        if( isset( $tag[0]['name'] ) ) { 
+        if( isset( $tag[0]['name'] ) ) {
             return $this->tag_name[$tag_id] = $tag[0]['name'];
         }
         return $this->tag_name[$tag_id] = $tag_id;
     }
-    
+
     //////////////////////////////////////////////////////////
     function get_tags() {
         if( isset($this->tags) ) {
@@ -830,7 +837,7 @@ class smt_tag EXTENDS smt_category {
         }
         return $count[0]['count'];
     }
-        
+
     /////////////////////////////////////////////////////////
     function get_reviews( $pageid ) {
         $reviews = $this->query_as_array('
@@ -847,13 +854,13 @@ class smt_tag EXTENDS smt_category {
     function get_reviews_per_category( $category_id ) {
         return $this->display_reviews( $this->get_db_reviews_per_category($category_id) );
     }
-   
+
     /////////////////////////////////////////////////////////
     function get_db_reviews_per_category( $category_id ) {
         $reviews = $this->query_as_array('
             SELECT SUM(t.count) AS count, tag.*
-            FROM tagging AS t, 
-                 tag, 
+            FROM tagging AS t,
+                 tag,
                  category2media AS c2m
             WHERE tag.id = t.tag_id
             AND c2m.media_pageid = t.media_pageid
@@ -863,17 +870,17 @@ class smt_tag EXTENDS smt_category {
             ', array(':category_id'=>$category_id) );
         return $reviews;
     }
-    
+
     /////////////////////////////////////////////////////////
     function get_total_files_reviewed_count() {
         if( isset($this->total_files_reviewed_count) ) {
             return $this->total_files_reviewed_count;
-        }        
+        }
         $response = $this->query_as_array('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
         if( isset($response[0]['total']) ) {
             return $this->total_files_reviewed_count = $response[0]['total'];
         }
-        return $this->total_files_reviewed_count = 0;        
+        return $this->total_files_reviewed_count = 0;
     }
 
     /////////////////////////////////////////////////////////
@@ -894,27 +901,27 @@ class smt_tag EXTENDS smt_category {
 // SMT - Shared Media Tagger
 class smt EXTENDS smt_tag {
 
-	var $setup;
+    var $setup;
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
 
     //////////////////////////////////////////////////////////
     function __construct( $title='' ) {
-        
+
         global $setup;
-        
-		$this->setup = array();
-		if( is_array($setup) ) {
-			$this->setup = $setup;
-		}
+
+        $this->setup = array();
+        if( is_array($setup) ) {
+            $this->setup = $setup;
+        }
 
         $this->debug = FALSE;
-        $this->database_name = __DIR__ . '/admin/db/media.sqlite';        
+        $this->database_name = __DIR__ . '/admin/db/media.sqlite';
         $this->title = $title;
         $this->sql_count = 0;
         $this->size_medium = 325;
         $this->size_thumb = 100;
-                
+
         if( isset($this->setup['site_url']) ) {
             $this->site_url = $setup['site_url'];
         } else {
@@ -926,7 +933,7 @@ class smt EXTENDS smt_tag {
         }
 
         $this->set_site_name();
-        
+
         $this->links = array(
             'home'       => $this->site_url . '',
             'css'        => $this->site_url . 'css.css',
@@ -942,7 +949,7 @@ class smt EXTENDS smt_tag {
             'users'      => $this->site_url . 'users.php',
             'github_smt' => 'https://github.com/attogram/shared-media-tagger',
         );
-        
+
         $this->get_user();
 
         if( isset($_GET['logoff']) ) {
@@ -952,11 +959,11 @@ class smt EXTENDS smt_tag {
 
     //////////////////////////////////////////////////////////
     function get_thumbnail( $media='', $thumb_width='' ) {
-        
+
         if( !$thumb_width || !$this->is_positive_number($thumb_width) ) {
             $thumb_width = $this->size_thumb;
         }
-                
+
         $default = array(
             'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
                     .'7+/Dw8HV1dfLy8ubm5vX19e3t7fr 6+nl5edra2nZ2dnx8fMHBwYODg/b29np6e'
@@ -964,10 +971,10 @@ class smt EXTENDS smt_tag {
                     . 'LAA4AAAVq4NFw1DNAX/o9imAsB tKpxKRd1+YEWUoIiUoiEWEAApIDMLGoRCyWi'
                     . 'KThenkwDgeGMiggDLEXQkDoTh CKNLpQDgjeAsY7MHgECgx8YR8oHwNHfwADBACG'
                     . 'h4EDA4iGAYAEBAcQIg0Dk gcEIQA7',
-            'width' => $thumb_width, 
+            'width' => $thumb_width,
             'height' => $thumb_width);
-            
-        
+
+
         if( !$media || !is_array($media) ) {
             return $default;
         }
@@ -976,7 +983,7 @@ class smt EXTENDS smt_tag {
         if( !$width ) { $width = $this->size_thumb; }
         $height = $media['height'];
         if( !$height ) { $height = $this->size_thumb; }
-        
+
         //$this->notice("::get_thumbnail: new-w:$thumb_width  old-w:$width old-h:$height");
         if( $thumb_width >= $width ) {
             //$this->notice('::get_thumbnail: new-w >= old-w');
@@ -987,23 +994,23 @@ class smt EXTENDS smt_tag {
         if( $height > $thumb_width ) {
             //$this->notice("WARNING: TALL THUMB");
         }
-        
+
         //$title = $media['title'];
         $mime = $media['mime'];
 
         $filename = $this->strip_prefix($media['title']);
         $filename = str_replace(' ','_',$filename);
-        
+
         $md5 = md5($filename);
         $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
-        . '/' . $md5[0] 
-        . '/' . $md5[0] . $md5[1] 
-        . '/' . $filename 
+        . '/' . $md5[0]
+        . '/' . $md5[0] . $md5[1]
+        . '/' . $filename
         . '/' . $thumb_width . 'px-' . $filename;
 
         $ratio = $width / $height;
         $thumb_height = round($thumb_width / $ratio);
-        
+
         switch( $mime ) {
             case 'application/ogg':
                 $thumb_url = str_replace('px-','px--',$thumb_url);
@@ -1020,15 +1027,15 @@ class smt EXTENDS smt_tag {
 
         return array('url'=>$thumb_url, 'width'=>$thumb_width, 'height'=>$thumb_height);
     }
-    
+
     //////////////////////////////////////////////////////////
     function display_thumbnail( $media='' ) {
-        
+
         $thumb = $this->get_thumbnail($media);
 
         return '<div style="display:inline-block;text-align:center;">'
             . '<a href="' .  $this->url('info') . '?i=' . $media['pageid'] . '">'
-            . '<img src="' . $thumb['url'] . '" width="' . $thumb['width'] 
+            . '<img src="' . $thumb['url'] . '" width="' . $thumb['width']
             . '" height="' . $thumb['height'] . '"'
             . ' title="' . htmlentities($media['title']) . '" /></a>'
             . '</div>'
@@ -1040,19 +1047,19 @@ class smt EXTENDS smt_tag {
         $return = '<div class="thumbnail_box">'
         . $this->display_thumbnail($media)
         . str_replace(
-            ' / ', 
-            '<br />', 
-            $this->display_attribution( $media, /*title truncate*/17, /*artist*/21 ) 
+            ' / ',
+            '<br />',
+            $this->display_attribution( $media, /*title truncate*/17, /*artist*/21 )
             )
         . $this->display_admin_functions( $media['pageid'] )
         //. '<br />'
         . '<div class="thumbnail_reviews left">'
-        . $this->get_reviews( $media['pageid'] ) 
+        . $this->get_reviews( $media['pageid'] )
         . '</div>'
         . '</div>';
         return $return;
     }
-    
+
     //////////////////////////////////////////////////////////
     function display_video( $media ) {
         $mime = $media['mime'];
@@ -1060,19 +1067,19 @@ class smt EXTENDS smt_tag {
         $width = $media['thumbwidth'];
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
-        
-        if( !$width || $width > $this->size_medium) { 
+
+        if( !$width || $width > $this->size_medium) {
             $height = $this->get_resized_height( $width, $height, $this->size_medium );
-            $width = $this->size_medium; 
+            $width = $this->size_medium;
         }
         //$infourl = $this->url('info') . '?i=' . $media['pageid'];
         $divwidth = $width = $media['thumbwidth'];
         if( $divwidth < $this->size_medium )  {
             $divwidth = $this->size_medium;
         }
-        
+
         $return = '<div style="width:' . $divwidth . 'px; margin:auto;">'
-        . '<video width="'. $divwidth . '" height="' . $height . '" poster="' . $poster 
+        . '<video width="'. $divwidth . '" height="' . $height . '" poster="' . $poster
         . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</video>'
@@ -1090,34 +1097,34 @@ class smt EXTENDS smt_tag {
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        if( !$width || $width > $this->size_medium) { 
+        if( !$width || $width > $this->size_medium) {
             $height = $this->get_resized_height( $width, $height, $this->size_medium );
-            $width = $this->size_medium; 
+            $width = $this->size_medium;
         }
         //$infourl = $this->url('info') . '?i=' . $media['pageid'];
         $divwidth = $width = $media['thumbwidth'];
         if( $divwidth < $this->size_medium )  {
             $divwidth = $this->size_medium;
         }
-        
+
         $return = '<div style="width:' . $divwidth . 'px; margin:auto;">'
-        . '<audio width="'. $width . '" height="' . $height . '" poster="' . $poster 
+        . '<audio width="'. $width . '" height="' . $height . '" poster="' . $poster
         . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</audio>'
         . $this->display_attribution( $media )
-        . $this->display_admin_functions( $media['pageid'] )        
+        . $this->display_admin_functions( $media['pageid'] )
         . '</div>';
-        return $return;    
+        return $return;
     }
-    
+
     //////////////////////////////////////////////////////////
     function display_image( $media='' ) {
         if( !$media || !is_array($media) ) {
             $this->error('display_image: ERROR: no image array');
             return FALSE;
         }
-        
+
         $mime = @$media['mime'];
 
         $video = array('application/ogg','video/webm');
@@ -1129,7 +1136,7 @@ class smt EXTENDS smt_tag {
         if( in_array( $mime, $audio ) ) {
             return $this->display_audio($media);
         }
-        
+
         $url = $media['thumburl'];
         $height = $media['thumbheight'];
         $divwidth = $width = $media['thumbwidth'];
@@ -1137,7 +1144,7 @@ class smt EXTENDS smt_tag {
             $divwidth = $this->size_medium;
         }
         $infourl =  $this->url('info') . '?i=' . $media['pageid'];
-        
+
         return  '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<a href="' . $infourl . '">'
         . '<img src="'. $url .'" height="'. $height .'" width="'. $width . '" alt=""></a>'
@@ -1152,7 +1159,7 @@ class smt EXTENDS smt_tag {
         if( !$media || !is_array($media) ) {
             $this->error('::display_attribution: Media Not Found');
             return FALSE;
-        }        
+        }
         $artist = @$media['artist'];
         if( !$artist ) {
             $artist = 'Unknown';
@@ -1163,11 +1170,11 @@ class smt EXTENDS smt_tag {
         }
         $licenseshortname = @$media['licenseshortname'];
         switch( $licenseshortname ) {
-            case 'No restrictions': 
+            case 'No restrictions':
             case 'Public domain':
                 $licenseshortname = 'Public Domain';
                 $copyright = ''; break;
-        }        
+        }
         return "$copyright $artist / $licenseshortname";
     }
 
@@ -1176,13 +1183,13 @@ class smt EXTENDS smt_tag {
         $infourl = $this->url('info') . '?i=' . $media['pageid'];
         $title = htmlspecialchars($this->strip_prefix($media['title']));
         return '<div class="mediatitle left">'
-        . '<a href="' . $infourl . '" title="' . htmlentities($title) . '">' 
-        . $this->truncate($title, $title_truncate) 
+        . '<a href="' . $infourl . '" title="' . htmlentities($title) . '">'
+        . $this->truncate($title, $title_truncate)
         . '</a></div>'
         . '<div class="attribution left">'
-        . '<a href="' . $infourl . '">' 
-        . $this->display_licensing($media, $artist_truncate) 
+        . '<a href="' . $infourl . '">'
+        . $this->display_licensing($media, $artist_truncate)
         . '</a></div>';
     }
 
-} // END class smt 
+} // END class smt
