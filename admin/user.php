@@ -23,21 +23,24 @@ print '<tr>
 <td>Tags</td>
 <td>Views</td>
 <td>Last</td>
-<td>IP</td>
-<td>Host</td>
+<td>IP/Host</td>
 <td>User Agent</td>
 </tr>';
 foreach( $users as $user ) {
-	print '<tr>'
-	. '<td>' . $user['id'] . '</td>'
-	. '<td>' . $smt->get_user_tag_count( $user['id'] ) . '</td>'
-	. '<td>' . $user['page_views'] . '</td>'
-	. '<td><small>' . $user['last'] . '</small></td>'
-	. '<td><small>' . $user['ip'] . '</small></td>'
-	. '<td><small>' . $user['host'] . '</small></td>'
-	. '<td><small>' . $user['user_agent'] . '</small></td>'
+    $iphost = $user['ip'];
+    if( $user['ip'] != $user['host'] ) {
+        $iphost .= '<br />'.$user['host'];
+    }
+    print '<tr>'
+    . '<td>' . $user['id'] . '</td>'
+    . '<td><a href="' . $smt->url('users') .'?i=' . $user['id'] . '">+' 
+    . $smt->get_user_tag_count( $user['id'] ) . '</a></td>'
+    . '<td>' . $user['page_views'] . '</td>'
+    . '<td><small>' . $user['last'] . '</small></td>'
+    . '<td><small>' . $iphost . '</small></td>'
+    . '<td><small>' . $user['user_agent'] . '</small></td>'
 
-	. '</tr>';
+    . '</tr>';
 }
 print '</table>';
 
