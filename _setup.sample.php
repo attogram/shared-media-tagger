@@ -2,7 +2,7 @@
 // Shared Media Tagger 
 // Site Setup
 //
-// Copy or Rename this file to:  _setup.php
+// To override system defaults, Copy this file to:  _setup.php
 
 $setup = array();
 
@@ -12,3 +12,8 @@ $setup = array();
 //$setup['site_url'] = '//example.com/';
 //$setup['site_url'] = 'https://example.com/mysite/';
 
+// Hide 'Powered by Shared Media Tagger' on footer
+//$setup['hide_powered_by'] = TRUE;
+
+// Hide 'Hosted by' on footer
+//$setup['hide_hosted_by'] = TRUE;

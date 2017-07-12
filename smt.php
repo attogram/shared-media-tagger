@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.0');
+define('__SMT__', '0.5.1');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -120,20 +120,24 @@ class smt_utils {
     
     //////////////////////////////////////////////////////////
     function include_footer() {
-        $this->include_menu();
-        print '<footer>'
-        . '<div class="menu" style="line-height:2; font-size:70%;">'
-        . '<br />'
-		. '<span class="nobr">Powered by <b>'
-        . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
-        . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>'
-        . '<br />'
-        . '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
-        . @$_SERVER['SERVER_NAME'] 
-        . '</a>'
-        . '</b></span>';
 
-    
+		$this->include_menu();
+
+		print '<footer>'
+        . '<div class="menu" style="line-height:2; font-size:70%;">';
+		
+		if( !@$this->setup['hide_powered_by'] ) {	
+			print '<br />'
+			. '<span class="nobr">Powered by <b>'
+			. '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
+			. 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
+		}
+		if( !@$this->setup['hide_hosted_by'] ) {
+			print '<br />'
+			. '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
+			. @$_SERVER['SERVER_NAME'] . '</a></b></span>';			
+		}
+
         if( $this->is_admin() ) {
             print '<br /><br />'
             . 'SQL count: ' . $this->sql_count
@@ -890,6 +894,7 @@ class smt_tag EXTENDS smt_category {
 // SMT - Shared Media Tagger
 class smt EXTENDS smt_tag {
 
+	var $setup;
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
 
@@ -898,6 +903,11 @@ class smt EXTENDS smt_tag {
         
         global $setup;
         
+		$this->setup = array();
+		if( is_array($setup) ) {
+			$this->setup = $setup;
+		}
+
         $this->debug = FALSE;
         $this->database_name = __DIR__ . '/admin/db/media.sqlite';        
         $this->title = $title;
@@ -905,7 +915,7 @@ class smt EXTENDS smt_tag {
         $this->size_medium = 325;
         $this->size_thumb = 100;
                 
-        if( isset($setup['site_url']) ) {
+        if( isset($this->setup['site_url']) ) {
             $this->site_url = $setup['site_url'];
         } else {
             $this->site_url = '//' . $_SERVER['HTTP_HOST'] . '/';
