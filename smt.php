@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.31');
+define('__SMT__', '0.4.32');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -334,7 +334,7 @@ class smt_database EXTENDS smt_database_utils {
 class smt_media EXTENDS smt_database {
     
     var $image_count;
-	
+    
     //////////////////////////////////////////////////////////
     function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
     function get_image_from_db($pageid) {
@@ -387,123 +387,164 @@ class smt_media EXTENDS smt_database {
 } // END class media
 
 //////////////////////////////////////////////////////////
+// SMT - Admin
+class smt_admin EXTENDS smt_media {
+
+    //////////////////////////////////////////////////////////
+    function is_admin() {
+        if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1 ) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    //////////////////////////////////////////////////////////
+    function admin_logoff() {
+        if( !$this->is_admin() ) {
+            return;
+        }
+        unset($_COOKIE['admin']);
+        setcookie('admin', null, -1, '/');
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_functions( $media_id ) {
+        if( !$this->is_admin() ) {
+            return;
+        }
+        if( !$this->is_positive_number($media_id) ) {
+            return;
+        }
+        return ''
+        . '<div class="attribution left" style="float:right; border:1px solid darkred;">'
+        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
+        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #' . $media_id . ' ?\');"'
+        . '>⛔</a>'
+        . ' '
+        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
+        . '</div>';
+    }
+
+} // END class smt_admin
+
+//////////////////////////////////////////////////////////
 // SMT - User
-class smt_user EXTENDS smt_media {
+class smt_user EXTENDS smt_admin {
 
-	var $user_id;
+    var $user_id;
 
-	//////////////////////////////////////////////////////////
-	function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
-		$sql = 'SELECT * FROM user';
-		$sql .= ' ORDER BY ' . $orderby;
-		$sql .= ' LIMIT ' . $limit;
-		$users = $this->query_as_array($sql);
-		if( isset($users[0]) ) {
-			return $users;
-		}
-		return array();
-	} // end function get_users
+    //////////////////////////////////////////////////////////
+    function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
+        $sql = 'SELECT * FROM user';
+        $sql .= ' ORDER BY ' . $orderby;
+        $sql .= ' LIMIT ' . $limit;
+        $users = $this->query_as_array($sql);
+        if( isset($users[0]) ) {
+            return $users;
+        }
+        return array();
+    } // end function get_users
 
-	//////////////////////////////////////////////////////////
-	function get_user() {
-		$ip_address = @$_SERVER['REMOTE_ADDR'];
-		$host = @$_SERVER['REMOTE_HOST'];
-		if( !$host ) { 
-			$host = $ip_address;
-		}
-		$user_agent = @$_SERVER['HTTP_USER_AGENT'];
+    //////////////////////////////////////////////////////////
+    function get_user() {
+        $ip_address = @$_SERVER['REMOTE_ADDR'];
+        $host = @$_SERVER['REMOTE_HOST'];
+        if( !$host ) { 
+            $host = $ip_address;
+        }
+        $user_agent = @$_SERVER['HTTP_USER_AGENT'];
 
-		$user = $this->query_as_array(
-			'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent', 
-			array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
-		);
-		if( !isset($user[0]['id']) ) {
-			return $this->new_user($ip_address, $host, $user_agent);
-		}
-		$this->user_id = $user[0]['id'];
-		$this->save_user_view();
-		return TRUE;
-	} // end function get_user_info()
+        $user = $this->query_as_array(
+            'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent', 
+            array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
+        );
+        if( !isset($user[0]['id']) ) {
+            return $this->new_user($ip_address, $host, $user_agent);
+        }
+        $this->user_id = $user[0]['id'];
+        $this->save_user_view();
+        return TRUE;
+    } // end function get_user_info()
 
-	//////////////////////////////////////////////////////////
-	function get_user_tag_count( $user_id ) {
-		$count = $this->query_as_array(
-			'SELECT sum(count) AS sum FROM user_tagging WHERE user_id = :user_id',
-			array(':user_id'=>$user_id)
-		);
-		if( isset($count[0]['sum']) ) {
-			return $count[0]['sum'];
-		}
-		return 0;
-	}
+    //////////////////////////////////////////////////////////
+    function get_user_tag_count( $user_id ) {
+        $count = $this->query_as_array(
+            'SELECT sum(count) AS sum FROM user_tagging WHERE user_id = :user_id',
+            array(':user_id'=>$user_id)
+        );
+        if( isset($count[0]['sum']) ) {
+            return $count[0]['sum'];
+        }
+        return 0;
+    }
 
-	//////////////////////////////////////////////////////////
-	function get_user_tagging( $user_id ) {
-		$tags = $this->query_as_array(
-			'SELECT m.*, ut.tag_id, ut.count 
-			FROM user_tagging AS ut, media AS m
-			WHERE ut.user_id = :user_id
-			AND ut.media_pageid = m.pageid
-			ORDER BY ut.media_pageid
-			
-			LIMIT 100  -- TMP 
-			
-			',
-			array(':user_id'=>$user_id)
-		);
-		if( $tags ) {
-			return $tags;
-		}
-		return array();
-	}
+    //////////////////////////////////////////////////////////
+    function get_user_tagging( $user_id ) {
+        $tags = $this->query_as_array(
+            'SELECT m.*, ut.tag_id, ut.count 
+            FROM user_tagging AS ut, media AS m
+            WHERE ut.user_id = :user_id
+            AND ut.media_pageid = m.pageid
+            ORDER BY ut.media_pageid
+            
+            LIMIT 100  -- TMP 
+            
+            ',
+            array(':user_id'=>$user_id)
+        );
+        if( $tags ) {
+            return $tags;
+        }
+        return array();
+    }
 
-	//////////////////////////////////////////////////////////
-	function save_user_view() {
-		if( !$this->user_id ) {
-			return FALSE;
-		}
-		$view = $this->query_as_bool(
-				'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
-				array( ':id' => $this->user_id, ':last'=>gmdate('Y-m-d H:i:s') )
-		);
-		if( $view ) {
-			return TRUE;
-		}
-		return FALSE;
-	}
-	
-	//////////////////////////////////////////////////////////
-	function new_user( $ip_address, $host, $user_agent ) {
-		if( 
-			$this->query_as_bool(
-				'INSERT INTO user (
-					ip, host, user_agent, page_views, last
-				) VALUES (
-					:ip_address, :host, :user_agent, 1, :last
-				)',
-				array( 
-					':ip_address'=>$ip_address, 
-					':host'=>$host, 
-					':user_agent'=>$user_agent,
-					':last'=>gmdate('Y-m-d H:i:s')
-				)
-			) 
-		) {
-			$this->user_id = $this->last_insert_id;
-			return TRUE;
-		}
-		$this->user_id = 0;
-		//$this->notice('new_user: FAILED to create user');
-		return FALSE;
-	} // end function new_user()
+    //////////////////////////////////////////////////////////
+    function save_user_view() {
+        if( !$this->user_id ) {
+            return FALSE;
+        }
+        $view = $this->query_as_bool(
+                'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
+                array( ':id' => $this->user_id, ':last'=>gmdate('Y-m-d H:i:s') )
+        );
+        if( $view ) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    
+    //////////////////////////////////////////////////////////
+    function new_user( $ip_address, $host, $user_agent ) {
+        if( 
+            $this->query_as_bool(
+                'INSERT INTO user (
+                    ip, host, user_agent, page_views, last
+                ) VALUES (
+                    :ip_address, :host, :user_agent, 1, :last
+                )',
+                array( 
+                    ':ip_address'=>$ip_address, 
+                    ':host'=>$host, 
+                    ':user_agent'=>$user_agent,
+                    ':last'=>gmdate('Y-m-d H:i:s')
+                )
+            ) 
+        ) {
+            $this->user_id = $this->last_insert_id;
+            return TRUE;
+        }
+        $this->user_id = 0;
+        //$this->notice('new_user: FAILED to create user');
+        return FALSE;
+    } // end function new_user()
 
-	
+    
 } // end class smt_user
 
 //////////////////////////////////////////////////////////
 // SMT - Category
 class smt_category EXTENDS smt_user {
-	
+    
     var $category_count; 
 
     //////////////////////////////////////////////////////////
@@ -690,7 +731,7 @@ class smt_tag EXTENDS smt_category {
     //////////////////////////////////////////////////////////
     function display_tags( $media_id ) {
         $tags = $this->get_tags();        
-        $response = '<div style="display:block; margin:auto;">';
+        $response = '<div class="nobr" style="display:block; margin:auto;">';
         foreach( $tags as $tag ) {
             $response .=  ''
             . '<div class="tagbutton tag' . $tag['position'] . '">'
@@ -718,16 +759,16 @@ class smt_tag EXTENDS smt_category {
         . '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
         return $response;        
     }
-	
+    
     //////////////////////////////////////////////////////////
     function get_tag_id_by_name( $name ) {
         if( isset( $this->tag_id[$name] ) ) {
             return $this->tag_id[$name];
         }
         $tag = $this->query_as_array(
-			'SELECT id FROM tag WHERE name = :name LIMIT 1',
-			array(':name'=>$name) 
-		);
+            'SELECT id FROM tag WHERE name = :name LIMIT 1',
+            array(':name'=>$name) 
+        );
         if( isset( $tag[0]['id'] ) ) { 
             return $this->tag_id[$name] = $tag[0]['id'];
         }
@@ -740,9 +781,9 @@ class smt_tag EXTENDS smt_category {
             return $this->tag_name[$id];
         }
         $tag = $this->query_as_array(
-			'SELECT name FROM tag WHERE id = :id LIMIT 1',
-			array(':id'=>$id) 
-		);
+            'SELECT name FROM tag WHERE id = :id LIMIT 1',
+            array(':id'=>$id) 
+        );
         if( isset( $tag[0]['name'] ) ) { 
             return $this->tag_name[$id] = $tag[0]['name'];
         }
@@ -882,10 +923,10 @@ class smt EXTENDS smt_tag {
             'tag'        => $this->site_url . 'tag.php',
             'user'       => $this->site_url . 'user.php',
             'users'      => $this->site_url . 'users.php',
-			'github_smt' => 'https://github.com/attogram/shared-media-tagger',
+            'github_smt' => 'https://github.com/attogram/shared-media-tagger',
         );
         
-		$this->get_user();
+        $this->get_user();
 
         if( isset($_GET['logoff']) ) {
             $this->admin_logoff();
@@ -1087,41 +1128,6 @@ class smt EXTENDS smt_tag {
         . $this->display_admin_functions( $media['pageid'] )
         . '</div>'
         ;
-    }
-
-    //////////////////////////////////////////////////////////
-    function is_admin() {
-        if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1 ) {
-            return TRUE;
-        }
-        return FALSE;
-    }
-
-    //////////////////////////////////////////////////////////
-    function admin_logoff() {
-        if( !$this->is_admin() ) {
-            return;
-        }
-        unset($_COOKIE['admin']);
-        setcookie('admin', null, -1, '/');
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_admin_functions( $media_id ) {
-        if( !$this->is_admin() ) {
-            return;
-        }
-        if( !$this->is_positive_number($media_id) ) {
-            return;
-        }
-        return ''
-        . '<div class="attribution left" style="float:right; border:1px solid darkred;">'
-        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
-        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #' . $media_id . ' ?\');"'
-        . '>⛔</a>'
-        . ' '
-        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
-        . '</div>';
     }
 
     /////////////////////////////////////////////////////////
