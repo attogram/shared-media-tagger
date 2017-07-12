@@ -34,14 +34,16 @@ if( !$users ) {
 foreach( $users as $user ) {
 	$tag_count = $smt->get_user_tag_count( $user['id'] );
 	if( !$tag_count ) {
-		continue;
+		continue; // user has not tagged anything yet
 	}
-	print '<div style="display:inline-block; border:1px solid grey; padding:4px; margin:4px; ">'
-	. '<a href="' . $smt->url('users') . '?i=' . $user['id'] . '">'
-	. '+' . $tag_count . ' reviews</a> <small>by User:' . $user['id'] . '</small>'
+	print '<div style="display:inline-block; border:1px solid grey; padding:4px; margin:2px; ">'
+	. '<h2><a href="' . $smt->url('users') . '?i=' . $user['id'] . '">'
+	. '+' . $tag_count . '</h2>'
+	. ' <small>user:' . $user['id'] . '</small>'
+	. '</a>'
 	. '</div>';
 }
-
+print '<hr />';
 
 
 if( !$user_id ) {

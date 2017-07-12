@@ -66,7 +66,7 @@ $smt->include_menu();
 
 print '<div class="box white">'
     . '<p>'
-    . '<div style="float:left; padding:0px 20px 4px 0px; font-size:80%;">' 
+    . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">' 
         . $smt->get_reviews_per_category( $category_info['id'] )
     . '</div>'
     . '<h1>' 

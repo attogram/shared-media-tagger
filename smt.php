@@ -1,13 +1,13 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.30');
+define('__SMT__', '0.4.31');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
 
 //////////////////////////////////////////////////////////
-// SMT Utils
+// SMT - Utils
 class smt_utils {
 
     var $links; // array of [page_name] = page_url
@@ -164,7 +164,7 @@ class smt_utils {
         . $space
         . '<a href="' . $this->url('reviews') . '">' . $this->get_total_review_count() . '&nbsp;Reviews</a>'
         . $space
-        . $this->get_image_count() . '&nbsp;files'
+        . '<a href="' . $this->url('home') . '">' . $this->get_image_count() . '&nbsp;files' . '</a>'
         . $space
         . '<a href="'. $this->url('about') . '">About</a>'
         . $space
@@ -199,7 +199,7 @@ class smt_utils {
 } //end class smt_utils
 
 //////////////////////////////////////////////////////////
-// SMT Database Utils
+// SMT - Database Utils
 class smt_database_utils EXTENDS smt_utils {
     var $database_name;
     var $db;
@@ -309,12 +309,10 @@ class smt_database_utils EXTENDS smt_utils {
 } // end class smt_database_utils
 
 //////////////////////////////////////////////////////////
-// SMT Database
+// SMT - Database
 class smt_database EXTENDS smt_database_utils {
 
     var $site_name;
-    var $image_count;
-    var $category_count; 
 
     //////////////////////////////////////////////////////////
     function set_site_name() {
@@ -327,6 +325,16 @@ class smt_database EXTENDS smt_database_utils {
         return TRUE;
     }
 
+
+
+} // END class smt_database
+
+//////////////////////////////////////////////////////////
+// SMT - Media
+class smt_media EXTENDS smt_database {
+    
+    var $image_count;
+	
     //////////////////////////////////////////////////////////
     function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
     function get_image_from_db($pageid) {
@@ -376,6 +384,180 @@ class smt_database EXTENDS smt_database_utils {
         return $this->image_count = $response[0]['count'];
     }
     
+} // END class media
+
+//////////////////////////////////////////////////////////
+// SMT - User
+class smt_user EXTENDS smt_media {
+
+	var $user_id;
+
+	//////////////////////////////////////////////////////////
+	function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
+		$sql = 'SELECT * FROM user';
+		$sql .= ' ORDER BY ' . $orderby;
+		$sql .= ' LIMIT ' . $limit;
+		$users = $this->query_as_array($sql);
+		if( isset($users[0]) ) {
+			return $users;
+		}
+		return array();
+	} // end function get_users
+
+	//////////////////////////////////////////////////////////
+	function get_user() {
+		$ip_address = @$_SERVER['REMOTE_ADDR'];
+		$host = @$_SERVER['REMOTE_HOST'];
+		if( !$host ) { 
+			$host = $ip_address;
+		}
+		$user_agent = @$_SERVER['HTTP_USER_AGENT'];
+
+		$user = $this->query_as_array(
+			'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent', 
+			array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
+		);
+		if( !isset($user[0]['id']) ) {
+			return $this->new_user($ip_address, $host, $user_agent);
+		}
+		$this->user_id = $user[0]['id'];
+		$this->save_user_view();
+		return TRUE;
+	} // end function get_user_info()
+
+	//////////////////////////////////////////////////////////
+	function get_user_tag_count( $user_id ) {
+		$count = $this->query_as_array(
+			'SELECT sum(count) AS sum FROM user_tagging WHERE user_id = :user_id',
+			array(':user_id'=>$user_id)
+		);
+		if( isset($count[0]['sum']) ) {
+			return $count[0]['sum'];
+		}
+		return 0;
+	}
+
+	//////////////////////////////////////////////////////////
+	function get_user_tagging( $user_id ) {
+		$tags = $this->query_as_array(
+			'SELECT m.*, ut.tag_id, ut.count 
+			FROM user_tagging AS ut, media AS m
+			WHERE ut.user_id = :user_id
+			AND ut.media_pageid = m.pageid
+			ORDER BY ut.media_pageid
+			
+			LIMIT 100  -- TMP 
+			
+			',
+			array(':user_id'=>$user_id)
+		);
+		if( $tags ) {
+			return $tags;
+		}
+		return array();
+	}
+
+	//////////////////////////////////////////////////////////
+	function save_user_view() {
+		if( !$this->user_id ) {
+			return FALSE;
+		}
+		$view = $this->query_as_bool(
+				'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
+				array( ':id' => $this->user_id, ':last'=>gmdate('Y-m-d H:i:s') )
+		);
+		if( $view ) {
+			return TRUE;
+		}
+		return FALSE;
+	}
+	
+	//////////////////////////////////////////////////////////
+	function new_user( $ip_address, $host, $user_agent ) {
+		if( 
+			$this->query_as_bool(
+				'INSERT INTO user (
+					ip, host, user_agent, page_views, last
+				) VALUES (
+					:ip_address, :host, :user_agent, 1, :last
+				)',
+				array( 
+					':ip_address'=>$ip_address, 
+					':host'=>$host, 
+					':user_agent'=>$user_agent,
+					':last'=>gmdate('Y-m-d H:i:s')
+				)
+			) 
+		) {
+			$this->user_id = $this->last_insert_id;
+			return TRUE;
+		}
+		$this->user_id = 0;
+		//$this->notice('new_user: FAILED to create user');
+		return FALSE;
+	} // end function new_user()
+
+	
+} // end class smt_user
+
+//////////////////////////////////////////////////////////
+// SMT - Category
+class smt_category EXTENDS smt_user {
+	
+    var $category_count; 
+
+    //////////////////////////////////////////////////////////
+    function display_categories( $media_id ) {
+        if( !$media_id || !$this->is_positive_number($media_id) ) {
+            return FALSE;
+        }
+        $cats = $this->get_image_categories( $media_id );
+        $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
+        if( !$cats ) { $response .= '<em>Uncategorized</em>'; }
+        foreach($cats as $cat ) {
+            $response .= ''
+            . '+'
+            . '<a href="' . $this->url('category') 
+            . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
+            . $this->strip_prefix($cat) . '</a><br />';
+        }
+        return $response . '</div>';
+    }
+
+    //////////////////////////////////////////////////////////
+    function strip_prefix( $string ) {
+        if( !$string || !is_string($string) ) {
+            return $string;
+        }
+        return preg_replace(
+            array( '/^File:/', '/^Category:/' ), 
+            '', 
+            $string
+        );
+    }
+   
+    //////////////////////////////////////////////////////////
+    function category_urldecode($category) {
+        return str_replace(
+            '_', 
+            ' ', 
+            urldecode($category)
+        );
+    }
+
+    //////////////////////////////////////////////////////////
+    function category_urlencode($category) {
+        return str_replace(
+            '+',
+            '_', 
+            str_replace(
+                '%3A',
+                ':', 
+                urlencode($category)
+            )
+        );
+    }
+
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
         $response = $this->query_as_array(
@@ -499,6 +681,44 @@ class smt_database EXTENDS smt_database_utils {
         return $return;
     }
 
+} // END class category
+
+//////////////////////////////////////////////////////////
+// SMT - Tag
+class smt_tag EXTENDS smt_category {
+
+    //////////////////////////////////////////////////////////
+    function display_tags( $media_id ) {
+        $tags = $this->get_tags();        
+        $response = '<div style="display:block; margin:auto;">';
+        foreach( $tags as $tag ) {
+            $response .=  ''
+            . '<div class="tagbutton tag' . $tag['position'] . '">'
+            . '<a href="' . $this->url('tag') . '?m=' . $media_id 
+                . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">' 
+            . $tag['display_name']
+            . '</a></div>';
+        }
+        return $response . '</div>'; 
+    }
+
+    /////////////////////////////////////////////////////////
+    function display_reviews( $reviews ) {
+        if( !$reviews ) {
+            return 'unreviewed';
+        }
+        $review_count = 0;
+        $response = '';
+        foreach( $reviews as $review ) {
+            $response .= '<div class="tag' . $review['position'] . '">'
+            . '+<b>' . $review['count'] . '</b> ' . $review['name'] . '</div>';
+            $review_count += $review['count'];
+        }
+        $response = '<div style="display:inline-block; text-align:left;">'
+        . '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
+        return $response;        
+    }
+	
     //////////////////////////////////////////////////////////
     function get_tag_id_by_name( $name ) {
         if( isset( $this->tag_id[$name] ) ) {
@@ -575,8 +795,7 @@ class smt_database EXTENDS smt_database_utils {
     function get_reviews_per_category( $category_id ) {
         return $this->display_reviews( $this->get_db_reviews_per_category($category_id) );
     }
-
-        
+   
     /////////////////////////////////////////////////////////
     function get_db_reviews_per_category( $category_id ) {
         $reviews = $this->query_as_array('
@@ -617,165 +836,11 @@ class smt_database EXTENDS smt_database_utils {
         return $this->total_review_count = 0;
     }
 
-} // END class smt_database
-
-//////////////////////////////////////////////////////////
-// SMT Site Utils
-class smt_site_utils EXTENDS smt_database {
-    
-    //////////////////////////////////////////////////////////
-    function strip_prefix( $string ) {
-        if( !$string || !is_string($string) ) {
-            return $string;
-        }
-        return preg_replace(
-            array( '/^File:/', '/^Category:/' ), 
-            '', 
-            $string
-        );
-    }
-    
-    //////////////////////////////////////////////////////////
-    function category_urldecode($category) {
-        return str_replace(
-            '_', 
-            ' ', 
-            urldecode($category)
-        );
-    }
-
-    //////////////////////////////////////////////////////////
-    function category_urlencode($category) {
-        return str_replace(
-            '+',
-            '_', 
-            str_replace(
-                '%3A',
-                ':', 
-                urlencode($category)
-            )
-        );
-    }
-    
-}
-
-//////////////////////////////////////////////////////////
-// SMT - User
-class smt_user EXTENDS smt_site_utils {
-
-	var $user_id;
-
-	//////////////////////////////////////////////////////////
-	function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
-		$sql = 'SELECT * FROM user';
-		$sql .= ' ORDER BY ' . $orderby;
-		$sql .= ' LIMIT ' . $limit;
-		$users = $this->query_as_array($sql);
-		if( isset($users[0]) ) {
-			return $users;
-		}
-		return array();
-	} // end function get_users
-
-	//////////////////////////////////////////////////////////
-	function get_user() {
-		$ip_address = @$_SERVER['REMOTE_ADDR'];
-		$host = @$_SERVER['REMOTE_HOST'];
-		if( !$host ) { 
-			$host = $ip_address;
-		}
-		$user_agent = @$_SERVER['HTTP_USER_AGENT'];
-
-		$user = $this->query_as_array(
-			'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent', 
-			array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
-		);
-		if( !isset($user[0]['id']) ) {
-			return $this->new_user($ip_address, $host, $user_agent);
-		}
-		$this->user_id = $user[0]['id'];
-		$this->save_user_view();
-		return TRUE;
-	} // end function get_user_info()
-
-	//////////////////////////////////////////////////////////
-	function get_user_tag_count( $user_id ) {
-		$count = $this->query_as_array(
-			'SELECT sum(count) AS sum FROM user_tagging WHERE user_id = :user_id',
-			array(':user_id'=>$user_id)
-		);
-		if( isset($count[0]['sum']) ) {
-			return $count[0]['sum'];
-		}
-		return 0;
-	}
-
-	//////////////////////////////////////////////////////////
-	function get_user_tagging( $user_id ) {
-		$tags = $this->query_as_array(
-			'SELECT m.*, ut.tag_id, ut.count 
-			FROM user_tagging AS ut, media AS m
-			WHERE ut.user_id = :user_id
-			AND ut.media_pageid = m.pageid
-			ORDER BY ut.media_pageid
-			
-			LIMIT 100  -- TMP 
-			
-			',
-			array(':user_id'=>$user_id)
-		);
-		if( $tags ) {
-			return $tags;
-		}
-		return array();
-	}
-
-	//////////////////////////////////////////////////////////
-	function save_user_view() {
-		if( !$this->user_id ) {
-			return FALSE;
-		}
-		$view = $this->query_as_bool(
-				'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
-				array( ':id' => $this->user_id, ':last'=>gmdate('Y-m-d H:i:s') )
-		);
-		if( $view ) {
-			return TRUE;
-		}
-		return FALSE;
-	}
-	
-	//////////////////////////////////////////////////////////
-	function new_user( $ip_address, $host, $user_agent ) {
-		if( 
-			$this->query_as_bool(
-				'INSERT INTO user (
-					ip, host, user_agent, page_views, last
-				) VALUES (
-					:ip_address, :host, :user_agent, 1, :last
-				)',
-				array( 
-					':ip_address'=>$ip_address, 
-					':host'=>$host, 
-					':user_agent'=>$user_agent,
-					':last'=>gmdate('Y-m-d H:i:s')
-				)
-			) 
-		) {
-			$this->user_id = $this->last_insert_id;
-			return TRUE;
-		}
-		$this->user_id = 0;
-		//$this->notice('new_user: FAILED to create user');
-		return FALSE;
-	} // end function new_user()
-
-	
-} // end class smt_user
+} // END clss smt_tag
 
 //////////////////////////////////////////////////////////
 // SMT - Shared Media Tagger
-class smt EXTENDS smt_user {
+class smt EXTENDS smt_tag {
 
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
@@ -930,7 +995,6 @@ class smt EXTENDS smt_user {
         return $return;
     }
     
-    
     //////////////////////////////////////////////////////////
     function display_video( $media ) {
         $mime = $media['mime'];
@@ -1058,56 +1122,6 @@ class smt EXTENDS smt_user {
         . ' '
         . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
         . '</div>';
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_categories( $media_id ) {
-        if( !$media_id || !$this->is_positive_number($media_id) ) {
-            return FALSE;
-        }
-        $cats = $this->get_image_categories( $media_id );
-        $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
-        if( !$cats ) { $response .= '<em>Uncategorized</em>'; }
-        foreach($cats as $cat ) {
-            $response .= ''
-            . '+'
-            . '<a href="' . $this->url('category') 
-            . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">' 
-            . $this->strip_prefix($cat) . '</a><br />';
-        }
-        return $response . '</div>';
-    }
-    
-    //////////////////////////////////////////////////////////
-    function display_tags( $media_id ) {
-        $tags = $this->get_tags();        
-        $response = '<div style="display:block; margin:auto;">';
-        foreach( $tags as $tag ) {
-            $response .=  ''
-            . '<div class="tagbutton tag' . $tag['position'] . '">'
-            . '<a href="' . $this->url('tag') . '?m=' . $media_id 
-                . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">' 
-            . $tag['display_name']
-            . '</a></div>';
-        }
-        return $response . '</div>'; 
-    }
-
-    /////////////////////////////////////////////////////////
-    function display_reviews( $reviews ) {
-        if( !$reviews ) {
-            return 'unreviewed';
-        }
-        $review_count = 0;
-        $response = '';
-        foreach( $reviews as $review ) {
-            $response .= '<div class="tag' . $review['position'] . '">'
-            . '+<b>' . $review['count'] . '</b> ' . $review['name'] . '</div>';
-            $review_count += $review['count'];
-        }
-        $response = '<div style="display:inline-block; text-align:left;">'
-        . '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
-        return $response;        
     }
 
     /////////////////////////////////////////////////////////
