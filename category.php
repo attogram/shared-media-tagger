@@ -25,23 +25,6 @@ if( !$category_info ) {
 }
 
 $category_size = $smt->get_category_size( $category_name );
-$pager = '';
-
-$sql = '
-    SELECT m.*
-    FROM category2media AS c2m, category AS c, media AS m
-    WHERE c2m.category_id = c.id
-    AND m.pageid = c2m.media_pageid
-    AND c.name = :category_name
-    ORDER BY m.pageid ASC
-';
-$bind = array(':category_name'=>$category_name);
-
-$category = $smt->query_as_array( $sql, $bind );
-
-if( !$category || !is_array($category) ) {
-    $smt->fail404('404 Category Not Found');
-}
 
 $pager = '';
 if( $category_size > $page_limit ) {
@@ -60,6 +43,22 @@ if( $category_size > $page_limit ) {
         . '">&nbsp;' . ++$page_count . '&nbsp;</a>';
     }
 } 
+
+$sql = '
+    SELECT m.*
+    FROM category2media AS c2m, category AS c, media AS m
+    WHERE c2m.category_id = c.id
+    AND m.pageid = c2m.media_pageid
+    AND c.name = :category_name
+    ORDER BY m.pageid ASC
+';
+$bind = array(':category_name'=>$category_name);
+
+$category = $smt->query_as_array( $sql, $bind );
+
+if( !$category || !is_array($category) ) {
+    $smt->fail404('404 Category Not Found');
+}
 
 $smt->include_header();
 $smt->include_menu();
