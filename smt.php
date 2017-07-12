@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.32');
+define('__SMT__', '0.4.33');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -388,7 +388,7 @@ class smt_media EXTENDS smt_database {
 
 //////////////////////////////////////////////////////////
 // SMT - Admin
-class smt_admin EXTENDS smt_media {
+class smt_site_admin EXTENDS smt_media {
 
     //////////////////////////////////////////////////////////
     function is_admin() {
@@ -429,7 +429,7 @@ class smt_admin EXTENDS smt_media {
 
 //////////////////////////////////////////////////////////
 // SMT - User
-class smt_user EXTENDS smt_admin {
+class smt_user EXTENDS smt_site_admin {
 
     var $user_id;
 
