@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.40');
+define('__SMT__', '0.4.41');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -176,6 +176,9 @@ class smt_utils {
         . '<a href="'. $this->url('users') . '?i=' . $this->user_id . '">Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
+		. ($this->is_admin() 
+			? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>'
+			: '')
         . '</div>'
         ;
 
@@ -779,18 +782,18 @@ class smt_tag EXTENDS smt_category {
     }
 
     //////////////////////////////////////////////////////////
-    function get_tag_name_by_id( $id ) {
-        if( isset( $this->tag_name[$id] ) ) {
-            return $this->tag_name[$id];
+    function get_tag_name_by_id( $tag_id ) {
+        if( isset( $this->tag_name[$tag_id] ) ) {
+            return $this->tag_name[$tag_id];
         }
         $tag = $this->query_as_array(
             'SELECT name FROM tag WHERE id = :id LIMIT 1',
-            array(':id'=>$id) 
+            array(':id'=>$tag_id) 
         );
         if( isset( $tag[0]['name'] ) ) { 
-            return $this->tag_name[$id] = $tag[0]['name'];
+            return $this->tag_name[$tag_id] = $tag[0]['name'];
         }
-        return $this->tag_name[$id] = $id;
+        return $this->tag_name[$tag_id] = $tag_id;
     }
     
     //////////////////////////////////////////////////////////
