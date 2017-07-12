@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.4.27');
+define('__SMT__', '0.4.28');
 
 $init = __DIR__.'/_setup.php'; 
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -153,7 +153,7 @@ class smt_utils {
 
     //////////////////////////////////////////////////////////
     function include_menu() {
-        $space = ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+        $space = ' &nbsp; &nbsp; ';
         print ''
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr">'
@@ -168,7 +168,9 @@ class smt_utils {
         . $space
         . '<a href="'. $this->url('about') . '">About</a>'
         . $space
-        . '<a href="'. $this->url('user') . '">User:' . $this->user_id . '</a>'
+        //. '<a href="'. $this->url('user') . '">User:' . $this->user_id . '</a>'
+        //. $space
+        . '<a href="'. $this->url('users') . '?i=' . $this->user_id . '">Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
         . '</div>'
@@ -178,7 +180,7 @@ class smt_utils {
         
     //////////////////////////////////////////////////////////
     function include_small_menu() {
-        $space = ' &nbsp; &nbsp; ';
+        $space = ' &nbsp; ';
         print ''
         . '<div class="menu" style="font-weight:bold;">'
           . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
@@ -814,6 +816,8 @@ class smt EXTENDS smt_user {
             'contact'    => $this->site_url . 'contact.php',
             'tag'        => $this->site_url . 'tag.php',
             'user'       => $this->site_url . 'user.php',
+            'users'      => $this->site_url . 'users.php',
+			'github_smt' => 'https://github.com/attogram/shared-media-tagger',
         );
         
 		$this->get_user();
