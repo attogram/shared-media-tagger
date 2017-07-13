@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.7');
+define('__SMT__', '0.5.8');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -858,6 +858,7 @@ class smt_tag EXTENDS smt_category {
             FROM tagging AS t, tag
             WHERE t.media_pageid = :media_pageid
             AND tag.id = t.tag_id
+			AND t.count > 0
             ORDER BY tag.position
             ', array(':media_pageid'=>$pageid) );
         return $this->display_reviews( $reviews );
@@ -878,6 +879,7 @@ class smt_tag EXTENDS smt_category {
             WHERE tag.id = t.tag_id
             AND c2m.media_pageid = t.media_pageid
             AND c2m.category_id = :category_id
+			AND t.count > 0
             GROUP BY (tag.id)
             ORDER BY tag.position
             ', array(':category_id'=>$category_id) );
