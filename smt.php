@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.4');
+define('__SMT__', '0.5.5');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -165,30 +165,23 @@ class smt_utils {
         $space = ' &nbsp; &nbsp; ';
         print ''
         . '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr">'
-        . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
-        . '</span>'
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
+        . $space
+        . '<a href="' . $this->url('home') . '">' . $this->get_image_count() . '&nbsp;Files' . '</a>'
         . $space
         . '<a href="' . $this->url('categories') . '">' . $this->get_categories_count() . '&nbsp;Categories</a>'
         . $space
         . '<a href="' . $this->url('reviews') . '">' . $this->get_total_review_count() . '&nbsp;Reviews</a>'
         . $space
-        . '<a href="' . $this->url('home') . '">' . $this->get_image_count() . '&nbsp;files' . '</a>'
-        . $space
-        . '<a href="'. $this->url('about') . '">About</a>'
-        . $space
-        //. '<a href="'. $this->url('user') . '">User:' . $this->user_id . '</a>'
-        //. $space
-        . '<a href="'. $this->url('users')
-            . ($this->user_id ? '?i=' . $this->user_id : '')
-        . '">Users</a>'
+        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">' . $this->get_user_count() .'&nbsp;Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
-        . ($this->is_admin()
-            ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>'
-            : '')
-        . '</div>'
-        ;
+        . $space
+        . '<a href="'. $this->url('about') . '">About</a>'
+
+        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>' : '')
+
+        . '</div>';
 
     }  // end function include_menu()
 
@@ -446,6 +439,19 @@ class smt_site_admin EXTENDS smt_media {
 class smt_user EXTENDS smt_site_admin {
 
     var $user_id;
+    var $user_count;
+
+    //////////////////////////////////////////////////////////
+    function get_user_count() {
+        if( isset($this->user_count) ) {
+            return $this->user_count;
+        }
+        $count = $this->query_as_array('SELECT count(id) AS count FROM user');
+        if( isset($count[0]['count']) ) {
+            return $this->user_count = $count[0]['count'];
+        }
+        return $this->user_count = 0;
+    }
 
     //////////////////////////////////////////////////////////
     function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
@@ -517,12 +523,12 @@ class smt_user EXTENDS smt_site_admin {
     }
 
     //////////////////////////////////////////////////////////
-	function save_user_last_tag_time() {
-		return $this->query_as_bool(
-			'UPDATE user SET last = :last WHERE id = :user_id',
-			array(':user_id'=>$this->user_id, ':last'=>gmdate('Y-m-d H:i:s'))
-		);
-	}
+    function save_user_last_tag_time() {
+        return $this->query_as_bool(
+            'UPDATE user SET last = :last WHERE id = :user_id',
+            array(':user_id'=>$this->user_id, ':last'=>gmdate('Y-m-d H:i:s'))
+        );
+    }
 
     //////////////////////////////////////////////////////////
     function save_user_view() {
@@ -563,7 +569,6 @@ class smt_user EXTENDS smt_site_admin {
         //$this->notice('new_user: FAILED to create user');
         return FALSE;
     } // end function new_user()
-
 
 } // end class smt_user
 
