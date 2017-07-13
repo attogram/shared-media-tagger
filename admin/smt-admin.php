@@ -1,10 +1,21 @@
 <?php
 // Shared Media Tagger
-// SMT-Admin
+// SMT Admin
 
 //////////////////////////////////////////////////////////
-// Admin Database Utils
-class smt_admin_database_utils extends smt {
+// SMT Admin - Utils
+class smt_admin_utils extends smt {
+
+	function check_robotstxt( $filename ) {
+		// exists?
+		// has tag.php excluded?
+	}
+
+} // end class smt_admin_utils
+
+//////////////////////////////////////////////////////////
+// SMT Admin - Database Utils
+class smt_admin_database_utils extends smt_admin_utils {
 
     //////////////////////////////////////////////////////////
     function insert_category( $name='' ) { 
@@ -437,14 +448,14 @@ EOT
     function drop_tables() { 
 
         $sqls = array(
+        'DROP TABLE IF EXISTS block',
+        'DROP TABLE IF EXISTS category',
+        'DROP TABLE IF EXISTS category2media',
+        'DROP TABLE IF EXISTS contact',
+        'DROP TABLE IF EXISTS media',
         'DROP TABLE IF EXISTS site',
         'DROP TABLE IF EXISTS tag',
         'DROP TABLE IF EXISTS tagging',
-        'DROP TABLE IF EXISTS category',
-        'DROP TABLE IF EXISTS category2media',
-        'DROP TABLE IF EXISTS media',
-        'DROP TABLE IF EXISTS contact',
-        'DROP TABLE IF EXISTS block',
         'DROP TABLE IF EXISTS user',
         'DROP TABLE IF EXISTS user_tagging',
         );
@@ -463,7 +474,7 @@ EOT
 } // END class smt_admin_database_utils
 
 //////////////////////////////////////////////////////////
-// Wikimedia Commons Database
+// SMT Admin - Database
 class smt_admin_database extends smt_admin_database_utils {
 
     //////////////////////////////////////////////////////////
@@ -490,7 +501,7 @@ class smt_admin_database extends smt_admin_database_utils {
 } // end class smt_admin_database
 
 //////////////////////////////////////////////////////////
-// Wikimedia Commons API
+// SMT Admin - Commons API
 class smt_commons_API extends smt_admin_database {
 
     //////////////////////////////////////////////////////////

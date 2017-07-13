@@ -6,6 +6,7 @@ table { border-spacing:0; border:1px solid grey; border-collapse:collapse; margi
 table td { padding:2px; vertical-align:top; }
 table th { padding:4px; vertical-align:center; font-size:75%; background-color:#ccc; }
 form { display:inline; }
+ul { line-height:1.3; display:block; }
 h1 { font-size:150%; display:inline; }
 h2 { font-size:100%; display:inline; }
 h3 { font-size:95%; display:inline; }
@@ -15,9 +16,7 @@ img { border:1px solid black; background-color:white; background-clip:content-bo
 img:hover { border:1px solid red; background-color:white; }
 video { border:1px solid black; background-color:white; background-clip:content-box; }
 audio { border:1px solid black; background-color:white; background-clip:content-box; }
-.menu { background-color:#222; color:#ccc; 
-	padding:3px 0px 3px 8px; margin:0px; line-height:2; 
-	text-align:center; font-size:85%; }
+.menu { background-color:#222; color:#ccc; padding:3px 0px 3px 8px; margin:0px; line-height:2; text-align:center; font-size:85%; }
 .menu a { background-color:#222; color:#ccc;  }
 .menu a:visited { color:#ddd }
 .menu a:hover { color:yellow }
@@ -33,23 +32,8 @@ audio { border:1px solid black; background-color:white; background-clip:content-
 .right { text-align:right; }
 .left { text-align:left; }
 .categories { padding:5px; margin:auto; text-align:left; font-size:90%; }
-.thumbnail_box {
-	background-color:#ccc;
-	border:1px solid grey;
-	display:inline-block;
-	text-align:center;
-	vertical-align:top;
-	margin:3px;
-	padding:3px;
-}
-.thumbnail_reviews {
-	background-color:inherit;
-	display:inline-block;
-	text-align:left;
-	margin:0px;
-	padding:1px;
-	font-size:80%;
-}
+.thumbnail_box { background-color:#ccc; border:1px solid grey; display:inline-block; text-align:center; vertical-align:top; margin:3px; padding:3px; }
+.thumbnail_reviews { background-color:inherit; display:inline-block; text-align:left; margin:0px; padding:1px; font-size:80%; }
 .message { margin:0; padding:2px; text-align:left; }
 .debug { color:black; background-color:yellow; font-size:80%; }
 .notice { color:black; background-color:lightsalmon; font-size:70%; }
@@ -58,17 +42,6 @@ audio { border:1px solid black; background-color:white; background-clip:content-
 .mediatitle { font-size:80%; }
 .attribution { font-size:65%; }
 .reviewbutton { display:inline-block; white-space:nowrap; padding:10px; margin:4px; border:1px solid black; font-weight:bold; }
-.tagbutton { 
-	display:inline-block; 
-	vertical-align:middle;
-	text-align:center;
-	white-space:pre;	
-	padding:0px 0px 0px 0px;
-	border:1px solid #333;
-}
-.tagbutton:hover { 
-	border:1px solid yellow; background-color:black; 
-}
-.tagbutton a { 
-	font-size:270%; 
-}
+.tagbutton { display:inline-block; vertical-align:middle; text-align:center; white-space:pre; padding:0px 0px 0px 0px; border:1px solid #333; }
+.tagbutton:hover { border:1px solid yellow; background-color:black; }
+.tagbutton a { font-size:270%; }
