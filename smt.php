@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.6');
+define('__SMT__', '0.5.7');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -1018,8 +1018,8 @@ class smt EXTENDS smt_tag {
         $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
         . '/' . $md5[0]
         . '/' . $md5[0] . $md5[1]
-        . '/' . $filename
-        . '/' . $thumb_width . 'px-' . $filename;
+        . '/' . urlencode($filename)
+        . '/' . $thumb_width . 'px-' . urlencode($filename);
 
         $ratio = $width / $height;
         $thumb_height = round($thumb_width / $ratio);
@@ -1048,8 +1048,9 @@ class smt EXTENDS smt_tag {
 
         return '<div style="display:inline-block;text-align:center;">'
             . '<a href="' .  $this->url('info') . '?i=' . $media['pageid'] . '">'
-            . '<img src="' . $thumb['url'] . '" width="' . $thumb['width']
-            . '" height="' . $thumb['height'] . '"'
+            . '<img src="' . $thumb['url'] . '"'
+			. ' width="' . $thumb['width'] . '"'
+			. ' height="' . $thumb['height'] . '"'
             . ' title="' . htmlentities($media['title']) . '" /></a>'
             . '</div>'
             ;
