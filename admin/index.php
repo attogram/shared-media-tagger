@@ -30,8 +30,8 @@ print '<p>Site:
 <li><b>' . $smt->get_categories_count() . '</b> Categories</li>
 <li><b>' . sizeof($smt->get_tags()) . '</b> Tags</li>
 <li><b>' . $smt->get_image_count() . '</b> Files</li>
-<li><b>' . $smt->get_total_files_reviewed_count() . '</b> Files reviewed</li>
 <li><b>' . $smt->get_block_count() . '</b> Blocked Files</li>
+<li><b>' . $smt->get_total_files_reviewed_count() . '</b> Files reviewed</li>
 <li><b>' . $smt->get_tagging_count() . '</b> Tagging Count</li>
 <li><b>' . $smt->get_total_review_count() . '</b> Total Review Count</li>
 <li><b>' . $smt->get_user_tag_count() . '</b> User Tag Count</li>
@@ -44,10 +44,21 @@ print '<p>Installation:
 <li>Server: ' . $smt->server . '</li>
 <li>URL: <a href="' . $smt->url('home') . '">' . $smt->url('home') . '</a></li>
 <li>Directory: ' . $smt->install_directory . '</li>
+<li>Site Name: ' . $smt->site_name . '</li>
+<li>Setup: ' . ($smt->setup ? print_r($smt->setup,1) : 'none') . '</li>
+<li>admin/.htaccess: TBD
+<li>admin/.htpasswd: TBD
+</ul>
+</p>';
+
+
+print '<p>Discovery:
+<ul>
 <li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>: 
 <span style="font-family:monospace;">'
 	. $smt->check_robotstxt() 
 . '</span></li>
+<li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a>: TBD
 </ul>
 </p>';
 

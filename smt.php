@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.11');
+define('__SMT__', '0.5.12');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -969,7 +969,6 @@ class smt EXTENDS smt_tag {
             'admin'      => $this->site_url . 'admin/',
             'contact'    => $this->site_url . 'contact.php',
             'tag'        => $this->site_url . 'tag.php',
-            'user'       => $this->site_url . 'user.php',
             'users'      => $this->site_url . 'users.php',
             'github_smt' => 'https://github.com/attogram/shared-media-tagger',
         );
