@@ -24,11 +24,11 @@ if( isset($r[0]['count']) ) {
     $msg_count = $r[0]['count'];
 }
 
-print '<p>Site:
+print '<p>Site: <b><a href="./site.php">' . $smt->site_name . '</a></b>
 <ul>
 <li><b>' . $msg_count . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
-<li><b>' . $smt->get_categories_count() . '</b> Categories</li>
-<li><b>' . sizeof($smt->get_tags()) . '</b> Tags</li>
+<li><b>' . $smt->get_categories_count() . '</b> <a href="./category.php">Categories</a> Active</li>
+<li><b>' . sizeof($smt->get_tags()) . '</b> <a href="./site.php">Tags</a></li>
 <li><b>' . $smt->get_image_count() . '</b> Files</li>
 <li><b>' . $smt->get_block_count() . '</b> Blocked Files</li>
 <li><b>' . $smt->get_total_files_reviewed_count() . '</b> Files reviewed</li>
@@ -44,31 +44,44 @@ print '<p>Installation:
 <li>Server: ' . $smt->server . '</li>
 <li>URL: <a href="' . $smt->url('home') . '">' . $smt->url('home') . '</a></li>
 <li>Directory: ' . $smt->install_directory . '</li>
-<li>Site Name: ' . $smt->site_name . '</li>
 <li>Setup: ' . ($smt->setup ? print_r($smt->setup,1) : 'none') . '</li>
-<li>admin/.htaccess: TBD
-<li>admin/.htpasswd: TBD
+<li>Global Header: '
+. ( is_readable($smt->install_directory.'/header.php') ? 'ACTIVE: ./header.php ' : 'none' )
+. '</li>
+<li>Global Footer: '
+. ( is_readable($smt->install_directory.'/footer.php') ? 'ACTIVE: ./footer.php' : 'none' )
+. '</li>
 </ul>
 </p>';
 
 
-print '<p>Discovery:
+print '<p>Discovery / Restrictions:
 <ul>
 <li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>: 
 <span style="font-family:monospace;">'
 	. $smt->check_robotstxt() 
 . '</span></li>
-<li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a>: TBD
+<li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a>
+<li>./admin/.htaccess: '
+. ( is_readable($smt->install_directory.'/admin/.htaccess') ? '✔ACTIVE: ' : '❌MISSING' )
+. '</li>
+<li>./admin/.htpasswd: '
+. ( is_readable($smt->install_directory.'/admin/.htpasswd') ? '✔ACTIVE: ' : '❌MISSING' )
+. '</li>
 </ul>
 </p>';
 
 print '<p>Database:
 <ul>
+<li>File: ' . $smt->database_name . '</li>
+<li>Permissions: ' 
+. ( is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY' )
+. '</li>
 <li>Size: '
 . (file_exists($smt->database_name) ? number_format(filesize($smt->database_name)) : 'NULL')
 . ' bytes</li>
-<li>File: ' . $smt->database_name . '</li>
-<li>URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
+
+<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
 </ul>
 </p>';
 

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.13');
+define('__SMT__', '0.5.14');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -154,10 +154,13 @@ class smt_utils {
         }
 
         if( $this->is_admin() ) {
-            print '<br /><br />'
-            . 'SQL count: ' . $this->sql_count
+            print '<br /><div style="text-align:left; line-height:1; ">'
+			. '<br />Admin @ ' . gmdate('Y-m-d H:i:s') . ' UTC'
+            . '<br />SQL count: ' . $this->sql_count
             . '<br />user_id: ' . $this->user_id
             . '<br /><a href="' . $this->url('home') . '?logoff">ADMIN logoff</a>'
+			. '<br /><br />'
+			. '</div>'
             ;
         }
 
