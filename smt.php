@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.10');
+define('__SMT__', '0.5.11');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -492,12 +492,12 @@ class smt_user EXTENDS smt_site_admin {
 
     //////////////////////////////////////////////////////////
     function get_user_tag_count( $user_id=FALSE ) {
-		$sql = 'SELECT sum(count) AS sum FROM user_tagging';
-		$bind = array();
-		if( $user_id > 0 ) {
-			$sql .= ' WHERE user_id = :user_id';
-			$bind[':user_id'] = $user_id;
-		}
+        $sql = 'SELECT sum(count) AS sum FROM user_tagging';
+        $bind = array();
+        if( $user_id > 0 ) {
+            $sql .= ' WHERE user_id = :user_id';
+            $bind[':user_id'] = $user_id;
+        }
         $count = $this->query_as_array($sql, $bind);
         if( isset($count[0]['sum']) ) {
             return $count[0]['sum'];
@@ -873,7 +873,7 @@ class smt_tag EXTENDS smt_category {
             FROM tagging AS t, tag
             WHERE t.media_pageid = :media_pageid
             AND tag.id = t.tag_id
-			AND t.count > 0
+            AND t.count > 0
             ORDER BY tag.position
             ', array(':media_pageid'=>$pageid) );
         return $this->display_reviews( $reviews );
@@ -894,7 +894,7 @@ class smt_tag EXTENDS smt_category {
             WHERE tag.id = t.tag_id
             AND c2m.media_pageid = t.media_pageid
             AND c2m.category_id = :category_id
-			AND t.count > 0
+            AND t.count > 0
             GROUP BY (tag.id)
             ORDER BY tag.position
             ', array(':category_id'=>$category_id) );
@@ -921,8 +921,8 @@ class smt_tag EXTENDS smt_category {
 class smt EXTENDS smt_tag {
 
     var $setup;
-	var $install_directory;
-	var $server;
+    var $install_directory;
+    var $server;
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
 
@@ -936,16 +936,16 @@ class smt EXTENDS smt_tag {
         }
 
         $this->debug = FALSE;
-		
-		$this->install_directory = __DIR__;
-		
+
+        $this->install_directory = __DIR__;
+
         $this->database_name = $this->install_directory . '/admin/db/media.sqlite';
 
         $this->size_medium = 325;
         $this->size_thumb = 100;
-		
-		$this->server = $_SERVER['SERVER_NAME']; // $_SERVER['HTTP_HOST'];
-		
+
+        $this->server = $_SERVER['SERVER_NAME']; // $_SERVER['HTTP_HOST'];
+
         if( isset($this->setup['site_url']) ) {
             $this->site_url = $setup['site_url'];
         } else {
@@ -976,7 +976,7 @@ class smt EXTENDS smt_tag {
 
         $this->get_user();
 
-		$this->sql_count = 0;
+        $this->sql_count = 0;
         if( isset($_GET['logoff']) ) {
             $this->admin_logoff();
         }
@@ -1062,8 +1062,8 @@ class smt EXTENDS smt_tag {
         return '<div style="display:inline-block;text-align:center;">'
             . '<a href="' .  $this->url('info') . '?i=' . $media['pageid'] . '">'
             . '<img src="' . $thumb['url'] . '"'
-			. ' width="' . $thumb['width'] . '"'
-			. ' height="' . $thumb['height'] . '"'
+            . ' width="' . $thumb['width'] . '"'
+            . ' height="' . $thumb['height'] . '"'
             . ' title="' . htmlentities($media['title']) . '" /></a>'
             . '</div>'
             ;
