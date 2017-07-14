@@ -6,9 +6,47 @@
 // SMT Admin - Utils
 class smt_admin_utils extends smt {
 
-	function check_robotstxt( $filename ) {
-		// exists?
-		// has tag.php excluded?
+	function check_robotstxt() {
+
+		$robotstxt = $this->install_directory . '/robots.txt';
+
+		$tag_url = str_replace('//'.$this->server, '', $this->url('tag'));
+		
+		$response = $robotstxt;
+
+		if( !file_exists($robotstxt) ) {
+			return '<br />❌file not found<br />❌rule not found: disallow: ' . $tag_url;
+		}
+		$response .= '<br />✔️exists';
+
+		$content = file($robotstxt);
+		if( !is_array($content) ) {
+			return $response .= '<br />❌empty';
+		}
+
+		$user_agent_star = FALSE;
+		$tag_disallow = FALSE;
+		
+		foreach( $content as $line ) {
+			if( strtolower(trim($line)) == 'user-agent: *' ) {
+				$user_agent_star = TRUE;
+				continue;
+			}
+			if( !$user_agent_star ) {
+				continue;
+			}
+						
+			if( strtolower(trim($line)) == 'disallow: ' . $tag_url ) {
+				return $response . '<br />✔️disallow: ' . $tag_url;
+			}
+		}
+		if( !$user_agent_star ) {
+			return $response .= '<br />❌rule not found: user-agent: *';
+		}
+		if( !$tag_disallow ) {
+			return $response .= '<br />❌rule not found: disallow: ' . $tag_url;
+		}
+		return $response;
 	}
 
 } // end class smt_admin_utils
@@ -405,7 +443,7 @@ class smt_admin_database_utils extends smt_admin_utils {
 
 // Default Demo Site setup
 
-'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger', 'This is a demonstration of the Shared Media Tagger software.')",
+'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger Demo', 'This is a demonstration of the Shared Media Tagger software.')",
 
 'default_tag1' => "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
 'default_tag2' => "INSERT INTO tag (id, position, name, display_name) VALUES (2, 2, '🙁 Bad',    '🙁')",
@@ -413,8 +451,8 @@ class smt_admin_database_utils extends smt_admin_utils {
 'default_tag4' => "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙂 Good',   '🙂')",
 'default_tag5' => "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
 
-'c1' => "INSERT INTO category (id,name,pageid) VALUES (1,'Category:Calibration videos',8461838);",
-'c2' => "INSERT INTO category (id,name,pageid) VALUES (2,'Category:Test patterns',202140);",
+'c1' => "INSERT INTO category (id,name,pageid) VALUES (1,'Category:Test patterns',202140);",
+'c2' => "INSERT INTO category (id,name,pageid) VALUES (2,'Category:Calibration videos',8461838);",
 'c3' => "INSERT INTO category (id,name,pageid) VALUES (3,'Category:Audio files for calibration',14878939);",
 
 'm1' => <<<EOT
@@ -425,7 +463,7 @@ EOT
 ,
 
 'c2m1' => <<<EOT
-INSERT INTO "category2media" ("id","category_id","media_pageid") VALUES ('205','2','45898475');
+INSERT INTO "category2media" ("id","category_id","media_pageid") VALUES ('1','1','45898475');
 EOT
 ,
 

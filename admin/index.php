@@ -27,23 +27,37 @@ if( isset($r[0]['count']) ) {
 print '<p>Site:
 <ul>
 <li><b>' . $msg_count . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
-<li><b>' . $smt->get_image_count() . '</b> Media files</li>
-<li><b>' . $smt->get_block_count() . '</b> Blocked files</li>
+<li><b>' . $smt->get_categories_count() . '</b> Categories</li>
+<li><b>' . sizeof($smt->get_tags()) . '</b> Tags</li>
+<li><b>' . $smt->get_image_count() . '</b> Files</li>
+<li><b>' . $smt->get_total_files_reviewed_count() . '</b> Files reviewed</li>
+<li><b>' . $smt->get_block_count() . '</b> Blocked Files</li>
+<li><b>' . $smt->get_tagging_count() . '</b> Tagging Count</li>
+<li><b>' . $smt->get_total_review_count() . '</b> Total Review Count</li>
+<li><b>' . $smt->get_user_tag_count() . '</b> User Tag Count</li>
+<li><b>' . $smt->get_user_count() . '</b> Users</li>
 </ul>
 </p>';
 
 print '<p>Installation:
 <ul>
-<li>Site URL: <a href="' . $smt->url('home') . '">' . $smt->url('home') . '</a></li>
-<li>Database Size: '
+<li>Server: ' . $smt->server . '</li>
+<li>URL: <a href="' . $smt->url('home') . '">' . $smt->url('home') . '</a></li>
+<li>Directory: ' . $smt->install_directory . '</li>
+<li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>: 
+<span style="font-family:monospace;">'
+	. $smt->check_robotstxt() 
+. '</span></li>
+</ul>
+</p>';
+
+print '<p>Database:
+<ul>
+<li>Size: '
 . (file_exists($smt->database_name) ? number_format(filesize($smt->database_name)) : 'NULL')
 . ' bytes</li>
-<li>Database File: ' . $smt->database_name . '</li>
-<li>Database URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
-<li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a></li>
-    <ul>
-    <li>exclude ' . $smt->url('tag') . ' ?</li>
-    </ul>
+<li>File: ' . $smt->database_name . '</li>
+<li>URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
 </ul>
 </p>';
 

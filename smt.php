@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.8');
+define('__SMT__', '0.5.10');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -491,11 +491,14 @@ class smt_user EXTENDS smt_site_admin {
     } // end function get_user_info()
 
     //////////////////////////////////////////////////////////
-    function get_user_tag_count( $user_id ) {
-        $count = $this->query_as_array(
-            'SELECT sum(count) AS sum FROM user_tagging WHERE user_id = :user_id',
-            array(':user_id'=>$user_id)
-        );
+    function get_user_tag_count( $user_id=FALSE ) {
+		$sql = 'SELECT sum(count) AS sum FROM user_tagging';
+		$bind = array();
+		if( $user_id > 0 ) {
+			$sql .= ' WHERE user_id = :user_id';
+			$bind[':user_id'] = $user_id;
+		}
+        $count = $this->query_as_array($sql, $bind);
         if( isset($count[0]['sum']) ) {
             return $count[0]['sum'];
         }
@@ -852,6 +855,18 @@ class smt_tag EXTENDS smt_category {
     }
 
     /////////////////////////////////////////////////////////
+    function get_total_review_count() {
+        if( isset($this->total_review_count) ) {
+            return $this->total_review_count;
+        }
+        $response = $this->query_as_array('SELECT SUM(count) AS total FROM tagging');
+        if( isset($response[0]['total']) ) {
+            return $this->total_review_count = $response[0]['total'];
+        }
+        return $this->total_review_count = 0;
+    }
+
+    /////////////////////////////////////////////////////////
     function get_reviews( $pageid ) {
         $reviews = $this->query_as_array('
             SELECT t.tag_id, t.count, tag.*
@@ -898,17 +913,6 @@ class smt_tag EXTENDS smt_category {
         return $this->total_files_reviewed_count = 0;
     }
 
-    /////////////////////////////////////////////////////////
-    function get_total_review_count() {
-        if( isset($this->total_review_count) ) {
-            return $this->total_review_count;
-        }
-        $response = $this->query_as_array('SELECT SUM(count) AS total FROM tagging');
-        if( isset($response[0]['total']) ) {
-            return $this->total_review_count = $response[0]['total'];
-        }
-        return $this->total_review_count = 0;
-    }
 
 } // END clss smt_tag
 
@@ -917,30 +921,35 @@ class smt_tag EXTENDS smt_category {
 class smt EXTENDS smt_tag {
 
     var $setup;
+	var $install_directory;
+	var $server;
     var $site, $site_url, $title;
     var $size_medium, $size_thumb;
 
     //////////////////////////////////////////////////////////
     function __construct( $title='' ) {
 
-        global $setup;
-
+        global $setup; // Load the setup array, if present in _setup.php
         $this->setup = array();
         if( is_array($setup) ) {
             $this->setup = $setup;
         }
 
         $this->debug = FALSE;
-        $this->database_name = __DIR__ . '/admin/db/media.sqlite';
-        $this->title = $title;
-        $this->sql_count = 0;
+		
+		$this->install_directory = __DIR__;
+		
+        $this->database_name = $this->install_directory . '/admin/db/media.sqlite';
+
         $this->size_medium = 325;
         $this->size_thumb = 100;
-
+		
+		$this->server = $_SERVER['SERVER_NAME']; // $_SERVER['HTTP_HOST'];
+		
         if( isset($this->setup['site_url']) ) {
             $this->site_url = $setup['site_url'];
         } else {
-            $this->site_url = '//' . $_SERVER['HTTP_HOST'] . '/';
+            $this->site_url = '//' . $this->server . '/';
             if( $base = basename(__DIR__) ) {
                 $this->site_url .= $base . '/';
             }
@@ -967,10 +976,12 @@ class smt EXTENDS smt_tag {
 
         $this->get_user();
 
+		$this->sql_count = 0;
         if( isset($_GET['logoff']) ) {
             $this->admin_logoff();
         }
-    }
+
+    } // end function __construct()
 
     //////////////////////////////////////////////////////////
     function get_thumbnail( $media='', $thumb_width='' ) {
