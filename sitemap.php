@@ -17,36 +17,42 @@ require_once($init);
 
 $smt = new smt();
 
+$cr = "\n";
 
-print '<url><loc>' . $smt->url('home') . '</loc>'
+$protocol = $smt->get_protocol();
+    
+print '<url><loc>' . $protocol . $smt->url('home') . '</loc>'
 . '<lastmod>' . gmdate('Y-m-d') . '</lastmod>'
 . '<changefreq>always</changefreq>'
-. '</url>';
+. '</url>' . $cr;
 
-print '<url><loc>' . $smt->url('about') . '</loc></url>';
-print '<url><loc>' . $smt->url('reviews') . '</loc></url>';
-print '<url><loc>' . $smt->url('users') . '</loc></url>';
-print '<url><loc>' . $smt->url('contact') . '</loc></url>';
+url( $smt->url('about') );
+url( $smt->url('reviews') );
+// TODO - all review report pages
+url( $smt->url('users') );
+// TODO - all users report pages
+url( $smt->url('contact') );
+url( $smt->url('categories') );
 
-print '<url><loc>' . $smt->url('categories') . '</loc></url>';
 // all categories
 $cats = $smt->query_as_array('
     SELECT DISTINCT(c2m.category_id), c.name
     FROM category2media AS c2m, category AS c
     WHERE c2m.category_id = c.id');
 foreach( $cats as $cat ) {
-    print '<url><loc>'
-    . $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($cat['name']))
-    . '</loc></url>';
+    url( $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($cat['name']) ) );
 }
 
 // all media files
 $media = $smt->query_as_array('SELECT pageid FROM media');
 foreach( $media as $pageid ) {
-    print '<url><loc>'
-    . $smt->url('info') . '?i=' . $pageid['pageid']
-    . '</loc></url>';
+    url( $smt->url('info') . '?i=' . $pageid['pageid'] );
 }
 
-print '
-</urlset>';
+print '</urlset>' . $cr;
+
+//////////////////////////////////////////////////////////
+function url($loc) {
+    global $protocol;
+    print '<url><loc>' . $protocol . $loc . '</loc></url>' . "\n";
+}

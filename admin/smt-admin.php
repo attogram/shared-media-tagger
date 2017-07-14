@@ -6,33 +6,49 @@
 // SMT Admin - Utils
 class smt_admin_utils extends smt {
 
-	//////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
     function check_robotstxt() {
 
         $robotstxt = $this->install_directory . '/robots.txt';
 
         $tag_url = str_replace('//'.$this->server, '', $this->url('tag'));
-
+        $sitemap_url = $this->get_protocol() . $this->url('home') . 'sitemap.php';
+        
         $response = $robotstxt;
 
         if( !file_exists($robotstxt) ) {
             return '<br />❌file not found: ' . $robotstxt
             . '<br />❌rule not found: user-agent: *'
-            . '<br />❌rule not found: disallow: ' . $tag_url;
+            . '<br />❌rule not found: disallow: ' . $tag_url
+            . '<br />❌rule not found: sitemap: ' . $sitemap_url
+            ;
         }
         $response .= '<br />✔️exists';
 
         $content = file($robotstxt);
         if( !is_array($content) ) {
-            return $response .= '<br />❌empty';
+            return $response .= ''
+            . '<br />❌rule not found: user-agent: *'
+            . '<br />❌rule not found: disallow: ' . $tag_url
+            . '<br />❌rule not found: sitemap: ' . $sitemap_url
+            ;
         }
 
         $user_agent_star = FALSE;
         $tag_disallow = FALSE;
+        $sitemap = FALSE;
 
         foreach( $content as $line ) {
+    
+            if( strtolower(trim($line)) == 'sitemap: ' . $sitemap_url ) {
+                $sitemap = TRUE;
+                $response .= '<br />✔️rule ok: sitemap: ' . $sitemap_url;
+                continue;
+            }
+        
             if( strtolower(trim($line)) == 'user-agent: *' ) {
                 $user_agent_star = TRUE;
+            $response .= '<br />✔️rule ok: user-agent: *';
                 continue;
             }
             if( !$user_agent_star ) {
@@ -40,14 +56,20 @@ class smt_admin_utils extends smt {
             }
 
             if( strtolower(trim($line)) == 'disallow: ' . $tag_url ) {
-                return $response . '<br />✔️disallow: ' . $tag_url;
+                $tag_disallow = TRUE;
+                $response .= '<br />✔️rule ok: disallow: ' . $tag_url;
+                continue;
             }
         }
         if( !$user_agent_star ) {
-            return $response .= '<br />❌rule not found: user-agent: *';
+            $response .= '<br />❌rule not found: user-agent: *';
         }
         if( !$tag_disallow ) {
-            return $response .= '<br />❌rule not found: disallow: ' . $tag_url;
+            $response .= '<br />❌rule not found: disallow: ' . $tag_url;
+        }
+        if( !$sitemap ) {
+             $response .= '<br />❌rule not found: sitemap: ' . $sitemap_url;
+
         }
         return $response;
     }

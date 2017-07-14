@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.12');
+define('__SMT__', '0.5.13');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -12,6 +12,7 @@ class smt_utils {
 
     var $links; // array of [page_name] = page_url
     var $debug; // debug mode TRUE / FALSE;
+	var $protocol; // http: or https:
 
     //////////////////////////////////////////////////////////
     function url( $link='' ) {
@@ -95,6 +96,20 @@ class smt_utils {
             return $string;
         }
         return str_pad($string, $length, ' ', STR_PAD_BOTH);
+    }
+
+    //////////////////////////////////////////////////////////
+    function get_protocol() {
+		if( isset($this->protocol) ) {
+			return $this->protocol;
+		}
+        if( 
+            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || $_SERVER['SERVER_PORT'] == 443 ) 
+        {
+            return $this->protocol = 'https:';
+        }
+        return $this->protocol = 'http:';
     }
 
     //////////////////////////////////////////////////////////
