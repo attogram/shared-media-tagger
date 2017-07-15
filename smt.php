@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.16');
+define('__SMT__', '0.5.17');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -121,10 +121,23 @@ class smt_utils {
         . '<html><head><title>' . $this->title . '</title>'
         . '<meta charset="utf-8" />'
         . '<meta name="viewport" content="initial-scale=1" />'
+		. '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
+		. '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '">'
+		. '<meta name="viewport" content="width=device-width, initial-scale=1">'
+		. '<!--[if lt IE 9]>'
+		. '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
+		. '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
+		. '<![endif]-->'
+		. '<script src="' . $this->url('jquery') . '"></script>'
+		. '<script src="' . $this->url('bootstrap_js') . '"></script>'
         . '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
         . '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
         . '</head><body>';
 
+/*
+echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">',
+
+*/
         // Site headers
         if( $this->is_admin() || get_class($this) == 'smt_admin') {
             return;
@@ -982,6 +995,9 @@ class smt EXTENDS smt_tag {
         $this->links = array(
             'home'       => $this->site_url . '',
             'css'        => $this->site_url . 'css.css',
+            'jquery'        => $this->site_url . 'use/jquery.min.js',
+			'bootstrap_js'  => $this->site_url . 'use/bootstrap/js/bootstrap.min.js',
+			'bootstrap_css' => $this->site_url . 'use/bootstrap/css/bootstrap.min.css',
             'info'       => $this->site_url . 'info.php',
             'categories' => $this->site_url . 'categories.php',
             'category'   => $this->site_url . 'category.php',
