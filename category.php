@@ -6,7 +6,7 @@ $page_limit = 25; // # of files per page
 
 $init = __DIR__.'/smt.php'; 
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
-$smt = new smt('Category');
+$smt = new smt();
 
 $category_name = isset($_GET['c']) ? $smt->category_urldecode($_GET['c']) : FALSE;
 
@@ -14,7 +14,7 @@ if( !$category_name ) {
     $smt->fail404('404 Category Not Found');
 }
 
-$smt->title = $category_name;
+$smt->title = $category_name . ' - ' . $smt->site_name;
 
 $category_name = 'Category:' . $category_name;
 

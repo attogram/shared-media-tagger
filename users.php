@@ -16,8 +16,6 @@ foreach( $all_users as $user ) {
     $users[$user['id']] = $user;
 }
 
-//$smt->notice($users);
-
 $user_id = FALSE;
 
 if( isset($_GET['i']) ) {
@@ -27,6 +25,10 @@ if( isset($_GET['i']) ) {
     }
 }
 
+$smt->title = 'Users - ' . $smt->site_name;
+if( $user_id ) {
+	$smt->title = 'User:' . $user_id . ' - ' . $smt->site_name;
+}
 $smt->include_header();
 $smt->include_menu();
 print '<div class="box white">';

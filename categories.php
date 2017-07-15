@@ -5,7 +5,8 @@
 $f = __DIR__.'/smt.php'; 
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 
-$smt = new smt('Categories');
+$smt = new smt();
+$smt->title = $smt->get_categories_count() . ' Categories - ' . $smt->site_name;
 $smt->include_header();
 $smt->include_menu();
 

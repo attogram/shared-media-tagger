@@ -5,8 +5,9 @@
 $f = __DIR__.'/smt.php'; 
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 
-$smt = new smt('Contact');
+$smt = new smt();
 
+$smt->title = 'Contact - ' . $smt->site_name;
 $smt->include_header();
 $smt->include_menu();
 

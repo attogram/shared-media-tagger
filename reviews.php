@@ -5,11 +5,13 @@
 $f = __DIR__.'/smt.php'; 
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 
-$smt = new smt('Reviews');
+$smt = new smt();
 
 $me = $smt->url('reviews');
 $tags = $smt->get_tags();
 
+//$smt->title = $smt->get_total_review_count() . ' Reviews - ' . $smt->site_name;
+$smt->title = 'Reviews - ' . $smt->site_name;
 $smt->include_header();
 $smt->include_menu();
 

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.5.14');
+define('__SMT__', '0.5.15');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -114,6 +114,9 @@ class smt_utils {
 
     //////////////////////////////////////////////////////////
     function include_header() {
+		if( !$this->title ) {
+			$this->title = $this->site_name;
+		}
         print "<!doctype html>\n"
         . '<html><head><title>' . $this->title . '</title>'
         . '<meta charset="utf-8" />'

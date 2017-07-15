@@ -31,11 +31,12 @@ $smt->include_menu();
  <tr>
   <td class="box grey center"><?php 
 
-    print $smt->display_image($media)
-    . $smt->display_categories( $pageid )
-    . '<br />'
-    . '<a href="./?i=' . $pageid . '">Review this file:</a>' 
+    print ''
     . $smt->display_tags( $pageid )
+	. $smt->display_image($media)
+    . $smt->display_categories( $pageid )
+	. $smt->get_reviews($pageid)
+
     ;
 
 ?>
@@ -45,7 +46,6 @@ $smt->include_menu();
     print $media['url']; ?>"><?php 
     print $smt->strip_prefix($media['title']); ?></a></h1>
 
-<p><?php print $smt->get_reviews($pageid);?></p>
     
 <p><?php print ($media['imagedescription']); ?></p>
 
@@ -88,11 +88,14 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 ?>
 </div>
 
-<p><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">View on commons.wikimedia.org</a>
-<br /><a target="commons" href="//wikidata.org/wiki/<?php 
-    print $smt->category_urlencode($media['title']); ?>">View on wikidata.org</a>
-<br /><a target="commons" href="//en.wikipedia.org/wiki/<?php 
-    print $smt->category_urlencode($media['title']); ?>">View on en.wikipedia.org</a>
+<p>View this file on:
+<ul style="margin-top:-10px;">
+<li><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">commons.wikimedia.org</a></li>
+<li><a target="commons" href="//en.wikipedia.org/wiki/<?php 
+    print $smt->category_urlencode($media['title']); ?>">en.wikipedia.org</a></li>
+<li><a target="commons" href="//wikidata.org/wiki/<?php 
+	    print $smt->category_urlencode($media['title']); ?>">wikidata.org</a></li>
+</ul>
 </p>
 
 <small>
