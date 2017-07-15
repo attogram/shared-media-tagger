@@ -61,7 +61,10 @@ unset($cats);
 <br />
 <?php print_category_table( $smt, $active); ?>
 <br /><br />
-<?php print_disabled_category_table( $smt, $disabled); ?>
+<?php 
+	// print_disabled_category_table( $smt, $disabled); 
+	print '<p>' . sizeof($disabled) . ' categories in curation que</p>';
+?>
 
 </div><?php
 $smt->include_footer();
@@ -97,10 +100,10 @@ function print_category_table( $smt, $cats ) {
 <tr style="background-color:lightgrey; font-size:80%;">
 <td style="padding:4px;"><b><?php print sizeof($cats); ?></b> Categories</td>
 <td style="padding:4px;">files</td>
-<td style="padding:4px;">reviews</td>
+<td style="padding:4px;">rates</td>
 <?php 
 foreach( $smt->get_tags() as $tag ) {
-    print '<td style="font-size:150%;" class="tag' . $tag['id'] . ' center">' 
+    print '<td style="font-size:110%;" class="tag' . $tag['id'] . ' center">' 
         //. $tag['display_name']
         . $tag['name']
         . '</td>';
@@ -132,7 +135,7 @@ foreach( $smt->get_tags() as $tag ) {
         foreach( $crevs as $r ) {
             //$smt->notice($r);
             $reviews[ $r['id'] ] = '<td class="tag' . $r['id'] 
-                . '" style="white-space:nowrap; font-size:90%;">+' 
+                . '" style="white-space:nowrap; font-size:80%;">+' 
                 . $r['count'] . ' ' . $r['name'] . '</td>';
             $count += $r['count'];
         }
