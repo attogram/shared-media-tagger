@@ -80,7 +80,7 @@ class smt_admin_utils extends smt {
         if( !$tag_disallow ) {
             $response .= '<br />❌rule not found: disallow: ' . $tag_url;
         }
-        if( !$tag_disallow ) {
+        if( !$report_disallow ) {
             $response .= '<br />❌rule not found: disallow: ' . $report_url;
         }
         return $response;
