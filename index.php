@@ -8,7 +8,7 @@ $smt = new smt('Home');
 $smt->title = $smt->site_name;
 
 if( isset($_GET['i']) && $smt->is_positive_number($_GET['i']) ) {
-    $image = $smt->get_image_from_db($_GET['i']);
+    $image = $smt->get_media($_GET['i']);
 } else {
     $image =  $smt->get_random_media(1);
 }

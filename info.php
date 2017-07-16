@@ -13,7 +13,7 @@ if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) )
 
 $pageid = (int)$_GET['i'];
 
-$media = $smt->get_image_from_db($pageid);
+$media = $smt->get_media($pageid);
 if( !$media || !isset($media[0]) || !is_array($media[0]) ) {
     $smt->fail404('404 Media Not Found');
 }
@@ -40,10 +40,13 @@ print ''
 </div><?php /* end left */ ?>
 
 <div class="col-sm-6 box white"><?php /* start right */ ?>
-<h1 style="padding-top:5px;"><a target="commons" href="<?php 
+
+<br />
+<h1><a target="commons" href="<?php 
     print $media['url']; ?>"><?php 
     print $smt->strip_prefix($media['title']); ?></a></h1>
-
+<br />
+<br />
     
 <p><?php print ($media['imagedescription']); ?></p>
 
@@ -85,9 +88,11 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 }
 ?>
 </div>
+<br />
+<br />
 
-<p>View this file on:
-<ul style="margin-top:-10px;">
+<p><em>View this file on:</em>
+<ul>
 <li><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">commons.wikimedia.org</a></li>
 <li><a target="commons" href="//en.wikipedia.org/wiki/<?php 
     print $smt->category_urlencode($media['title']); ?>">en.wikipedia.org</a></li>
@@ -96,31 +101,26 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 </ul>
 </p>
 
-<small>
-<em>Media info:</em>
-<br />
- width: <b><?php print $media['width']; ?></b>,
- height: <b><?php print $media['height']; ?></b>
-<br />
- mime: <b><?php print $media['mime']; ?></b>,
- size: <b><?php print $media['size']; ?></b>, 
- duration: <b><?php print ( $media['duration'] ? $media['duration'] : '0'); ?></b>
- <br />
+<p><em>Media info:</em>
+<ul>
+<li>width x height: <b><?php print $media['width']; ?> x <?php print $media['height']; ?></b> pixels</li>
+<li>mime: <b><?php print $media['mime']; ?></b></li>
+<li>size: <b><?php print $media['size']; ?></b> bytes</li>
+<?php 
+	 $media['duration'] 
+		? print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>'
+		: print '';
+?>
+<li>timestamp: <b><?php print $media['timestamp']; ?></b></li>
+<li>uploader: <b><a target="commons" href="https://commons.wikimedia.org/wiki/User:<?php 
+    print urlencode($media['user']); ?>">User:<?php print $media['user']; ?></a></b></li>
+</ul>
+</p>
 
-timestamp: <b><?php print $media['timestamp']; ?></b>
-<br />
-uploaded by: <b><a target="commons" href="https://commons.wikimedia.org/wiki/User:<?php 
-    print $media['user']; ?>">User:<?php 
-    print $media['user']; ?></a></b> 
-
-<br />
-<br />
-
-<a href="<?php 
-print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a>
+<p><a href="<?php 
+print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a></p>
 
 </div><?php /* end right */ ?>
-
 </div><?php /* end row */ ?>
 </div><?php /* end container */ ?>
 <br />

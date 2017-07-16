@@ -48,7 +48,7 @@ $footer = '
 if( isset($_GET['r']) && $smt->is_positive_number($_GET['r']) ) {
     $pageid = (int)$_GET['r'];
     
-    $media = $smt->get_image_from_db($pageid);
+    $media = $smt->get_media($pageid);
     if( !$media || !isset($media[0]) ) {
         $smt->notice('ERROR: no media ID #' . $pageid . ' found.');
         goto form;

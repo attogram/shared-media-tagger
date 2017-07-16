@@ -104,22 +104,22 @@ class smt_admin_database_utils extends smt_admin_utils {
     }
 
     //////////////////////////////////////////////////////////
-    function save_images_to_database($images='', $category='') {
+    function save_media_to_database($images='', $category='') {
         if( !$images || !is_array($images) ) {
-            $this->error('::save_images_to_database: no image array');
+            $this->error('::save_media_to_database: no image array');
             return FALSE;
         }
         if( !$category || !is_string($category) ) {
-            $this->error('::save_images_to_database: no category');
+            $this->error('::save_media_to_database: no category');
             return FALSE;
         }
         $cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
         if( !$cat_id || !isset($cat_id[0]['id']) ) {
-            $this->error('::save_images_to_database: unable to get category id: ' . $category);
+            $this->error('::save_media_to_database: unable to get category id: ' . $category);
             return FALSE;
         }
         $category_id = $cat_id[0]['id'];
-        $this->notice('::save_images_to_database: ' . sizeof($images) . ' images to insert from '
+        $this->notice('::save_media_to_database: ' . sizeof($images) . ' images to insert from '
             . $category. ' (id:' . $category_id . ')');
 
         $errors = array();
@@ -134,7 +134,7 @@ class smt_admin_database_utils extends smt_admin_utils {
             $new[':title'] = @$image['title'];
             $new[':url'] = @$image['imageinfo'][0]['url'];
             if( !isset($new[':url']) || $new[':url'] == '' ) {
-                $this->error('::save_images_to_database: ERROR SKIPPING: pageid='
+                $this->error('::save_media_to_database: ERROR SKIPPING: pageid='
                     . @$new[':pageid'] . ' title=' . @$new[':title'] );
                 $errors[ $new[':pageid'] ] = $new[':title'];
                 continue;
@@ -172,7 +172,7 @@ class smt_admin_database_utils extends smt_admin_utils {
             $new[':timestamp'] = @$image['imageinfo'][0]['timestamp'];
 
             if( isset($new['mime']) && $new['mime'] == 'application/pdf' ) {
-                $this->notice('::save_images_to_database() ERROR: skipping pdf');
+                $this->notice('::save_media_to_database() ERROR: skipping pdf');
                 continue;
             }
 
@@ -197,9 +197,9 @@ class smt_admin_database_utils extends smt_admin_utils {
             $response = $this->query_as_bool($sql, $new);
 
             if( $response === FALSE) {
-                $this->error('::save_images_to_database: FAILED insert into media table');
-                $this->error('::save_images_to_database: SQL: ' . $sql);
-                $this->error('::save_images_to_database: BIND i: ' . print_r($new,1) );
+                $this->error('::save_media_to_database: FAILED insert into media table');
+                $this->error('::save_media_to_database: SQL: ' . $sql);
+                $this->error('::save_media_to_database: BIND i: ' . print_r($new,1) );
                 $this->error("STOPPING IMPORT");
                 exit;
             }
@@ -212,7 +212,7 @@ class smt_admin_database_utils extends smt_admin_utils {
                 array('category_id'=>$category_id, 'pageid'=>$new[':pageid'])
             );
             if( !$response ) {
-                $this->error('::save_images_to_database: insert into category2media table failed. pageid: '
+                $this->error('::save_media_to_database: insert into category2media table failed. pageid: '
                 . $new[':pageid']);
             }
 
@@ -537,8 +537,8 @@ EOT
 } // END class smt_admin_database_utils
 
 //////////////////////////////////////////////////////////
-// SMT Admin - Database
-class smt_admin_database extends smt_admin_database_utils {
+// SMT Admin - Block
+class smt_admin_block extends smt_admin_database_utils {
 
     //////////////////////////////////////////////////////////
     function get_block_count() {
@@ -565,7 +565,7 @@ class smt_admin_database extends smt_admin_database_utils {
 
 //////////////////////////////////////////////////////////
 // SMT Admin - Commons API
-class smt_commons_API extends smt_admin_database {
+class smt_commons_API extends smt_admin_block {
 
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
@@ -712,7 +712,7 @@ class smt_commons_API extends smt_admin_database {
         $chunks = array_chunk( $categorymembers, 50 );
         foreach( $chunks as $chunk ) {
             $this->notice('::get_media_from_category: TRY CHUNK: ' . sizeof($chunk));
-            $this->save_images_to_database( $this->get_api_imageinfo($chunk), $category );
+            $this->save_media_to_database( $this->get_api_imageinfo($chunk), $category );
         }
 
     } // end function get_media_from_category()

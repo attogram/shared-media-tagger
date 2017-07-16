@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.1');
+define('__SMT__', '0.6.2');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -366,8 +366,6 @@ class smt_database EXTENDS smt_database_utils {
         return TRUE;
     }
 
-
-
 } // END class smt_database
 
 //////////////////////////////////////////////////////////
@@ -377,11 +375,10 @@ class smt_media EXTENDS smt_database {
     var $image_count;
 
     //////////////////////////////////////////////////////////
-    function get_media( $pageid ) { return $this->get_image_from_db($pageid); }
-    function get_image_from_db($pageid) {
-        $this->debug("smt-db:get_image_from_db($pageid)");
+    function get_media($pageid) {
+        $this->debug("smt-db:get_media($pageid)");
         if( !$pageid || !$this->is_positive_number($pageid) ) {
-            $this->error('get_image_from_db: ERROR no id');
+            $this->error('get_media: ERROR no id');
             return FALSE;
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';

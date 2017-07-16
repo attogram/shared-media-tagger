@@ -17,7 +17,7 @@ require_once($init);
 
 $smt = new smt();
 
-$cr = "\n";
+$cr = ''; // "\n";
 
 $protocol = $smt->get_protocol();
     
