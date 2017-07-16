@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.4');
+define('__SMT__', '0.6.5');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -12,7 +12,7 @@ class smt_utils {
 
     var $links; // array of [page_name] = page_url
     var $debug; // debug mode TRUE / FALSE;
-	var $protocol; // http: or https:
+    var $protocol; // http: or https:
 
     //////////////////////////////////////////////////////////
     function url( $link='' ) {
@@ -100,12 +100,12 @@ class smt_utils {
 
     //////////////////////////////////////////////////////////
     function get_protocol() {
-		if( isset($this->protocol) ) {
-			return $this->protocol;
-		}
-        if( 
+        if( isset($this->protocol) ) {
+            return $this->protocol;
+        }
+        if(
             (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || $_SERVER['SERVER_PORT'] == 443 ) 
+            || $_SERVER['SERVER_PORT'] == 443 )
         {
             return $this->protocol = 'https:';
         }
@@ -118,37 +118,37 @@ class smt_utils {
 // SMT - Page
 class smt_page EXTENDS smt_utils {
 
-	var $title;
-	var $use_bootstrap;
-	var $use_jquery;
+    var $title;
+    var $use_bootstrap;
+    var $use_jquery;
 
     //////////////////////////////////////////////////////////
     function include_header() {
 
-		if( !$this->title ) {
-			$this->title = $this->site_name;
-		}
+        if( !$this->title ) {
+            $this->title = $this->site_name;
+        }
 
         print "<!doctype html>\n"
         . '<html><head><title>' . $this->title . '</title>'
         . '<meta charset="utf-8" />'
         . '<meta name="viewport" content="initial-scale=1" />'
-		. '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
-		if( $this->use_bootstrap ) {
-			print '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '" />'
-			. '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-			. '<!--[if lt IE 9]>'
-			. '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
-			. '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
-			. '<![endif]-->';
-		}
-		if( $this->use_bootstrap || $this->use_jquery ) {
-			print '<script src="' . $this->url('jquery') . '"></script>';
-		}
-		if( $this->use_bootstrap ) {
-			print '<script src="' . $this->url('bootstrap_js') . '"></script>';
-		}
-		print '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
+        . '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
+        if( $this->use_bootstrap ) {
+            print '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '" />'
+            . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
+            . '<!--[if lt IE 9]>'
+            . '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
+            . '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
+            . '<![endif]-->';
+        }
+        if( $this->use_bootstrap || $this->use_jquery ) {
+            print '<script src="' . $this->url('jquery') . '"></script>';
+        }
+        if( $this->use_bootstrap ) {
+            print '<script src="' . $this->url('bootstrap_js') . '"></script>';
+        }
+        print '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
         . '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
         . '</head><body>';
 
@@ -185,12 +185,12 @@ class smt_page EXTENDS smt_utils {
 
         if( $this->is_admin() ) {
             print '<br /><div style="text-align:left; line-height:1; ">'
-			. '<br />Admin @ ' . gmdate('Y-m-d H:i:s') . ' UTC'
+            . '<br />Admin @ ' . gmdate('Y-m-d H:i:s') . ' UTC'
             . '<br />SQL count: ' . $this->sql_count
             . '<br />user_id: ' . $this->user_id
             . '<br /><a href="' . $this->url('home') . '?logoff">ADMIN logoff</a>'
-			. '<br /><br />'
-			. '</div>'
+            . '<br /><br />'
+            . '</div>'
             ;
         }
 
@@ -250,7 +250,7 @@ class smt_page EXTENDS smt_utils {
         . '</div>'
         ;
     }
-	
+
 } // end class smt_page
 
 //////////////////////////////////////////////////////////
@@ -1007,8 +1007,8 @@ class smt EXTENDS smt_tag {
             'home'       => $this->site_url . '',
             'css'        => $this->site_url . 'css.css',
             'jquery'        => $this->site_url . 'use/jquery.min.js',
-			'bootstrap_js'  => $this->site_url . 'use/bootstrap/js/bootstrap.min.js',
-			'bootstrap_css' => $this->site_url . 'use/bootstrap/css/bootstrap.min.css',
+            'bootstrap_js'  => $this->site_url . 'use/bootstrap/js/bootstrap.min.js',
+            'bootstrap_css' => $this->site_url . 'use/bootstrap/css/bootstrap.min.css',
             'info'       => $this->site_url . 'info.php',
             'categories' => $this->site_url . 'categories.php',
             'category'   => $this->site_url . 'category.php',
