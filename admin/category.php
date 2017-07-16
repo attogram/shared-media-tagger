@@ -8,7 +8,9 @@ $f = __DIR__.'/../smt.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 $f = __DIR__.'/smt-admin.php'; 
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
-$smt = new smt_admin('Category Admin');
+$smt = new smt_admin();
+
+$smt->title = 'Category Admin';
 $smt->include_header();
 $smt->include_menu();
 $smt->include_admin_menu();

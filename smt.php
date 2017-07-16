@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.3');
+define('__SMT__', '0.6.4');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -112,32 +112,46 @@ class smt_utils {
         return $this->protocol = 'http:';
     }
 
+} //end class smt_utils
+
+//////////////////////////////////////////////////////////
+// SMT - Page
+class smt_page EXTENDS smt_utils {
+
+	var $title;
+	var $use_bootstrap;
+	var $use_jquery;
+
     //////////////////////////////////////////////////////////
     function include_header() {
+
 		if( !$this->title ) {
 			$this->title = $this->site_name;
 		}
+
         print "<!doctype html>\n"
         . '<html><head><title>' . $this->title . '</title>'
         . '<meta charset="utf-8" />'
         . '<meta name="viewport" content="initial-scale=1" />'
-		. '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
-		. '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '">'
-		. '<meta name="viewport" content="width=device-width, initial-scale=1">'
-		. '<!--[if lt IE 9]>'
-		. '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
-		. '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
-		. '<![endif]-->'
-		. '<script src="' . $this->url('jquery') . '"></script>'
-		. '<script src="' . $this->url('bootstrap_js') . '"></script>'
-        . '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
+		. '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
+		if( $this->use_bootstrap ) {
+			print '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '" />'
+			. '<meta name="viewport" content="width=device-width, initial-scale=1" />'
+			. '<!--[if lt IE 9]>'
+			. '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
+			. '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
+			. '<![endif]-->';
+		}
+		if( $this->use_bootstrap || $this->use_jquery ) {
+			print '<script src="' . $this->url('jquery') . '"></script>';
+		}
+		if( $this->use_bootstrap ) {
+			print '<script src="' . $this->url('bootstrap_js') . '"></script>';
+		}
+		print '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
         . '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
         . '</head><body>';
 
-/*
-echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">',
-
-*/
         // Site headers
         if( $this->is_admin() || get_class($this) == 'smt_admin') {
             return;
@@ -236,12 +250,12 @@ echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">',
         . '</div>'
         ;
     }
-
-} //end class smt_utils
+	
+} // end class smt_page
 
 //////////////////////////////////////////////////////////
 // SMT - Database Utils
-class smt_database_utils EXTENDS smt_utils {
+class smt_database_utils EXTENDS smt_page {
     var $database_name;
     var $db;
     var $sql_count;
@@ -958,7 +972,7 @@ class smt EXTENDS smt_tag {
     var $size_medium, $size_thumb;
 
     //////////////////////////////////////////////////////////
-    function __construct( $title='' ) {
+    function __construct() {
 
         global $setup; // Load the setup array, if present in _setup.php
         $this->setup = array();

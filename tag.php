@@ -5,7 +5,7 @@
 $init = __DIR__.'/smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 
-$smt = new smt('Tag');
+$smt = new smt();
 
 $smt->notice = FALSE;
 

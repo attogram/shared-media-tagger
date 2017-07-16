@@ -4,8 +4,7 @@
 
 $f = __DIR__.'/smt.php'; 
 if(!file_exists($f)||!is_readable($f)){print 'Site down for maintenance';exit;} require_once($f);
-$smt = new smt('Home');
-$smt->title = $smt->site_name;
+$smt = new smt();
 
 if( isset($_GET['i']) && $smt->is_positive_number($_GET['i']) ) {
     $image = $smt->get_media($_GET['i']);
@@ -17,6 +16,7 @@ if( !$image || !isset($image[0]) ) {
 } 
 $image = $image[0]; 
 
+$smt->title = $smt->site_name;
 $smt->include_header();
 $smt->include_small_menu();
 

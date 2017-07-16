@@ -7,8 +7,9 @@ if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance';
 $init = __DIR__.'/smt-admin.php'; 
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 
-$smt = new smt_admin('Admin');
+$smt = new smt_admin();
 
+$smt->title = 'User Admin';
 $smt->include_header();
 $smt->include_menu();
 $smt->include_admin_menu();

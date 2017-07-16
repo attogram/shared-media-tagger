@@ -5,7 +5,7 @@
 $f = __DIR__.'/smt.php'; 
 if( !file_exists($f) || !is_readable($f) ) { print 'Site down for maintenance'; exit; } require_once($f);
 
-$smt = new smt('Media Info');
+$smt = new smt();
 
 if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) ) { 
     $smt->fail404('404 Media Not Found');
@@ -23,6 +23,8 @@ $media = @$media[0];
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $smt->title = 'Info: ' . $smt->strip_prefix($media['title']);
+$smt->use_bootstrap = TRUE;
+$smt->use_jquery = TRUE;
 $smt->include_header();
 $smt->include_menu();
 

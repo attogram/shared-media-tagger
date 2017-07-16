@@ -815,8 +815,8 @@ class smt_admin extends smt_commons_API {
     var $api_count;
 
     //////////////////////////////////////////////////////////
-    function __construct( $title='' ) {
-        parent::__construct( $title );
+    function __construct() {
+        parent::__construct();
         $this->commons_api_url = 'https://commons.wikimedia.org/w/api.php';
         ini_set('user_agent','Shared Media Tagger v' . __SMT__);
         $this->api_count = 0;

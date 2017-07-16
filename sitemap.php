@@ -54,5 +54,5 @@ print '</urlset>' . $cr;
 //////////////////////////////////////////////////////////
 function url($loc) {
     global $protocol;
-    print '<url><loc>' . $protocol . $loc . '</loc></url>' . "\n";
+    print '<url><loc>' . $protocol . $loc . '</loc></url>'; // . "\n";
 }
