@@ -24,11 +24,12 @@ $smt->include_header();
 $smt->include_menu();
 
 print '
-<div class="box white" style="padding-top:10px;">
+<div class="box white" style="padding:30px;">
 <h1>' . $name. '</h1>
 <p>' . $about . '</p>
 <hr />
 <h2>How to use this site:</h2>
+<br /><br />
 <dl>
     <dt><h3><a href="' . $smt->url('home') . '">Review a file</a><h3></dt>
     <dd>Click a rating for each media file shown.  
@@ -43,6 +44,9 @@ print '
     <dt><h3><a href="' . $smt->url('reviews') . '">Browse Reviews</a><h3></dt>
     <dd>All rated media is shown here, with a page for each rating option.</dd>
     <br />
+    <dt><h3><a href="' . $smt->url('users') . '">Browse Users</a><h3></dt>
+    <dd>All ratings per user are shown here.</dd>
+    <br />
     <dt><h3><a href="' . $smt->url('contact') . '">Contact</a></h3></dt>
     <dd>Have a question or comment?  Contact the site administrators with this form.</dd>
 
@@ -50,7 +54,7 @@ print '
 </dl>
 
 <hr /><h2>Reusing images, videos and audio files</h2>
-
+<br /><br />
 <p>All media files highlighted on this site are
 <b><a href="https://freedomdefined.org/Definition" target="commons">Free Cultural Works</a></b>.</p>
 

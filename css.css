@@ -7,8 +7,8 @@ table td { padding:2px; vertical-align:top; }
 table th { padding:4px; vertical-align:center; font-size:75%; background-color:#ccc; }
 form { display:inline; }
 ul { line-height:1.3; display:block; }
-h1 { font-size:150%; display:inline; }
-h2 { font-size:100%; display:inline; }
+h1 { display:inline; font-size:150% !important; font-weight:bold !important; }
+h2 { display:inline; font-size:110% !important; font-weight:bold !important; }
 h3 { font-size:95%; display:inline; }
 h4 { font-size:70%; display:inline; }
 h5 { font-size:60%; display:inline; }
