@@ -27,21 +27,19 @@ $smt->include_header();
 $smt->include_menu();
 
 ?>
-<table style="border:0px !important;">
- <tr>
-  <td class="box grey center"><?php 
+<div class="container">
+<div class="row">
 
-    print ''
-    . $smt->display_tags( $pageid )
-	. $smt->display_image($media)
-    . $smt->display_categories( $pageid )
-	. $smt->get_reviews($pageid)
+<div class="col-sm-6 box grey center"><?php /* start left */ ?>
+<?php 
+print ''
+. $smt->display_tags( $pageid )
+. $smt->display_image($media)
+. $smt->display_categories( $pageid )
+. $smt->get_reviews($pageid); ?>
+</div><?php /* end left */ ?>
 
-    ;
-
-?>
-  </td>
-  <td class="box white">
+<div class="col-sm-6 box white"><?php /* start right */ ?>
 <h1 style="padding-top:5px;"><a target="commons" href="<?php 
     print $media['url']; ?>"><?php 
     print $smt->strip_prefix($media['title']); ?></a></h1>
@@ -121,12 +119,10 @@ uploaded by: <b><a target="commons" href="https://commons.wikimedia.org/wiki/Use
 <a href="<?php 
 print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a>
 
-  </td>
- </tr>
-</table>
+</div><?php /* end right */ ?>
+
+</div><?php /* end row */ ?>
+</div><?php /* end container */ ?>
+<br />
 <?php
-
-
 $smt->include_footer();
-exit;
-
