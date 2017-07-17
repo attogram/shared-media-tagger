@@ -29,15 +29,15 @@ if( isset($r[0]['count']) ) {
 print '<p>Site: <b><a href="./site.php">' . $smt->site_name . '</a></b>
 <ul>
 <li><b>' . $msg_count . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
-<li><b>' . $smt->get_categories_count() . '</b> <a href="./category.php">Categories</a> Active</li>
+<li><b>' . number_format($smt->get_categories_count()) . '</b> <a href="./category.php">Categories</a> Active</li>
 <li><b>' . sizeof($smt->get_tags()) . '</b> <a href="./site.php">Tags</a></li>
-<li><b>' . $smt->get_image_count() . '</b> Files</li>
-<li><b>' . $smt->get_block_count() . '</b> Blocked Files</li>
-<li><b>' . $smt->get_total_files_reviewed_count() . '</b> Files reviewed</li>
-<li><b>' . $smt->get_tagging_count() . '</b> Tagging Count</li>
-<li><b>' . $smt->get_total_review_count() . '</b> Total Review Count</li>
-<li><b>' . $smt->get_user_tag_count() . '</b> User Tag Count</li>
-<li><b>' . $smt->get_user_count() . '</b> Users</li>
+<li><b>' . number_format($smt->get_image_count()) . '</b> Files</li>
+<li><b>' . number_format($smt->get_block_count()) . '</b> Blocked Files</li>
+<li><b>' . number_format($smt->get_total_files_reviewed_count()) . '</b> Files reviewed</li>
+<li><b>' . number_format($smt->get_tagging_count()) . '</b> Tagging Count</li>
+<li><b>' . number_format($smt->get_total_review_count()) . '</b> Total Review Count</li>
+<li><b>' . number_format($smt->get_user_tag_count()) . '</b> User Tag Count</li>
+<li><b>' . number_format($smt->get_user_count()) . '</b> Users</li>
 </ul>
 </p>';
 

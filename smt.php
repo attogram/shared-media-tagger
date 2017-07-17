@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.6');
+define('__SMT__', '0.6.7');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -10,18 +10,8 @@ if(file_exists($init) && is_readable($init)){ include_once($init); }
 // SMT - Utils
 class smt_utils {
 
-    var $links; // array of [page_name] = page_url
     var $debug; // debug mode TRUE / FALSE;
     var $protocol; // http: or https:
-
-    //////////////////////////////////////////////////////////
-    function url( $link='' ) {
-        if( !$link || !isset($this->links[$link]) ) {
-            $this->error("::url: Link Not Found: $link");
-            return FALSE;
-        }
-        return $this->links[$link];
-    }
 
     //////////////////////////////////////////////////////////
     function log_message( $message, $type ) {
@@ -112,16 +102,40 @@ class smt_utils {
         return $this->protocol = 'http:';
     }
 
+	//////////////////////////////////////////////////////////
+	function seconds_to_time( $raw_seconds ) {
+		if( !$raw_seconds ) { return '0 seconds'; }
+		$hours = floor($raw_seconds / 3600);
+		$minutes = floor(($raw_seconds / 60) % 60);
+		$seconds = $raw_seconds % 60;
+		$seconds += round( $raw_seconds - floor($raw_seconds), 2);
+		$resonse = array();
+		if( $hours ) { $response[] = $hours . ' hours'; }
+		if( $minutes ) { $response[] = $minutes . ' minutes'; }
+		if( $seconds ) { $response[] = $seconds . ' seconds'; }
+		return implode($response, ', ');
+	}
+
 } //end class smt_utils
 
 //////////////////////////////////////////////////////////
 // SMT - Page
 class smt_page EXTENDS smt_utils {
 
-    var $title;
+    var $links; // array of [page_name] = page_url
+    var $title; // Page <title>
     var $use_bootstrap;
     var $use_jquery;
 
+    //////////////////////////////////////////////////////////
+    function url( $link='' ) {
+        if( !$link || !isset($this->links[$link]) ) {
+            $this->error("::url: Link Not Found: $link");
+            return FALSE;
+        }
+        return $this->links[$link];
+    }
+	
     //////////////////////////////////////////////////////////
     function include_header() {
 
@@ -171,16 +185,16 @@ class smt_page EXTENDS smt_utils {
         print '<footer>'
         . '<div class="menu" style="line-height:2; font-size:70%;">';
 
+
+        if( !@$this->setup['hide_hosted_by'] ) {
+            print '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
+            . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
+        }		
+		print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
         if( !@$this->setup['hide_powered_by'] ) {
-            print '<br />'
-            . '<span class="nobr">Powered by <b>'
+            print '<span class="nobr">Powered by <b>'
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
             . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
-        }
-        if( !@$this->setup['hide_hosted_by'] ) {
-            print '<br />'
-            . '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
-            . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
         }
 
         if( $this->is_admin() ) {
@@ -215,13 +229,14 @@ class smt_page EXTENDS smt_utils {
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
         . $space
-        . '<a href="' . $this->url('home') . '">' . $this->get_image_count() . '&nbsp;Files' . '</a>'
+        . '<a href="' . $this->url('home') . '">' . number_format($this->get_image_count()) . '&nbsp;Files' . '</a>'
         . $space
-        . '<a href="' . $this->url('categories') . '">' . $this->get_categories_count() . '&nbsp;Categories</a>'
+        . '<a href="' . $this->url('categories') . '">' . number_format($this->get_categories_count()) . '&nbsp;Categories</a>'
         . $space
-        . '<a href="' . $this->url('reviews') . '">' . $this->get_total_review_count() . '&nbsp;Reviews</a>'
+        . '<a href="' . $this->url('reviews') . '">' . number_format($this->get_total_review_count()) . '&nbsp;Reviews</a>'
         . $space
-        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">' . $this->get_user_count() .'&nbsp;Users</a>'
+        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">' 
+		. number_format($this->get_user_count()) .'&nbsp;Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
         . $space

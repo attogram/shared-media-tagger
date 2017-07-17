@@ -109,9 +109,10 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 <li>mime: <b><?php print $media['mime']; ?></b></li>
 <li>size: <b><?php print $media['size']; ?></b> bytes</li>
 <?php 
-	 $media['duration'] 
-		? print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>'
-		: print '';
+if( $media['duration'] > 0 ) {
+	//print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
+	print '<li>duration: <b>' . $smt->seconds_to_time($media['duration']) . '</b></li>';
+}
 ?>
 <li>timestamp: <b><?php print $media['timestamp']; ?></b></li>
 <li>uploader: <b><a target="commons" href="https://commons.wikimedia.org/wiki/User:<?php 
