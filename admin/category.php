@@ -163,8 +163,8 @@ foreach( $cats as $c ) {
         $alert_td = '';
     }
     print ''
-    . '<td' . $alert_td . '>' . $local_files . '</td>'
-    . '<td>' . ($c['files'] ? $c['files'] : '<span style="color:#ccc;">0</span>') . '</td>'
+    . '<td class="right" ' . $alert_td . '>' . $local_files . '</td>'
+    . '<td class="right">' . ($c['files'] ? number_format($c['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
     ;
     if( $c['subcats'] > 0 ) {
         $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->category_urlencode($c['name']) . '"">+' 
@@ -175,7 +175,7 @@ foreach( $cats as $c ) {
             $subcatslink = '<span style="color:#ccc;">0</span>';
         }
     }
-    print '<td>' . $subcatslink . '</td>';
+    print '<td class="right">' . $subcatslink . '</td>';
 
     print ''
     . '<td><a target="commons" href="https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']) . '">view</a></td>'
