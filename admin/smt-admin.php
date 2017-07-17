@@ -419,7 +419,7 @@ class smt_admin_media extends smt_commons_API {
         }
         $response = '<div style="background-color:lightgreen; padding:10px;">'
         . '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
-
+		
         // Get media
         $media = $this->get_api_imageinfo( array($pageid), /*$recurse_count=*/0 );
         //$this->notice($media);
@@ -429,6 +429,9 @@ class smt_admin_media extends smt_commons_API {
             return $response;
         }
         $response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
+
+		// Remove media - old version, if present
+		$this->query_as_bool('DELETE FROM media WHERE pageid = :pageid', array(':pageid'=>$pageid));
 
         // Save media
         if( !$this->save_media_to_database($media) ) {
@@ -461,22 +464,11 @@ class smt_admin_media extends smt_commons_API {
             }
             $found_categories[] = $cat['title'];
         }
-        //$this->notice("found_categories="); $this->notice($found_categories);
+    
+		// Remove old category list - if present
+		$this->query_as_bool('DELETE FROM category2media WHERE pageid = :pageid', array(':pageid'=>$pageid));
 
-        $existing_categories = $this->get_image_categories( $pageid );
-        //$this->notice("existing_categories="); $this->notice($existing_categories);
-
-        $new_categories = array_diff($found_categories, $existing_categories);
-        //$this->notice("new_categories="); $this->notice($new_categories);
-        if( !$new_categories ) {
-            foreach( $existing_categories AS $cat ) {
-                $response .= 'OK: <a href="' . $this->url('category')
-                . '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">'
-                . $cat . '</a><br />';
-            }
-        }
-
-        foreach( $new_categories as $cat ) {
+        foreach( $found_categories as $cat ) {
 
             $cat_id = $this->get_category_id_from_name($cat);
             if( !$cat_id ) {
@@ -492,9 +484,9 @@ class smt_admin_media extends smt_commons_API {
                 continue;
             }
 
-            $response .= 'New: <a href="' . $this->url('category')
+            $response .= 'OK: +<a href="' . $this->url('category')
             . '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">'
-            . $cat . '</a><br />';
+            . $this->strip_prefix($cat) . '</a><br />';
 
         } // end foreach cats
 
