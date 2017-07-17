@@ -470,7 +470,8 @@ class smt_admin_media extends smt_commons_API {
 				continue;
 			}
 			
-			$response .= 'Linked <a href="' . $this->url('info') . '?i=' . $pageid . '">' 
+			$response .= 'Linked <a href="' . $this->url('category') 
+			. '?c=' . $this->category_urlencode($this->strip_prefix($cat['title'])) . '">' 
 			. $cat['title'] . '</a><br />';
 		
 		} // end foreach cats
