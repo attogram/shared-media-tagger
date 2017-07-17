@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.8');
+define('__SMT__', '0.6.9');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -1067,15 +1067,15 @@ class smt EXTENDS smt_tag {
             return $default;
         }
 
-        $width = $media['width'];
+        $width = @$media['width'];
         if( !$width ) { $width = $this->size_thumb; }
-        $height = $media['height'];
+        $height = @$media['height'];
         if( !$height ) { $height = $this->size_thumb; }
 
         //$this->notice("::get_thumbnail: new-w:$thumb_width  old-w:$width old-h:$height");
         if( $thumb_width >= $width ) {
             //$this->notice('::get_thumbnail: new-w >= old-w');
-            return array('url'=>$media['thumburl'], 'width'=>$width, 'height'=>$height);
+            return array('url'=>@$media['thumburl'], 'width'=>@$width, 'height'=>@$height);
         }
 
 

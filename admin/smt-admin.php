@@ -101,46 +101,6 @@ class smt_admin_utils extends smt {
 // SMT Admin - Database Utils
 class smt_admin_database_utils extends smt_admin_utils {
 
-
-    //////////////////////////////////////////////////////////
-    function empty_media_tables() {
-        $sqls = array(
-            'DELETE FROM tagging',
-            'DELETE FROM user_tagging',
-            'DELETE FROM category2media',
-            'DELETE FROM media',
-            'DELETE FROM block',
-        );
-        $response = array();
-        foreach( $sqls as $sql ) {
-            if( $this->query_as_bool($sql) ) {
-                $response[] = 'OK: ' . $sql;
-            } else {
-                $response[] = 'FAIL: ' . $sql;
-            }
-        }
-        $this->vacuum();
-        return $response;
-    }
-
-    //////////////////////////////////////////////////////////
-    function empty_category_tables() {
-        $sqls = array(
-            'DELETE FROM category2media',
-            'DELETE FROM category',
-        );
-        $response = array();
-        foreach( $sqls as $sql ) {
-            if( $this->query_as_bool($sql) ) {
-                $response[] = 'OK: ' . $sql;
-            } else {
-                $response[] = 'FAIL: ' . $sql;
-            }
-        }
-        $this->vacuum();
-        return $response;
-    }
-
     //////////////////////////////////////////////////////////
     function empty_tagging_tables() {
         $sqls = array(
@@ -370,8 +330,86 @@ EOT
 } // END class smt_admin_database_utils
 
 //////////////////////////////////////////////////////////
+// SMT Admin - Commons API
+class smt_commons_API extends smt_admin_database_utils {
+
+    var $commons_api_url;
+    var $api_count;
+    var $prop_imageinfo;
+    var $totalhits;
+    var $continue;
+    var $sroffset;
+    var $batchcomplete;
+    var $commons_response;
+	
+    //////////////////////////////////////////////////////////
+    function call_commons($url, $key='') {
+        $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
+        if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; }
+        $get_response = file_get_contents($url);
+        if( $get_response === FALSE ) {
+            $this->error('::call_commons: ERROR: get failed');
+            return FALSE;
+        }
+        $this->api_count++;
+        $this->commons_response = json_decode($get_response,TRUE); // assoc
+        if( !$this->commons_response ) {
+            $this->error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error() );
+            $this->error('::call_commons: ERROR: ' . $this->smt_json_last_error_msg() );
+            return FALSE;
+        }
+
+        if( !@$this->commons_response['query'][$key] || !is_array($this->commons_response['query'][$key])  ) {
+            $this->error("::call_commons: WARNING: missing key: $key");
+            //return FALSE;
+        }
+
+        $this->totalhits = $this->continue = $this->batchcomplete = FALSE;
+
+        if( isset($this->commons_response['batchcomplete']) ) {
+            $this->batchcomplete = TRUE;
+            //$this->notice('::call_commmons: batchcomplete=' . $this->batchcomplete);
+        }
+
+        if( isset($this->commons_response['query']['searchinfo']['totalhits']) ) {
+            $this->totalhits = $this->commons_response['query']['searchinfo']['totalhits'];
+            $this->notice('::call_commmons: totalhits=' . $this->totalhits);
+
+        }
+        if( isset($this->commons_response['continue']) ) {
+            $this->continue = $this->commons_response['continue']['continue'];
+            //$this->notice('::call_commmons: continue=' . $this->continue  );
+        }
+        if( isset($this->commons_response['sroffset']) ) {
+            $this->sroffset = $this->commons_response['continue']['sroffset'];
+            //$this->notice('::call_commmons: sroffset=' . $this->sroffset  );
+        }
+        if( isset($this->commons_response['warnings']) ) {
+            $this->error('::call_commons: ' . print_r($this->commons_response['warnings'],1) );
+            $this->error('::call_commons: url: ' . $url);
+        }
+           return TRUE;
+    } // end function call_commons()
+
+    //////////////////////////////////////////////////////////
+    function smt_json_last_error_msg() {
+        static $errors = array(
+            JSON_ERROR_NONE             => null,
+            JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
+            JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
+            JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
+            JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
+            JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+        );
+        $error = json_last_error();
+        return array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
+    }
+
+} // end class smt_commons_API
+
+//////////////////////////////////////////////////////////
 // SMT Admin - Media
-class smt_admin_media extends smt_admin_database_utils {
+class smt_admin_media extends smt_commons_API {
 
     //////////////////////////////////////////////////////////
 	function add_media($pageid) {
@@ -392,8 +430,6 @@ class smt_admin_media extends smt_admin_database_utils {
 		}
 		$response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
 
-		// Get Categories
-		
 		// Save media
 		if( !$this->save_media_to_database($media) ) {
 			$response .= '<p>ERROR: failed to save media to database</p></div>';
@@ -401,6 +437,45 @@ class smt_admin_media extends smt_admin_database_utils {
 		}
 		$response .= '<p>OK: Saved media info: <b><a href="' . $this->url('info')
 		. '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
+		
+		
+		// Get Categories
+		if( !$this->get_categories_from_media( $pageid ) ) {
+			$response .= '<p>ERROR: failed to get categories</p></div>';
+			return $response;			
+		}
+		$cats = @$this->commons_response['query']['pages'][$pageid]['categories'];
+		if( !$cats || !is_array($cats) ) { 
+			$response .= '<p>No Categories found</p></div>';
+			return $response;
+		}
+		
+		foreach( $cats as $cat ) {
+			if( !isset($cat['title']) || !$cat['title'] ) {
+				$this->error('add_media: ERROR: missing category title');
+				continue;
+			}
+
+			$cat_id = $this->get_category_id_from_name($cat['title']);
+			if( !$cat_id ) {
+				if( !$this->insert_category( $cat['title'] ) ) {
+					$this->error('add_media: ERROR: can not add ' . $cat['title']);
+					continue;
+				}
+				$cat_id = $this->last_insert_id;
+			}
+			
+			if( !$this->link_media_category( $pageid, $cat_id ) ) {
+				$this->error("add_media: ERROR: can not link pageid:$pageid to category:$cat_id");
+				continue;
+			}
+			
+			$response .= 'Linked <a href="' . $this->url('info') . '?i=' . $pageid . '">' 
+			. $cat['title'] . '</a><br />';
+		
+		} // end foreach cats
+		
+		//$response .= $this->display_thumbnail_box($media[$pageid]);
 
 		$response .= '</div>';
 		return $response;
@@ -520,10 +595,7 @@ class smt_admin_media extends smt_admin_database_utils {
 
             // connect category
 			if( $category ) {
-				$response = $this->query_as_bool(
-					'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
-					array('category_id'=>$category_id, 'pageid'=>$new[':pageid'])
-				);
+				$response = $this->link_media_category( $new[':pageid'], $category_id );
 				if( !$response ) {
 					$this->error('::save_media_to_database: insert into category2media table failed. pageid: '
 					. $new[':pageid']);
@@ -581,257 +653,6 @@ class smt_admin_media extends smt_admin_database_utils {
 
         $response .= '</div>';
         return $response;
-    }
-
-    //////////////////////////////////////////////////////////
-    // modified from: https://github.com/gbv/image-attribution - MIT License
-    function open_content_license_name($uri) {
-        if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
-            return "CC0";
-        } else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
-            return "Public Domain";
-        } else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
-            $license = "CC ".strtoupper($match[1])." ".$match[4];
-            if (isset($match[6])) $license .= " ".$match[6];
-            return $license;
-        } else {
-            return;
-        }
-    }
-
-    //////////////////////////////////////////////////////////
-    // modified from: https://github.com/gbv/image-attribution - MIT License
-    function open_content_license_uri($license) {
-        $license = strtolower(trim($license));
-
-        // CC Zero
-        if (preg_match('/^(cc0|cc[ -]zero)$/', $license)) {
-            return 'http://creativecommons.org/publicdomain/zero/1.0/';
-        }
-        // Public Domain
-        elseif (preg_match('/^(cc )?(pd|pdm|public[ -]domain)( mark( 1\.0)?)?$/', $license)) {
-            return 'https://creativecommons.org/publicdomain/mark/1.0/';
-        }
-        // No restrictions (for instance images imported from Flickr Commons)
-        elseif ($license == "no restrictions") {
-            return 'https://creativecommons.org/publicdomain/mark/1.0/';
-        }
-        // CC licenses.
-        // see <https://wiki.creativecommons.org/wiki/License_Versions>
-        // See <https://wiki.creativecommons.org/wiki/Jurisdiction_Database>
-        elseif (preg_match('/^cc([ -]by)?([ -]sa)?([ -]([1-4]\.0|2\.5))([ -]([a-z][a-z]))?$/', $license, $match)) {
-            $byline = $match[1] ? 'by' : '';
-            $sharealike = $match[2] ? 'sa' : '';
-            $port = isset($match[6]) ? $match[6] : '';
-            $version = $match[4];
-
-            // just "CC" is not enough
-            if (!($byline or $sharealike) or !$version) return;
-
-            // only 1.0 had pure SA-license without BY
-            if ($version == "1.0" && !$byline) {
-                $condition = "sa";
-            } else {
-                $condition = $sharealike ? "by-sa" : "by";
-            }
-
-            // ported versions only existed in 2.0, 2.5, and 3.0
-            if ($port) {
-                if ($version == "1.0" or $version == "4.0") return;
-                # TODO: check whether port actually exists at given version, for instance 2.5 had less ports!
-            }
-
-            // build URI
-            $uri = "http://creativecommons.org/licenses/$condition/$version/";
-            if ($port) $uri .= "$port/";
-
-            return $uri;
-        }
-        // TODO: GFLD and other licenses
-        else {
-            return;
-        }
-    }
-
-} // end class smt_admin_media
-
-//////////////////////////////////////////////////////////
-class smt_admin_category extends smt_admin_media {
-
-    //////////////////////////////////////////////////////////
-    function insert_category( $name='' ) {
-        if( !$name ) {
-            $this->error('::insert_category: no name found');
-            return FALSE;
-        }
-        $response = $this->query_as_bool(
-            'INSERT OR IGNORE INTO category (name) VALUES (:name)',
-            array(':name'=>$name)
-        );
-        if( !$response ) {
-            $this->error('::insert_category: insert into category table failed: name=' . $name);
-            return FALSE;
-        }
-        if( !$this->last_insert_id ) {
-            $this->notice('::insert_category: EXISTS: ' . $name);
-            return FALSE;
-        }
-        $this->notice('::insert_category: SAVED ' . $name);
-        $this->vacuum();
-        return TRUE;
-    }
-
-} // end class smt_admin_category
-
-//////////////////////////////////////////////////////////
-// SMT Admin - Block
-class smt_admin_block extends smt_admin_category {
-
-    //////////////////////////////////////////////////////////
-    function get_block_count() {
-        $count = $this->query_as_array('SELECT count(block.pageid) AS count FROM block');
-        if( isset($count[0]['count']) ) {
-            return $count[0]['count'];
-        }
-        return 0;
-    } // end function get_block_count()
-
-    //////////////////////////////////////////////////////////
-    function is_blocked( $pageid ) {
-        $block = $this->query_as_array(
-            'SELECT pageid FROM block WHERE pageid = :pageid',
-            array(':pageid'=>$pageid)
-        );
-        if( isset($block[0]['pageid']) ) {
-            return TRUE;
-        }
-        return FALSE;
-    } // end function is_blocked()
-
-} // end class smt_admin_database
-
-//////////////////////////////////////////////////////////
-// SMT Admin - Commons API
-class smt_commons_API extends smt_admin_block {
-
-    var $commons_api_url;
-    var $api_count;
-    var $prop_imageinfo;
-    var $totalhits;
-    var $continue;
-    var $sroffset;
-    var $batchcomplete;
-    var $categories;
-    var $commons_response;
-	
-    //////////////////////////////////////////////////////////
-    function call_commons($url, $key='') {
-        $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
-        if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; }
-        $get_response = file_get_contents($url);
-        if( $get_response === FALSE ) {
-            $this->error('::call_commons: ERROR: get failed');
-            return FALSE;
-        }
-        $this->api_count++;
-        $this->commons_response = json_decode($get_response,TRUE); // assoc
-        if( !$this->commons_response ) {
-            $this->error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error() );
-            $this->error('::call_commons: ERROR: ' . $this->smt_json_last_error_msg() );
-            return FALSE;
-        }
-
-        if( !$this->commons_response['query'][$key] || !is_array($this->commons_response['query'][$key])  ) {
-            $this->error("::call_commons: WARNING: missing key: $key");
-            //return FALSE;
-        }
-
-        $this->totalhits = $this->continue = $this->batchcomplete = FALSE;
-
-        if( isset($this->commons_response['batchcomplete']) ) {
-            $this->batchcomplete = TRUE;
-            //$this->notice('::call_commmons: batchcomplete=' . $this->batchcomplete);
-        }
-
-        if( isset($this->commons_response['query']['searchinfo']['totalhits']) ) {
-            $this->totalhits = $this->commons_response['query']['searchinfo']['totalhits'];
-            $this->notice('::call_commmons: totalhits=' . $this->totalhits);
-
-        }
-        if( isset($this->commons_response['continue']) ) {
-            $this->continue = $this->commons_response['continue']['continue'];
-            //$this->notice('::call_commmons: continue=' . $this->continue  );
-        }
-        if( isset($this->commons_response['sroffset']) ) {
-            $this->sroffset = $this->commons_response['continue']['sroffset'];
-            //$this->notice('::call_commmons: sroffset=' . $this->sroffset  );
-        }
-        if( isset($this->commons_response['warnings']) ) {
-            $this->error('::call_commons: ' . print_r($this->commons_response['warnings'],1) );
-            $this->error('::call_commons: url: ' . $url);
-        }
-           return TRUE;
-    } // end function call_commons()
-
-    //////////////////////////////////////////////////////////
-    function find_categories( $search='' ) {
-        if( !$search || $search == '' || !is_string($search) ) {
-            $this->error('::find_categories: invalid search string: ' . $search);
-            return FALSE;
-        }
-        $call = $this->commons_api_url . '?action=query&format=json'
-        . '&list=search'
-        . '&srnamespace=14' // 6 = File   14 = Category
-        . '&srprop=size|snippet' // titlesnippet|timestamp|title
-        . '&srlimit=500'
-        . '&srsearch=' . urlencode($search);
-        if( !$this->call_commons($call, 'search') ) {
-            $this->error('::find_categories: nothing found');
-            return FALSE;
-        }
-        return $this->commons_response['query']['search'];
-    } // end function find_categories()
-
-    //////////////////////////////////////////////////////////
-    function get_category_info( $category ) {
-        if( !$category || $category=='' || !is_string($category) ) {
-            $this->error('::get_category_info: ERROR - no category');
-            return FALSE;
-        }
-        $this->notice('::get_category_info: ' . $category);
-        $call = $this->commons_api_url . '?action=query&format=json'
-        . '&prop=categoryinfo'
-        . '&titles=' . urlencode($category);    // cicontinue
-        if( !$this->call_commons($call, 'pages') ) {
-            $this->error('::get_category_info: nothing found');
-            return FALSE;
-        }
-        return $this->commons_response['query']['pages'];
-    } // end function get_category_info()
-
-    //////////////////////////////////////////////////////////
-    function get_subcats( $category ) {
-        if( !$category || $category=='' || !is_string($category) ) {
-            $this->error('::get_subcats: ERROR - no category');
-            return FALSE;
-        }
-        $this->notice('::get_subcats: ' . $category);
-        $call = $this->commons_api_url . '?action=query&format=json&cmlimit=50'
-        . '&list=categorymembers'
-        . '&cmtype=subcat'
-        . '&cmprop=title'
-        . '&cmlimit=500'
-        . '&cmtitle=' . urlencode($category) ;
-        if( !$this->call_commons($call, 'categorymembers')
-            || !isset($this->commons_response['query']['categorymembers'])
-            || !is_array($this->commons_response['query']['categorymembers'])
-        ) {
-            $this->error('::get_subcats: Nothing Found');
-            return FALSE;
-        }
-        foreach( $this->commons_response['query']['categorymembers'] as $subcat ) {
-            $this->insert_category( $subcat['title'] );
-        }
     }
 
     //////////////////////////////////////////////////////////
@@ -949,24 +770,268 @@ class smt_commons_API extends smt_admin_block {
     }
 
     //////////////////////////////////////////////////////////
-    function smt_json_last_error_msg() {
-        static $errors = array(
-            JSON_ERROR_NONE             => null,
-            JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
-            JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
-            JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
-            JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
-            JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+    function empty_media_tables() {
+        $sqls = array(
+            'DELETE FROM tagging',
+            'DELETE FROM user_tagging',
+            'DELETE FROM category2media',
+            'DELETE FROM media',
+            'DELETE FROM block',
         );
-        $error = json_last_error();
-        return array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
+        $response = array();
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql) ) {
+                $response[] = 'OK: ' . $sql;
+            } else {
+                $response[] = 'FAIL: ' . $sql;
+            }
+        }
+        $this->vacuum();
+        return $response;
+    }
+	
+    //////////////////////////////////////////////////////////
+    // modified from: https://github.com/gbv/image-attribution - MIT License
+    function open_content_license_name($uri) {
+        if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
+            return "CC0";
+        } else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
+            return "Public Domain";
+        } else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
+            $license = "CC ".strtoupper($match[1])." ".$match[4];
+            if (isset($match[6])) $license .= " ".$match[6];
+            return $license;
+        } else {
+            return;
+        }
     }
 
-} // end class smt_commons_API
+    //////////////////////////////////////////////////////////
+    // modified from: https://github.com/gbv/image-attribution - MIT License
+    function open_content_license_uri($license) {
+        $license = strtolower(trim($license));
+
+        // CC Zero
+        if (preg_match('/^(cc0|cc[ -]zero)$/', $license)) {
+            return 'http://creativecommons.org/publicdomain/zero/1.0/';
+        }
+        // Public Domain
+        elseif (preg_match('/^(cc )?(pd|pdm|public[ -]domain)( mark( 1\.0)?)?$/', $license)) {
+            return 'https://creativecommons.org/publicdomain/mark/1.0/';
+        }
+        // No restrictions (for instance images imported from Flickr Commons)
+        elseif ($license == "no restrictions") {
+            return 'https://creativecommons.org/publicdomain/mark/1.0/';
+        }
+        // CC licenses.
+        // see <https://wiki.creativecommons.org/wiki/License_Versions>
+        // See <https://wiki.creativecommons.org/wiki/Jurisdiction_Database>
+        elseif (preg_match('/^cc([ -]by)?([ -]sa)?([ -]([1-4]\.0|2\.5))([ -]([a-z][a-z]))?$/', $license, $match)) {
+            $byline = $match[1] ? 'by' : '';
+            $sharealike = $match[2] ? 'sa' : '';
+            $port = isset($match[6]) ? $match[6] : '';
+            $version = $match[4];
+
+            // just "CC" is not enough
+            if (!($byline or $sharealike) or !$version) return;
+
+            // only 1.0 had pure SA-license without BY
+            if ($version == "1.0" && !$byline) {
+                $condition = "sa";
+            } else {
+                $condition = $sharealike ? "by-sa" : "by";
+            }
+
+            // ported versions only existed in 2.0, 2.5, and 3.0
+            if ($port) {
+                if ($version == "1.0" or $version == "4.0") return;
+                # TODO: check whether port actually exists at given version, for instance 2.5 had less ports!
+            }
+
+            // build URI
+            $uri = "http://creativecommons.org/licenses/$condition/$version/";
+            if ($port) $uri .= "$port/";
+
+            return $uri;
+        }
+        // TODO: GFLD and other licenses
+        else {
+            return;
+        }
+    }
+
+} // end class smt_admin_media
+
+//////////////////////////////////////////////////////////
+class smt_admin_category extends smt_admin_media {
+
+    var $categories;
+
+    //////////////////////////////////////////////////////////
+	function get_categories_from_media( $pageid ) {
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
+            $this->error('::get_categories_from_media: invalid pageid');
+            return FALSE;
+        }
+        $call = $this->commons_api_url . '?action=query&format=json'
+        . '&prop=categories'
+		. '&pageids=' . $pageid
+		;
+        if( !$this->call_commons($call, 'pages') ) {	
+            $this->error('::get_categories_from_media: nothing found');
+            return FALSE;
+        }
+		return TRUE;
+	}
+
+    //////////////////////////////////////////////////////////
+	function link_media_category( $pageid, $category_id ) {
+		$response = $this->query_as_bool(
+			'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
+			array('category_id'=>$category_id, 'pageid'=>$pageid)
+		);
+		if( !$response ) {
+			$this->error('::link_media_category: ERROR: insert failed. pageid: '
+			. $pageid . ' cat_id: ' . $category_id);
+			return FALSE;
+		}
+		return TRUE;
+	}
+	
+    //////////////////////////////////////////////////////////
+    function find_categories( $search='' ) {
+        if( !$search || $search == '' || !is_string($search) ) {
+            $this->error('::find_categories: invalid search string: ' . $search);
+            return FALSE;
+        }
+        $call = $this->commons_api_url . '?action=query&format=json'
+        . '&list=search'
+        . '&srnamespace=14' // 6 = File   14 = Category
+        . '&srprop=size|snippet' // titlesnippet|timestamp|title
+        . '&srlimit=500'
+        . '&srsearch=' . urlencode($search);
+        if( !$this->call_commons($call, 'search') ) {
+            $this->error('::find_categories: nothing found');
+            return FALSE;
+        }
+        return TRUE;
+    } // end function find_categories()
+
+    //////////////////////////////////////////////////////////
+    function get_category_info( $category ) {
+        if( !$category || $category=='' || !is_string($category) ) {
+            $this->error('::get_category_info: ERROR - no category');
+            return FALSE;
+        }
+        $this->notice('::get_category_info: ' . $category);
+        $call = $this->commons_api_url . '?action=query&format=json'
+        . '&prop=categoryinfo'
+        . '&titles=' . urlencode($category);    // cicontinue
+        if( !$this->call_commons($call, 'pages') ) {
+            $this->error('::get_category_info: nothing found');
+            return FALSE;
+        }
+        return $this->commons_response['query']['pages'];
+    } // end function get_category_info()
+
+    //////////////////////////////////////////////////////////
+    function get_subcats( $category ) {
+        if( !$category || $category=='' || !is_string($category) ) {
+            $this->error('::get_subcats: ERROR - no category');
+            return FALSE;
+        }
+        $this->notice('::get_subcats: ' . $category);
+        $call = $this->commons_api_url . '?action=query&format=json&cmlimit=50'
+        . '&list=categorymembers'
+        . '&cmtype=subcat'
+        . '&cmprop=title'
+        . '&cmlimit=500'
+        . '&cmtitle=' . urlencode($category) ;
+        if( !$this->call_commons($call, 'categorymembers')
+            || !isset($this->commons_response['query']['categorymembers'])
+            || !is_array($this->commons_response['query']['categorymembers'])
+        ) {
+            $this->error('::get_subcats: Nothing Found');
+            return FALSE;
+        }
+        foreach( $this->commons_response['query']['categorymembers'] as $subcat ) {
+            $this->insert_category( $subcat['title'] );
+        }
+    }
+
+    //////////////////////////////////////////////////////////
+    function insert_category( $name='' ) {
+        if( !$name ) {
+            $this->error('::insert_category: no name found');
+            return FALSE;
+        }
+        $response = $this->query_as_bool(
+            'INSERT OR IGNORE INTO category (name) VALUES (:name)',
+            array(':name'=>$name)
+        );
+        if( !$response ) {
+            $this->error('::insert_category: insert into category table failed: name=' . $name);
+            return FALSE;
+        }
+        if( !$this->last_insert_id ) {
+            $this->notice('::insert_category: EXISTS: ' . $name);
+            return FALSE;
+        }
+        $this->notice('::insert_category: SAVED ' . $name);
+        $this->vacuum();
+        return TRUE;
+    }
+
+    //////////////////////////////////////////////////////////
+    function empty_category_tables() {
+        $sqls = array(
+            'DELETE FROM category2media',
+            'DELETE FROM category',
+        );
+        $response = array();
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql) ) {
+                $response[] = 'OK: ' . $sql;
+            } else {
+                $response[] = 'FAIL: ' . $sql;
+            }
+        }
+        $this->vacuum();
+        return $response;
+    }
+
+} // end class smt_admin_category
+
+//////////////////////////////////////////////////////////
+// SMT Admin - Block
+class smt_admin_block extends smt_admin_category {
+
+    //////////////////////////////////////////////////////////
+    function get_block_count() {
+        $count = $this->query_as_array('SELECT count(block.pageid) AS count FROM block');
+        if( isset($count[0]['count']) ) {
+            return $count[0]['count'];
+        }
+        return 0;
+    } // end function get_block_count()
+
+    //////////////////////////////////////////////////////////
+    function is_blocked( $pageid ) {
+        $block = $this->query_as_array(
+            'SELECT pageid FROM block WHERE pageid = :pageid',
+            array(':pageid'=>$pageid)
+        );
+        if( isset($block[0]['pageid']) ) {
+            return TRUE;
+        }
+        return FALSE;
+    } // end function is_blocked()
+
+} // end class smt_admin_database
 
 //////////////////////////////////////////////////////////
 // SMT Admin
-class smt_admin extends smt_commons_API {
+class smt_admin extends smt_admin_block {
 
     //////////////////////////////////////////////////////////
     function __construct() {
