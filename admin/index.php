@@ -59,9 +59,9 @@ print '<p>Installation:
 
 print '<p>Discovery / Restrictions:
 <ul>
-<li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>: 
+<li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>:
 <span style="font-family:monospace;">'
-	. $smt->check_robotstxt() 
+    . $smt->check_robotstxt()
 . '</span></li>
 <li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a>
 <li>./admin/.htaccess: '
@@ -76,7 +76,7 @@ print '<p>Discovery / Restrictions:
 print '<p>Database:
 <ul>
 <li>File: ' . $smt->database_name . '</li>
-<li>Permissions: ' 
+<li>Permissions: '
 . ( is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY' )
 . '</li>
 <li>Size: '

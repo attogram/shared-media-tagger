@@ -4,7 +4,7 @@
 
 $page_limit = 25; // # of files per page
 
-$init = __DIR__.'/smt.php'; 
+$init = __DIR__.'/smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 $smt = new smt();
 
@@ -35,15 +35,15 @@ if( $category_size > $page_limit ) {
     $pager = 'pages: ';
     for( $x = 0; $x < $category_size; $x+=$page_limit ) {
         if( $x == $offset ) {
-            $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">&nbsp;' 
+            $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">&nbsp;'
             . ++$page_count . '&nbsp;</span>';
             continue;
         }
-        $pager .= '<a href="?o=' . $x . '&amp;c=' 
-        . $smt->category_urlencode($smt->strip_prefix($category_name)) 
+        $pager .= '<a href="?o=' . $x . '&amp;c='
+        . $smt->category_urlencode($smt->strip_prefix($category_name))
         . '">&nbsp;' . ++$page_count . '&nbsp;</a>';
     }
-} 
+}
 
 $sql = '
     SELECT m.*
@@ -66,16 +66,16 @@ $smt->include_menu();
 
 print '<div class="box white">'
     . '<p>'
-    . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">' 
+    . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">'
         . $smt->get_reviews_per_category( $category_info['id'] )
     . '</div>'
-    . '<h1>' 
-    . str_replace( 
+    . '<h1>'
+    . str_replace(
         'Category:',
         '<a href="' . $smt->url('categories') . '">Category:</a> ',
         $category_name)
     . '</h1>'
-    . '<br /><b>' . $category_size 
+    . '<br /><b>' . $category_size
     . '</b> files'
     . ($pager ? ', '.$pager : '')
     . '</p><br clear="all" />'
@@ -88,7 +88,7 @@ if( $smt->is_admin() ) {
 foreach( $category as $media ) {
     print $smt->display_thumbnail_box( $media );
 }
- 
+
 if( $smt->is_admin() ) {
     print '<p><input type="submit" value="Delete selected media"></p></form>';
 }

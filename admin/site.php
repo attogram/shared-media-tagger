@@ -2,9 +2,9 @@
 // Shared Media Tagger
 // Site Admin
 
-$f = __DIR__.'/../smt.php'; 
+$f = __DIR__.'/../smt.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
-$f = __DIR__.'/smt-admin.php'; 
+$f = __DIR__.'/smt-admin.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 $smt = new smt_admin();
 
@@ -31,12 +31,12 @@ if( !$site['name'] ) {$site['name'] = '(empty)'; }
 if( !$site['about'] ) {$site['about'] = '(empty)'; }
 
 print ''
-. '<p>Site Name / About:  (<a 
-target="sqlite" href="./sqladmin.php?table=site&action=row_editordelete&pk=[' 
+. '<p>Site Name / About:  (<a
+target="sqlite" href="./sqladmin.php?table=site&action=row_editordelete&pk=['
 . $site['id'] . ']&type=edit">EDIT</a>)'
 . '<div style="font-weight:bold; font-size:120%; color:white; background-color:black; padding:2px;">'
 . $site['name'] . '</div>'
-. '<div style="color:black; background-color:#ddd; padding:2px;">' 
+. '<div style="color:black; background-color:#ddd; padding:2px;">'
 . $site['about'] . '</div>';
 
 $tags = $smt->get_tags();
@@ -58,9 +58,9 @@ print '<br /><em>Tags preview:</em>'
 . '</tr>';
 foreach( $tags as $tag ) {
     print '<form action="" method="GET"><input type="hidden" name="tagid" value="' . $tag['id'] . '">';
-    print '<tr >' 
-    . '<td>' 
-        . '<a target="sqlite" href="./sqladmin.php?table=tag&action=row_editordelete&pk=[' 
+    print '<tr >'
+    . '<td>'
+        . '<a target="sqlite" href="./sqladmin.php?table=tag&action=row_editordelete&pk=['
             . $tag['id'] . ']&type=edit">' . $tag['id'] . '</a>'
     . '</td>'
     . '<td><input name="position" value="' . $tag['position'] . '" size="1" /></td>'
@@ -79,7 +79,7 @@ foreach( $tags as $tag ) {
 print '</table>';
 print '<br /><a href="./sqladmin.php?table=tag&action=row_create" target="sqlite">ADD NEW tag</a>'
  . '<br /><a href="./sqladmin.php?action=row_view&table=tag" target="sqlite">VIEW/EDIT tag table</a>';
-        
+
 
 print '</div>';
 $smt->include_footer();
@@ -92,7 +92,7 @@ $smt->include_footer();
 function save_tag() {
     global $smt;
 
-    $sql = 'UPDATE tag SET 
+    $sql = 'UPDATE tag SET
         position = :position,
         name = :name, display_name = :display_name,
         color = :color, bgcolor = :bgcolor,
@@ -103,20 +103,20 @@ function save_tag() {
     $bind = array(
         ':id'    => @$_GET['tagid'],
         ':position'    => @$_GET['position'],
-        ':name'    => @$_GET['name'], 
-        ':display_name'    => @$_GET['display_name'], 
+        ':name'    => @$_GET['name'],
+        ':display_name'    => @$_GET['display_name'],
         ':color'    => @$_GET['color'],
         ':bgcolor'    => @$_GET['bgcolor'],
         ':hover_color'    => @$_GET['hover_color'],
         ':hover_bgcolor'    => @$_GET['hover_bgcolor'],
         ':padding'    => @$_GET['padding'],
     );
-    
+
     if( $smt->query_as_bool($sql, $bind) ) {
         $smt->notice('OK: Saved Tag ID#'.$_GET['tagid']);
         return TRUE;
     }
-    $smt->notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>' 
+    $smt->notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>'
         . print_r($bind,1) . ' </pre>');
     return FALSE;
-}    
+}

@@ -2,7 +2,7 @@
 // Shared Media Tagger
 // Contact
 
-$f = __DIR__.'/smt.php'; 
+$f = __DIR__.'/smt.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 
 $smt = new smt();
@@ -18,7 +18,7 @@ if( isset($_POST['c']) ) {
     $ip = @$_SERVER['REMOTE_ADDR'];
     $i = $smt->query_as_bool(
         'INSERT INTO contact (comment, datetime, ip) VALUES (:comment, CURRENT_TIMESTAMP, :ip)'
-        , array(':comment'=>$comment, ':ip'=>$ip) 
+        , array(':comment'=>$comment, ':ip'=>$ip)
     );
     if( $i ) {
         print '<p>Thank you for your message.</p>';
@@ -47,7 +47,7 @@ $footer = '
 
 if( isset($_GET['r']) && $smt->is_positive_number($_GET['r']) ) {
     $pageid = (int)$_GET['r'];
-    
+
     $media = $smt->get_media($pageid);
     if( !$media || !isset($media[0]) ) {
         $smt->notice('ERROR: no media ID #' . $pageid . ' found.');
@@ -55,7 +55,7 @@ if( isset($_GET['r']) && $smt->is_positive_number($_GET['r']) ) {
     }
     $media = $media[0];
 
-    $headline = '<p>REPORT file #' . $pageid . '<br />' 
+    $headline = '<p>REPORT file #' . $pageid . '<br />'
     . $smt->display_thumbnail($media) . '</p>';
     $innertext = '
 * REPORT file #' . $pageid . ':

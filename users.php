@@ -2,7 +2,7 @@
 // Shared Media Tagger
 // Users
 
-$init = __DIR__.'/smt.php'; 
+$init = __DIR__.'/smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 
 $smt = new smt();
@@ -27,7 +27,7 @@ if( isset($_GET['i']) ) {
 
 $smt->title = 'Users - ' . $smt->site_name;
 if( $user_id ) {
-	$smt->title = 'User:' . $user_id . ' - ' . $smt->site_name;
+    $smt->title = 'User:' . $user_id . ' - ' . $smt->site_name;
 }
 $smt->include_header();
 $smt->include_menu();

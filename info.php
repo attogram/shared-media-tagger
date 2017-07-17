@@ -1,13 +1,13 @@
 <?php
-// Shared Media Tagger 
+// Shared Media Tagger
 // Media info
 
-$f = __DIR__.'/smt.php'; 
+$f = __DIR__.'/smt.php';
 if( !file_exists($f) || !is_readable($f) ) { print 'Site down for maintenance'; exit; } require_once($f);
 
 $smt = new smt();
 
-if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) ) { 
+if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) ) {
     $smt->fail404('404 Media Not Found');
 }
 
@@ -33,7 +33,7 @@ $smt->include_menu();
 <div class="row">
 
 <div class="col-sm-6 box grey center"><?php /* start left */ ?>
-<?php 
+<?php
 print ''
 . $smt->display_tags( $pageid )
 . $smt->display_image($media)
@@ -44,12 +44,12 @@ print ''
 <div class="col-sm-6 box white"><?php /* start right */ ?>
 
 <br />
-<h1><a target="commons" href="<?php 
-    print $media['url']; ?>"><?php 
+<h1><a target="commons" href="<?php
+    print $media['url']; ?>"><?php
     print $smt->strip_prefix($media['title']); ?></a></h1>
 <br />
 <br />
-    
+
 <p><?php print ($media['imagedescription']); ?></p>
 
 <p><em>by:</em> <b><?php print ($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
@@ -77,7 +77,7 @@ $lics[] = $media['usageterms'];
 $lics = array_unique($lics);
 
 if( $media['licenseuri'] && $media['licenseuri'] != 'false' ) {
-    print '<br /><b><a target="license" href="' 
+    print '<br /><b><a target="license" href="'
     . $media['licenseuri'] . '">' . implode('<br />', $lics)  . '</a></b>';
 } else {
     print '<b>' . implode('<br />', $lics) . '</b>';
@@ -96,10 +96,10 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 <p><em>View this file on:</em>
 <ul>
 <li><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">commons.wikimedia.org</a></li>
-<li><a target="commons" href="//en.wikipedia.org/wiki/<?php 
+<li><a target="commons" href="//en.wikipedia.org/wiki/<?php
     print $smt->category_urlencode($media['title']); ?>">en.wikipedia.org</a></li>
-<li><a target="commons" href="//wikidata.org/wiki/<?php 
-	    print $smt->category_urlencode($media['title']); ?>">wikidata.org</a></li>
+<li><a target="commons" href="//wikidata.org/wiki/<?php
+        print $smt->category_urlencode($media['title']); ?>">wikidata.org</a></li>
 </ul>
 </p>
 
@@ -108,19 +108,19 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 <li>width x height: <b><?php print $media['width']; ?> x <?php print $media['height']; ?></b> pixels</li>
 <li>mime: <b><?php print $media['mime']; ?></b></li>
 <li>size: <b><?php print $media['size']; ?></b> bytes</li>
-<?php 
+<?php
 if( $media['duration'] > 0 ) {
-	//print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
-	print '<li>duration: <b>' . $smt->seconds_to_time($media['duration']) . '</b></li>';
+    //print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
+    print '<li>duration: <b>' . $smt->seconds_to_time($media['duration']) . '</b></li>';
 }
 ?>
 <li>timestamp: <b><?php print $media['timestamp']; ?></b></li>
-<li>uploader: <b><a target="commons" href="https://commons.wikimedia.org/wiki/User:<?php 
+<li>uploader: <b><a target="commons" href="https://commons.wikimedia.org/wiki/User:<?php
     print urlencode($media['user']); ?>">User:<?php print $media['user']; ?></a></b></li>
 </ul>
 </p>
 
-<p><a href="<?php 
+<p><a href="<?php
 print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a></p>
 
 </div><?php /* end right */ ?>

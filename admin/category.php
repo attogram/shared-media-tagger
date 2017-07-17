@@ -4,9 +4,9 @@
 
 if( function_exists('set_time_limit') ) { set_time_limit( 250 ); }
 
-$f = __DIR__.'/../smt.php'; 
+$f = __DIR__.'/../smt.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
-$f = __DIR__.'/smt-admin.php'; 
+$f = __DIR__.'/smt-admin.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 $smt = new smt_admin();
 
@@ -25,7 +25,7 @@ if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
 
     $cat_url = '<a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
     . htmlentities($smt->strip_prefix($category_name)) . '</a>';
-    
+
     print '<p>Importing media from <b>' . $cat_url . '</b></p>';
 
     $smt->get_media_from_category( $category_name );
@@ -51,11 +51,11 @@ if( isset($_GET['d']) && $_GET['d'] ) {
     $smt->vacuum();
 }
 
-if( isset($_GET['s']) && $_GET['s'] ) { 
+if( isset($_GET['s']) && $_GET['s'] ) {
     get_search_results($smt);
 }
 
-if( isset($_GET['sc']) && $_GET['sc'] ) { 
+if( isset($_GET['sc']) && $_GET['sc'] ) {
     $smt->get_subcats( $smt->category_urldecode($_GET['sc']) );
 }
 
@@ -75,23 +75,23 @@ if( isset($_GET['g']) && $_GET['g']=='all' ) {
     get_category_info($smt);
 }
 
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
 if( isset($_GET['sca']) && $_GET['sca']=='all' ) {
-    $sql = 'SELECT id, name, pageid, files, subcats FROM category WHERE subcats > 0 ORDER BY name'; 
+    $sql = 'SELECT id, name, pageid, files, subcats FROM category WHERE subcats > 0 ORDER BY name';
     $smt->notice('SHOWING only categories with subcategories');
 
 } elseif( isset($_GET['wf']) ) {
     $sql = 'SELECT id, name, pageid, files, subcats FROM category WHERE files > 0 ORDER BY name';
     $smt->notice('SHOWING only categories with files');
-    
+
 } elseif( isset($_POST['s']) ) {
     $sql = "SELECT id, name, pageid, files, subcats FROM category WHERE name LIKE :search ORDER BY name";
     $bind = array(':search'=>'%' . $_POST['s']. '%');
     $smt->notice('SHOWING only categories with search text: ' . $_POST['s'] );
-    
+
 } else {
     $sql = 'SELECT id, name, pageid, files, subcats FROM category ORDER BY name';
 
@@ -134,21 +134,21 @@ print '<table border="1">'
 reset($cats);
 $common_files_count = $local_files_count = 0;
 foreach( $cats as $c ) {
-    
+
     $common_files_count += $c['files'];
-    
+
     print '<tr>'
-    . '<td><b><a href="' . $smt->url('category') . '?c=' 
+    . '<td><b><a href="' . $smt->url('category') . '?c='
     . $smt->category_urlencode($smt->strip_prefix($c['name']))
     . '">' . $smt->strip_prefix($c['name']) . '</a></b></td>';
-    
+
     $local_files = '';
     $lfsql = '
-        SELECT count(category_id) AS count 
-        FROM category2media 
+        SELECT count(category_id) AS count
+        FROM category2media
         WHERE category_id = :category_id';
     $lfbind = array(':category_id'=>$c['id']);
-    $lf = $smt->query_as_array($lfsql, $lfbind);    
+    $lf = $smt->query_as_array($lfsql, $lfbind);
     if( !$lf || !isset($lf[0]['count']) || !$lf[0]['count'] ) {
         $local_files = '<span style="color:#ccc;">0</span>';
     } else {
@@ -167,7 +167,7 @@ foreach( $cats as $c ) {
     . '<td class="right">' . ($c['files'] ? number_format($c['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
     ;
     if( $c['subcats'] > 0 ) {
-        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->category_urlencode($c['name']) . '"">+' 
+        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->category_urlencode($c['name']) . '"">+'
         . $c['subcats'] . '</a>';
     } else {
         $subcatslink = '';
@@ -215,7 +215,7 @@ function delete_category($smt) {
         if( $smt->query_as_bool($sql, array(':category_id'=>$category_id) ) ) {
             $response[] = 'Delete OK  : ' . $sql;
             continue;
-        } 
+        }
         $response[] = 'Delete FAIL: ' . $sql;
     }
     $smt->notice($response);
@@ -236,9 +236,9 @@ function get_search_results($smt) {
     <script type="text/javascript" language="javascript">// <![CDATA[
     function checkAll(formname, checktoggle)
     {
-      var checkboxes = new Array(); 
+      var checkboxes = new Array();
       checkboxes = document[formname].getElementsByTagName(\'input\');
-     
+
       for (var i=0; i<checkboxes.length; i++)  {
         if (checkboxes[i].type == \'checkbox\')   {
           checkboxes[i].checked = checktoggle;
@@ -254,10 +254,10 @@ function get_search_results($smt) {
     . '<input type="submit" value="  save to database  "><br /><br />';
 
     while( list(,$cat) = each($cats) ) {
-        print '<input type="checkbox" checked="checked" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>' 
-        . $cat['title'] 
-        . '</strong><small> ' 
-        . '<a target="commons" href="https://commons.wikimedia.org/wiki/' 
+        print '<input type="checkbox" checked="checked" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
+        . $cat['title']
+        . '</strong><small> '
+        . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
             . $smt->category_urlencode($cat['title']) . '">(view)</a> '
         . ' (' . $cat['snippet'] . ')'
         . ' (size:' . $cat['size'] . ')</small><br />';
@@ -265,7 +265,7 @@ function get_search_results($smt) {
     print '</form>';
     print '</div>';
     $smt->include_footer();
-    exit;    
+    exit;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -283,10 +283,10 @@ function import_categories($smt) {
 function get_category_info($smt) {
     $cat = urldecode($_GET['c']);
     //print '<p>Category Info: <b>' . $cat . '</b></p>';
-    $cats = $smt->get_category_info($cat);    
-    if( !$cats ) { 
-        $smt->error('failed to get category info'); 
-        return; 
+    $cats = $smt->get_category_info($cat);
+    if( !$cats ) {
+        $smt->error('failed to get category info');
+        return;
     }
     foreach( $cats as $cat ) {
         $title = $cat['title'];
@@ -294,7 +294,7 @@ function get_category_info($smt) {
         $files = $cat['categoryinfo']['files'];
         $subcats = $cat['categoryinfo']['subcats'];
         $x = $smt->query_as_bool(
-            'UPDATE category 
+            'UPDATE category
             SET pageid = :pageid, files = :files, subcats = :subcats
             WHERE name = :name',
             array( ':pageid'=>$pageid, ':files'=>$files, ':subcats'=>$subcats, ':name'=>$title)

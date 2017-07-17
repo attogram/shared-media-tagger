@@ -2,7 +2,7 @@
 // Shared Media Tagger
 // Reviews
 
-$f = __DIR__.'/smt.php'; 
+$f = __DIR__.'/smt.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 
 $smt = new smt();
@@ -26,7 +26,7 @@ foreach( $tags as $tag ) {
     . '<a href="' . $me . '?o=reviews.' . $smt->category_urlencode($tag['name']) . '">'
     . '+' . $tag_count . ' ' . $tag['name'] . '</a></span>';
 }
-print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+' 
+print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+'
 . $smt->get_tagging_count() . ' Total</a></span>'
 . '<hr />';
 
@@ -43,17 +43,17 @@ if( (preg_match('/^reviews\.(.*)/', $order, $matches)) === 1 ) {
     //$smt->notice("PREG: tag_name=$tag_name tag_id=$tag_id matches=" . print_r($matches,1));
 
 }
-    
-    
+
+
 $limit = 100;
 
 switch( $order ) {
-    
+
     default:
         print '<p>Please choose a report above.</p></div>';
         $smt->include_footer();
         exit;
-        
+
 
     case 'PER.TAG':
         $tags = $smt->get_tags();
@@ -66,7 +66,7 @@ switch( $order ) {
         $bind = array(':tag_id'=>$tag_id);
         break;
 
-        
+
     case 'total.reviews':
         $order_desc = 'Total # of reviews';
         $sql = '
@@ -87,7 +87,7 @@ if( !is_array($x) ) { $x = array(); }
 ?>
 <p><b><?php print $order_desc; ?></b>: <?php print sizeof($x); ?> files reviewed.</p>
 
-<?php 
+<?php
 foreach( $x as $media ) {
     print $smt->display_thumbnail_box($media);
 }

@@ -2,9 +2,9 @@
 // Shared Media Tagger
 // Media Admin
 
-$init = __DIR__.'/../smt.php'; 
+$init = __DIR__.'/../smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
-$init = __DIR__.'/smt-admin.php'; 
+$init = __DIR__.'/smt-admin.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 $smt = new smt_admin();
 
@@ -85,11 +85,11 @@ function delete_media_in_category( $category_name ) {
     }
     $return = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
     . 'Deleting Media in <b>' . $category_name . '</b>';
-    
+
     $media = $smt->get_media_in_category( $category_name );
-    
+
     $return .= '<br /><b>' . count($media) . '</b> Media files found in Category';
-    
+
     foreach( $media as $pageid ) {
         $return .= '<br />Deleting #' . $pageid;
         $return .= $smt->delete_media($pageid);

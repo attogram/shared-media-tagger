@@ -20,7 +20,7 @@ $smt = new smt();
 $cr = ''; // "\n";
 
 $protocol = $smt->get_protocol();
-    
+
 print '<url><loc>' . $protocol . $smt->url('home') . '</loc>'
 . '<lastmod>' . gmdate('Y-m-d') . '</lastmod>'
 . '<changefreq>always</changefreq>'
