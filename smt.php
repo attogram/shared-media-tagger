@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.7');
+define('__SMT__', '0.6.8');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -764,7 +764,7 @@ class smt_category EXTENDS smt_user {
             array(':pageid'=>$pageid)
         );
         if( !isset( $response[0]['name'] ) ) {
-            $this->error('::get_image_categories: ' . print_r($response,1) );
+            $this->debug('::get_image_categories: ' . print_r($response,1) );
             return $error;
         }
         $cats = array();

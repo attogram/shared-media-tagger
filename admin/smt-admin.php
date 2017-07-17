@@ -7,6 +7,15 @@
 class smt_admin_utils extends smt {
 
     //////////////////////////////////////////////////////////
+    function set_admin_cookie() {
+        if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == '1' ) {
+            return;
+        }
+        setcookie('admin','1',time()+60*60,'/'); // 1 hour admin cookie
+        //$this->notice('Admin cookie set');
+    }
+
+    //////////////////////////////////////////////////////////
     function check_robotstxt() {
 
         $robotstxt = $this->install_directory . '/robots.txt';
@@ -92,194 +101,6 @@ class smt_admin_utils extends smt {
 // SMT Admin - Database Utils
 class smt_admin_database_utils extends smt_admin_utils {
 
-    //////////////////////////////////////////////////////////
-    function insert_category( $name='' ) {
-        if( !$name ) {
-            $this->error('::insert_category: no name found');
-            return FALSE;
-        }
-        $response = $this->query_as_bool(
-            'INSERT OR IGNORE INTO category (name) VALUES (:name)',
-            array(':name'=>$name)
-        );
-        if( !$response ) {
-            $this->error('::insert_category: insert into category table failed: name=' . $name);
-            return FALSE;
-        }
-        if( !$this->last_insert_id ) {
-            $this->notice('::insert_category: EXISTS: ' . $name);
-            return FALSE;
-        }
-        $this->notice('::insert_category: SAVED ' . $name);
-        $this->vacuum();
-        return TRUE;
-    }
-
-    //////////////////////////////////////////////////////////
-    function save_media_to_database($images='', $category='') {
-        if( !$images || !is_array($images) ) {
-            $this->error('::save_media_to_database: no image array');
-            return FALSE;
-        }
-        if( !$category || !is_string($category) ) {
-            $this->error('::save_media_to_database: no category');
-            return FALSE;
-        }
-        $cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
-        if( !$cat_id || !isset($cat_id[0]['id']) ) {
-            $this->error('::save_media_to_database: unable to get category id: ' . $category);
-            return FALSE;
-        }
-        $category_id = $cat_id[0]['id'];
-        $this->notice('::save_media_to_database: ' . sizeof($images) . ' images to insert from '
-            . $category. ' (id:' . $category_id . ')');
-
-        $errors = array();
-
-        $this->begin_transaction();
-
-        while( list(,$image) = each($images) ) {
-
-            $new = array();
-
-            $new[':pageid'] = @$image['pageid'];
-            $new[':title'] = @$image['title'];
-            $new[':url'] = @$image['imageinfo'][0]['url'];
-            if( !isset($new[':url']) || $new[':url'] == '' ) {
-                $this->error('::save_media_to_database: ERROR SKIPPING: pageid='
-                    . @$new[':pageid'] . ' title=' . @$new[':title'] );
-                $errors[ $new[':pageid'] ] = $new[':title'];
-                continue;
-            }
-
-            $new[':descriptionurl'] = @$image['imageinfo'][0]['descriptionurl'];
-            $new[':descriptionshorturl'] = @$image['imageinfo'][0]['descriptionshorturl'];
-
-            $new[':imagedescription'] = @$image['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
-            $new[':artist'] = @$image['imageinfo'][0]['extmetadata']['Artist']['value'];
-            $new[':datetimeoriginal'] = @$image['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
-            $new[':licenseshortname'] = @$image['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
-            $new[':usageterms'] = @$image['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
-            $new[':attributionrequired'] = @$image['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
-            $new[':restrictions'] = @$image['imageinfo'][0]['extmetadata']['Restrictions']['value'];
-
-            $new[':licenseuri'] = @$this->open_content_license_uri( $new[':licenseshortname'] );
-            $new[':licensename'] = @$this->open_content_license_name( $new[':licenseuri'] );
-
-            $new[':size'] = @$image['imageinfo'][0]['size'];
-            $new[':width'] = @$image['imageinfo'][0]['width'];
-            $new[':height'] = @$image['imageinfo'][0]['height'];
-            $new[':sha1'] = @$image['imageinfo'][0]['sha1'];
-            $new[':mime'] = @$image['imageinfo'][0]['mime'];
-
-            $new[':thumburl'] = @$image['imageinfo'][0]['thumburl'];
-            $new[':thumbwidth'] = @$image['imageinfo'][0]['thumbwidth'];
-            $new[':thumbheight'] = @$image['imageinfo'][0]['thumbheight'];
-            $new[':thumbmime'] = @$image['imageinfo'][0]['thumbmime'];
-
-            $new[':user'] = @$image['imageinfo'][0]['user'];
-            $new[':userid'] = @$image['imageinfo'][0]['userid'];
-
-            $new[':duration'] = @$image['imageinfo'][0]['duration'];
-            $new[':timestamp'] = @$image['imageinfo'][0]['timestamp'];
-
-            if( isset($new['mime']) && $new['mime'] == 'application/pdf' ) {
-                $this->notice('::save_media_to_database() ERROR: skipping pdf');
-                continue;
-            }
-
-            $sql = "INSERT OR REPLACE INTO MEDIA (
-                        pageid, title, url,
-                        descriptionurl, descriptionshorturl, imagedescription,
-                        artist, datetimeoriginal,
-                        licenseuri, licensename, licenseshortname, usageterms, attributionrequired, restrictions,
-                        size, width, height, sha1, mime,
-                        thumburl, thumbwidth, thumbheight, thumbmime,
-                        user, userid, duration, timestamp
-                    ) VALUES (
-                        :pageid, :title, :url,
-                        :descriptionurl, :descriptionshorturl, :imagedescription,
-                        :artist, :datetimeoriginal,
-                        :licenseuri, :licensename, :licenseshortname, :usageterms, :attributionrequired, :restrictions,
-                        :size, :width, :height, :sha1, :mime,
-                        :thumburl, :thumbwidth, :thumbheight, :thumbmime,
-                        :user, :userid, :duration, :timestamp
-                    )";
-
-            $response = $this->query_as_bool($sql, $new);
-
-            if( $response === FALSE) {
-                $this->error('::save_media_to_database: FAILED insert into media table');
-                $this->error('::save_media_to_database: SQL: ' . $sql);
-                $this->error('::save_media_to_database: BIND i: ' . print_r($new,1) );
-                $this->error("STOPPING IMPORT");
-                exit;
-            }
-
-            $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
-
-            // connect category
-            $response = $this->query_as_bool(
-                'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
-                array('category_id'=>$category_id, 'pageid'=>$new[':pageid'])
-            );
-            if( !$response ) {
-                $this->error('::save_media_to_database: insert into category2media table failed. pageid: '
-                . $new[':pageid']);
-            }
-
-        }
-
-        $this->commit();
-        $this->vacuum();
-
-        if( $errors ) { $this->error($errors); }
-        return TRUE;
-    }
-
-    ////////////////////////////////////////////////////
-    function delete_media( $pageid ) {
-        if( !$pageid || !$this->is_positive_number($pageid) ) {
-            $this->error('delete_media: Invalid PageID');
-            return FALSE;
-        }
-        $response = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
-        . 'Deleting Media :pageid = ' . $pageid;
-
-        $media = $this->get_media($pageid);
-        if( !$media ) {
-            $response .= '<p>Media Not Found</p></div>';
-            return $response;
-        }
-        $sqls = array();
-        $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
-        $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
-        $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
-        $sqls[] = 'DELETE FROM user_tagging WHERE media_pageid = :pageid';
-        $bind = array(':pageid'=>$pageid);
-        foreach( $sqls as $sql ) {
-            if( $this->query_as_bool($sql, $bind) ) {
-                $response .= '<br />OK: ' . $sql;
-            } else {
-                $response .= '<br />ERROR: ' . $sql;
-            }
-        }
-
-        $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
-        $bind = array(
-            ':pageid'=>$pageid,
-            ':title'=>@$media[0]['title'],
-            ':thumb'=>@$media[0]['thumburl'],
-        );
-        if( $this->query_as_bool($sql, $bind) ) {
-            $response .= '<br />OK: ' . $sql;
-        } else {
-            $response .= '<br />ERROR: ' . $sql;
-        }
-
-        $response .= '</div>';
-        return $response;
-    }
 
     //////////////////////////////////////////////////////////
     function empty_media_tables() {
@@ -549,8 +370,322 @@ EOT
 } // END class smt_admin_database_utils
 
 //////////////////////////////////////////////////////////
+// SMT Admin - Media
+class smt_admin_media extends smt_admin_database_utils {
+
+    //////////////////////////////////////////////////////////
+	function add_media($pageid) {
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
+            $this->error('add_media: Invalid PageID');
+            return FALSE;
+        }
+		$response = '<div style="background-color:lightgreen; padding:10px;">'
+		. '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
+
+		// Get media
+		$media = $this->get_api_imageinfo( array($pageid), /*$recurse_count=*/0 );
+		//$this->notice($media);
+
+		if( !$media ) {
+			$response .= '<p>ERROR: failed to get media info</p></div>';
+			return $response;
+		}
+		$response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
+
+		// Get Categories
+		
+		// Save media
+		if( !$this->save_media_to_database($media) ) {
+			$response .= '<p>ERROR: failed to save media to database</p></div>';
+			return $response;
+		}
+		$response .= '<p>OK: Saved media info: <b><a href="' . $this->url('info')
+		. '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
+
+		$response .= '</div>';
+		return $response;
+	}
+
+    //////////////////////////////////////////////////////////
+    function save_media_to_database($images='', $category='') {
+		
+		//$this->notice('save_media_to_database: ' . print_r($images,1) );
+		
+        if( !$images || !is_array($images) ) {
+            $this->error('::save_media_to_database: no media array');
+            return FALSE;
+        }
+        
+		$category_id = 0;
+		if( $category ) {
+			//if( !$category || !is_string($category) ) {
+			//	$this->error('::save_media_to_database: no category');
+			//	return FALSE;
+			//}
+			$cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
+			if( !$cat_id || !isset($cat_id[0]['id']) ) {
+				$this->error('::save_media_to_database: unable to get category id: ' . $category);
+				return FALSE;
+			}
+			$category_id = $cat_id[0]['id'];
+		}
+
+        $this->notice('::save_media_to_database: ' . sizeof($images) . ' images to insert. Category: '
+            . $category. ' (category_id:' . $category_id . ')');
+
+        $errors = array();
+
+        $this->begin_transaction();
+
+        while( list(,$image) = each($images) ) {
+
+			//$this->notice(':;save_media_to_database: LOOP: image=' . print_r($image,1));
+            $new = array();
+
+            $new[':pageid'] = @$image['pageid'];
+            $new[':title'] = @$image['title'];
+            $new[':url'] = @$image['imageinfo'][0]['url'];
+            if( !isset($new[':url']) || $new[':url'] == '' ) {
+                $this->error('::save_media_to_database: ERROR: NO URL: SKIPPING: pageid='
+                    . @$new[':pageid'] . ' title=' . @$new[':title'] );
+                $errors[ $new[':pageid'] ] = $new[':title'];
+                continue;
+            }
+
+            $new[':descriptionurl'] = @$image['imageinfo'][0]['descriptionurl'];
+            $new[':descriptionshorturl'] = @$image['imageinfo'][0]['descriptionshorturl'];
+
+            $new[':imagedescription'] = @$image['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
+            $new[':artist'] = @$image['imageinfo'][0]['extmetadata']['Artist']['value'];
+            $new[':datetimeoriginal'] = @$image['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
+            $new[':licenseshortname'] = @$image['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
+            $new[':usageterms'] = @$image['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
+            $new[':attributionrequired'] = @$image['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
+            $new[':restrictions'] = @$image['imageinfo'][0]['extmetadata']['Restrictions']['value'];
+
+            $new[':licenseuri'] = @$this->open_content_license_uri( $new[':licenseshortname'] );
+            $new[':licensename'] = @$this->open_content_license_name( $new[':licenseuri'] );
+
+            $new[':size'] = @$image['imageinfo'][0]['size'];
+            $new[':width'] = @$image['imageinfo'][0]['width'];
+            $new[':height'] = @$image['imageinfo'][0]['height'];
+            $new[':sha1'] = @$image['imageinfo'][0]['sha1'];
+            $new[':mime'] = @$image['imageinfo'][0]['mime'];
+
+            $new[':thumburl'] = @$image['imageinfo'][0]['thumburl'];
+            $new[':thumbwidth'] = @$image['imageinfo'][0]['thumbwidth'];
+            $new[':thumbheight'] = @$image['imageinfo'][0]['thumbheight'];
+            $new[':thumbmime'] = @$image['imageinfo'][0]['thumbmime'];
+
+            $new[':user'] = @$image['imageinfo'][0]['user'];
+            $new[':userid'] = @$image['imageinfo'][0]['userid'];
+
+            $new[':duration'] = @$image['imageinfo'][0]['duration'];
+            $new[':timestamp'] = @$image['imageinfo'][0]['timestamp'];
+
+            //if( isset($new['mime']) && $new['mime'] == 'application/pdf' ) {
+            //    $this->notice('::save_media_to_database() ERROR: skipping pdf');
+            //    continue;
+            //}
+
+            $sql = "INSERT OR REPLACE INTO MEDIA (
+                        pageid, title, url,
+                        descriptionurl, descriptionshorturl, imagedescription,
+                        artist, datetimeoriginal,
+                        licenseuri, licensename, licenseshortname, usageterms, attributionrequired, restrictions,
+                        size, width, height, sha1, mime,
+                        thumburl, thumbwidth, thumbheight, thumbmime,
+                        user, userid, duration, timestamp
+                    ) VALUES (
+                        :pageid, :title, :url,
+                        :descriptionurl, :descriptionshorturl, :imagedescription,
+                        :artist, :datetimeoriginal,
+                        :licenseuri, :licensename, :licenseshortname, :usageterms, :attributionrequired, :restrictions,
+                        :size, :width, :height, :sha1, :mime,
+                        :thumburl, :thumbwidth, :thumbheight, :thumbmime,
+                        :user, :userid, :duration, :timestamp
+                    )";
+
+            $response = $this->query_as_bool($sql, $new);
+
+            if( $response === FALSE) {
+                $this->error('::save_media_to_database: FAILED insert into media table');
+                $this->error('::save_media_to_database: SQL: ' . $sql);
+                $this->error('::save_media_to_database: BIND i: ' . print_r($new,1) );
+                $this->error("STOPPING IMPORT");
+                exit;
+            }
+
+            $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
+
+            // connect category
+			if( $category ) {
+				$response = $this->query_as_bool(
+					'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
+					array('category_id'=>$category_id, 'pageid'=>$new[':pageid'])
+				);
+				if( !$response ) {
+					$this->error('::save_media_to_database: insert into category2media table failed. pageid: '
+					. $new[':pageid']);
+				}
+			} // end if category
+
+        } // end while each media
+
+        $this->commit();
+        $this->vacuum();
+
+        if( $errors ) { $this->error($errors); }
+        return TRUE;
+    }
+
+    ////////////////////////////////////////////////////
+    function delete_media( $pageid ) {
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
+            $this->error('delete_media: Invalid PageID');
+            return FALSE;
+        }
+        $response = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
+        . 'Deleting Media :pageid = ' . $pageid;
+
+        $media = $this->get_media($pageid);
+        if( !$media ) {
+            $response .= '<p>Media Not Found</p></div>';
+            return $response;
+        }
+        $sqls = array();
+        $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
+        $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
+        $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
+        $sqls[] = 'DELETE FROM user_tagging WHERE media_pageid = :pageid';
+        $bind = array(':pageid'=>$pageid);
+        foreach( $sqls as $sql ) {
+            if( $this->query_as_bool($sql, $bind) ) {
+                $response .= '<br />OK: ' . $sql;
+            } else {
+                $response .= '<br />ERROR: ' . $sql;
+            }
+        }
+
+        $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
+        $bind = array(
+            ':pageid'=>$pageid,
+            ':title'=>@$media[0]['title'],
+            ':thumb'=>@$media[0]['thumburl'],
+        );
+        if( $this->query_as_bool($sql, $bind) ) {
+            $response .= '<br />OK: ' . $sql;
+        } else {
+            $response .= '<br />ERROR: ' . $sql;
+        }
+
+        $response .= '</div>';
+        return $response;
+    }
+
+    //////////////////////////////////////////////////////////
+    // modified from: https://github.com/gbv/image-attribution - MIT License
+    function open_content_license_name($uri) {
+        if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
+            return "CC0";
+        } else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
+            return "Public Domain";
+        } else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
+            $license = "CC ".strtoupper($match[1])." ".$match[4];
+            if (isset($match[6])) $license .= " ".$match[6];
+            return $license;
+        } else {
+            return;
+        }
+    }
+
+    //////////////////////////////////////////////////////////
+    // modified from: https://github.com/gbv/image-attribution - MIT License
+    function open_content_license_uri($license) {
+        $license = strtolower(trim($license));
+
+        // CC Zero
+        if (preg_match('/^(cc0|cc[ -]zero)$/', $license)) {
+            return 'http://creativecommons.org/publicdomain/zero/1.0/';
+        }
+        // Public Domain
+        elseif (preg_match('/^(cc )?(pd|pdm|public[ -]domain)( mark( 1\.0)?)?$/', $license)) {
+            return 'https://creativecommons.org/publicdomain/mark/1.0/';
+        }
+        // No restrictions (for instance images imported from Flickr Commons)
+        elseif ($license == "no restrictions") {
+            return 'https://creativecommons.org/publicdomain/mark/1.0/';
+        }
+        // CC licenses.
+        // see <https://wiki.creativecommons.org/wiki/License_Versions>
+        // See <https://wiki.creativecommons.org/wiki/Jurisdiction_Database>
+        elseif (preg_match('/^cc([ -]by)?([ -]sa)?([ -]([1-4]\.0|2\.5))([ -]([a-z][a-z]))?$/', $license, $match)) {
+            $byline = $match[1] ? 'by' : '';
+            $sharealike = $match[2] ? 'sa' : '';
+            $port = isset($match[6]) ? $match[6] : '';
+            $version = $match[4];
+
+            // just "CC" is not enough
+            if (!($byline or $sharealike) or !$version) return;
+
+            // only 1.0 had pure SA-license without BY
+            if ($version == "1.0" && !$byline) {
+                $condition = "sa";
+            } else {
+                $condition = $sharealike ? "by-sa" : "by";
+            }
+
+            // ported versions only existed in 2.0, 2.5, and 3.0
+            if ($port) {
+                if ($version == "1.0" or $version == "4.0") return;
+                # TODO: check whether port actually exists at given version, for instance 2.5 had less ports!
+            }
+
+            // build URI
+            $uri = "http://creativecommons.org/licenses/$condition/$version/";
+            if ($port) $uri .= "$port/";
+
+            return $uri;
+        }
+        // TODO: GFLD and other licenses
+        else {
+            return;
+        }
+    }
+
+} // end class smt_admin_media
+
+//////////////////////////////////////////////////////////
+class smt_admin_category extends smt_admin_media {
+
+    //////////////////////////////////////////////////////////
+    function insert_category( $name='' ) {
+        if( !$name ) {
+            $this->error('::insert_category: no name found');
+            return FALSE;
+        }
+        $response = $this->query_as_bool(
+            'INSERT OR IGNORE INTO category (name) VALUES (:name)',
+            array(':name'=>$name)
+        );
+        if( !$response ) {
+            $this->error('::insert_category: insert into category table failed: name=' . $name);
+            return FALSE;
+        }
+        if( !$this->last_insert_id ) {
+            $this->notice('::insert_category: EXISTS: ' . $name);
+            return FALSE;
+        }
+        $this->notice('::insert_category: SAVED ' . $name);
+        $this->vacuum();
+        return TRUE;
+    }
+
+} // end class smt_admin_category
+
+//////////////////////////////////////////////////////////
 // SMT Admin - Block
-class smt_admin_block extends smt_admin_database_utils {
+class smt_admin_block extends smt_admin_category {
 
     //////////////////////////////////////////////////////////
     function get_block_count() {
@@ -579,6 +714,16 @@ class smt_admin_block extends smt_admin_database_utils {
 // SMT Admin - Commons API
 class smt_commons_API extends smt_admin_block {
 
+    var $commons_api_url;
+    var $api_count;
+    var $prop_imageinfo;
+    var $totalhits;
+    var $continue;
+    var $sroffset;
+    var $batchcomplete;
+    var $categories;
+    var $commons_response;
+	
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
         $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
@@ -781,6 +926,12 @@ class smt_commons_API extends smt_admin_block {
                 unset( $pages[ $media['pageid'] ] );
             }
         }
+		
+		if( !$recurse_count ) {
+			$this->notice('::get_api_imageinfo: NO RECURSION.  returning');
+			return $pages;
+		}
+
         if( $recurse_count > 5 ) {
             $this->error('::get_api_imageinfo: TOO MUCH RECURSION: ' . $recurse_count);
             return $pages;
@@ -811,20 +962,11 @@ class smt_commons_API extends smt_admin_block {
         return array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
     }
 
-}
+} // end class smt_commons_API
 
 //////////////////////////////////////////////////////////
 // SMT Admin
 class smt_admin extends smt_commons_API {
-    var $commons_api_url;
-    var $commons_response;
-    var $prop_imageinfo;
-    var $totalhits;
-    var $continue;
-    var $sroffset;
-    var $batchcomplete;
-    var $categories;
-    var $api_count;
 
     //////////////////////////////////////////////////////////
     function __construct() {
@@ -836,15 +978,6 @@ class smt_admin extends smt_commons_API {
         . '&iiprop=url|size|mime|thumbmime|user|userid|sha1|timestamp|extmetadata'
         . '&iiextmetadatafilter=LicenseShortName|UsageTerms|AttributionRequired|Restrictions|Artist|ImageDescription|DateTimeOriginal';
         $this->set_admin_cookie();
-    }
-
-    //////////////////////////////////////////////////////////
-    function set_admin_cookie() {
-        if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == '1' ) {
-            return;
-        }
-        setcookie('admin','1',time()+60*60,'/'); // 1 hour admin cookie
-        //$this->notice('Admin cookie set');
     }
 
     //////////////////////////////////////////////////////////
@@ -863,74 +996,4 @@ class smt_admin extends smt_commons_API {
 
     } //end function include_admin_menu()
 
-    //////////////////////////////////////////////////////////
-    // modified from: https://github.com/gbv/image-attribution - MIT License
-    function open_content_license_name($uri) {
-        if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
-            return "CC0";
-        } else if($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
-            return "Public Domain";
-        } else if(preg_match('/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',$uri,$match)) {
-            $license = "CC ".strtoupper($match[1])." ".$match[4];
-            if (isset($match[6])) $license .= " ".$match[6];
-            return $license;
-        } else {
-            return;
-        }
-    }
-
-    //////////////////////////////////////////////////////////
-    // modified from: https://github.com/gbv/image-attribution - MIT License
-    function open_content_license_uri($license) {
-        $license = strtolower(trim($license));
-
-        // CC Zero
-        if (preg_match('/^(cc0|cc[ -]zero)$/', $license)) {
-            return 'http://creativecommons.org/publicdomain/zero/1.0/';
-        }
-        // Public Domain
-        elseif (preg_match('/^(cc )?(pd|pdm|public[ -]domain)( mark( 1\.0)?)?$/', $license)) {
-            return 'https://creativecommons.org/publicdomain/mark/1.0/';
-        }
-        // No restrictions (for instance images imported from Flickr Commons)
-        elseif ($license == "no restrictions") {
-            return 'https://creativecommons.org/publicdomain/mark/1.0/';
-        }
-        // CC licenses.
-        // see <https://wiki.creativecommons.org/wiki/License_Versions>
-        // See <https://wiki.creativecommons.org/wiki/Jurisdiction_Database>
-        elseif (preg_match('/^cc([ -]by)?([ -]sa)?([ -]([1-4]\.0|2\.5))([ -]([a-z][a-z]))?$/', $license, $match)) {
-            $byline = $match[1] ? 'by' : '';
-            $sharealike = $match[2] ? 'sa' : '';
-            $port = isset($match[6]) ? $match[6] : '';
-            $version = $match[4];
-
-            // just "CC" is not enough
-            if (!($byline or $sharealike) or !$version) return;
-
-            // only 1.0 had pure SA-license without BY
-            if ($version == "1.0" && !$byline) {
-                $condition = "sa";
-            } else {
-                $condition = $sharealike ? "by-sa" : "by";
-            }
-
-            // ported versions only existed in 2.0, 2.5, and 3.0
-            if ($port) {
-                if ($version == "1.0" or $version == "4.0") return;
-                # TODO: check whether port actually exists at given version, for instance 2.5 had less ports!
-            }
-
-            // build URI
-            $uri = "http://creativecommons.org/licenses/$condition/$version/";
-            if ($port) $uri .= "$port/";
-
-            return $uri;
-        }
-        // TODO: GFLD and other licenses
-        else {
-            return;
-        }
-    }
-
-}
+} // end class smt_admin

@@ -135,7 +135,7 @@ foreach( $smt->get_tags() as $tag ) {
         foreach( $crevs as $r ) {
             //$smt->notice($r);
             $reviews[ $r['id'] ] = '<td class="tag' . $r['id'] 
-                . '" style="white-space:nowrap; font-size:80%;">+' 
+                . '" style="white-space:nowrap; font-size:80%; text-align:right;">+' 
                 . $r['count'] . ' ' . $r['name'] . '</td>';
             $count += $r['count'];
         }

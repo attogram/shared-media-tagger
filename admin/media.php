@@ -2,10 +2,10 @@
 // Shared Media Tagger
 // Media Admin
 
-$f = __DIR__.'/../smt.php'; 
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
-$f = __DIR__.'/smt-admin.php'; 
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
+$init = __DIR__.'/../smt.php'; 
+if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
+$init = __DIR__.'/smt-admin.php'; 
+if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 $smt = new smt_admin();
 
 $smt->title = 'Media Admin';
@@ -13,6 +13,11 @@ $smt->include_header();
 $smt->include_menu();
 $smt->include_admin_menu();
 print '<div class="box white"><p>Media Admin:</p>';
+
+
+if( isset($_GET['am']) ) {
+    print $smt->add_media($_GET['am']) . '<hr />';
+}
 
 if( isset($_GET['media'])  ) {
     print multi_delete_media($_GET['media']) . '<hr />';
@@ -41,16 +46,22 @@ function multi_delete_media( $list ) {
     }
     return $response;
 }
+
 // MENU ////////////////////////////////////////////
 ?>
 <form action="" method="GET">
+* Add Media:
+<input type="text" name="am" value="" size="10" />
+<input type="submit" value="  Add via pageid  "/>
+</form>
+<br /><br />
 * Delete &amp; Block Media:
 <input type="text" name="dm" value="" size="10" />
 <input type="submit" value="  Delete via pageid  "/>
 </form>
 <br /><br />
 <form action="" method="GET">
-* Delete Media in Category:
+* Delete &amp; Block All Media in Category:
 <input type="text" name="dc" value="" size="30" />
 <input type="submit" value="  Delete via Category Name  "/>
 </form>
