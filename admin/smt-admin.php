@@ -341,7 +341,7 @@ class smt_commons_API extends smt_admin_database_utils {
     var $sroffset;
     var $batchcomplete;
     var $commons_response;
-	
+
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
         $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
@@ -412,125 +412,121 @@ class smt_commons_API extends smt_admin_database_utils {
 class smt_admin_media extends smt_commons_API {
 
     //////////////////////////////////////////////////////////
-	function add_media($pageid) {
+    function add_media($pageid) {
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('add_media: Invalid PageID');
             return FALSE;
         }
-		$response = '<div style="background-color:lightgreen; padding:10px;">'
-		. '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
+        $response = '<div style="background-color:lightgreen; padding:10px;">'
+        . '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
 
-		// Get media
-		$media = $this->get_api_imageinfo( array($pageid), /*$recurse_count=*/0 );
-		//$this->notice($media);
+        // Get media
+        $media = $this->get_api_imageinfo( array($pageid), /*$recurse_count=*/0 );
+        //$this->notice($media);
 
-		if( !$media ) {
-			$response .= '<p>ERROR: failed to get media info</p></div>';
-			return $response;
-		}
-		$response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
+        if( !$media ) {
+            $response .= '<p>ERROR: failed to get media info</p></div>';
+            return $response;
+        }
+        $response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
 
-		// Save media
-		if( !$this->save_media_to_database($media) ) {
-			$response .= '<p>ERROR: failed to save media to database</p></div>';
-			return $response;
-		}
-		$response .= '<p>OK: Saved media: <b><a href="' . $this->url('info')
-		. '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
-		
-		
-		// Get Categories
-		if( !$this->get_categories_from_media( $pageid ) ) {
-			$response .= '<p>ERROR: failed to get categories</p></div>';
-			return $response;			
-		}
-		$cats = @$this->commons_response['query']['pages'][$pageid]['categories'];
-		if( !$cats || !is_array($cats) ) { 
-			$response .= '<p>No Categories found</p></div>';
-			return $response;
-		}
-		$found_categories = array();
-		foreach( $cats as $cat ) {
-			if( !isset($cat['title']) || !$cat['title'] ) {
-				$this->error('add_media: ERROR: missing category title');
-				continue;
-			}
-			if( !isset($cat['ns']) || $cat['ns'] != '14' ) {
-				$this->error('add_media: ERROR: invalid category namespace');
-				continue;
-			}
-			$found_categories[] = $cat['title'];
-		}
-		//$this->notice("found_categories="); $this->notice($found_categories);
+        // Save media
+        if( !$this->save_media_to_database($media) ) {
+            $response .= '<p>ERROR: failed to save media to database</p></div>';
+            return $response;
+        }
+        $response .= '<p>OK: Saved media: <b><a href="' . $this->url('info')
+        . '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
 
-		$existing_categories = $this->get_image_categories( $pageid );
-		//$this->notice("existing_categories="); $this->notice($existing_categories);
 
-		$new_categories = array_diff($found_categories, $existing_categories);
-		//$this->notice("new_categories="); $this->notice($new_categories);
-		if( !$new_categories ) {
-			foreach( $existing_categories AS $cat ) {
-				$response .= 'OK: <a href="' . $this->url('category') 
-				. '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">' 
-				. $cat . '</a><br />';
-			}
-			//return $response . '</div>';
-		}
-		
-		//$delete_categories = array_diff($existing_categories, $found_categories);
-		//$this->notice("delete_categories="); $this->notice($delete_categories);
-		
-		foreach( $new_categories as $cat ) {
+        // Get Categories
+        if( !$this->get_categories_from_media( $pageid ) ) {
+            $response .= '<p>ERROR: failed to get categories</p></div>';
+            return $response;
+        }
+        $cats = @$this->commons_response['query']['pages'][$pageid]['categories'];
+        if( !$cats || !is_array($cats) ) {
+            $response .= '<p>No Categories found</p></div>';
+            return $response;
+        }
+        $found_categories = array();
+        foreach( $cats as $cat ) {
+            if( !isset($cat['title']) || !$cat['title'] ) {
+                $this->error('add_media: ERROR: missing category title');
+                continue;
+            }
+            if( !isset($cat['ns']) || $cat['ns'] != '14' ) {
+                $this->error('add_media: ERROR: invalid category namespace');
+                continue;
+            }
+            $found_categories[] = $cat['title'];
+        }
+        //$this->notice("found_categories="); $this->notice($found_categories);
 
-			$cat_id = $this->get_category_id_from_name($cat);
-			if( !$cat_id ) {
-				if( !$this->insert_category( $cat ) ) {
-					$this->error('add_media: ERROR: can not insert ' . $cat);
-					continue;
-				}
-				$cat_id = $this->last_insert_id;
-			}
-			
-			if( !$this->link_media_category( $pageid, $cat_id ) ) {
-				$this->error("add_media: ERROR: can not link pageid:$pageid to category:$cat_id");
-				continue;
-			}
-			
-			$response .= 'New: <a href="' . $this->url('category') 
-			. '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">' 
-			. $cat . '</a><br />';
-		
-		} // end foreach cats
-		
-		//$response .= $this->display_thumbnail_box($media[$pageid]);
+        $existing_categories = $this->get_image_categories( $pageid );
+        //$this->notice("existing_categories="); $this->notice($existing_categories);
 
-		$response .= '</div>';
-		return $response;
-	}
+        $new_categories = array_diff($found_categories, $existing_categories);
+        //$this->notice("new_categories="); $this->notice($new_categories);
+        if( !$new_categories ) {
+            foreach( $existing_categories AS $cat ) {
+                $response .= 'OK: <a href="' . $this->url('category')
+                . '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">'
+                . $cat . '</a><br />';
+            }
+        }
+
+        foreach( $new_categories as $cat ) {
+
+            $cat_id = $this->get_category_id_from_name($cat);
+            if( !$cat_id ) {
+                if( !$this->insert_category( $cat ) ) {
+                    $this->error('add_media: ERROR: can not insert ' . $cat);
+                    continue;
+                }
+                $cat_id = $this->last_insert_id;
+            }
+
+            if( !$this->link_media_category( $pageid, $cat_id ) ) {
+                $this->error("add_media: ERROR: can not link pageid:$pageid to category:$cat_id");
+                continue;
+            }
+
+            $response .= 'New: <a href="' . $this->url('category')
+            . '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">'
+            . $cat . '</a><br />';
+
+        } // end foreach cats
+
+        //$response .= $this->display_thumbnail_box($media[$pageid]);
+
+        $response .= '</div>';
+        return $response;
+    }
 
     //////////////////////////////////////////////////////////
     function save_media_to_database($images='', $category='') {
-		
-		//$this->notice('save_media_to_database: ' . print_r($images,1) );
-		
+
+        //$this->notice('save_media_to_database: ' . print_r($images,1) );
+
         if( !$images || !is_array($images) ) {
             $this->error('::save_media_to_database: no media array');
             return FALSE;
         }
-        
-		$category_id = 0;
-		if( $category ) {
-			//if( !$category || !is_string($category) ) {
-			//	$this->error('::save_media_to_database: no category');
-			//	return FALSE;
-			//}
-			$cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
-			if( !$cat_id || !isset($cat_id[0]['id']) ) {
-				$this->error('::save_media_to_database: unable to get category id: ' . $category);
-				return FALSE;
-			}
-			$category_id = $cat_id[0]['id'];
-		}
+
+        $category_id = 0;
+        if( $category ) {
+            //if( !$category || !is_string($category) ) {
+            //  $this->error('::save_media_to_database: no category');
+            //  return FALSE;
+            //}
+            $cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
+            if( !$cat_id || !isset($cat_id[0]['id']) ) {
+                $this->error('::save_media_to_database: unable to get category id: ' . $category);
+                return FALSE;
+            }
+            $category_id = $cat_id[0]['id'];
+        }
 
         $this->notice('::save_media_to_database: ' . sizeof($images) . ' images to insert. Category: '
             . $category. ' (category_id:' . $category_id . ')');
@@ -541,7 +537,7 @@ class smt_admin_media extends smt_commons_API {
 
         while( list(,$image) = each($images) ) {
 
-			//$this->notice(':;save_media_to_database: LOOP: image=' . print_r($image,1));
+            //$this->notice(':;save_media_to_database: LOOP: image=' . print_r($image,1));
             $new = array();
 
             $new[':pageid'] = @$image['pageid'];
@@ -621,13 +617,13 @@ class smt_admin_media extends smt_commons_API {
             $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
 
             // connect category
-			if( $category ) {
-				$response = $this->link_media_category( $new[':pageid'], $category_id );
-				if( !$response ) {
-					$this->error('::save_media_to_database: insert into category2media table failed. pageid: '
-					. $new[':pageid']);
-				}
-			} // end if category
+            if( $category ) {
+                $response = $this->link_media_category( $new[':pageid'], $category_id );
+                if( !$response ) {
+                    $this->error('::save_media_to_database: insert into category2media table failed. pageid: '
+                    . $new[':pageid']);
+                }
+            } // end if category
 
         } // end while each media
 
@@ -774,11 +770,11 @@ class smt_admin_media extends smt_commons_API {
                 unset( $pages[ $media['pageid'] ] );
             }
         }
-		
-		if( !$recurse_count ) {
-			$this->notice('::get_api_imageinfo: NO RECURSION.  returning');
-			return $pages;
-		}
+
+        if( !$recurse_count ) {
+            $this->notice('::get_api_imageinfo: NO RECURSION.  returning');
+            return $pages;
+        }
 
         if( $recurse_count > 5 ) {
             $this->error('::get_api_imageinfo: TOO MUCH RECURSION: ' . $recurse_count);
@@ -816,7 +812,7 @@ class smt_admin_media extends smt_commons_API {
         $this->vacuum();
         return $response;
     }
-	
+
     //////////////////////////////////////////////////////////
     // modified from: https://github.com/gbv/image-attribution - MIT License
     function open_content_license_name($uri) {
@@ -895,36 +891,36 @@ class smt_admin_category extends smt_admin_media {
     var $categories;
 
     //////////////////////////////////////////////////////////
-	function get_categories_from_media( $pageid ) {
+    function get_categories_from_media( $pageid ) {
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('::get_categories_from_media: invalid pageid');
             return FALSE;
         }
         $call = $this->commons_api_url . '?action=query&format=json'
         . '&prop=categories'
-		. '&pageids=' . $pageid
-		;
-        if( !$this->call_commons($call, 'pages') ) {	
+        . '&pageids=' . $pageid
+        ;
+        if( !$this->call_commons($call, 'pages') ) {
             $this->error('::get_categories_from_media: nothing found');
             return FALSE;
         }
-		return TRUE;
-	}
+        return TRUE;
+    }
 
     //////////////////////////////////////////////////////////
-	function link_media_category( $pageid, $category_id ) {
-		$response = $this->query_as_bool(
-			'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
-			array('category_id'=>$category_id, 'pageid'=>$pageid)
-		);
-		if( !$response ) {
-			$this->error('::link_media_category: ERROR: insert failed. pageid: '
-			. $pageid . ' cat_id: ' . $category_id);
-			return FALSE;
-		}
-		return TRUE;
-	}
-	
+    function link_media_category( $pageid, $category_id ) {
+        $response = $this->query_as_bool(
+            'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
+            array('category_id'=>$category_id, 'pageid'=>$pageid)
+        );
+        if( !$response ) {
+            $this->error('::link_media_category: ERROR: insert failed. pageid: '
+            . $pageid . ' cat_id: ' . $category_id);
+            return FALSE;
+        }
+        return TRUE;
+    }
+
     //////////////////////////////////////////////////////////
     function find_categories( $search='' ) {
         if( !$search || $search == '' || !is_string($search) ) {

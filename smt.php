@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.11');
+define('__SMT__', '0.6.12');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -102,19 +102,19 @@ class smt_utils {
         return $this->protocol = 'http:';
     }
 
-	//////////////////////////////////////////////////////////
-	function seconds_to_time( $raw_seconds ) {
-		if( !$raw_seconds ) { return '0 seconds'; }
-		$hours = floor($raw_seconds / 3600);
-		$minutes = floor(($raw_seconds / 60) % 60);
-		$seconds = $raw_seconds % 60;
-		$seconds += round( $raw_seconds - floor($raw_seconds), 2);
-		$resonse = array();
-		if( $hours ) { $response[] = $hours . ' hours'; }
-		if( $minutes ) { $response[] = $minutes . ' minutes'; }
-		if( $seconds ) { $response[] = $seconds . ' seconds'; }
-		return implode($response, ', ');
-	}
+    //////////////////////////////////////////////////////////
+    function seconds_to_time( $raw_seconds ) {
+        if( !$raw_seconds ) { return '0 seconds'; }
+        $hours = floor($raw_seconds / 3600);
+        $minutes = floor(($raw_seconds / 60) % 60);
+        $seconds = $raw_seconds % 60;
+        $seconds += round( $raw_seconds - floor($raw_seconds), 2);
+        $resonse = array();
+        if( $hours ) { $response[] = $hours . ' hours'; }
+        if( $minutes ) { $response[] = $minutes . ' minutes'; }
+        if( $seconds ) { $response[] = $seconds . ' seconds'; }
+        return implode($response, ', ');
+    }
 
 } //end class smt_utils
 
@@ -135,7 +135,7 @@ class smt_page EXTENDS smt_utils {
         }
         return $this->links[$link];
     }
-	
+
     //////////////////////////////////////////////////////////
     function include_header() {
 
@@ -189,8 +189,8 @@ class smt_page EXTENDS smt_utils {
         if( !@$this->setup['hide_hosted_by'] ) {
             print '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
             . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
-        }		
-		print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+        }
+        print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
         if( !@$this->setup['hide_powered_by'] ) {
             print '<span class="nobr">Powered by <b>'
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
@@ -235,8 +235,8 @@ class smt_page EXTENDS smt_utils {
         . $space
         . '<a href="' . $this->url('reviews') . '">' . number_format($this->get_total_review_count()) . '&nbsp;Reviews</a>'
         . $space
-        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">' 
-		. number_format($this->get_user_count()) .'&nbsp;Users</a>'
+        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
+        . number_format($this->get_user_count()) .'&nbsp;Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
         . $space
@@ -486,14 +486,14 @@ class smt_site_admin EXTENDS smt_media {
         . '<div class="attribution left" style=" display:inline-block; float:right;">'
 
         . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
-        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #' 
-		. $media_id . ' ?\');">❌</a>'
+        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
+        . $media_id . ' ?\');">❌</a>'
 
         . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
 
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
         . '" title="Refresh" target="admin">♻</a>'
-		
+
         . '</div>';
     }
 
