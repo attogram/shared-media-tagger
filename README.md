@@ -2,9 +2,15 @@
 
 ALPHA RELEASE
 
-* Shared Media Tagger is a rating site creator for images and media files, 
-fed from administrator-curated media from Wikimedia Commons.
-
+* Shared Media Tagger is a rating website creator for Free Cultural Works
+* Supports images, videos and audio files
+* Site administrators create a curated set of free media files
+* Users review and rate the files
+* Media file data is loaded from Wikimedia Commons
+* All media files are Free Cultural Works with permissive licensing allowing free re-use
+* Source code is Open Source, available on Github: https://github.com/attogram/shared-media-tagger
+* Built with PHP and SQLite. No external database required.
+* Demos and Installation list:  http://fosiper.com/smt/
 
 ## Requirements
 
