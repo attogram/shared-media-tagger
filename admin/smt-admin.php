@@ -435,7 +435,7 @@ class smt_admin_media extends smt_commons_API {
 			$response .= '<p>ERROR: failed to save media to database</p></div>';
 			return $response;
 		}
-		$response .= '<p>OK: Saved media info: <b><a href="' . $this->url('info')
+		$response .= '<p>OK: Saved media: <b><a href="' . $this->url('info')
 		. '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
 		
 		
@@ -449,17 +449,43 @@ class smt_admin_media extends smt_commons_API {
 			$response .= '<p>No Categories found</p></div>';
 			return $response;
 		}
-		
+		$found_categories = array();
 		foreach( $cats as $cat ) {
 			if( !isset($cat['title']) || !$cat['title'] ) {
 				$this->error('add_media: ERROR: missing category title');
 				continue;
 			}
+			if( !isset($cat['ns']) || $cat['ns'] != '14' ) {
+				$this->error('add_media: ERROR: invalid category namespace');
+				continue;
+			}
+			$found_categories[] = $cat['title'];
+		}
+		//$this->notice("found_categories="); $this->notice($found_categories);
 
-			$cat_id = $this->get_category_id_from_name($cat['title']);
+		$existing_categories = $this->get_image_categories( $pageid );
+		//$this->notice("existing_categories="); $this->notice($existing_categories);
+
+		$new_categories = array_diff($found_categories, $existing_categories);
+		//$this->notice("new_categories="); $this->notice($new_categories);
+		if( !$new_categories ) {
+			foreach( $existing_categories AS $cat ) {
+				$response .= 'OK: <a href="' . $this->url('category') 
+				. '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">' 
+				. $cat . '</a><br />';
+			}
+			//return $response . '</div>';
+		}
+		
+		//$delete_categories = array_diff($existing_categories, $found_categories);
+		//$this->notice("delete_categories="); $this->notice($delete_categories);
+		
+		foreach( $new_categories as $cat ) {
+
+			$cat_id = $this->get_category_id_from_name($cat);
 			if( !$cat_id ) {
-				if( !$this->insert_category( $cat['title'] ) ) {
-					$this->error('add_media: ERROR: can not add ' . $cat['title']);
+				if( !$this->insert_category( $cat ) ) {
+					$this->error('add_media: ERROR: can not insert ' . $cat);
 					continue;
 				}
 				$cat_id = $this->last_insert_id;
@@ -470,9 +496,9 @@ class smt_admin_media extends smt_commons_API {
 				continue;
 			}
 			
-			$response .= 'Linked <a href="' . $this->url('category') 
-			. '?c=' . $this->category_urlencode($this->strip_prefix($cat['title'])) . '">' 
-			. $cat['title'] . '</a><br />';
+			$response .= 'New: <a href="' . $this->url('category') 
+			. '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">' 
+			. $cat . '</a><br />';
 		
 		} // end foreach cats
 		
@@ -978,7 +1004,7 @@ class smt_admin_category extends smt_admin_media {
             $this->notice('::insert_category: EXISTS: ' . $name);
             return FALSE;
         }
-        $this->notice('::insert_category: SAVED ' . $name);
+        $this->notice('::insert_category: SAVED ' . $this->last_insert_id . ' = ' . $name);
         $this->vacuum();
         return TRUE;
     }
