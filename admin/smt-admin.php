@@ -344,7 +344,10 @@ class smt_commons_API extends smt_admin_database_utils {
 
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
-        $this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'.$url.'">'.$url.'</a>');
+		
+        //$this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'
+		//	.$url.'">'. $this->truncate($url, 90).'</a>');
+		
         if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; }
         $get_response = file_get_contents($url);
         if( $get_response === FALSE ) {
@@ -413,88 +416,46 @@ class smt_admin_media extends smt_commons_API {
 
     //////////////////////////////////////////////////////////
     function add_media($pageid) {
+
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('add_media: Invalid PageID');
             return FALSE;
         }
+
         $response = '<div style="background-color:lightgreen; padding:10px;">'
         . '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
 
-        // Get media
+        // Get media info from API
         $media = $this->get_api_imageinfo( array($pageid), /*$recurse_count=*/0 );
-        //$this->notice($media);
-
         if( !$media ) {
-            $response .= '<p>ERROR: failed to get media info</p></div>';
-            return $response;
+            return $response . '<p>ERROR: failed to get media info from API</p></div>';
         }
         $response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
 
-        // Remove media - old version, if present
-        $this->query_as_bool(
-            'DELETE FROM media WHERE pageid = :pageid',
-            array(':pageid'=>$pageid)
-        );
-
         // Save media
         if( !$this->save_media_to_database($media) ) {
-            $response .= '<p>ERROR: failed to save media to database</p></div>';
-            return $response;
+            return $response . '<p>ERROR: failed to save media to database</p></div>';
         }
         $response .= '<p>OK: Saved media: <b><a href="' . $this->url('info')
         . '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
 
 
-        // Get Categories
-        if( !$this->get_categories_from_media( $pageid ) ) {
-            $response .= '<p>ERROR: failed to get categories</p></div>';
-            return $response;
-        }
-        $cats = @$this->commons_response['query']['pages'][$pageid]['categories'];
-        if( !$cats || !is_array($cats) ) {
-            $response .= '<p>No Categories found</p></div>';
-            return $response;
-        }
-        $found_categories = array();
-        foreach( $cats as $cat ) {
-            if( !isset($cat['title']) || !$cat['title'] ) {
-                $this->error('add_media: ERROR: missing category title');
-                continue;
-            }
-            if( !isset($cat['ns']) || $cat['ns'] != '14' ) {
-                $this->error('add_media: ERROR: invalid category namespace');
-                continue;
-            }
-            $found_categories[] = $cat['title'];
-        }
+		if( !$this->link_media_categories( $pageid ) ) {
+            return $response . '<p>ERROR: failed to link media categories</p></div>';
+		}
 
-        // Remove old category list - if present
-        $this->query_as_bool(
-            'DELETE FROM category2media WHERE media_pageid = :pageid',
-            array(':pageid'=>$pageid)
-        );
+		if( !$this->categories ) {
+			return $response . '<p>No Categories Found</p></div>';
+		}
 
-        foreach( $found_categories as $cat ) {
 
-            $cat_id = $this->get_category_id_from_name($cat);
-            if( !$cat_id ) {
-                if( !$this->insert_category( $cat ) ) {
-                    $this->error('add_media: ERROR: can not insert ' . $cat);
-                    continue;
-                }
-                $cat_id = $this->last_insert_id;
-            }
+		foreach( $this->categories as $category ) {
+			$response .= '+' 
+			. '<a href="' . $this->url('category') 
+			. '?c=' . $this->category_urlencode($this->strip_prefix($category['title']))
+			. '">' . $this->strip_prefix($category['title']) . '</a><br />';
+		}
 
-            if( !$this->link_media_category( $pageid, $cat_id ) ) {
-                $this->error("add_media: ERROR: can not link pageid:$pageid to category:$cat_id");
-                continue;
-            }
-
-            $response .= 'OK: +<a href="' . $this->url('category')
-            . '?c=' . $this->category_urlencode($this->strip_prefix($cat)) . '">'
-            . $this->strip_prefix($cat) . '</a><br />';
-
-        } // end foreach cats
 
         //$response .= $this->display_thumbnail_box($media[$pageid]);
 
@@ -503,44 +464,26 @@ class smt_admin_media extends smt_commons_API {
     }
 
     //////////////////////////////////////////////////////////
-    function save_media_to_database($images='', $category='') {
+    function save_media_to_database( $media=array() ) {
 
-        //$this->notice('save_media_to_database: ' . print_r($images,1) );
-
-        if( !$images || !is_array($images) ) {
+        if( !$media || !is_array($media) ) {
             $this->error('::save_media_to_database: no media array');
             return FALSE;
         }
 
-        $category_id = 0;
-        if( $category ) {
-            //if( !$category || !is_string($category) ) {
-            //  $this->error('::save_media_to_database: no category');
-            //  return FALSE;
-            //}
-            $cat_id = $this->query_as_array('SELECT id FROM category WHERE name = :category', array(':category'=>$category) );
-            if( !$cat_id || !isset($cat_id[0]['id']) ) {
-                $this->error('::save_media_to_database: unable to get category id: ' . $category);
-                return FALSE;
-            }
-            $category_id = $cat_id[0]['id'];
-        }
-
-        $this->notice('::save_media_to_database: ' . sizeof($images) . ' images to insert. Category: '
-            . $category. ' (category_id:' . $category_id . ')');
+        $this->notice('START save_media_to_database: ' . sizeof($media) . ' files to save');
 
         $errors = array();
 
         $this->begin_transaction();
 
-        while( list(,$image) = each($images) ) {
+        while( list(,$media_file) = each($media) ) {
 
-            //$this->notice(':;save_media_to_database: LOOP: image=' . print_r($image,1));
             $new = array();
+            $new[':pageid'] = @$media_file['pageid'];
+            $new[':title'] = @$media_file['title'];
 
-            $new[':pageid'] = @$image['pageid'];
-            $new[':title'] = @$image['title'];
-            $new[':url'] = @$image['imageinfo'][0]['url'];
+            $new[':url'] = @$media_file['imageinfo'][0]['url'];
             if( !isset($new[':url']) || $new[':url'] == '' ) {
                 $this->error('::save_media_to_database: ERROR: NO URL: SKIPPING: pageid='
                     . @$new[':pageid'] . ' title=' . @$new[':title'] );
@@ -548,41 +491,36 @@ class smt_admin_media extends smt_commons_API {
                 continue;
             }
 
-            $new[':descriptionurl'] = @$image['imageinfo'][0]['descriptionurl'];
-            $new[':descriptionshorturl'] = @$image['imageinfo'][0]['descriptionshorturl'];
+            $new[':descriptionurl'] = @$media_file['imageinfo'][0]['descriptionurl'];
+            $new[':descriptionshorturl'] = @$media_file['imageinfo'][0]['descriptionshorturl'];
 
-            $new[':imagedescription'] = @$image['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
-            $new[':artist'] = @$image['imageinfo'][0]['extmetadata']['Artist']['value'];
-            $new[':datetimeoriginal'] = @$image['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
-            $new[':licenseshortname'] = @$image['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
-            $new[':usageterms'] = @$image['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
-            $new[':attributionrequired'] = @$image['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
-            $new[':restrictions'] = @$image['imageinfo'][0]['extmetadata']['Restrictions']['value'];
+            $new[':imagedescription'] = @$media_file['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
+            $new[':artist'] = @$media_file['imageinfo'][0]['extmetadata']['Artist']['value'];
+            $new[':datetimeoriginal'] = @$media_file['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
+            $new[':licenseshortname'] = @$media_file['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
+            $new[':usageterms'] = @$media_file['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
+            $new[':attributionrequired'] = @$media_file['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
+            $new[':restrictions'] = @$media_file['imageinfo'][0]['extmetadata']['Restrictions']['value'];
 
             $new[':licenseuri'] = @$this->open_content_license_uri( $new[':licenseshortname'] );
             $new[':licensename'] = @$this->open_content_license_name( $new[':licenseuri'] );
 
-            $new[':size'] = @$image['imageinfo'][0]['size'];
-            $new[':width'] = @$image['imageinfo'][0]['width'];
-            $new[':height'] = @$image['imageinfo'][0]['height'];
-            $new[':sha1'] = @$image['imageinfo'][0]['sha1'];
-            $new[':mime'] = @$image['imageinfo'][0]['mime'];
+            $new[':size'] = @$media_file['imageinfo'][0]['size'];
+            $new[':width'] = @$media_file['imageinfo'][0]['width'];
+            $new[':height'] = @$media_file['imageinfo'][0]['height'];
+            $new[':sha1'] = @$media_file['imageinfo'][0]['sha1'];
+            $new[':mime'] = @$media_file['imageinfo'][0]['mime'];
 
-            $new[':thumburl'] = @$image['imageinfo'][0]['thumburl'];
-            $new[':thumbwidth'] = @$image['imageinfo'][0]['thumbwidth'];
-            $new[':thumbheight'] = @$image['imageinfo'][0]['thumbheight'];
-            $new[':thumbmime'] = @$image['imageinfo'][0]['thumbmime'];
+            $new[':thumburl'] = @$media_file['imageinfo'][0]['thumburl'];
+            $new[':thumbwidth'] = @$media_file['imageinfo'][0]['thumbwidth'];
+            $new[':thumbheight'] = @$media_file['imageinfo'][0]['thumbheight'];
+            $new[':thumbmime'] = @$media_file['imageinfo'][0]['thumbmime'];
 
-            $new[':user'] = @$image['imageinfo'][0]['user'];
-            $new[':userid'] = @$image['imageinfo'][0]['userid'];
+            $new[':user'] = @$media_file['imageinfo'][0]['user'];
+            $new[':userid'] = @$media_file['imageinfo'][0]['userid'];
 
-            $new[':duration'] = @$image['imageinfo'][0]['duration'];
-            $new[':timestamp'] = @$image['imageinfo'][0]['timestamp'];
-
-            //if( isset($new['mime']) && $new['mime'] == 'application/pdf' ) {
-            //    $this->notice('::save_media_to_database() ERROR: skipping pdf');
-            //    continue;
-            //}
+            $new[':duration'] = @$media_file['imageinfo'][0]['duration'];
+            $new[':timestamp'] = @$media_file['imageinfo'][0]['timestamp'];
 
             $sql = "INSERT OR REPLACE INTO MEDIA (
                         pageid, title, url,
@@ -605,31 +543,142 @@ class smt_admin_media extends smt_commons_API {
             $response = $this->query_as_bool($sql, $new);
 
             if( $response === FALSE) {
+                $this->error('::save_media_to_database: STOPPING IMPORT');
                 $this->error('::save_media_to_database: FAILED insert into media table');
-                $this->error('::save_media_to_database: SQL: ' . $sql);
-                $this->error('::save_media_to_database: BIND i: ' . print_r($new,1) );
-                $this->error("STOPPING IMPORT");
-                exit;
+                $this->debug('::save_media_to_database: SQL: ' . $sql);
+                $this->debug('::save_media_to_database: BIND i: ' . print_r($new,1) );
+                return FALSE;
             }
 
-            $this->notice('::: SAVED: ' . $new[':pageid'] . ' ' . $new[':title'] );
+            //$this->notice('::: SAVED media: ' . $new[':pageid'] . ' = ' . $new[':title'] );
 
-            // connect category
-            if( $category ) {
-                $response = $this->link_media_category( $new[':pageid'], $category_id );
-                if( !$response ) {
-                    $this->error('::save_media_to_database: insert into category2media table failed. pageid: '
-                    . $new[':pageid']);
-                }
-            } // end if category
-
+			if( !$this->link_media_categories($new[':pageid']) ) {
+				$this->error('::: FAILED to link media categories - p:' . $new[':pageid']);
+			}
+			//$this->notice('::: LINKED ' . sizeof($this->categories) . ' categories');
         } // end while each media
 
         $this->commit();
         $this->vacuum();
-
+		
+		$this->notice('END of save_media_to_database: ' . sizeof($media) . ' files');
         if( $errors ) { $this->error($errors); }
         return TRUE;
+    } // end function save_media_to_database()
+
+    //////////////////////////////////////////////////////////
+    function get_media_from_category( $category='' ) {
+
+        $category = trim($category);
+        if( !$category ) { return false; }
+        $category = ucfirst($category);
+        if ( !preg_match('/^[Category:]/i', $category)) {
+            $category = 'Category:' . $category;
+        }
+
+        $this->notice("START get_media_from_category( $category )");
+
+        $categorymembers = $this->get_api_categorymembers( $category );
+        if( !$categorymembers ) {
+            $this->error('::get_media_from_category: No Media Found');
+            return FALSE;
+        }
+
+        $blocked = $this->query_as_array(
+            'SELECT pageid FROM block WHERE pageid IN ('
+                . implode($categorymembers, ',')
+            . ')');
+        if( $blocked ) {
+            $this->error('ERROR: ' . sizeof($blocked) . ' BLOCKED MEDIA FILES');
+            foreach( $blocked as $bpageid ) {
+                if(($key = array_search($bpageid['pageid'], $categorymembers)) !== false) {
+                    unset($categorymembers[$key]);
+                }
+                $this->error("Skipping BLOCKED Media: " . $bpageid['pageid']);
+            }
+        }
+
+        $chunks = array_chunk( $categorymembers, 50 );
+        foreach( $chunks as $chunk ) {
+            //$this->notice('::get_media_from_category: TRY CHUNK: ' . sizeof($chunk));
+            $this->save_media_to_database( $this->get_api_imageinfo($chunk) );
+        }
+
+		$this->notice('END of get_media_from_category: ' . sizeof($categorymembers) . ' files');
+    } // end function get_media_from_category()
+
+    //////////////////////////////////////////////////////////
+    function get_api_categorymembers( $category ) {
+        //$this->notice('::get_api_categorymembers: ' . $category);
+        $url = $this->commons_api_url . '?action=query&format=json'
+        . '&list=categorymembers'  // https://www.mediawiki.org/wiki/API:Categorymembers
+        . '&cmtype=file'
+        . '&cmprop=ids'
+        . '&cmlimit=500'
+        . '&cmtitle=' . urlencode($category);
+        if( !$this->call_commons($url, 'categorymembers')
+            || !isset( $this->commons_response['query']['categorymembers'])
+        ) {
+            $this->error('::get_api_categorymembers: ERROR: call');
+            return array();
+        }
+        $pageids = array();
+        foreach( $this->commons_response['query']['categorymembers']  as $x ) {
+            $pageids[] = $x['pageid'];
+        }
+        if( !$pageids ) {
+            //$this->notice('::get_api_categorymembers: No files found');
+            return array();
+        }
+        //$this->notice('::get_api_categorymembers: GOT: ' . sizeof($pageids) );
+        return $pageids;
+    }
+
+    //////////////////////////////////////////////////////////
+    function get_api_imageinfo( $pageids, $recurse_count=0 ) {
+        //$this->notice('::get_api_imageinfo: pageids size: ' . sizeof($pageids) . ' recurse=' . $recurse_count);
+        $call = $this->commons_api_url . '?action=query&format=json'
+        . $this->prop_imageinfo
+        . '&iiurlwidth=' . $this->size_medium
+        . '&iilimit=50'
+        . '&pageids=' . implode('|',$pageids);
+        if( !$this->call_commons($call, 'pages')
+            || !isset($this->commons_response['query']['pages'])
+        ) {
+            $this->error('::get_api_imageinfo: ERROR: call');
+            return array();
+        }
+
+        $pages = $this->commons_response['query']['pages'];
+        //$this->notice('::get_api_imageinfo: CALL #' . $recurse_count . ': GOT: ' . sizeof($pages) . ' files');
+
+        $errors = array();
+        foreach( $pages as $media ) {
+            if( !isset($media['imageinfo'][0]['url']) ) {
+                $errors[] = $media['pageid'];
+                unset( $pages[ $media['pageid'] ] );
+            }
+        }
+
+        if( !$recurse_count ) {
+            //$this->notice('::get_api_imageinfo: NO RECURSION.  returning');
+            return $pages;
+        }
+
+        if( $recurse_count > 5 ) {
+            $this->error('::get_api_imageinfo: TOO MUCH RECURSION: ' . $recurse_count);
+            return $pages;
+        }
+        $recurse_count++;
+        if( $errors ) {
+            $this->error('::get_api_imageinfo: CALL #' . $recurse_count . ': ' . sizeof($errors) . ' EMPTY files');
+            $second = $this->get_api_imageinfo( $errors, $recurse_count );
+            $this->notice('::get_api_imageinfo: CALL #' . $recurse_count . ': GOT: ' . sizeof($second) . ' files');
+            $pages = array_merge($pages, $second);
+            $this->notice('::get_api_imageinfo: CALL #' . $recurse_count . ': total pages: ' . sizeof($pages) . ' files');
+        }
+
+        return $pages;
     }
 
     ////////////////////////////////////////////////////
@@ -674,120 +723,6 @@ class smt_admin_media extends smt_commons_API {
 
         $response .= '</div>';
         return $response;
-    }
-
-    //////////////////////////////////////////////////////////
-    function get_media_from_category( $category='' ) {
-
-        $category = trim($category);
-        if( !$category ) { return false; }
-        $category = ucfirst($category);
-        if ( !preg_match('/^[Category:]/i', $category)) {
-            $category = 'Category:' . $category;
-        }
-
-        $this->notice("::get_media_from_category( $category )");
-
-        $categorymembers = $this->get_api_categorymembers( $category );
-        if( !$categorymembers ) {
-            $this->error('::get_media_from_category: No Media Found');
-            return FALSE;
-        }
-
-        $blocked = $this->query_as_array(
-            'SELECT pageid FROM block WHERE pageid IN ('
-                . implode($categorymembers, ',')
-            . ')');
-        if( $blocked ) {
-            $this->error('ERROR: ' . sizeof($blocked) . ' BLOCKED MEDIA FILES');
-            foreach( $blocked as $bpageid ) {
-                if(($key = array_search($bpageid['pageid'], $categorymembers)) !== false) {
-                    unset($categorymembers[$key]);
-                }
-                $this->error("Skipping BLOCKED Media: " . $bpageid['pageid']);
-            }
-        }
-
-        $chunks = array_chunk( $categorymembers, 50 );
-        foreach( $chunks as $chunk ) {
-            $this->notice('::get_media_from_category: TRY CHUNK: ' . sizeof($chunk));
-            $this->save_media_to_database( $this->get_api_imageinfo($chunk), $category );
-        }
-
-    } // end function get_media_from_category()
-
-    //////////////////////////////////////////////////////////
-    function get_api_categorymembers( $category ) {
-        $this->notice('::get_api_categorymembers: ' . $category);
-        $url = $this->commons_api_url . '?action=query&format=json'
-        . '&list=categorymembers'  // https://www.mediawiki.org/wiki/API:Categorymembers
-        . '&cmtype=file'
-        . '&cmprop=ids'
-        . '&cmlimit=500'
-        . '&cmtitle=' . urlencode($category);
-        if( !$this->call_commons($url, 'categorymembers')
-            || !isset( $this->commons_response['query']['categorymembers'])
-        ) {
-            $this->error('::get_api_categorymembers: ERROR: call');
-            return array();
-        }
-        $pageids = array();
-        foreach( $this->commons_response['query']['categorymembers']  as $x ) {
-            $pageids[] = $x['pageid'];
-        }
-        if( !$pageids ) {
-            $this->notice('::get_api_categorymembers: No files found');
-            return array();
-        }
-        $this->notice('::get_api_categorymembers: GOT: ' . sizeof($pageids) );
-        return $pageids;
-    }
-
-    //////////////////////////////////////////////////////////
-    function get_api_imageinfo( $pageids, $recurse_count=0 ) {
-        $this->notice('::get_api_imageinfo: pageids size: ' . sizeof($pageids) . ' recurse=' . $recurse_count);
-        $call = $this->commons_api_url . '?action=query&format=json'
-        . $this->prop_imageinfo
-        . '&iiurlwidth=' . $this->size_medium
-        . '&iilimit=50'
-        . '&pageids=' . implode('|',$pageids);
-        if( !$this->call_commons($call, 'pages')
-            || !isset($this->commons_response['query']['pages'])
-        ) {
-            $this->error('::get_api_imageinfo: ERROR: call');
-            return array();
-        }
-
-        $pages = $this->commons_response['query']['pages'];
-        $this->notice('::get_api_imageinfo: CALL #' . $recurse_count . ': GOT: ' . sizeof($pages) . ' files');
-
-        $errors = array();
-        foreach( $pages as $media ) {
-            if( !isset($media['imageinfo'][0]['url']) ) {
-                $errors[] = $media['pageid'];
-                unset( $pages[ $media['pageid'] ] );
-            }
-        }
-
-        if( !$recurse_count ) {
-            $this->notice('::get_api_imageinfo: NO RECURSION.  returning');
-            return $pages;
-        }
-
-        if( $recurse_count > 5 ) {
-            $this->error('::get_api_imageinfo: TOO MUCH RECURSION: ' . $recurse_count);
-            return $pages;
-        }
-        $recurse_count++;
-        if( $errors ) {
-            $this->error('::get_api_imageinfo: CALL #' . $recurse_count . ': ' . sizeof($errors) . ' EMPTY files');
-            $second = $this->get_api_imageinfo( $errors, $recurse_count );
-            $this->notice('::get_api_imageinfo: CALL #' . $recurse_count . ': GOT: ' . sizeof($second) . ' files');
-            $pages = array_merge($pages, $second);
-            $this->notice('::get_api_imageinfo: CALL #' . $recurse_count . ': total pages: ' . sizeof($pages) . ' files');
-        }
-
-        return $pages;
     }
 
     //////////////////////////////////////////////////////////
@@ -902,17 +837,66 @@ class smt_admin_category extends smt_admin_media {
             $this->error('::get_categories_from_media: nothing found');
             return FALSE;
         }
+		$this->categories = @$this->commons_response['query']['pages'][$pageid]['categories'];
         return TRUE;
     }
 
     //////////////////////////////////////////////////////////
-    function link_media_category( $pageid, $category_id ) {
+	function link_media_categories( $pageid ) {
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
+            $this->error('link_media_categories: invalid pageid');
+            return FALSE;
+        }
+		if( !$this->get_categories_from_media($pageid) ) {
+			$this->error('link_media_categories: unable to get categories from API');
+			return FALSE;
+		}
+		
+        // Remove any old category links for this media
+        $this->query_as_bool(
+            'DELETE FROM category2media WHERE media_pageid = :pageid',
+            array(':pageid'=>$pageid)
+        );
+		
+		foreach( $this->categories as $category ) {
+			
+            if( !isset($category['title']) || !$category['title'] ) {
+                $this->error('link_media_categories: ERROR: missing category title');
+                continue;
+            }
+            if( !isset($category['ns']) || $category['ns'] != '14' ) {
+                $this->error('link_media_categories: ERROR: invalid category namespace');
+                continue;
+            }
+
+            $category_id = $this->get_category_id_from_name($category['title']);
+            if( !$category_id ) {
+				//$this->error('link_media_categories: NOT FOUND: ' . $category['title']);
+                if( !$this->insert_category( $category['title'] ) ) {
+                    $this->error('link_media_categories: FAILED to insert ' . $cat);
+                    continue;
+                }
+                $category_id = $this->last_insert_id;
+            }
+			//$this->notice('link_media_categories: pageid:'.$pageid.' = ' . $category['title'] . ' == cat_id:'.$category_id);
+
+            if( !$this->link_media_to_category( $pageid, $category_id ) ) {
+				$this->error('link_media_categories: FAILED to link category');
+				continue;
+            }
+			//$this->notice('OK: link_media_categories: p:' . $pageid . ' = c:' . $category_id . ' = ' . $category['title']);
+		} // end foreach categories
+		return TRUE;
+	} // end function link_media_categories()
+
+    //////////////////////////////////////////////////////////
+    function link_media_to_category( $pageid, $category_id ) {
         $response = $this->query_as_bool(
-            'INSERT OR REPLACE INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
+            'INSERT INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
             array('category_id'=>$category_id, 'pageid'=>$pageid)
         );
         if( !$response ) {
-            $this->error('::link_media_category: ERROR: insert failed. pageid: '
+            $this->debug('::link_media_to_category: ERROR: insert failed. pageid: '
             . $pageid . ' cat_id: ' . $category_id);
             return FALSE;
         }
@@ -995,11 +979,11 @@ class smt_admin_category extends smt_admin_media {
             return FALSE;
         }
         if( !$this->last_insert_id ) {
-            $this->notice('::insert_category: EXISTS: ' . $name);
+            //$this->notice('::insert_category: EXISTS: ' . $name);
             return FALSE;
         }
-        $this->notice('::insert_category: SAVED ' . $this->last_insert_id . ' = ' . $name);
-        $this->vacuum();
+        //$this->notice('::insert_category: SAVED ' . $this->last_insert_id . ' = ' . $name);
+        //$this->vacuum();
         return TRUE;
     }
 

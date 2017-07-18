@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.16');
+define('__SMT__', '0.6.17');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -338,7 +338,7 @@ class smt_database_utils EXTENDS smt_page {
         }
 
         if( !$statement->execute() ) {
-            $this->error('::query_as_bool: EXECUTE FAILED: ' . $sql
+            $this->debug('::query_as_bool: EXECUTE FAILED: ' . $sql
             //. '<br />errorinfo:'.print_r($this->db->errorInfo(),1)
             );
             return FALSE;
@@ -351,6 +351,7 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function vacuum() {
+		$this->notice('VACUUM');
         if( $this->query_as_bool('VACUUM') ) {
             return TRUE;
         }
@@ -360,6 +361,7 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function begin_transaction() {
+		$this->notice('BEGIN TRANSACTION');
         if( $this->query_as_bool('BEGIN TRANSACTION') ) {
             return TRUE;
         }
@@ -369,6 +371,7 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function commit() {
+		$this->notice('COMMIT');
         if( $this->query_as_bool('COMMIT') ) {
             return TRUE;
         }

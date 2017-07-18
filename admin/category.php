@@ -5,9 +5,9 @@
 if( function_exists('set_time_limit') ) { set_time_limit( 250 ); }
 
 $f = __DIR__.'/../smt.php';
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
+if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; return; } require_once($f);
 $f = __DIR__.'/smt-admin.php';
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
+if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; return; } require_once($f);
 $smt = new smt_admin();
 
 $smt->title = 'Category Admin';
@@ -34,7 +34,7 @@ if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
 
     print '</div>';
     $smt->include_footer();
-    exit;
+    return;
 }
 
 if( isset($_POST['cats']) && $_POST['cats'] ) {
@@ -229,7 +229,7 @@ function get_search_results($smt) {
 
     if( !$cats || !is_array($cats) ) {
         $smt->notice('Error: no categories found');
-        exit;
+        return;
     }
     print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>' . $smt->totalhits . '</b> categories</p>';
     print '
@@ -265,7 +265,7 @@ function get_search_results($smt) {
     print '</form>';
     print '</div>';
     $smt->include_footer();
-    exit;
+    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -276,7 +276,7 @@ function import_categories($smt) {
     }
     print '</div>';
     $smt->include_footer();
-    exit;
+    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,9 +288,10 @@ function get_category_info($smt) {
         $smt->error('failed to get category info');
         return;
     }
+	
     foreach( $cats as $cat ) {
         $title = $cat['title'];
-        $pageid = $cat['pageid'];
+        $pageid = $cat['pageid'];   // ????
         $files = $cat['categoryinfo']['files'];
         $subcats = $cat['categoryinfo']['subcats'];
         $x = $smt->query_as_bool(
