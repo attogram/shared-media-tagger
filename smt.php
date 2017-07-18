@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.19');
+define('__SMT__', '0.6.21');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -651,21 +651,43 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function display_categories( $media_id ) {
+
         if( !$media_id || !$this->is_positive_number($media_id) ) {
             return FALSE;
         }
-        $cats = $this->get_image_categories( $media_id );
+		
+        $cats = $this->get_image_categories($media_id);
+		
         $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
-        if( !$cats ) { $response .= '<em>Uncategorized</em>'; }
+
+        if( !$cats ) { return $response . '<em>Uncategorized</em></div>'; }
+
+		$hidden = array();
         foreach($cats as $cat ) {
+			if( $this->is_hidden_category($cat) ) {
+				$hidden[] = $cat;
+				continue;
+			}
             $response .= ''
-            . '+'
-            . '<a href="' . $this->url('category')
+            . '+<a href="' . $this->url('category')
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">'
             . $this->strip_prefix($cat) . '</a><br />';
         }
-        return $response . '</div>';
-    }
+		
+		if( !$hidden ) {
+			return $response . '</div>';
+		}
+        
+		$response .= '<br /><div style="font-size:80%;">';
+			
+		foreach( $hidden as $hcat ) {
+			$response .= '+<a href="' . $this->url('category')
+            . '?c=' . $this->category_urlencode( $this->strip_prefix($hcat) ) . '">'
+            . $this->strip_prefix($hcat) . '</a><br />';
+		}
+		return $response . '</div></div>';
+
+    } // end function display_categories()
 
     //////////////////////////////////////////////////////////
     function strip_prefix( $string ) {
@@ -825,6 +847,26 @@ class smt_category EXTENDS smt_user {
         return $return;
     }
 
+    //////////////////////////////////////////////////////////
+	function is_hidden_category( $category_name ) {
+		if( !$category_name ) {
+			$this->error('::is_hidden_category: category_name NOT FOUND');
+			return FALSE;
+		}
+		if( in_array( $this->strip_prefix($category_name), $this->get_hidden_categories() ) ) {
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+    //////////////////////////////////////////////////////////
+	function get_hidden_categories() {
+		return array(
+			'CC-BY-SA-4.0',
+			'Self-published work',
+		);
+	} // end get_hidden_categories
+	
 } // END class category
 
 //////////////////////////////////////////////////////////
@@ -849,17 +891,21 @@ class smt_tag EXTENDS smt_category {
     /////////////////////////////////////////////////////////
     function display_reviews( $reviews ) {
         if( !$reviews ) {
-            return 'unreviewed';
+            return; // 'unreviewed';
         }
-        $review_count = 0;
+        //$review_count = 0;
         $response = '';
         foreach( $reviews as $review ) {
-            $response .= '<div class="tag' . $review['position'] . '">'
-            . '+<b>' . $review['count'] . '</b> ' . $review['name'] . '</div>';
-            $review_count += $review['count'];
+            $response .= ''
+			. '+<a href="' . $this->url('reviews') 
+			. '?o=reviews.' . urlencode($review['name'])
+			. '">'
+			. $review['count'] . ' ' . $review['name'] 
+			. '</a><br />';
+            //$review_count += $review['count'];
         }
-        $response = '<div style="display:inline-block; text-align:left;">'
-        . '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
+        //$response = '<div style="display:inline-block; text-align:left;">'
+        //. '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
         return $response;
     }
 

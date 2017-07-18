@@ -20,19 +20,17 @@ $smt->title = $smt->site_name;
 $smt->include_header();
 $smt->include_small_menu();
 
-print '<div class="box grey center">'
-. $smt->display_tags( $image['pageid'])
+print ''
+. '<div class="box grey center">'
+. $smt->display_tags($image['pageid'])
 . $smt->display_image($image)
-. $smt->display_categories( $image['pageid'] )
-. '<br />'
 . '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
 . $smt->get_reviews( $image['pageid'] )
-. '<br />'
-. '<br />'
-. '<a href="' . $smt->url('contact') . '?r=' . $image['pageid'] . '" style="color:#666; font-size:85%;">'
-. 'REPORT this file</a>'
+. $smt->display_categories( $image['pageid'] )
+. '<br /><a href="' . $smt->url('contact') . '?r=' 
+. $image['pageid'] . '" style="color:#666; font-size:85%;">REPORT this file</a>'
+. '</div>'
 . '</div>'
 ;
 
-print '</div>';
 $smt->include_footer();

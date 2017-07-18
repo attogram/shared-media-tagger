@@ -37,8 +37,11 @@ $smt->include_menu();
 print ''
 . $smt->display_tags( $pageid )
 . $smt->display_image($media)
-. $smt->display_categories( $pageid )
-. $smt->get_reviews($pageid); ?>
+. '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
+. $smt->get_reviews($pageid)
+. $smt->display_categories($pageid)
+. '</div>'; 
+?>
 </div><?php /* end left */ ?>
 
 <div class="col-sm-6 box white"><?php /* start right */ ?>
