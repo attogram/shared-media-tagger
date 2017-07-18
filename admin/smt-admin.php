@@ -419,7 +419,7 @@ class smt_admin_media extends smt_commons_API {
         }
         $response = '<div style="background-color:lightgreen; padding:10px;">'
         . '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
-		
+
         // Get media
         $media = $this->get_api_imageinfo( array($pageid), /*$recurse_count=*/0 );
         //$this->notice($media);
@@ -430,8 +430,11 @@ class smt_admin_media extends smt_commons_API {
         }
         $response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
 
-		// Remove media - old version, if present
-		$this->query_as_bool('DELETE FROM media WHERE pageid = :pageid', array(':pageid'=>$pageid));
+        // Remove media - old version, if present
+        $this->query_as_bool(
+            'DELETE FROM media WHERE pageid = :pageid',
+            array(':pageid'=>$pageid)
+        );
 
         // Save media
         if( !$this->save_media_to_database($media) ) {
@@ -464,9 +467,12 @@ class smt_admin_media extends smt_commons_API {
             }
             $found_categories[] = $cat['title'];
         }
-    
-		// Remove old category list - if present
-		$this->query_as_bool('DELETE FROM category2media WHERE pageid = :pageid', array(':pageid'=>$pageid));
+
+        // Remove old category list - if present
+        $this->query_as_bool(
+            'DELETE FROM category2media WHERE media_pageid = :pageid',
+            array(':pageid'=>$pageid)
+        );
 
         foreach( $found_categories as $cat ) {
 
@@ -981,7 +987,7 @@ class smt_admin_category extends smt_admin_media {
             return FALSE;
         }
         $response = $this->query_as_bool(
-            'INSERT OR IGNORE INTO category (name) VALUES (:name)',
+            'INSERT INTO category (name) VALUES (:name)',
             array(':name'=>$name)
         );
         if( !$response ) {
