@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.18');
+define('__SMT__', '0.6.19');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -351,7 +351,7 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function vacuum() {
-		$this->notice('VACUUM');
+        $this->notice('VACUUM');
         if( $this->query_as_bool('VACUUM') ) {
             return TRUE;
         }
@@ -361,7 +361,7 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function begin_transaction() {
-		$this->notice('BEGIN TRANSACTION');
+        $this->notice('BEGIN TRANSACTION');
         if( $this->query_as_bool('BEGIN TRANSACTION') ) {
             return TRUE;
         }
@@ -371,7 +371,7 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function commit() {
-		$this->notice('COMMIT');
+        $this->notice('COMMIT');
         if( $this->query_as_bool('COMMIT') ) {
             return TRUE;
         }
@@ -768,7 +768,8 @@ class smt_category EXTENDS smt_user {
             'SELECT category.name
             FROM category, category2media
             WHERE category2media.category_id = category.id
-            AND category2media.media_pageid = :pageid',
+            AND category2media.media_pageid = :pageid
+            ORDER BY category.name',
             array(':pageid'=>$pageid)
         );
         if( !isset( $response[0]['name'] ) ) {

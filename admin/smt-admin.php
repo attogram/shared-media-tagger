@@ -344,10 +344,10 @@ class smt_commons_API extends smt_admin_database_utils {
 
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
-		
+        
         //$this->notice('::call_commons: key='.$key.' url=<a target="commons" href="'
-		//	.$url.'">'. $this->truncate($url, 90).'</a>');
-		
+        //  .$url.'">'. $this->truncate($url, 90).'</a>');
+        
         if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; }
         $get_response = file_get_contents($url);
         if( $get_response === FALSE ) {
@@ -440,21 +440,21 @@ class smt_admin_media extends smt_commons_API {
         . '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
 
 
-		if( !$this->link_media_categories( $pageid ) ) {
+        if( !$this->link_media_categories( $pageid ) ) {
             return $response . '<p>ERROR: failed to link media categories</p></div>';
-		}
+        }
 
-		if( !$this->categories ) {
-			return $response . '<p>No Categories Found</p></div>';
-		}
+        if( !$this->categories ) {
+            return $response . '<p>No Categories Found</p></div>';
+        }
 
 
-		foreach( $this->categories as $category ) {
-			$response .= '+' 
-			. '<a href="' . $this->url('category') 
-			. '?c=' . $this->category_urlencode($this->strip_prefix($category['title']))
-			. '">' . $this->strip_prefix($category['title']) . '</a><br />';
-		}
+        foreach( $this->categories as $category ) {
+            $response .= '+' 
+            . '<a href="' . $this->url('category') 
+            . '?c=' . $this->category_urlencode($this->strip_prefix($category['title']))
+            . '">' . $this->strip_prefix($category['title']) . '</a><br />';
+        }
 
 
         //$response .= $this->display_thumbnail_box($media[$pageid]);
@@ -552,16 +552,16 @@ class smt_admin_media extends smt_commons_API {
 
             //$this->notice('::: SAVED media: ' . $new[':pageid'] . ' = ' . $new[':title'] );
 
-			if( !$this->link_media_categories($new[':pageid']) ) {
-				$this->error('::: FAILED to link media categories - p:' . $new[':pageid']);
-			}
-			//$this->notice('::: LINKED ' . sizeof($this->categories) . ' categories');
+            if( !$this->link_media_categories($new[':pageid']) ) {
+                $this->error('::: FAILED to link media categories - p:' . $new[':pageid']);
+            }
+            //$this->notice('::: LINKED ' . sizeof($this->categories) . ' categories');
         } // end while each media
 
         $this->commit();
         $this->vacuum();
-		
-		$this->notice('END of save_media_to_database: ' . sizeof($media) . ' files');
+        
+        $this->notice('END of save_media_to_database: ' . sizeof($media) . ' files');
         if( $errors ) { $this->error($errors); }
         return TRUE;
     } // end function save_media_to_database()
@@ -604,7 +604,7 @@ class smt_admin_media extends smt_commons_API {
             $this->save_media_to_database( $this->get_api_imageinfo($chunk) );
         }
 
-		$this->notice('END of get_media_from_category: ' . sizeof($categorymembers) . ' files');
+        $this->notice('END of get_media_from_category: ' . sizeof($categorymembers) . ' files');
     } // end function get_media_from_category()
 
     //////////////////////////////////////////////////////////
@@ -709,9 +709,9 @@ class smt_admin_media extends smt_commons_API {
             }
         }
 
-		if( $no_block ) {
-			return $response . '</div>';
-		}
+        if( $no_block ) {
+            return $response . '</div>';
+        }
 
         $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
         $bind = array(
@@ -841,29 +841,29 @@ class smt_admin_category extends smt_admin_media {
             $this->error('::get_categories_from_media: nothing found');
             return FALSE;
         }
-		$this->categories = @$this->commons_response['query']['pages'][$pageid]['categories'];
+        $this->categories = @$this->commons_response['query']['pages'][$pageid]['categories'];
         return TRUE;
     }
 
     //////////////////////////////////////////////////////////
-	function link_media_categories( $pageid ) {
+    function link_media_categories( $pageid ) {
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('link_media_categories: invalid pageid');
             return FALSE;
         }
-		if( !$this->get_categories_from_media($pageid) ) {
-			$this->error('link_media_categories: unable to get categories from API');
-			return FALSE;
-		}
-		
+        if( !$this->get_categories_from_media($pageid) ) {
+            $this->error('link_media_categories: unable to get categories from API');
+            return FALSE;
+        }
+        
         // Remove any old category links for this media
         $this->query_as_bool(
             'DELETE FROM category2media WHERE media_pageid = :pageid',
             array(':pageid'=>$pageid)
         );
-		
-		foreach( $this->categories as $category ) {
-			
+        
+        foreach( $this->categories as $category ) {
+            
             if( !isset($category['title']) || !$category['title'] ) {
                 $this->error('link_media_categories: ERROR: missing category title');
                 continue;
@@ -875,23 +875,23 @@ class smt_admin_category extends smt_admin_media {
 
             $category_id = $this->get_category_id_from_name($category['title']);
             if( !$category_id ) {
-				//$this->error('link_media_categories: NOT FOUND: ' . $category['title']);
+                //$this->error('link_media_categories: NOT FOUND: ' . $category['title']);
                 if( !$this->insert_category( $category['title'] ) ) {
                     $this->error('link_media_categories: FAILED to insert ' . $cat);
                     continue;
                 }
                 $category_id = $this->last_insert_id;
             }
-			//$this->notice('link_media_categories: pageid:'.$pageid.' = ' . $category['title'] . ' == cat_id:'.$category_id);
+            //$this->notice('link_media_categories: pageid:'.$pageid.' = ' . $category['title'] . ' == cat_id:'.$category_id);
 
             if( !$this->link_media_to_category( $pageid, $category_id ) ) {
-				$this->error('link_media_categories: FAILED to link category');
-				continue;
+                $this->error('link_media_categories: FAILED to link category');
+                continue;
             }
-			//$this->notice('OK: link_media_categories: p:' . $pageid . ' = c:' . $category_id . ' = ' . $category['title']);
-		} // end foreach categories
-		return TRUE;
-	} // end function link_media_categories()
+            //$this->notice('OK: link_media_categories: p:' . $pageid . ' = c:' . $category_id . ' = ' . $category['title']);
+        } // end foreach categories
+        return TRUE;
+    } // end function link_media_categories()
 
     //////////////////////////////////////////////////////////
     function link_media_to_category( $pageid, $category_id ) {
