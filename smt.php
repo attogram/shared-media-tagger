@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.21');
+define('__SMT__', '0.6.22');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -655,9 +655,9 @@ class smt_category EXTENDS smt_user {
         if( !$media_id || !$this->is_positive_number($media_id) ) {
             return FALSE;
         }
-		
+
         $cats = $this->get_image_categories($media_id);
-		
+
         $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
 
         if( !$cats ) { return $response . '<em>Uncategorized</em></div>'; }
@@ -673,13 +673,13 @@ class smt_category EXTENDS smt_user {
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">'
             . $this->strip_prefix($cat) . '</a><br />';
         }
-		
+
 		if( !$hidden ) {
 			return $response . '</div>';
 		}
-        
+
 		$response .= '<br /><div style="font-size:80%;">';
-			
+
 		foreach( $hidden as $hcat ) {
 			$response .= '+<a href="' . $this->url('category')
             . '?c=' . $this->category_urlencode( $this->strip_prefix($hcat) ) . '">'
@@ -862,11 +862,89 @@ class smt_category EXTENDS smt_user {
     //////////////////////////////////////////////////////////
 	function get_hidden_categories() {
 		return array(
-			'CC-BY-SA-4.0',
-			'Self-published work',
+
+'CC-BY-2.0',
+'CC-BY-2.5',
+'CC-BY-2.5-DK',
+'CC-BY-3.0',
+'CC-BY-4.0',
+'CC-BY-SA-2.0',
+'CC-BY-SA-2.0-DE',
+'CC-BY-SA-2.5',
+'CC-BY-SA-2.5,2.0,1.0',
+'CC-BY-SA-3.0',
+'CC-BY-SA-3.0-DE',
+'CC-BY-SA-3.0-migrated',
+'CC-BY-SA-3.0-NL',
+'CC-BY-SA-3.0,',
+'CC-BY-SA-3.0,2.5,2.0,1.0',
+'CC-BY-SA-4.0',
+'CC-BY-SA-4.0,3.0,2.5,2.0,1.0',
+'CC-PD-Mark',
+'CC-Zero',
+'Files with no machine-readable author',
+'Files with no machine-readable source',
+'Flickr images reviewed by FlickreviewR',
+'Flickr images reviewed by File Upload Bot (Magnus Manske)',
+'Flickr images reviewed by trusted users',
+'GFDL',
+'GFDL-1.2',
+'Images from DoD uploaded by Fæ',
+'Images which had their watermark removed',
+'Images with annotations',
+'Images with extracted images',
+'Images with watermarks',
+'License migration redundant',
+'Media lacking a description',
+'Media lacking author information',
+'Media missing infobox template',
+'Media with locations',
+'Pages with maps',
+'Pages with script errors',
+'PD ineligible',
+'PD Italy (20 years after creation)',
+'PD NASA',
+'PD Old',
+'PD other reasons',
+'PD other reasons new',
+'PD shape,',
+'PD US',
+'PD US Air Force',
+'PD US Congress',
+'PD US DOS',
+'PD US Government',
+'PD US HHS CDC',
+'PD US Marines',
+'PD US Military',
+'PD US Navy',
+'PD US not renewed',
+'PD-1996',
+'PD-anon-1923',
+'PD-Art (PD-old-100)',
+'PD-author',
+'PD-HU-exempt (possible wrong license)',
+'PD-old-70-1923',
+'PD-self',
+'PD-user',
+'Personality rights warning',
+'Self-published work',
+'Symbol images that should use vector graphics',
+'Taken with Canon EOS 1D X Mark II',
+'Taken with Canon EOS 400D',
+'Taken with Canon EOS 5D Mark II',
+'Taken with Canon EOS 5D Mark III',
+'Taken with Nikon Coolpix P7700',
+'Taken with Nikon D200',
+'Taken with Nikon D3s',
+'Taken with Nikon D600',
+'Taken with Nikon D90',
+'Taken with Panasonic NV-GS500',
+'Uploaded with derivativeFX',
+'UW uploads using a custom license',
+
 		);
 	} // end get_hidden_categories
-	
+
 } // END class category
 
 //////////////////////////////////////////////////////////
@@ -897,10 +975,10 @@ class smt_tag EXTENDS smt_category {
         $response = '';
         foreach( $reviews as $review ) {
             $response .= ''
-			. '+<a href="' . $this->url('reviews') 
+			. '+<a href="' . $this->url('reviews')
 			. '?o=reviews.' . urlencode($review['name'])
 			. '">'
-			. $review['count'] . ' ' . $review['name'] 
+			. $review['count'] . ' ' . $review['name']
 			. '</a><br />';
             //$review_count += $review['count'];
         }

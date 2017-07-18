@@ -25,9 +25,12 @@ print ''
 . $smt->display_tags($image['pageid'])
 . $smt->display_image($image)
 . '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
+. '<br />'
 . $smt->get_reviews( $image['pageid'] )
+. '<br />'
 . $smt->display_categories( $image['pageid'] )
-. '<br /><a href="' . $smt->url('contact') . '?r=' 
+. '<br />'
+. '<a href="' . $smt->url('contact') . '?r=' 
 . $image['pageid'] . '" style="color:#666; font-size:85%;">REPORT this file</a>'
 . '</div>'
 . '</div>'

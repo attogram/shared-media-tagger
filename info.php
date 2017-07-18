@@ -38,7 +38,9 @@ print ''
 . $smt->display_tags( $pageid )
 . $smt->display_image($media)
 . '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
+. '<br />'
 . $smt->get_reviews($pageid)
+. '<br />'
 . $smt->display_categories($pageid)
 . '</div>'; 
 ?>
