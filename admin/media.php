@@ -92,7 +92,7 @@ function delete_media_in_category( $category_name ) {
 
     foreach( $media as $pageid ) {
         $return .= '<br />Deleting #' . $pageid;
-        $return .= $smt->delete_media($pageid);
+        $return .= $smt->delete_media($pageid, /*no-block*/TRUE);
     }
     $return .= '</div><br />';
     return $return;

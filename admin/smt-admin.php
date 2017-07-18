@@ -682,7 +682,7 @@ class smt_admin_media extends smt_commons_API {
     }
 
     ////////////////////////////////////////////////////
-    function delete_media( $pageid ) {
+    function delete_media( $pageid, $no_block=FALSE ) {
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('delete_media: Invalid PageID');
             return FALSE;
@@ -709,6 +709,10 @@ class smt_admin_media extends smt_commons_API {
             }
         }
 
+		if( $no_block ) {
+			return $response . '</div>';
+		}
+
         $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
         $bind = array(
             ':pageid'=>$pageid,
@@ -721,8 +725,8 @@ class smt_admin_media extends smt_commons_API {
             $response .= '<br />ERROR: ' . $sql;
         }
 
-        $response .= '</div>';
-        return $response;
+        return $response . '</div>';
+ 
     }
 
     //////////////////////////////////////////////////////////
