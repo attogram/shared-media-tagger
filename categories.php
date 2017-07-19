@@ -117,9 +117,9 @@ foreach( $smt->get_tags() as $tag ) {
         //$commons_url = 'https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']);
         print '<tr>';
 
-        print '<td class="center"><a href="' . $local_url . '">' . $c['local_count'] . '</a></td>';
+        print '<td class="right"><a href="' . $local_url . '">' . $c['local_count'] . '</a></td>';
 
-        print '<td style="font-weight:bold;"><a href="' . $local_url . '">' 
+        print '<td style="padding:0 0 0 10px; font-weight:bold;"><a href="' . $local_url . '">' 
 		. $smt->strip_prefix($c['name']) . '</a></td>';
 		
 

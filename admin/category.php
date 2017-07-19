@@ -190,11 +190,12 @@ foreach( $cats as $c ) {
     print '<td class="right">' . $subcatslink . '</td>';
 
     print ''
-    . '<td>&nbsp; <a target="commons" href="https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']) . '">View</a> &nbsp;</td>'
-    . '<td>&nbsp; <a href="./' . basename(__FILE__) . '?c=' . $smt->category_urlencode($c['name']) . '">Info</a> &nbsp;</td>'
-    . '<td>&nbsp; <a href="./' . basename(__FILE__) . '?i=' . $smt->category_urlencode($c['name']) . '">Import</a> &nbsp;</td>'
-    . '<td>&nbsp; <a href="./media.php?dc=' . $smt->category_urlencode($c['name']) . '">Clear</a> &nbsp;</td>'
-    . '<td>&nbsp; <a href="./' . basename(__FILE__) . '?d=' . urlencode($c['id']) . '">Delete</a> &nbsp;</td>'
+    . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/' 
+		. $smt->category_urlencode($c['name']) . '">View</a></td>'
+    . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__) . '?c=' . $smt->category_urlencode($c['name']) . '">Info</a></td>'
+    . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__) . '?i=' . $smt->category_urlencode($c['name']) . '">Import</a></td>'
+    . '<td style="padding:0 10px 0 10px;"><a href="./media.php?dc=' . $smt->category_urlencode($c['name']) . '">Clear</a></td>'
+    . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__) . '?d=' . urlencode($c['id']) . '">Delete</a></td>'
     . '</tr>'
     ;
 }
