@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.27');
+define('__SMT__', '0.6.28');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -856,123 +856,64 @@ class smt_category EXTENDS smt_user {
         if( in_array( $this->strip_prefix($category_name), $this->get_hidden_categories() ) ) {
             return TRUE;
         }
+		
+		foreach( $this->get_hidden_categories_match() as $pattern ) {			
+			if( preg_match('/'.$pattern.'/', $this->strip_prefix($category_name)) ) {
+				return TRUE;
+			}
+		}
         return FALSE;
     }
 
     //////////////////////////////////////////////////////////
+	function get_hidden_categories_match() {
+		return array (
+'OTRS',
+'^Author matching',
+'^CC-',
+'^Created with ',
+'^Edited versions of Flickr',
+'^Files created by ',
+'^Files from ',
+'^Files uploaded by',
+'^Files with ',
+'^Flickr images reviewed by',
+'^GFDL',
+'^Images from',
+'^Images which had',
+'^Images with',
+'^Media lacking',
+'^Media missing',
+'^Media with',
+'^PD ',
+'^PD-',
+'^Pages with',
+'^Symbol images that',
+'^Taken with',
+'^Temporary for',
+'^UW uploads',
+'^Uploaded with',
+'^Videos created with',
+'^Photos uploaded from',
+'^Photos by',
+'^Photographs by',
+'^Photographs taken on',
+'^Photographs taken with',
+'^Pictures taken by',
+
+		);
+	} // end get_hidden_categories_match
+
+    //////////////////////////////////////////////////////////
     function get_hidden_categories() {
         return array(
-
-'Author matching Creator template, Creator template not used',
-'CC-BY-2.0',
-'CC-BY-2.5',
-'CC-BY-2.5-DK',
-'CC-BY-3.0',
-'CC-BY-4.0',
-'CC-BY-SA-2.0',
-'CC-BY-SA-2.0-DE',
-'CC-BY-SA-2.5',
-'CC-BY-SA-2.5,2.0,1.0',
-'CC-BY-SA-3.0',
-'CC-BY-SA-3.0,',
-'CC-BY-SA-3.0,2.5,2.0,1.0',
-'CC-BY-SA-3.0-DE',
-'CC-BY-SA-3.0-NL',
-'CC-BY-SA-3.0-migrated',
-'CC-BY-SA-4.0',
-'CC-BY-SA-4.0,3.0,2.5,2.0,1.0',
-'CC-PD-Mark',
-'CC-Zero',
-'Created with Adobe Photoshop',
-'Edited versions of Flickr originals',
-'Files created by the United States Army with known IDs',
-'Files from Flickr uploaded by Moheen Reeyad',
-'Files from Flickr with bad file names',
-'Files from external sources with reviewed licenses',
-'Files uploaded by The Photographer from Flickr',
-'Files uploaded by Yann Forget',
-'Files with closed captioning in Arabic',
-'Files with closed captioning in Chinese',
-'Files with closed captioning in Czech',
-'Files with closed captioning in English',
-'Files with closed captioning in Esperanto',
-'Files with closed captioning in French',
-'Files with closed captioning in German',
-'Files with closed captioning in Italian',
-'Files with closed captioning in Portuguese',
-'Files with closed captioning',
-'Files with no machine-readable author',
-'Files with no machine-readable source',
-'Flickr images reviewed by File Upload Bot (Magnus Manske)',
-'Flickr images reviewed by FlickreviewR',
-'Flickr images reviewed by trusted users',
-'Flickr images uploaded by Flickr upload bot',
-'GFDL',
-'GFDL-1.2',
-'Images from DoD uploaded by Fæ',
-'Images which had their watermark removed',
-'Images with annotations',
-'Images with extracted images',
-'Images with watermarks',
-'Items with OTRS permission confirmed',
 'License migration redundant',
-'Media lacking a description',
-'Media lacking author information',
-'Media missing infobox template',
-'Media with locations',
-'PD Italy (20 years after creation)',
-'PD NASA',
-'PD Old',
-'PD US Air Force',
-'PD US Army',
-'PD US Congress',
-'PD US DOS',
-'PD US Government',
-'PD US HHS CDC',
-'PD US Marines',
-'PD US Military',
-'PD US Navy',
-'PD US Treasury',
-'PD US no notice',
-'PD US not renewed',
-'PD US',
-'PD ineligible',
-'PD other reasons new',
-'PD other reasons',
-'PD shape,',
-'PD-1996',
-'PD-Art (PD-old-100)',
-'PD-HU-exempt (possible wrong license)',
-'PD-anon-1923',
-'PD-author',
-'PD-old-70-1923',
-'PD-self',
-'PD-user',
-'Pages with maps',
-'Pages with script errors',
 'Personality rights warning',
 'Retouched pictures',
 'Self-published work',
-'Symbol images that should use vector graphics',
-'Taken with Canon EOS 1D X Mark II',
-'Taken with Canon EOS 400D',
-'Taken with Canon EOS 5D Mark II',
-'Taken with Canon EOS 5D Mark III',
-'Taken with Fujifilm FinePix S6500fd',
-'Taken with Nikon Coolpix P7700',
-'Taken with Nikon D200',
-'Taken with Nikon D3s',
-'Taken with Nikon D600',
-'Taken with Nikon D7100',
-'Taken with Nikon D800E',
-'Taken with Nikon D90',
-'Taken with Panasonic NV-GS500',
-'Temporary for Cat-a-lot - Female humans',
-'UW uploads using a custom license',
-'Uploaded with derivativeFX',
-'Uploaded with video2commons',
-'Videos created with Blender',
 'WebM videos',
+'OGG videos',
+'Vector version available',
 
         );
     } // end get_hidden_categories

@@ -39,13 +39,17 @@ if( !is_array($cats) ) {
     $cats = array();
 }
 
-$active = $disabled = array();
+$active = $disabled = $hidden = array();
 foreach( $cats as $cat ) {
-    if( $cat['local_count'] > 0 ) {
-        $active[] = $cat;
-    } else {
+	if( $smt->is_hidden_category($cat['name']) ) {
+		$hidden[] = $cat;
+		continue;
+	}
+    if( $cat['local_count'] == 0 ) {
         $disabled[] = $cat;
-    }
+		continue;
+    } 
+    $active[] = $cat;
 }
 unset($cats);
 
@@ -59,37 +63,22 @@ unset($cats);
 </div>
 
 <br />
+
 <?php print_category_table( $smt, $active); ?>
+
 <br /><br />
+
+<p class="center"><em>Hidden Categories:</em></p>
+<?php print_category_table( $smt, $hidden); ?>
+
+<br /><br />
+
+<p><?php print sizeof($disabled) . ' categories in curation que'; ?></p>
+
+</div>
 <?php
-    // print_disabled_category_table( $smt, $disabled);
-    print '<p>' . sizeof($disabled) . ' categories in curation que</p>';
-?>
-
-</div><?php
 $smt->include_footer();
-exit;
 
-
-/////////////////////////////////////////////////////////////
-function print_disabled_category_table( $smt, $cats ) {
-
-    print '
-<table border="1">
-<tr style="background-color:lightgrey;">
- <td style="padding:4px;"><b>' . sizeof($cats) . '</b> Categories in curation que:</td>
-</tr>
-<tr>
-<td>';
-
-    foreach( $cats as $c ) {
-        $commons_url = 'https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']);
-        print '<a href="' . $commons_url . '" target="commons">'
-            . $smt->strip_prefix($c['name']) . '</a><br />';
-    }
-
-    print '</td></tr></table>';
-}
 
 
 /////////////////////////////////////////////////////////////
