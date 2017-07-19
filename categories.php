@@ -98,9 +98,8 @@ function print_category_table( $smt, $cats ) {
 ?>
 <table border="1">
 <tr style="background-color:lightgrey; font-size:80%;">
+<td style="padding:4px;">#files</td>
 <td style="padding:4px;"><b><?php print sizeof($cats); ?></b> Categories</td>
-<td style="padding:4px;">files</td>
-<td style="padding:4px;">rates</td>
 <?php
 foreach( $smt->get_tags() as $tag ) {
     print '<td style="font-size:110%;" class="tag' . $tag['id'] . ' center">'
@@ -109,6 +108,7 @@ foreach( $smt->get_tags() as $tag ) {
         . '</td>';
 }
 ?>
+<td style="padding:4px;">#rates</td>
 </tr>
 <?php
     foreach( $cats as $c ) {
@@ -117,11 +117,11 @@ foreach( $smt->get_tags() as $tag ) {
         //$commons_url = 'https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']);
         print '<tr>';
 
+        print '<td class="center"><a href="' . $local_url . '">' . $c['local_count'] . '</a></td>';
 
-        print ''
-        . '<td style="font-weight:bold;"><a href="' . $local_url . '">' . $smt->strip_prefix($c['name']) . '</a></td>'
-        . '<td><a href="' . $local_url . '">' . $c['local_count'] . '</a></td>'
-        ;
+        print '<td style="font-weight:bold;"><a href="' . $local_url . '">' 
+		. $smt->strip_prefix($c['name']) . '</a></td>';
+		
 
 
         $reviews = array();
@@ -140,9 +140,9 @@ foreach( $smt->get_tags() as $tag ) {
             $count += $r['count'];
         }
 
-        print '<td>' . $count . '</td>';
-        print implode('', $reviews);
 
+        print implode('', $reviews);
+        print '<td class="right">' . $count . '</td>';
         print '</tr>';
     }
 
