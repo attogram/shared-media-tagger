@@ -594,7 +594,7 @@ class smt_admin_media extends smt_commons_API {
                 if(($key = array_search($bpageid['pageid'], $categorymembers)) !== false) {
                     unset($categorymembers[$key]);
                 }
-                $this->error("Skipping BLOCKED Media: " . $bpageid['pageid']);
+                //$this->error("Skipping BLOCKED Media: " . $bpageid['pageid']);
             }
         }
 

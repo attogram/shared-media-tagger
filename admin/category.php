@@ -4,10 +4,11 @@
 
 if( function_exists('set_time_limit') ) { set_time_limit( 250 ); }
 
-$f = __DIR__.'/../smt.php';
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; return; } require_once($f);
-$f = __DIR__.'/smt-admin.php';
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; return; } require_once($f);
+$init = __DIR__.'/../smt.php';
+if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; return; } require_once($init);
+$init = __DIR__.'/smt-admin.php';
+if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; return; } require_once($init);
+
 $smt = new smt_admin();
 
 $smt->title = 'Category Admin';
@@ -18,20 +19,13 @@ print '<div class="box white">';
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
-
     $category_name = $smt->category_urldecode($_GET['i']);
-
     $cat_url = '<a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
     . htmlentities($smt->strip_prefix($category_name)) . '</a>';
-
     print '<p>Importing media from <b>' . $cat_url . '</b></p>';
-
     $smt->get_media_from_category( $category_name );
-
     print '<p>Imported media from <b>' . $cat_url . '</b></p>';
-
     print '</div>';
     $smt->include_footer();
     return;
@@ -40,6 +34,9 @@ if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
 if( isset($_POST['cats']) && $_POST['cats'] ) {
     import_categories($smt);
     $smt->vacuum();
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 if( isset($_GET['c']) && $_GET['c'] ) {
@@ -49,6 +46,9 @@ if( isset($_GET['c']) && $_GET['c'] ) {
 if( isset($_GET['d']) && $_GET['d'] ) {
     delete_category($smt);
     $smt->vacuum();
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 if( isset($_GET['s']) && $_GET['s'] ) {

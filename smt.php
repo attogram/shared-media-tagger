@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.22');
+define('__SMT__', '0.6.23');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -882,11 +882,14 @@ class smt_category EXTENDS smt_user {
 'CC-BY-SA-4.0,3.0,2.5,2.0,1.0',
 'CC-PD-Mark',
 'CC-Zero',
+'Files from external sources with reviewed licenses',
 'Files with no machine-readable author',
 'Files with no machine-readable source',
+'Files uploaded by The Photographer from Flickr',
 'Flickr images reviewed by FlickreviewR',
 'Flickr images reviewed by File Upload Bot (Magnus Manske)',
 'Flickr images reviewed by trusted users',
+'Flickr images uploaded by Flickr upload bot',
 'GFDL',
 'GFDL-1.2',
 'Images from DoD uploaded by Fæ',
@@ -894,6 +897,7 @@ class smt_category EXTENDS smt_user {
 'Images with annotations',
 'Images with extracted images',
 'Images with watermarks',
+'Items with OTRS permission confirmed',
 'License migration redundant',
 'Media lacking a description',
 'Media lacking author information',
@@ -927,6 +931,7 @@ class smt_category EXTENDS smt_user {
 'PD-self',
 'PD-user',
 'Personality rights warning',
+'Retouched pictures',
 'Self-published work',
 'Symbol images that should use vector graphics',
 'Taken with Canon EOS 1D X Mark II',
@@ -938,7 +943,9 @@ class smt_category EXTENDS smt_user {
 'Taken with Nikon D3s',
 'Taken with Nikon D600',
 'Taken with Nikon D90',
+'Taken with Nikon D800E',
 'Taken with Panasonic NV-GS500',
+'Taken with Fujifilm FinePix S6500fd',
 'Uploaded with derivativeFX',
 'UW uploads using a custom license',
 
