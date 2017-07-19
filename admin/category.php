@@ -63,6 +63,9 @@ if( isset($_GET['s']) && $_GET['s'] ) {
 
 if( isset($_GET['sc']) && $_GET['sc'] ) {
     $smt->get_subcats( $smt->category_urldecode($_GET['sc']) );
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 if( isset($_GET['g']) && $_GET['g']=='all' ) {
@@ -235,12 +238,12 @@ function delete_category($smt) {
 function get_search_results($smt) {
 
     $search = urldecode($_GET['s']);
-    
-	if( !$smt->find_categories($search) ) {
+
+    if( !$smt->find_categories($search) ) {
         $smt->notice('Error: no categories found');
-		return;
-	}
-	$cats = @$smt->commons_response['query']['search'];
+        return;
+    }
+    $cats = @$smt->commons_response['query']['search'];
     if( !$cats || !is_array($cats) ) {
         $smt->notice('Error: no categories returned');
         return;
@@ -285,9 +288,6 @@ function import_categories($smt) {
     foreach( $_POST['cats'] as $cat ) {
         $smt->insert_category( $smt->category_urldecode($cat) );
     }
-    print '</div>';
-    $smt->include_footer();
-    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ function get_category_info($smt) {
         $smt->error('failed to get category info');
         return;
     }
-	
+
     foreach( $cats as $cat ) {
         $title = $cat['title'];
         $pageid = $cat['pageid'];   // ????

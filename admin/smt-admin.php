@@ -979,7 +979,7 @@ class smt_admin_category extends smt_admin_media {
             array(':name'=>$name)
         );
         if( !$response ) {
-            $this->error('::insert_category: insert into category table failed: name=' . $name);
+            $this->error('::insert_category: Category already exists.  Insert FAILED.  name=' . $name);
             return FALSE;
         }
         if( !$this->last_insert_id ) {

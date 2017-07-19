@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.24');
+define('__SMT__', '0.6.25');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -662,30 +662,30 @@ class smt_category EXTENDS smt_user {
 
         if( !$cats ) { return $response . '<em>Uncategorized</em></div>'; }
 
-		$hidden = array();
+        $hidden = array();
         foreach($cats as $cat ) {
-			if( $this->is_hidden_category($cat) ) {
-				$hidden[] = $cat;
-				continue;
-			}
+            if( $this->is_hidden_category($cat) ) {
+                $hidden[] = $cat;
+                continue;
+            }
             $response .= ''
             . '+<a href="' . $this->url('category')
             . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">'
             . $this->strip_prefix($cat) . '</a><br />';
         }
 
-		if( !$hidden ) {
-			return $response . '</div>';
-		}
+        if( !$hidden ) {
+            return $response . '</div>';
+        }
 
-		$response .= '<br /><div style="font-size:80%;">';
+        $response .= '<br /><div style="font-size:80%;">';
 
-		foreach( $hidden as $hcat ) {
-			$response .= '+<a href="' . $this->url('category')
+        foreach( $hidden as $hcat ) {
+            $response .= '+<a href="' . $this->url('category')
             . '?c=' . $this->category_urlencode( $this->strip_prefix($hcat) ) . '">'
             . $this->strip_prefix($hcat) . '</a><br />';
-		}
-		return $response . '</div></div>';
+        }
+        return $response . '</div></div>';
 
     } // end function display_categories()
 
@@ -848,20 +848,20 @@ class smt_category EXTENDS smt_user {
     }
 
     //////////////////////////////////////////////////////////
-	function is_hidden_category( $category_name ) {
-		if( !$category_name ) {
-			$this->error('::is_hidden_category: category_name NOT FOUND');
-			return FALSE;
-		}
-		if( in_array( $this->strip_prefix($category_name), $this->get_hidden_categories() ) ) {
-			return TRUE;
-		}
-		return FALSE;
-	}
+    function is_hidden_category( $category_name ) {
+        if( !$category_name ) {
+            $this->error('::is_hidden_category: category_name NOT FOUND');
+            return FALSE;
+        }
+        if( in_array( $this->strip_prefix($category_name), $this->get_hidden_categories() ) ) {
+            return TRUE;
+        }
+        return FALSE;
+    }
 
     //////////////////////////////////////////////////////////
-	function get_hidden_categories() {
-		return array(
+    function get_hidden_categories() {
+        return array(
 
 'Author matching Creator template, Creator template not used',
 'CC-BY-2.0',
@@ -883,27 +883,30 @@ class smt_category EXTENDS smt_user {
 'CC-BY-SA-4.0,3.0,2.5,2.0,1.0',
 'CC-PD-Mark',
 'CC-Zero',
+'Created with Adobe Photoshop',
+'Edited versions of Flickr originals',
 'Files created by the United States Army with known IDs',
+'Files from Flickr uploaded by Moheen Reeyad',
 'Files from Flickr with bad file names',
 'Files from external sources with reviewed licenses',
 'Files uploaded by The Photographer from Flickr',
+'Files uploaded by Yann Forget',
+'Files with closed captioning in Arabic',
+'Files with closed captioning in Chinese',
+'Files with closed captioning in Czech',
+'Files with closed captioning in English',
+'Files with closed captioning in Esperanto',
+'Files with closed captioning in French',
+'Files with closed captioning in German',
+'Files with closed captioning in Italian',
+'Files with closed captioning in Portuguese',
+'Files with closed captioning',
 'Files with no machine-readable author',
 'Files with no machine-readable source',
 'Flickr images reviewed by File Upload Bot (Magnus Manske)',
 'Flickr images reviewed by FlickreviewR',
 'Flickr images reviewed by trusted users',
 'Flickr images uploaded by Flickr upload bot',
-'Files with closed captioning',
-'Files with closed captioning in Arabic',
-'Files with closed captioning in Chinese',
-'Files with closed captioning in Czech',
-'Files with closed captioning in English',	
-'Files with closed captioning in Esperanto',		 	 
-'Files with closed captioning in French',		 
-'Files with closed captioning in German',	 	 
-'Files with closed captioning in Italian',	 
-'Files with closed captioning in Portuguese',
-'Files uploaded by Yann Forget',
 'GFDL',
 'GFDL-1.2',
 'Images from DoD uploaded by Fæ',
@@ -929,9 +932,9 @@ class smt_category EXTENDS smt_user {
 'PD US Marines',
 'PD US Military',
 'PD US Navy',
-'PD US not renewed',
 'PD US Treasury',
 'PD US no notice',
+'PD US not renewed',
 'PD US',
 'PD ineligible',
 'PD other reasons new',
@@ -960,17 +963,19 @@ class smt_category EXTENDS smt_user {
 'Taken with Nikon D200',
 'Taken with Nikon D3s',
 'Taken with Nikon D600',
+'Taken with Nikon D7100',
 'Taken with Nikon D800E',
 'Taken with Nikon D90',
 'Taken with Panasonic NV-GS500',
+'Temporary for Cat-a-lot - Female humans',
 'UW uploads using a custom license',
 'Uploaded with derivativeFX',
 'Uploaded with video2commons',
 'Videos created with Blender',
 'WebM videos',
 
-		);
-	} // end get_hidden_categories
+        );
+    } // end get_hidden_categories
 
 } // END class category
 
@@ -1002,11 +1007,11 @@ class smt_tag EXTENDS smt_category {
         $response = '';
         foreach( $reviews as $review ) {
             $response .= ''
-			. '+<a href="' . $this->url('reviews')
-			. '?o=reviews.' . urlencode($review['name'])
-			. '">'
-			. $review['count'] . ' ' . $review['name']
-			. '</a><br />';
+            . '+<a href="' . $this->url('reviews')
+            . '?o=reviews.' . urlencode($review['name'])
+            . '">'
+            . $review['count'] . ' ' . $review['name']
+            . '</a><br />';
             //$review_count += $review['count'];
         }
         //$response = '<div style="display:inline-block; text-align:left;">'
