@@ -11,7 +11,7 @@ $smt = new smt();
 $category_name = isset($_GET['c']) ? $smt->category_urldecode($_GET['c']) : FALSE;
 
 if( !$category_name ) {
-    $smt->fail404('404 Category Not Found');
+    $smt->fail404('404 Category Name Not Found');
 }
 
 $smt->title = $category_name . ' - ' . $smt->site_name;

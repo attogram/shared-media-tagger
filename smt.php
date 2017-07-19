@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.29');
+define('__SMT__', '0.6.30');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -951,6 +951,13 @@ class smt_category EXTENDS smt_user {
 '^Photos edited by ',
 '^Large images',
 '^Long exposure photography',
+' created or edited with ',
+'^Supported by Wikimedia',
+'^Gif animations assembled with ',
+'^Bitmap version available',
+'^JPG images that should use ',
+'^Uploads by ',
+'^Valid SVG created ',
 
 		);
 	} // end get_hidden_categories_match

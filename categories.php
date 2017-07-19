@@ -2,15 +2,26 @@
 // Shared Media Tagger
 // Categories
 
-$f = __DIR__.'/smt.php';
-if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
+$init = __DIR__.'/smt.php';
+if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
+
+$search = FALSE;
+if( isset($_GET['s']) && $_GET['s'] ) {
+	$search = $_GET['s'];
+}
+
+$mode = 'active';
+if( isset($_GET['h']) && $_GET['h'] ) {
+	$mode = 'hidden';
+}
 
 $smt = new smt();
-$smt->title = $smt->get_categories_count() . ' Categories - ' . $smt->site_name;
-$smt->include_header();
-$smt->include_menu();
 
-if( isset($_GET['s']) && $_GET['s'] ) {
+
+//$order_by = 'ORDER BY c.name';
+$order_by = 'ORDER BY local_count DESC';
+
+if( $search ) {
     $sql = '
     SELECT c.id, c.name,
         c.files AS commons_count,
@@ -19,8 +30,8 @@ if( isset($_GET['s']) && $_GET['s'] ) {
     LEFT OUTER JOIN category2media AS c2m ON c2m.category_id = c.id
     WHERE c.name LIKE :search
     GROUP BY c.name
-    ORDER BY c.name';
-    $bind = array(':search'=>'%' . $_GET['s']. '%');
+    ' . $order_by;
+    $bind = array(':search'=>'%' . $search . '%');
 } else {
     $sql = '
     SELECT c.id, c.name,
@@ -29,9 +40,8 @@ if( isset($_GET['s']) && $_GET['s'] ) {
     FROM category AS c
     LEFT OUTER JOIN category2media AS c2m ON c2m.category_id = c.id
     GROUP BY c.name
-    ORDER BY c.name';
+    ' . $order_by;
     $bind = array();
-
 }
 
 $cats = $smt->query_as_array($sql, $bind);
@@ -53,28 +63,48 @@ foreach( $cats as $cat ) {
 }
 unset($cats);
 
+switch( $mode ) {
+	case 'active':
+	default:
+		$smt->title = sizeof($active) . ' Categories - ' . $smt->site_name;
+		break;
+	case 'hidden';
+		$smt->title = sizeof($hidden) . ' Technical Categories - ' . $smt->site_name;
+		break;
+}
+
+$smt->include_header();
+$smt->include_menu();
 ?>
 <div class="box white">
-
 <div class="center">
-<form method="GET"><input type="text" name="s" value="<?php
-    isset($_GET['s']) ? print htmlentities(urldecode($_GET['s'])) : print '';
- ?>" size="20"><input type="submit" value="search"></form>
+<form method="GET">
+<?php if( $mode == 'hidden' ) { print '<input type="hidden" name="h" value="1">'; } ?>
+<input type="text" name="s" value="<?php $search ? print htmlentities(urldecode($search)) : print ''; ?>" size="20">
+<input type="submit" value=" Search Categories ">
+</form>
 </div>
-
 <br />
 
-<?php print_category_table( $smt, $active); ?>
+<?php 
+switch( $mode ) {
+	case 'active':
+	default:	
+		print '<p class="center" style="padding:10px;">' . sizeof($active) . ' Active Categories</p>';
+		print_category_table( $smt, $active); 
+		print '<p class="center" style="padding:20px;"><a href="' . $smt->url('categories') . '?h=1">View ' . sizeof($hidden) . ' Technical Categories</a></p>';
+		break;
+	case 'hidden':
+		print '<p class="center" style="padding:10px;"><a href="' . $smt->url('categories') . '">View ' . sizeof($active) . ' Active Categories</a></p>';
+		print '<p class="center" style="padding:10px;">' . sizeof($hidden) . ' Technical Categories</p>';
+		print_category_table( $smt, $hidden); 
+		break;
+}
+?>
+
 
 <br /><br />
-
-<p class="center"><em>Technical Categories:</em></p>
-<span style="font-size:90%;"><?php print_category_table( $smt, $hidden); ?></span>
-
-<br /><br />
-
-<p><?php print sizeof($disabled) . ' categories in curation que'; ?></p>
-
+<p class="center"><?php print sizeof($disabled) . ' categories in curation que'; ?></p>
 </div>
 <?php
 $smt->include_footer();
