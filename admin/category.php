@@ -294,18 +294,27 @@ function import_categories($smt) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_category_info($smt) {
     $cat = urldecode($_GET['c']);
-    //print '<p>Category Info: <b>' . $cat . '</b></p>';
     $cats = $smt->get_category_info($cat);
     if( !$cats ) {
         $smt->error('failed to get category info');
         return;
     }
+	//$smt->notice($cats);
 
     foreach( $cats as $cat ) {
         $title = $cat['title'];
-        $pageid = $cat['pageid'];   // ????
-        $files = $cat['categoryinfo']['files'];
-        $subcats = $cat['categoryinfo']['subcats'];
+		
+        $pageid = @$cat['pageid'];
+		if( !$pageid ) {
+			$smt->error('no pageid. cat='.print_r($cat,1));
+			$pageid = 0;
+		}
+        $files = @$cat['categoryinfo']['files'];
+		if( !$files ) { $files = 0; }
+        $subcats = @$cat['categoryinfo']['subcats'];
+		if( !$subcats ) { $subcats = 0; }
+		
+		$smt->notice("Updating info: title:$title pageid:$pageid files:$files subcats:$subcats");
         $x = $smt->query_as_bool(
             'UPDATE category
             SET pageid = :pageid, files = :files, subcats = :subcats

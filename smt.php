@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.28');
+define('__SMT__', '0.6.29');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -853,10 +853,6 @@ class smt_category EXTENDS smt_user {
             $this->error('::is_hidden_category: category_name NOT FOUND');
             return FALSE;
         }
-        if( in_array( $this->strip_prefix($category_name), $this->get_hidden_categories() ) ) {
-            return TRUE;
-        }
-		
 		foreach( $this->get_hidden_categories_match() as $pattern ) {			
 			if( preg_match('/'.$pattern.'/', $this->strip_prefix($category_name)) ) {
 				return TRUE;
@@ -868,55 +864,96 @@ class smt_category EXTENDS smt_user {
     //////////////////////////////////////////////////////////
 	function get_hidden_categories_match() {
 		return array (
-'OTRS',
-'^Author matching',
+' OTRS',
+' photos requiring renaming$',
+' reviewed by ',
+' uploaded by ',
+'^Artworks with ',
+'^Artworks without ',
+'^Author died more than 100 years ago public domain images',
+'^Author matching ',
 '^CC-',
 '^Created with ',
-'^Edited versions of Flickr',
+'^Edited versions of Flickr ',
+'^Exposure time ',
+'^F-number f',
+'^Featured pictures on ',
+'^Formerly featured pictures on ',
+'^Files by ',
 '^Files created by ',
 '^Files from ',
+'^Files moved ',
 '^Files uploaded by',
 '^Files with ',
-'^Flickr images reviewed by',
+'^Flikr files ',
+'^Flikr images ',
 '^GFDL',
-'^Images from',
-'^Images which had',
-'^Images with',
-'^Media lacking',
-'^Media missing',
-'^Media with',
+'^GPL',
+'^ISO speed rating ',
+'^Images by ',
+'^Images from ',
+'^Images taken by ',
+'^Images uploaded by ',
+'^Images which had ',
+'^Images with ',
+'^Import by ',
+'^Lens focal length ',
+'^Library of Congress-no known copyright restrictions',
+'^License migration ',
+'^Media contributed by ',
+'^Media created by ',
+'^Media lacking ',
+'^Media missing ',
+'^Media needing ',
+'^Media renaming ',
+'^Media with ',
+'^Mobile uploads ',
+'^Ogv videos',
 '^PD ',
 '^PD-',
-'^Pages with',
-'^Symbol images that',
-'^Taken with',
-'^Temporary for',
-'^UW uploads',
-'^Uploaded with',
-'^Videos created with',
-'^Photos uploaded from',
-'^Photos by',
-'^Photographs by',
-'^Photographs taken on',
-'^Photographs taken with',
-'^Pictures taken by',
+'^PNG version available',
+'^Content created by  ',
+'^Pages with ',
+'^Personality rights warning',
+'^Photographs by ',
+'^Photographs taken on ',
+'^Photographs taken with ',
+'^Photos by ',
+'^Photos uploaded from ',
+'^Pictures taken by ',
+'^Animated GIF files',
+'^Picturing Canada images missing ',
+'^Quality Images by ',
+'^Retouched pictures',
+'^Self-published work',
+'^Symbol images that ',
+'^Taken with ',
+'^Template Unknown ',
+'^Temporary for ',
+'^UK Government artistic works',
+'^UW uploads ',
+'^Uploaded by ',
+'^Uploaded via ',
+'^Uploaded with ',
+'^User page images',
+'^User-created GFDL images',
+'^User:',
+'^Vector images using ',
+'^Vector version available',
+'^Video display resolution ',
+'^Videos available on ',
+'^Videos created with ',
+'^Videos needing ',
+'^WebM videos',
+'^Derivative versions',
+'^Extracted images',
+'^All media needing ',
+'^Photos edited by ',
+'^Large images',
+'^Long exposure photography',
 
 		);
 	} // end get_hidden_categories_match
-
-    //////////////////////////////////////////////////////////
-    function get_hidden_categories() {
-        return array(
-'License migration redundant',
-'Personality rights warning',
-'Retouched pictures',
-'Self-published work',
-'WebM videos',
-'OGG videos',
-'Vector version available',
-
-        );
-    } // end get_hidden_categories
 
 } // END class category
 

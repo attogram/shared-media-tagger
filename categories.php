@@ -41,14 +41,14 @@ if( !is_array($cats) ) {
 
 $active = $disabled = $hidden = array();
 foreach( $cats as $cat ) {
-	if( $smt->is_hidden_category($cat['name']) ) {
-		$hidden[] = $cat;
-		continue;
-	}
     if( $cat['local_count'] == 0 ) {
         $disabled[] = $cat;
 		continue;
     } 
+	if( $smt->is_hidden_category($cat['name']) ) {
+		$hidden[] = $cat;
+		continue;
+	}
     $active[] = $cat;
 }
 unset($cats);
@@ -68,8 +68,8 @@ unset($cats);
 
 <br /><br />
 
-<p class="center"><em>Hidden Categories:</em></p>
-<?php print_category_table( $smt, $hidden); ?>
+<p class="center"><em>Technical Categories:</em></p>
+<span style="font-size:90%;"><?php print_category_table( $smt, $hidden); ?></span>
 
 <br /><br />
 
