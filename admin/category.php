@@ -41,6 +41,9 @@ if( isset($_POST['cats']) && $_POST['cats'] ) {
 
 if( isset($_GET['c']) && $_GET['c'] ) {
     get_category_info($smt);
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 if( isset($_GET['d']) && $_GET['d'] ) {
@@ -53,6 +56,9 @@ if( isset($_GET['d']) && $_GET['d'] ) {
 
 if( isset($_GET['s']) && $_GET['s'] ) {
     get_search_results($smt);
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 if( isset($_GET['sc']) && $_GET['sc'] ) {
@@ -73,6 +79,9 @@ if( isset($_GET['g']) && $_GET['g']=='all' ) {
     }
     $_GET['c'] = implode('|',$toget);
     get_category_info($smt);
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 
@@ -178,11 +187,11 @@ foreach( $cats as $c ) {
     print '<td class="right">' . $subcatslink . '</td>';
 
     print ''
-    . '<td><a target="commons" href="https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']) . '">view</a></td>'
-    . '<td><a href="./' . basename(__FILE__) . '?c=' . $smt->category_urlencode($c['name']) . '">info</a></td>'
-    . '<td><a href="./' . basename(__FILE__) . '?i=' . $smt->category_urlencode($c['name']) . '">import</a></td>'
-    . '<td><a href="./media.php?dc=' . $smt->category_urlencode($c['name']) . '">Clear</a></td>'
-    . '<td><a href="./' . basename(__FILE__) . '?d=' . urlencode($c['id']) . '">Delete</a></td>'
+    . '<td>&nbsp; <a target="commons" href="https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']) . '">View</a> &nbsp;</td>'
+    . '<td>&nbsp; <a href="./' . basename(__FILE__) . '?c=' . $smt->category_urlencode($c['name']) . '">Info</a> &nbsp;</td>'
+    . '<td>&nbsp; <a href="./' . basename(__FILE__) . '?i=' . $smt->category_urlencode($c['name']) . '">Import</a> &nbsp;</td>'
+    . '<td>&nbsp; <a href="./media.php?dc=' . $smt->category_urlencode($c['name']) . '">Clear</a> &nbsp;</td>'
+    . '<td>&nbsp; <a href="./' . basename(__FILE__) . '?d=' . urlencode($c['id']) . '">Delete</a> &nbsp;</td>'
     . '</tr>'
     ;
 }
@@ -224,11 +233,16 @@ function delete_category($smt) {
 
 ///////////////////////////////////////////////////////////////////////////////
 function get_search_results($smt) {
-    $search = urldecode($_GET['s']);
-    $cats = $smt->find_categories($search);
 
-    if( !$cats || !is_array($cats) ) {
+    $search = urldecode($_GET['s']);
+    
+	if( !$smt->find_categories($search) ) {
         $smt->notice('Error: no categories found');
+		return;
+	}
+	$cats = @$smt->commons_response['query']['search'];
+    if( !$cats || !is_array($cats) ) {
+        $smt->notice('Error: no categories returned');
         return;
     }
     print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>' . $smt->totalhits . '</b> categories</p>';
@@ -263,9 +277,6 @@ function get_search_results($smt) {
         . ' (size:' . $cat['size'] . ')</small><br />';
     }
     print '</form>';
-    print '</div>';
-    $smt->include_footer();
-    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
