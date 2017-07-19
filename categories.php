@@ -63,16 +63,37 @@ foreach( $cats as $cat ) {
 }
 unset($cats);
 
+$toobig = 1000; // if category is BIG
+$cutoff = 2;  // then only show categories with # local files > $cutoff
+
 switch( $mode ) {
 	case 'active':
 	default:
 		$smt->title = sizeof($active) . ' Categories - ' . $smt->site_name;
+		if( sizeof($active) > $toobig ) {
+			$active = trim_cats_array($active, $cutoff);
+		}
 		break;
 	case 'hidden';
 		$smt->title = sizeof($hidden) . ' Technical Categories - ' . $smt->site_name;
+		if( sizeof($hidden) > $toobig ) {
+			$hidden = trim_cats_array($hidden, $cutoff);
+		}
 		break;
 }
 
+
+//////
+function trim_cats_array($cats_array, $cutoff) {
+	$trim = array();
+	foreach( $cats_array as $cat ) {
+		if( $cat['local_count'] > $cutoff ) {
+			$trim[] = $cat;
+		}
+	}
+	return $trim;
+}
+/////
 $smt->include_header();
 $smt->include_menu();
 ?>
