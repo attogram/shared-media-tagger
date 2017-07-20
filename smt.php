@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.31');
+define('__SMT__', '0.6.32');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -12,6 +12,23 @@ class smt_utils {
 
     var $debug; // debug mode TRUE / FALSE;
     var $protocol; // http: or https:
+	var $timer;
+	var $time_results;
+
+    //////////////////////////////////////////////////////////
+    function start_timer( $name ) {
+        $this->timer[$name] = microtime(1);
+    }
+  
+    //////////////////////////////////////////////////////////  
+    function end_timer( $name ) {
+        if( !isset($this->timer[$name]) ) {
+            $this->time_results[$name] = 0;
+            return;
+        }
+        $this->time_results[$name] = microtime(1) - $this->timer[$name];
+		unset($this->timer[$name]);
+    }
 
     //////////////////////////////////////////////////////////
     function log_message( $message, $type ) {
@@ -208,6 +225,10 @@ class smt_page EXTENDS smt_utils {
             ;
         }
 
+		$this->end_timer('page');
+		print '<br /><div style="text-align:left; line-height:1; ">'
+		. 'Page loaded in ' . round($this->time_results['page'],3) . ' seconds</div>';
+		
         print '</div></footer>';
 
         // Site footers
@@ -219,6 +240,7 @@ class smt_page EXTENDS smt_utils {
                 include($site_footer);
             }
         }
+		
         print '</body></html>';
     } // end include_footer()
 
@@ -885,10 +907,16 @@ class smt_category EXTENDS smt_user {
 '^Files moved ',
 '^Files uploaded by',
 '^Files with ',
-'^Flikr files ',
-'^Flikr images ',
+'^Flickr files ',
+'^Flickr images ',
+' uploaded from ',
 '^GFDL',
 '^GPL',
+'Faebot',
+'High-resolution TIFF',
+'^Photos from Panoramio',
+'Picasa Web Albums files',
+'Year of birth missing',
 '^ISO speed rating ',
 '^Images by ',
 '^Images from ',
@@ -958,6 +986,7 @@ class smt_category EXTENDS smt_user {
 '^JPG images that should use ',
 '^Uploads by ',
 '^Valid SVG created ',
+'^Attribution$',
 
 		);
 	} // end get_hidden_categories_match
@@ -1138,6 +1167,8 @@ class smt EXTENDS smt_tag {
 
     //////////////////////////////////////////////////////////
     function __construct() {
+
+		$this->start_timer('page');
 
         global $setup; // Load the setup array, if present in _setup.php
         $this->setup = array();

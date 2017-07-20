@@ -18,7 +18,22 @@ if( isset($_GET['h']) && $_GET['h'] ) {
 $smt = new smt();
 
 
-//$order_by = 'ORDER BY c.name';
+
+/*
+
+quicker?
+
+- SELECT id, name, files FROM category;
+	or
+		SELECT id, name, files FROM category WHERE name LIKE %SEARCHSTRING%;
+		
+- loop thru, get wanted cats  (mode=active|hidden)
+-- make list of category_id's wanted
+- SELECT count(media_pageid) AS local_count FROM category2media WHERE local_count > 0 AND category_id IN ( ID,LIST,1,2,3,4,... )
+- check if resultset is TOOBIG - trim it if required, via local_count > CUTOFF
+
+*/
+
 $order_by = 'ORDER BY local_count DESC';
 
 if( $search ) {
@@ -44,15 +59,15 @@ if( $search ) {
     $bind = array();
 }
 
+
 $cats = $smt->query_as_array($sql, $bind);
 if( !is_array($cats) ) {
     $cats = array();
 }
 
-$active = $disabled = $hidden = array();
+$active = $hidden = array();
 foreach( $cats as $cat ) {
     if( $cat['local_count'] == 0 ) {
-        $disabled[] = $cat;
 		continue;
     } 
 	if( $smt->is_hidden_category($cat['name']) ) {
@@ -61,7 +76,6 @@ foreach( $cats as $cat ) {
 	}
     $active[] = $cat;
 }
-unset($cats);
 
 $toobig = 1000; // if category is BIG
 $cutoff = 2;  // then only show categories with # local files > $cutoff
@@ -125,7 +139,6 @@ switch( $mode ) {
 
 
 <br /><br />
-<p class="center"><?php print sizeof($disabled) . ' categories in curation que'; ?></p>
 </div>
 <?php
 $smt->include_footer();
