@@ -18,94 +18,77 @@ if( isset($_GET['h']) && $_GET['h'] ) {
 $smt = new smt();
 
 
-
-/*
-
-quicker?
-
-- SELECT id, name, files FROM category;
-	or
-		SELECT id, name, files FROM category WHERE name LIKE %SEARCHSTRING%;
-		
-- loop thru, get wanted cats  (mode=active|hidden)
--- make list of category_id's wanted
-- SELECT count(media_pageid) AS local_count FROM category2media WHERE local_count > 0 AND category_id IN ( ID,LIST,1,2,3,4,... )
-- check if resultset is TOOBIG - trim it if required, via local_count > CUTOFF
-
-*/
-
-$order_by = 'ORDER BY local_count DESC';
-
 if( $search ) {
-    $sql = '
-    SELECT c.id, c.name,
-        c.files AS commons_count,
-        count(c2m.media_pageid) AS local_count
-    FROM category AS c
-    LEFT OUTER JOIN category2media AS c2m ON c2m.category_id = c.id
-    WHERE c.name LIKE :search
-    GROUP BY c.name
-    ' . $order_by;
-    $bind = array(':search'=>'%' . $search . '%');
+	$all_categories = $smt->query_as_array(
+		'SELECT id, name FROM category WHERE name LIKE :search',
+		array(':search'=>'%' . $search . '%')
+	);
 } else {
-    $sql = '
-    SELECT c.id, c.name,
-        c.files AS commons_count,
-        count(c2m.media_pageid) AS local_count
-    FROM category AS c
-    LEFT OUTER JOIN category2media AS c2m ON c2m.category_id = c.id
-    GROUP BY c.name
-    ' . $order_by;
-    $bind = array();
+	$all_categories = $smt->query_as_array('SELECT id, name FROM category');
 }
 
-
-$cats = $smt->query_as_array($sql, $bind);
-if( !is_array($cats) ) {
-    $cats = array();
-}
 
 $active = $hidden = array();
-foreach( $cats as $cat ) {
-    if( $cat['local_count'] == 0 ) {
-		continue;
-    } 
+foreach( $all_categories as $cat ) {
 	if( $smt->is_hidden_category($cat['name']) ) {
-		$hidden[] = $cat;
+		$hidden[$cat['id']] = $cat;
 		continue;
 	}
-    $active[] = $cat;
+    $active[$cat['id']] = $cat;
 }
+unset($all_categories);
+$sizeof_active = sizeof($active);
+$sizeof_hidden = sizeof($hidden);
 
-$toobig = 1000; // if category is BIG
-$cutoff = 2;  // then only show categories with # local files > $cutoff
+switch( $mode ) {
+	default:
+	case 'active': $categories = $active; break;
+	case 'hidden': $categories = $hidden; break;
+}
+unset($active);
+unset($hidden);
+
+$ids = array();
+foreach( $categories as $cat ) {
+	$ids[] = $cat['id'];
+}
+$sql = '
+    SELECT c2m.category_id, count(c2m.media_pageid) AS local_count
+    FROM category2media AS c2m	
+	WHERE c2m.category_id IN ( ' . implode($ids, ', ') . ')
+    GROUP BY c2m.category_id
+	ORDER BY local_count DESC';
+unset($ids);
+$bind = array();	
+
+$local_count = $smt->query_as_array($sql, $bind);
+
+foreach( $local_count AS $cat ) {
+	$categories[$cat['category_id']]['local_count'] = $cat['local_count'];
+}
+unset($local_count);
+
+aasort($categories, 'local_count');
+///////////////////////////////////////////////////
+function aasort (&$array, $key) {
+    $sorter=array();
+    $ret=array();
+    reset($array);
+    foreach ($array as $ii => $va) { $sorter[$ii]=@$va[$key]; }
+    asort($sorter);
+    foreach ($sorter as $ii => $va) { $ret[$ii]=$array[$ii]; }
+    $array=array_reverse($ret);
+}
+///////////////////////////////////////////////////
 
 switch( $mode ) {
 	case 'active':
 	default:
-		$smt->title = sizeof($active) . ' Categories - ' . $smt->site_name;
-		if( sizeof($active) > $toobig ) {
-			$active = trim_cats_array($active, $cutoff);
-		}
+		$smt->title = sizeof($categories) . ' Categories - ' . $smt->site_name;
 		break;
 	case 'hidden';
-		$smt->title = sizeof($hidden) . ' Technical Categories - ' . $smt->site_name;
-		if( sizeof($hidden) > $toobig ) {
-			$hidden = trim_cats_array($hidden, $cutoff);
-		}
+		$smt->title = sizeof($categories) . ' Technical Categories - ' . $smt->site_name;
 		break;
-}
-
-
-//////
-function trim_cats_array($cats_array, $cutoff) {
-	$trim = array();
-	foreach( $cats_array as $cat ) {
-		if( $cat['local_count'] > $cutoff ) {
-			$trim[] = $cat;
-		}
-	}
-	return $trim;
 }
 /////
 $smt->include_header();
@@ -120,19 +103,30 @@ $smt->include_menu();
 </form>
 </div>
 <br />
-
 <?php 
+
+$full_size = sizeof($categories);
+if( $full_size > 1000 ) {
+	$categories = array_slice($categories, 0, 1000);
+	print '<p class="center">Showing ' . sizeof($categories) . ' of ' . $full_size . ' Categories</p>';
+}
+
 switch( $mode ) {
 	case 'active':
 	default:	
-		print '<p class="center" style="padding:10px;">' . sizeof($active) . ' Active Categories</p>';
-		print_category_table( $smt, $active); 
-		print '<p class="center" style="padding:20px;"><a href="' . $smt->url('categories') . '?h=1">View ' . sizeof($hidden) . ' Technical Categories</a></p>';
+		print '<p class="center" style="padding:10px;">' . $sizeof_active . ' Active Categories</p>';
+		print_category_table( $smt, $categories ); 
+		print '<p class="center" style="padding:20px;"><a href="' 
+		. $smt->url('categories') . '?h=1">View ' 
+		. $sizeof_hidden . ' Technical Categories</a></p>';
 		break;
 	case 'hidden':
-		print '<p class="center" style="padding:10px;"><a href="' . $smt->url('categories') . '">View ' . sizeof($active) . ' Active Categories</a></p>';
-		print '<p class="center" style="padding:10px;">' . sizeof($hidden) . ' Technical Categories</p>';
-		print_category_table( $smt, $hidden); 
+		print '<p class="center" style="padding:10px;"><a href="' 
+		. $smt->url('categories') . '">View ' . $sizeof_active 
+		. ' Active Categories</a></p>';
+		print '<p class="center" style="padding:10px;">' . $sizeof_hidden 
+		. ' Technical Categories</p>';
+		print_category_table( $smt, $categories ); 
 		break;
 }
 ?>
@@ -142,6 +136,16 @@ switch( $mode ) {
 </div>
 <?php
 $smt->include_footer();
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -166,14 +170,14 @@ foreach( $smt->get_tags() as $tag ) {
 <?php
     foreach( $cats as $c ) {
         $local_url = $smt->url('category')
-            . '?c=' . $smt->category_urlencode( $smt->strip_prefix( $c['name'] ));
+            . '?c=' . $smt->category_urlencode( $smt->strip_prefix( @$c['name'] ));
         //$commons_url = 'https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($c['name']);
         print '<tr>';
 
-        print '<td class="right"><a href="' . $local_url . '">' . $c['local_count'] . '</a></td>';
+        print '<td class="right"><a href="' . $local_url . '">' . @$c['local_count'] . '</a></td>';
 
         print '<td style="padding:0 0 0 10px; font-weight:bold;"><a href="' . $local_url . '">' 
-		. $smt->strip_prefix($c['name']) . '</a></td>';
+		. $smt->strip_prefix(@$c['name']) . '</a></td>';
 		
 
 
@@ -182,7 +186,7 @@ foreach( $smt->get_tags() as $tag ) {
             $reviews[ $tag['id'] ] = '<td class="tag' . $tag['id'] . '">&nbsp;</td>';
         }
 
-        $crevs = $smt->get_db_reviews_per_category($c['id']);
+        $crevs = $smt->get_db_reviews_per_category(@$c['id']);
 
         $count = 0;
         foreach( $crevs as $r ) {

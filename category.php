@@ -70,10 +70,7 @@ print '<div class="box white">'
         . $smt->get_reviews_per_category( $category_info['id'] )
     . '</div>'
     . '<h1>'
-    . str_replace(
-        'Category:',
-        '<a href="' . $smt->url('categories') . '">Category:</a> ',
-        $category_name)
+    . $smt->strip_prefix($category_name)
     . '</h1>'
     . '<br /><b>' . $category_size
     . '</b> files'

@@ -17,8 +17,10 @@ print '<div class="box white">';
 ?>
 <p>Database Admin:</p>
 <p>- <a href="sqladmin.php" target="sqlite">SQLite ADMIN</a></p>
+<p>- <a href="reports.php" >Reports</a></p>
+<br />
+<br />
 <p>- <a href="database.php?a=c">CREATE tables</a></p>
-
 <br />
 <br />
 <br />
