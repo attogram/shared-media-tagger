@@ -40,9 +40,8 @@ print ''
 . '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
 . '<br />'
 . $smt->get_reviews($pageid)
-. '<br />'
 . $smt->display_categories($pageid)
-. '</div>'; 
+. '</div>';
 ?>
 </div><?php /* end left */ ?>
 

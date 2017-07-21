@@ -15,63 +15,119 @@ $smt->include_menu();
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
-<li><a href="' . $smt->url('admin') .'reports.php?r=cat0local">Categories with 0 Local files</a></li>
-<li><a href="' . $smt->url('admin') .'reports.php?r=cat0commons">Categories with 0 Commons files</a></li>
+<li><a href="' . $smt->url('admin') .'reports.php?r=catclean">Clean Category Table</a></li>
 </ul>
 <hr />';
 
-if( !isset($_GET['r']) || !$_GET['r'] ) {
-	print '</div>';
-	$smt->include_footer();
-	return;
-}
 
-switch( $_GET['r'] ) { 
-	default: print '<p>Unknown Report</p>'; break;
-	case 'cat0local': cat0local(); break;
-	case 'cat0commons': cat0commons(); break;
+switch( @$_GET['r'] ) {
+    default: print '<p>Please choose a report above</p>'; break;
+    case 'cat0local': cat0local(); break;
+    case 'catclean': catclean(); break;
 } // end switch
 
 print '</div>';
 $smt->include_footer();
 
 
-////////////////////////////////
-function cat0local() {
-	global $smt;
-	$sql = '
-		SELECT count(c2m.media_pageid) AS local_count,  c.id, c.name
-		FROM category AS c
-		LEFT OUTER JOIN category2media AS c2m ON c2m.category_id = c.id
-		GROUP BY c.id';
-	$cats = $smt->query_as_array($sql);
-	if( !$cats ) {
-		print '<p>FAILED to get category list</p>';
-		return;
-	}
-	
-	$zcats = array();
-	foreach( $cats as $cat ) {
-		if( $cat['local_count'] == 0 ) {
-			$zcats[] = $cat['id'];
-			print '<a href="' . $smt->url('category') . '?c=' 
-			. $smt->category_urlencode($smt->strip_prefix($cat['name'])) . '">' 
-			. $cat['name'] . '</a><br />';		
-		}
-	}
-	if( !$zcats ) {
-		print '<p>No results found.</p>';
-		return;
-	}
-	
-	print '<p>Delete SQL:<br /><br />'
-	. 'DELETE FROM category WHERE id IN ( ' . implode($zcats, ', ') . ' );'
-	. '</p>';
-
-
-} // end function cat0local()
 
 ////////////////////////////////
-function cat0commons() {
-	print '<p>cat0commons</p>';
-}
+function catclean() {
+
+    global $smt;
+
+    $tab = " \t ";
+
+    $checker_limit = 25;
+    if( isset($_GET['checker']) && $_GET['checker'] ) {
+        $checker_limit = (int)$_GET['checker'];
+    }
+
+    print '<p>Clean Category Table:</p>'
+    . '<p><a href="?r=catclean&amp;cleaner=1">RUN CLEANER</a> (updates: local_files, sanitizes: hidden, missing.  No API calls.)</p>'
+    . '<p><a href="?r=catclean&amp;checker=' . $checker_limit . '">RUN CATEGORY-INFO CHECKER x'
+    . $checker_limit. '</a>  (updates ALL category info.  Remote API calls.)</p>';
+
+    if( isset($_GET['cleaner']) ) {
+        $categories = $smt->query_as_array('SELECT * FROM category');
+        //print '<p>START: CLEANER</p>';
+        $smt->begin_transaction();
+        $result = '';
+        foreach( $categories as $category ) {
+            //$result .= ' ' . $category['id'];
+            $bind = array();
+            $bind[':local_files'] = $smt->get_category_size($category['name']);
+            $bind[':hidden'] = 0;
+            if( $category['hidden'] == 1 ) { $bind[':hidden'] = 1; }
+            $bind[':missing'] = 0;
+            if( $category['missing'] == 1 ) { $bind[':missing'] = 1; }
+            $bind[':id'] = $category['id'];
+            $bind[':updated'] = $smt->time_now();
+            $upd = $smt->query_as_bool('UPDATE category SET
+                    local_files = :local_files,
+                    hidden = :hidden,
+                    missing = :missing,
+                    updated = :updated
+                    WHERE id = :id', $bind);
+            if( $upd ) { continue; }
+            $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
+        }
+        $smt->commit();
+        $smt->vacuum();
+        print '<p>OK: RAN: CLEANER: <span style="font-size:80%;">' . $result . '</span></p>';
+    }
+
+    if( isset($_GET['checker']) ) {
+        $categories = $smt->query_as_array(
+            'SELECT * FROM category ORDER BY updated ASC LIMIT ' . $checker_limit
+        );
+        //print '<p>START: CATEGORY-INFO CHECKER x' . $checker_limit . '</p>';
+        $smt->begin_transaction();
+        $result = '';
+        foreach( $categories as $category ) {
+            $result .= ' ' . $category['id'];
+            if( $smt->save_category_info($category['name']) ) {
+                continue;
+            }
+            $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
+        }
+        $smt->commit();
+        $smt->vacuum();
+        print '<p>OK: RAN: CATEGORY-INFO CHECKER: <span style="font-size:80%;">' . $result . '</span></p>';
+    }
+
+
+
+
+
+    $categories = $smt->query_as_array(
+        'SELECT * FROM category ORDER BY hidden ASC, local_files DESC, name ASC'
+    );
+    print '<p><b>' . number_format(sizeof($categories)) . '</b> Categories</p>';
+
+    print '<pre>'
+    . '<b>LOCAL' . $tab
+    . 'COM' . $tab
+    . 'H M ID' . $tab
+    . 'Last Updated' . $tab . $tab
+    . 'Category</b><br />';
+    foreach( $categories as $category ) {
+        print ''
+
+        . number_format($category['local_files']) . $tab
+        . number_format($category['files']) . $tab
+        . $category['hidden'] . ' '
+        . $category['missing'] . ' '
+        . $category['id'] . $tab
+
+        . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00' ) . $tab
+
+        . '<a target="site" href="' . $smt->url('category') . '?c='
+        . $smt->category_urlencode($smt->strip_prefix($category['name']))
+        . '">' . $category['name'] . '</a>'
+        . '<br />';
+    }
+    print '<br />END or report.</pre>';
+
+
+} // end catsize()

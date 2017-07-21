@@ -57,7 +57,7 @@ switch( $order ) {
 
     case 'PER.TAG':
         $tags = $smt->get_tags();
-        $order_desc = $tag_name . ' reviews';
+        $order_desc = $tag_name; // . ' reviews';
         $sql = '
         SELECT t.count, t.tag_id, m.*
         FROM tagging AS t, media AS m

@@ -1,7 +1,9 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.6.33');
+define('__SMT__', '0.7.0');
+
+ob_start('ob_gzhandler');
 
 $init = __DIR__.'/_setup.php';
 if(file_exists($init) && is_readable($init)){ include_once($init); }
@@ -12,22 +14,31 @@ class smt_utils {
 
     var $debug; // debug mode TRUE / FALSE;
     var $protocol; // http: or https:
-	var $timer;
-	var $time_results;
+    var $timer;
+    var $timer_results;
+
+    //////////////////////////////////////////////////////////
+    function time_now() {
+        return gmdate('Y-m-d H:i:s');
+    }
 
     //////////////////////////////////////////////////////////
     function start_timer( $name ) {
         $this->timer[$name] = microtime(1);
     }
-  
-    //////////////////////////////////////////////////////////  
+
+    //////////////////////////////////////////////////////////
     function end_timer( $name ) {
         if( !isset($this->timer[$name]) ) {
-            $this->time_results[$name] = 0;
+            $this->timer_results[$name] = 0;
             return;
         }
-        $this->time_results[$name] = microtime(1) - $this->timer[$name];
-		unset($this->timer[$name]);
+        $result = microtime(1) - $this->timer[$name];
+        if( isset($this->timer_results[$name]) ) {
+            $this->timer_results[$name] += $result;
+            return;
+        }
+        $this->timer_results[$name] = $result;
     }
 
     //////////////////////////////////////////////////////////
@@ -68,14 +79,19 @@ class smt_utils {
     }
 
     //////////////////////////////////////////////////////////
-    function fail404 ( $message='' ) {
+    function fail404 ( $message='', $extra='' ) {
         header('HTTP/1.0 404 Not Found');
         $this->include_header();
         $this->include_menu();
         if( !$message || !is_string($message) ) {
             $message = '404 Not Found';
         }
-        print '<div class="box white center" style="padding:50px 0px 50px 0px;"><h1>' . $message . '</h1></div>';
+        print '<div class="box white center" style="padding:30px 0px 30px 0px;">'
+        . '<h1>' . $message . '</h1>';
+        if( $extra && is_string($extra) ) {
+            print '<br />' . $extra;
+        }
+        print '</div>';
         $this->include_footer();
         exit;
     }
@@ -200,7 +216,7 @@ class smt_page EXTENDS smt_utils {
         $this->include_menu();
 
         print '<footer>'
-        . '<div class="menu" style="line-height:2; font-size:70%;">';
+        . '<div class="menu" style="line-height:2; font-size:80%;">';
 
 
         if( !@$this->setup['hide_hosted_by'] ) {
@@ -214,21 +230,24 @@ class smt_page EXTENDS smt_utils {
             . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
         }
 
+        $this->end_timer('page');
+
         if( $this->is_admin() ) {
-            print '<br /><div style="text-align:left; line-height:1; ">'
-            . '<br />Admin @ ' . gmdate('Y-m-d H:i:s') . ' UTC'
-            . '<br />SQL count: ' . $this->sql_count
-            . '<br />user_id: ' . $this->user_id
-            . '<br /><a href="' . $this->url('home') . '?logoff">ADMIN logoff</a>'
-            . '<br /><br />'
-            . '</div>'
-            ;
+            print '<br /><br />'
+            . '<div style="text-align:left; word-wrap:none; font-family:monospace; font-size:10pt;">'
+            . '<a href="' . $this->url('home') . '?logoff">LOGOFF</a>'
+            . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC';
+
+            while( list($timer_name,$result) = each($this->timer_results) ) {
+                print '<br />TIMER: ' . round($result,5) . ' - ' . $timer_name;
+            }
+            print '<br />SQL count: ' . number_format($this->sql_count)
+            . '<br />MEMORY usage: ' . number_format(memory_get_usage())
+            . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage());
+            print '</div><br /><br /><br />';
         }
 
-		$this->end_timer('page');
-		print '<br /><div style="text-align:left; line-height:1; ">'
-		. 'Page loaded in ' . round($this->time_results['page'],3) . ' seconds</div>';
-		
+
         print '</div></footer>';
 
         // Site footers
@@ -240,7 +259,7 @@ class smt_page EXTENDS smt_utils {
                 include($site_footer);
             }
         }
-		
+
         print '</body></html>';
     } // end include_footer()
 
@@ -297,6 +316,7 @@ class smt_database_utils EXTENDS smt_page {
     var $db;
     var $sql_count;
     var $last_insert_id;
+    var $last_error;
 
     //////////////////////////////////////////////////////////
     function init_database() {
@@ -315,8 +335,10 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function query_as_array( $sql, $bind=array() ) {
-        $this->debug("::query_as_array() sql: $sql #bind:" . sizeof($bind));
+
         if( !$this->db ) { $this->init_database(); }
+        if( !$this->db ) { return FALSE; }
+
         $statement = $this->db->prepare($sql);
         if( !$statement ) {
             $this->debug('::query_as_array(): ERROR PREPARE'); // '. $this->db->errorInfo()[2]);
@@ -326,13 +348,16 @@ class smt_database_utils EXTENDS smt_page {
             $this->debug('::query_as_array(): bindParam '. $xbind[0] .' = ' . $xbind[1]);
             $statement->bindParam( $xbind[0], $xbind[1]);
         }
+        $this->start_timer('sql');
         if( !$statement->execute() ) {
             $this->error('::query_as_array(): ERROR EXECUTE: '
                 //. $sql
                 . ' == '.print_r($this->db->errorInfo(),1));
+            $this->end_timer('sql');
             return array();
         }
-        $this->sql_count++;
+        $this->end_timer('sql');
+
         $response = $statement->fetchAll(PDO::FETCH_ASSOC);
         if( !$response && $this->db->errorCode() != '00000') {
             $this->error('::query_as_array(): ERROR FETCH: '.print_r($this->db->errorInfo(),1));
@@ -345,59 +370,68 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function query_as_bool( $sql, $bind=array() ) {
-        $this->debug("::query_as_bool() sql: $sql #bind:" . sizeof($bind));
+
+        $this->debug("query_as_bool: $sql");
+        if( $bind ) { $this->debug('BIND: ' . print_r($bind,1) ); }
+
         if( !$this->db ) { $this->init_database(); }
+        if( !$this->db ) { return FALSE; }
+        $this->last_insert_id = $this->last_error = FALSE;
+        $this->sql_count++;
         $statement = $this->db->prepare($sql);
         if( !$statement ) {
-            $this->debug('::query_as_bool(): ERROR PREPARE'); // : '.$this->db->errorInfo()[2]);
+            $this->last_error = $this->db->errorInfo();
+            $this->debug('query_as_bool: prepare failed. SQL:<br />'
+                . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
             return FALSE;
         }
-        $this->debug('::query_as_bool(): bind: '.print_r($bind,1));
-
         while( $xbind = each($bind) ) {
-            $this->debug('::query_as_bool: bindParam: ' . $xbind[0] . ' = ' . htmlentities($xbind[1]));
             $statement->bindParam( $xbind[0], $xbind[1] );
         }
-
+        $this->start_timer('sql');
         if( !$statement->execute() ) {
-            $this->debug('::query_as_bool: EXECUTE FAILED: ' . $sql
-            //. '<br />errorinfo:'.print_r($this->db->errorInfo(),1)
-            );
+            $this->end_timer('sql');
+            $this->last_error = $this->db->errorInfo();
+            $this->debug($this->last_error);
+            if( $this->last_error[0] == '00000' ) {
+                $this->debug('NULL EVENT: ' . trim($sql));
+                return TRUE;
+            }
+            $this->debug('query_as_bool: prepare failed. SQL: '
+                . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
             return FALSE;
         }
-        $this->sql_count++;
+        $this->end_timer('sql');
+        $this->last_error = $this->db->errorInfo();
         $this->last_insert_id = $this->db->lastInsertId();
-        $this->debug('::query_as_bool(): OK');
+        $this->debug('OK: ' . trim($sql));
         return TRUE;
-    }
+    } // end function query_as_bool()
 
     //////////////////////////////////////////////////////////
     function vacuum() {
-        $this->notice('VACUUM');
         if( $this->query_as_bool('VACUUM') ) {
             return TRUE;
         }
-        $this->notice('ERROR vacumming database');
+        $this->error('FAILED to VACUUM');
         return FALSE;
     }
 
     //////////////////////////////////////////////////////////
     function begin_transaction() {
-        $this->notice('BEGIN TRANSACTION');
         if( $this->query_as_bool('BEGIN TRANSACTION') ) {
             return TRUE;
         }
-        $this->notice('ERROR begining transaction');
+        $this->error('FAILED to BEGIN TRANSACTION');
         return FALSE;
     }
 
     //////////////////////////////////////////////////////////
     function commit() {
-        $this->notice('COMMIT');
         if( $this->query_as_bool('COMMIT') ) {
             return TRUE;
         }
-        $this->notice('ERROR commiting transaction');
+        $this->error('FAILED to COMMIT');
         return FALSE;
     }
 
@@ -500,7 +534,7 @@ class smt_site_admin EXTENDS smt_media {
     }
 
     //////////////////////////////////////////////////////////
-    function display_admin_functions( $media_id ) {
+    function display_admin_media_functions( $media_id ) {
         if( !$this->is_admin() ) {
             return;
         }
@@ -509,17 +543,49 @@ class smt_site_admin EXTENDS smt_media {
         }
         return ''
         . '<div class="attribution left" style=" display:inline-block; float:right;">'
-
         . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
         . $media_id . ' ?\');">❌</a>'
-
         . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
-
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
         . '" title="Refresh" target="admin">♻</a>'
-
         . '</div>';
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_category_functions( $category_name ) {
+        if( !$this->is_admin() ) { return; }
+        $category = $this->get_category($category_name);
+        if( !$category ) {
+            return '<p>ADMIN: category not in database</p>';
+        }
+        $response = '
+<br /><br /><br />
+<div class="left pre" style="display:inline-block; border:1px solid red; padding:10px;">
+<input type="submit" value="Delete selected media">
+<br />
+<pre>' . print_r($category,1) . '</pre>
+<br />
+<br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
+. $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
+<br />
+<br /><a href="' . $this->url('admin') . 'category.php/?c='
+. $this->category_urlencode($category['name']) . '">Get Category Info</a>
+<br />
+<br /><a href="' . $this->url('admin') . 'category.php/?i='
+. $this->category_urlencode($category['name']) . '">Import Media to Category</a>
+<br />
+<br /><a href="' . $this->url('admin') . 'media.php?dc='
+. $this->category_urlencode($category['name'])
+. '" onclick="return confirm(\'Confirm: Clear Media from '
+. $category['name']. ' ?\');">Clear Media from Category</a>
+<br />
+<br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
+. '" onclick="return confirm(\'Confirm: Delete ' . $category['name']. ' ?\');">Delete Category</a>
+</form>
+</div>
+<br /><br />';
+        return $response;
     }
 
 } // END class smt_admin
@@ -748,7 +814,7 @@ class smt_category EXTENDS smt_user {
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
         $response = $this->query_as_array(
-            'SELECT id, name, pageid, files, subcats FROM category WHERE name = :name',
+            'SELECT * FROM category WHERE name = :name',
             array(':name'=>$name)
         );
         if( !isset($response[0]['id']) ) {
@@ -768,8 +834,10 @@ class smt_category EXTENDS smt_user {
             array(':name'=>$category_name)
         );
         if( !isset($response[0]['size']) ) {
+            $this->error('get_category_size: no size found');
             return 0;
         }
+        //$this->notice("get_category_size( $category_name ) = " . $response[0]['size']);
         return $response[0]['size'];
     }
 
@@ -870,23 +938,49 @@ class smt_category EXTENDS smt_user {
     }
 
     //////////////////////////////////////////////////////////
+    function get_count_local_files_per_category( $category_id_array ) {
+        if( !is_array($category_id_array) ) {
+            $this->error('get_count_local_files_per_category: invalid category array');
+            return 0;
+        }
+        $locals = $this->query_as_array(
+            'SELECT count(category_id) AS count
+            FROM category2media
+            WHERE category_id IN ( :category_id )',
+            array( ':category_id'=> implode($category_id_array, ', ') )
+        );
+        if( $locals && isset($locals[0]['count']) ) {
+            return $locals[0]['count'];
+        }
+        return 0;
+    }
+
+    //////////////////////////////////////////////////////////
     function is_hidden_category( $category_name ) {
         if( !$category_name ) {
             $this->error('::is_hidden_category: category_name NOT FOUND');
             return FALSE;
         }
-		foreach( $this->get_hidden_categories_match() as $pattern ) {			
-			if( preg_match('/'.$pattern.'/', $this->strip_prefix($category_name)) ) {
-				return TRUE;
-			}
-		}
+        foreach( $this->get_hidden_categories_match() as $pattern ) {
+            if( preg_match('/'.$pattern.'/', $this->strip_prefix($category_name)) ) {
+                return TRUE;
+            }
+        }
         return FALSE;
     }
 
     //////////////////////////////////////////////////////////
-	function get_hidden_categories_match() {
-		return array (
+    function get_hidden_categories_match() {
+        return array (
+'^Self-published work',
+'^Personality rights warning',
+'^CC-',
+'^Flickr files ',
+'^Flickr images ',
 ' OTRS',
+'GFDL',
+'^License migration ',
+
 ' photos requiring renaming$',
 ' reviewed by ',
 ' uploaded by ',
@@ -894,7 +988,6 @@ class smt_category EXTENDS smt_user {
 '^Artworks without ',
 '^Author died more than 100 years ago public domain images',
 '^Author matching ',
-'^CC-',
 '^Created with ',
 '^Edited versions of Flickr ',
 '^Exposure time ',
@@ -907,10 +1000,7 @@ class smt_category EXTENDS smt_user {
 '^Files moved ',
 '^Files uploaded by',
 '^Files with ',
-'^Flickr files ',
-'^Flickr images ',
 ' uploaded from ',
-'^GFDL',
 '^GPL',
 'Faebot',
 'High-resolution TIFF',
@@ -927,7 +1017,6 @@ class smt_category EXTENDS smt_user {
 '^Import by ',
 '^Lens focal length ',
 '^Library of Congress-no known copyright restrictions',
-'^License migration ',
 '^Media contributed by ',
 '^Media created by ',
 '^Media lacking ',
@@ -942,7 +1031,6 @@ class smt_category EXTENDS smt_user {
 '^PNG version available',
 '^Content created by  ',
 '^Pages with ',
-'^Personality rights warning',
 '^Photographs by ',
 '^Photographs taken on ',
 '^Photographs taken with ',
@@ -953,7 +1041,6 @@ class smt_category EXTENDS smt_user {
 '^Picturing Canada images missing ',
 '^Quality Images by ',
 '^Retouched pictures',
-'^Self-published work',
 '^Symbol images that ',
 '^Taken with ',
 '^Template Unknown ',
@@ -988,8 +1075,8 @@ class smt_category EXTENDS smt_user {
 '^Valid SVG created ',
 '^Attribution$',
 
-		);
-	} // end get_hidden_categories_match
+        );
+    } // end get_hidden_categories_match
 
 } // END class category
 
@@ -1168,7 +1255,7 @@ class smt EXTENDS smt_tag {
     //////////////////////////////////////////////////////////
     function __construct() {
 
-		$this->start_timer('page');
+        $this->start_timer('page');
 
         global $setup; // Load the setup array, if present in _setup.php
         $this->setup = array();
@@ -1321,7 +1408,7 @@ class smt EXTENDS smt_tag {
             '<br />',
             $this->display_attribution( $media, /*title truncate*/17, /*artist*/21 )
             )
-        . $this->display_admin_functions( $media['pageid'] )
+        . $this->display_admin_media_functions( $media['pageid'] )
         //. '<br />'
         . '<div class="thumbnail_reviews left">'
         . $this->get_reviews( $media['pageid'] )
@@ -1354,7 +1441,7 @@ class smt EXTENDS smt_tag {
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</video>'
         . $this->display_attribution( $media )
-        . $this->display_admin_functions( $media['pageid'] )
+        . $this->display_admin_media_functions( $media['pageid'] )
         . '</div>';
         return $return;
     }
@@ -1383,7 +1470,7 @@ class smt EXTENDS smt_tag {
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</audio>'
         . $this->display_attribution( $media )
-        . $this->display_admin_functions( $media['pageid'] )
+        . $this->display_admin_media_functions( $media['pageid'] )
         . '</div>';
         return $return;
     }
@@ -1419,7 +1506,7 @@ class smt EXTENDS smt_tag {
         . '<a href="' . $infourl . '">'
         . '<img src="'. $url .'" height="'. $height .'" width="'. $width . '" alt=""></a>'
         . $this->display_attribution( $media )
-        . $this->display_admin_functions( $media['pageid'] )
+        . $this->display_admin_media_functions( $media['pageid'] )
         . '</div>'
         ;
     }

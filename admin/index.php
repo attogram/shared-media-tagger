@@ -16,8 +16,8 @@ print '<div class="box white">';
 
 $site_count = $smt->query_as_array('SELECT count(id) AS count FROM site');
 if( !$site_count ) {
-    print '<p>Welome!  Creating new Shared Media Tagger Database:</p>'
-    . $smt->create_tables();
+    print '<p>Welome!  Creating new Shared Media Tagger Database:</p><pre>'
+    . $smt->create_tables() . '</pre>';
 }
 
 $msg_count = 0;

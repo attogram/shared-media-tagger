@@ -2,7 +2,7 @@
 // Shared Media Tagger
 // Category Admin
 
-if( function_exists('set_time_limit') ) { set_time_limit( 250 ); }
+if( function_exists('set_time_limit') ) { set_time_limit( 1000 ); }
 
 $init = __DIR__.'/../smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; return; } require_once($init);
@@ -18,10 +18,11 @@ $smt->include_admin_menu();
 print '<div class="box white">';
 
 ///////////////////////////////////////////////////////////////////////////////
-
-if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
+// Import images from a category
+if( isset($_GET['i']) && $_GET['i'] ) {
     $category_name = $smt->category_urldecode($_GET['i']);
-    $cat_url = '<a href="' . $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
+    $cat_url = '<a href="' . $smt->url('category')
+    . '?c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
     . htmlentities($smt->strip_prefix($category_name)) . '</a>';
     print '<p>Importing media from <b>' . $cat_url . '</b></p>';
     $smt->get_media_from_category( $category_name );
@@ -31,16 +32,17 @@ if( isset($_GET['i']) && $_GET['i'] ) { // Import images from a category
     return;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
 if( isset($_POST['cats']) && $_POST['cats'] ) {
-    import_categories($smt);
-    $smt->vacuum();
+    $smt->import_categories( $_POST['cats'] );
     print '</div>';
     $smt->include_footer();
     return;
 }
 
 if( isset($_GET['c']) && $_GET['c'] ) {
-    get_category_info($smt);
+    $smt->save_category_info( $_GET['c'] );
     print '</div>';
     $smt->include_footer();
     return;
@@ -48,7 +50,6 @@ if( isset($_GET['c']) && $_GET['c'] ) {
 
 if( isset($_GET['d']) && $_GET['d'] ) {
     delete_category($smt);
-    $smt->vacuum();
     print '</div>';
     $smt->include_footer();
     return;
@@ -68,9 +69,12 @@ if( isset($_GET['sc']) && $_GET['sc'] ) {
     return;
 }
 
+
+$order_by = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
+
 if( isset($_GET['g']) && $_GET['g']=='all' ) {
     $toget = array();
-    $cats = $smt->query_as_array('SELECT name, pageid, files, subcats FROM category ORDER BY name');
+    $cats = $smt->query_as_array('SELECT * FROM category ' . $order_by);
     foreach( $cats as $c ) {
         if( $c['subcats'] != '' && $c['files'] != '' && $c['pageid'] != '' ) {
             continue;
@@ -81,7 +85,7 @@ if( isset($_GET['g']) && $_GET['g']=='all' ) {
         $toget[] = $c['name'];
     }
     $_GET['c'] = implode('|',$toget);
-    get_category_info($smt);
+    $smt->get_category_info($smt);
     print '</div>';
     $smt->include_footer();
     return;
@@ -92,20 +96,20 @@ if( isset($_GET['g']) && $_GET['g']=='all' ) {
 
 
 if( isset($_GET['sca']) && $_GET['sca']=='all' ) {
-    $sql = 'SELECT id, name, pageid, files, subcats FROM category WHERE subcats > 0 ORDER BY name';
+    $sql = 'SELECT * FROM category WHERE subcats > 0 ' . $order_by;
     $smt->notice('SHOWING only categories with subcategories');
 
 } elseif( isset($_GET['wf']) ) {
-    $sql = 'SELECT id, name, pageid, files, subcats FROM category WHERE files > 0 ORDER BY name';
+    $sql = 'SELECT * FROM category WHERE files > 0 ' . $order_by;
     $smt->notice('SHOWING only categories with files');
 
 } elseif( isset($_POST['s']) ) {
-    $sql = "SELECT id, name, pageid, files, subcats FROM category WHERE name LIKE :search ORDER BY name";
+    $sql = 'SELECT * FROM category WHERE name LIKE :search ' . $order_by;
     $bind = array(':search'=>'%' . $_POST['s']. '%');
     $smt->notice('SHOWING only categories with search text: ' . $_POST['s'] );
 
 } else {
-    $sql = 'SELECT id, name, pageid, files, subcats FROM category ORDER BY name';
+    $sql = 'SELECT * FROM category ' . $order_by;
 
 }
 if( !isset($bind) ) { $bind = array(); }
@@ -114,19 +118,24 @@ $cats = $smt->query_as_array($sql, $bind);
 if( !is_array($cats) ) { $cats = array(); }
 
 
-
+$spacer = ' &nbsp; &nbsp; &nbsp; ';
 print '<p><form action="" method="GET">'
 . '<input id="s" name="s" type="text" size="35" value=""/>'
 . '<input type="submit" value="   Find Categories on Commons  " /></form>'
-
 . '<br /><br />'
+. '<a href="' . $smt->url('admin') . 'category.php?v=1">[View&nbsp;Category&nbsp;List]</a>'
+. $spacer
 . ' <a href="./sqladmin.php?table=category&action=row_create" target="sqlite">'
 . ' [Manually&nbsp;add&nbsp;category]</a>'
-. ' &nbsp; &nbsp; &nbsp; '
-. '<a href="./' . basename(__FILE__) . '?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
-
+. $spacer
+. '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
+if( !isset($_GET['v']) || $_GET['v'] != '1' ) {
+    print '</div>';
+    $smt->include_footer();
+    return;
+}
 
 print '<table border="1">'
 . '<tr style="background-color:lightblue;font-style:italic;">'
@@ -144,7 +153,9 @@ print '<table border="1">'
 ;
 
 reset($cats);
+
 $common_files_count = $local_files_count = 0;
+
 foreach( $cats as $c ) {
 
     $common_files_count += $c['files'];
@@ -155,19 +166,14 @@ foreach( $cats as $c ) {
     . '">' . $smt->strip_prefix($c['name']) . '</a></b></td>';
 
     $local_files = '';
-    $lfsql = '
-        SELECT count(category_id) AS count
-        FROM category2media
-        WHERE category_id = :category_id';
-    $lfbind = array(':category_id'=>$c['id']);
-    $lf = $smt->query_as_array($lfsql, $lfbind);
-    if( !$lf || !isset($lf[0]['count']) || !$lf[0]['count'] ) {
+
+    $lcount = $c['local_files'];
+    if( !$lcount ) {
         $local_files = '<span style="color:#ccc;">0</span>';
     } else {
-        $local_files = $lf[0]['count'];
-        $local_files_count += $lf[0]['count'];
+        $local_files = $lcount;
+        $local_files_count += $lcount;
     }
-
 
     if( $local_files != $c['files'] ) {
         $alert_td = ' style="background-color:lightsalmon;"';
@@ -190,8 +196,8 @@ foreach( $cats as $c ) {
     print '<td class="right">' . $subcatslink . '</td>';
 
     print ''
-    . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/' 
-		. $smt->category_urlencode($c['name']) . '">View</a></td>'
+    . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/'
+        . $smt->category_urlencode($c['name']) . '">View</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__) . '?c=' . $smt->category_urlencode($c['name']) . '">Info</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__) . '?i=' . $smt->category_urlencode($c['name']) . '">Import</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./media.php?dc=' . $smt->category_urlencode($c['name']) . '">Clear</a></td>'
@@ -272,7 +278,7 @@ function get_search_results($smt) {
     . '<input type="submit" value="  save to database  "><br /><br />';
 
     while( list(,$cat) = each($cats) ) {
-        print '<input type="checkbox" checked="checked" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
+        print '<input type="checkbox" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
         . $cat['title']
         . '</strong><small> '
         . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
@@ -283,48 +289,3 @@ function get_search_results($smt) {
     print '</form>';
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function import_categories($smt) {
-    print '<p>Saving categories to database:</p>';
-    foreach( $_POST['cats'] as $cat ) {
-        $smt->insert_category( $smt->category_urldecode($cat) );
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-function get_category_info($smt) {
-    $cat = urldecode($_GET['c']);
-    $cats = $smt->get_category_info($cat);
-    if( !$cats ) {
-        $smt->error('failed to get category info');
-        return;
-    }
-	//$smt->notice($cats);
-
-    foreach( $cats as $cat ) {
-        $title = $cat['title'];
-		
-        $pageid = @$cat['pageid'];
-		if( !$pageid ) {
-			$smt->error('no pageid. cat='.print_r($cat,1));
-			$pageid = 0;
-		}
-        $files = @$cat['categoryinfo']['files'];
-		if( !$files ) { $files = 0; }
-        $subcats = @$cat['categoryinfo']['subcats'];
-		if( !$subcats ) { $subcats = 0; }
-		
-		$smt->notice("Updating info: title:$title pageid:$pageid files:$files subcats:$subcats");
-        $x = $smt->query_as_bool(
-            'UPDATE category
-            SET pageid = :pageid, files = :files, subcats = :subcats
-            WHERE name = :name',
-            array( ':pageid'=>$pageid, ':files'=>$files, ':subcats'=>$subcats, ':name'=>$title)
-        );
-        if( $x ) {
-            //$smt->notice("::get_category_info: UPDATED category: title:$title pageid:$pageid files:$files subcats:$subcats");
-        } else {
-            $smt->notice("::get_category_info: error updateing category: title:$title pageid:$pageid files:$files subcats:$subcats");
-        }
-    }
-}// end function get_category_info

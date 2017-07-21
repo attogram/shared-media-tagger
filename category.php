@@ -2,7 +2,7 @@
 // Shared Media Tagger
 // Category
 
-$page_limit = 25; // # of files per page
+$page_limit = 20; // # of files per page
 
 $init = __DIR__.'/smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
@@ -21,7 +21,10 @@ $category_name = 'Category:' . $category_name;
 $category_info = $smt->get_category($category_name);
 
 if( !$category_info ) {
-    $smt->fail404('404 Category Not Found');
+    $smt->fail404(
+        '404 Category Not Found',
+        $smt->display_admin_category_functions($category_name)
+    );
 }
 
 $category_size = $smt->get_category_size( $category_name );
@@ -58,7 +61,10 @@ $bind = array(':category_name'=>$category_name);
 $category = $smt->query_as_array( $sql, $bind );
 
 if( !$category || !is_array($category) ) {
-    $smt->fail404('404 Category Not Found');
+    $smt->fail404(
+        '404 Category Not Found',
+        $smt->display_admin_category_functions($category_name)
+    );
 }
 
 $smt->include_header();
@@ -86,45 +92,13 @@ foreach( $category as $media ) {
     print $smt->display_thumbnail_box( $media );
 }
 
-
 if( $pager ) {
     print '<p>' . $pager . '</p>';
 }
 
 if( $smt->is_admin() ) {
-	$category = $smt->get_category($category_name);
-    print '
-<br />
-<br />
-<p>Admin: 
-
-<br />Local files: ' . $category_size . '
-<br />Commons files: ' . @$category['files'] . '
-
-<br />Local ID: ' . @$category['id'] . '
-<br />Commons PageID: ' . @$category['pageid'] . '
-<br />Commons subcats: ' . @$category['subcats'] . '
-
-<br /><a target="commons" href="https://commons.wikimedia.org/wiki/' . $smt->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
-
-<br />
-<br /><input type="submit" value="Delete selected media">
-
-<br />
-<br /><a href="' . $smt->url('admin') . 'category.php/?c=' . $smt->category_urlencode($category['name']) . '">Get Category Info</a>
-<br />
-<br /><a href="' . $smt->url('admin') . 'category.php/?i=' . $smt->category_urlencode($category['name']) . '">Import Media to Category</a>
-<br />
-<br /><a href="' . $smt->url('admin') . 'media.php?dc=' . $smt->category_urlencode($category['name']) 
-. '" onclick="return confirm(\'Confirm: Clear Media from ' . $category['name']. ' ?\');">Clear Media from Category</a>
-<br />
-<br /><a href="' . $smt->url('admin') . 'category.php/?d=' . urlencode($category['id']) 
-. '" onclick="return confirm(\'Confirm: Delete ' . $category['name']. ' ?\');">Delete Category</a>
-</form>
-</p>';
-
+    print $smt->display_admin_category_functions($category_name);
 }
-
 
 print '</div>';
 $smt->include_footer();
