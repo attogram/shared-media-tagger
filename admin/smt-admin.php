@@ -594,7 +594,10 @@ class smt_admin_media extends smt_commons_API {
             $this->save_media_to_database( $this->get_api_imageinfo($chunk) );
         }
 
-        $this->notice('END of get_media_from_category: ' . sizeof($categorymembers) . ' files');
+        $this->debug('END of get_media_from_category: ' . sizeof($categorymembers) . ' files');
+		
+		$this->update_category_local_files_count( $category );
+		
         $this->save_category_info( $category );
 
     } // end function get_media_from_category()
@@ -1142,6 +1145,25 @@ class smt_admin_category extends smt_admin_media {
         }
         $this->commit();
     }
+
+    //////////////////////////////////////////////////////////
+	function update_category_local_files_count( $category_name ) {
+		$this->debug("update_category_local_files_count( $category_name )");
+		$sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
+		$bind[':local_files'] = $this->get_category_size( $category_name );
+		$bind[':id'] = $this->get_category_id_from_name( $category_name );
+		if( !$bind[':id'] ) {
+			$this->error("update_category_local_files_count( $category_name ) - Category Not Found in Database");
+			return FALSE;
+		}
+		if( $this->query_as_bool($sql,$bind) ) {
+			$this->notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $category_name);
+			return TRUE;
+		}
+		$this->error("update_category_local_files_count( $category_name ) - UPDATE ERROR");
+		return FALSE;
+	}
+
 
     //////////////////////////////////////////////////////////
     function empty_category_tables() {
