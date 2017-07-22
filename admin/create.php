@@ -53,12 +53,7 @@ if( empty($_GET['montage']) ) {
 	return;
 }
 
-
-
-
-
-
-
+/*
 $sql = '
 SELECT m.*, t.count
 FROM  media AS m, tagging AS t, tag as tg
@@ -67,8 +62,15 @@ AND   t.tag_id = :tag_id
 AND   tg.id = t.tag_id
 AND   m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
 ' . $order_by . ' LIMIT ' . $number_of_images;
+*/
+$sql = '
+SELECT m.* 
+FROM media AS m
+WHERE m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
+ORDER BY RANDOM() LIMIT ' . $number_of_images;
 
-$images = $smt->query_as_array($sql ,array(':tag_id'=>$tag_id) );
+
+$images = $smt->query_as_array($sql /*,array(':tag_id'=>$tag_id)*/ );
 
 if( !$images ) {
 	$smt->error('No tagged images for tag ID ' . $tag_id);

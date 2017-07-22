@@ -68,23 +68,28 @@ print '';
 <p style="display:inline-block;"><b><?php print $smt->title; ?></b></p>
 <style>
 .catcon {
-    width:100%;
     margin:0;
     padding:0;
-    border:1px solid #eee;
+	display:table-row;
 }
 .catfiles {
-    display:inline-block;
+    display:table-cell;
     min-width:42px;
-    padding:0px 25px 0px 10px;
+    padding:0px 10px 0px 0px;
     margin:0;
     text-align:right;
     font-size:90%;
+    border:1px solid #eee;
 }
 .catname {
-    display:inline;
-    padding:0;
+    display:table-cell;
+    padding:0px 0px 0px 10px;
     margin:0;
+    border:1px solid #eee;
+	text-align:left;
+}
+.catname:hover {
+	background-color:yellow;
 }
 .cathead {
     font-weight:bold;
@@ -92,7 +97,7 @@ print '';
 }
 </style>
 <?php
-
+print '<div style="display:table;">';
 print '<div class="catcon"><div class="catfiles cathead"># Files</div><div class="catname cathead">Category</div></div>';
 ob_flush(); flush();
 
@@ -105,14 +110,15 @@ foreach( $categories as $category ) {
     //. '<a href="' . $local_url . '">'
     . number_format(@$category['local_files'])
     //. '</a>'
-    . '</div><div class="catname">'
+    . '</div><div class="catname" onclick="window.location=\'' . $local_url . '\'">'
     . '<a href="' . $local_url . '">' . $smt->strip_prefix(@$category['name']) . '</a>'
     . '</div>'
     . '</div>';
     ;
     ob_flush(); flush();
-
 }
+
+print '</div>';
 
 $smt->end_timer('print_category_table');
 
