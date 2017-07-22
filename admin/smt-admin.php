@@ -1251,6 +1251,7 @@ class smt_admin extends smt_admin_block {
         . $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
         . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
         . $space . '<a href="' . $admin . 'user.php">USER</a>'
+        . $space . '<a href="' . $admin . 'create.php">CREATE</a>'
         . $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
         . '</div>';
 

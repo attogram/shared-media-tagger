@@ -1,2 +1,2 @@
-media.sqlite
-media.sqlite-journal
+*.sqlite
+*.sqlite-journal
