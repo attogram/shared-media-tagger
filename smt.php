@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.6');
+define('__SMT__', '0.7.7');
 
 ob_start('ob_gzhandler');
 
@@ -559,7 +559,8 @@ class smt_site_admin EXTENDS smt_media {
         . $media_id . ' ?\');">❌</a>'
         . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
-        . '" title="Refresh" target="admin">♻</a>'
+        . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
+        . $media_id . ' ?\');">♻</a>'
         . '</div>';
     }
 
