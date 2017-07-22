@@ -68,7 +68,7 @@ if( !$category || !is_array($category) ) {
 }
 
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 
 print '<div class="box white">'
     . '<p>'

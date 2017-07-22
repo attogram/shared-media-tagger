@@ -26,7 +26,7 @@ $smt->title = 'Info: ' . $smt->strip_prefix($media['title']);
 $smt->use_bootstrap = TRUE;
 $smt->use_jquery = TRUE;
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 
 ?>
 <div class="container">

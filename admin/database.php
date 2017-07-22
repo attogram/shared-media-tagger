@@ -10,7 +10,7 @@ $smt = new smt_admin();
 
 $smt->title = 'Database Admin';
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white">';
 
@@ -19,13 +19,8 @@ print '<div class="box white">';
 <p>- <a href="sqladmin.php" target="sqlite">SQLite ADMIN</a></p>
 <p>- <a href="reports.php" >Reports</a></p>
 <br />
-<br />
 <p>- <a href="database.php?a=c">CREATE tables</a></p>
-<br />
-<br />
-<br />
-<br />
-<br />
+<br /><br /><br />
 <div style="color:darkred; background-color:lightpink; padding:10px; display:inline-block;">
 DANGER ZONE:
 <br />

@@ -11,7 +11,7 @@ $smt = new smt_admin();
 
 $smt->title = 'Admin Reports';
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
@@ -62,12 +62,10 @@ function catclean() {
             $bind[':missing'] = 0;
             if( $category['missing'] == 1 ) { $bind[':missing'] = 1; }
             $bind[':id'] = $category['id'];
-            $bind[':updated'] = $smt->time_now();
             $upd = $smt->query_as_bool('UPDATE category SET
                     local_files = :local_files,
                     hidden = :hidden,
-                    missing = :missing,
-                    updated = :updated
+                    missing = :missing
                     WHERE id = :id', $bind);
             if( $upd ) { continue; }
             $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';

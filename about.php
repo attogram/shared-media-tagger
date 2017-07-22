@@ -21,7 +21,7 @@ if( $name == '' ) {
 $smt->title = 'About ' . $name;
 
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 
 print '
 <div class="box white" style="padding:30px;">

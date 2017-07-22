@@ -13,7 +13,7 @@ $smt = new smt_admin();
 
 $smt->title = 'Category Admin';
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white">';
 
@@ -42,7 +42,12 @@ if( isset($_POST['cats']) && $_POST['cats'] ) {
 }
 
 if( isset($_GET['c']) && $_GET['c'] ) {
-    $smt->save_category_info( $_GET['c'] );
+    if( $smt->save_category_info( urldecode($_GET['c']) ) ) {
+		$smt->notice('OK: Refreshed Category Info: ' 
+		. '<b><a href="' . $smt->url('category') . '?c='
+		. $smt->strip_prefix($smt->category_urlencode($_GET['c']))		
+		. '">' . htmlentities($smt->category_urldecode($_GET['c']))) . '</a></b>';
+	}
     print '</div>';
     $smt->include_footer();
     return;

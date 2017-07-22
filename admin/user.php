@@ -11,7 +11,7 @@ $smt = new smt_admin();
 
 $smt->title = 'User Admin';
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white"><p>User Admin</p>';
 

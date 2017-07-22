@@ -13,7 +13,7 @@ $tags = $smt->get_tags();
 //$smt->title = $smt->get_total_review_count() . ' Reviews - ' . $smt->site_name;
 $smt->title = 'Reviews - ' . $smt->site_name;
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 
 $order = isset($_GET['o']) ? $smt->category_urldecode($_GET['o']) : '';
 

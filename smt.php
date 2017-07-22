@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.1');
+define('__SMT__', '0.7.2');
 
 ob_start('ob_gzhandler');
 
@@ -44,16 +44,16 @@ class smt_utils {
     //////////////////////////////////////////////////////////
     function log_message( $message, $type ) {
         switch( $type ) {
-            case 'debug':  $class = 'debug';  $head = 'DEBUG'; break;
-            case 'notice': $class = 'notice'; $head = 'NOTICE'; break;
-            case 'error':  $class = 'error';  $head = 'ERROR'; break;
-            case 'fail':   $class = 'fail';   $head = 'GURU MEDITATION FAILURE'; break;
+            case 'debug':  $class = 'debug';  $head = ''; break;
+            case 'notice': $class = 'notice'; $head = ''; break;
+            case 'error':  $class = 'error';  $head = 'ERROR:'; break;
+            case 'fail':   $class = 'fail';   $head = 'GURU MEDITATION FAILURE:'; break;
             default: return;
         }
         if( is_array($message) ) {
             $message = '<pre>' . print_r($message,1) . '</pre>';
         }
-        print '<div class="message ' . $class . '"><b>' . $head . '</b>: ' . $message . '</div>';
+        print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
     }
 
     //////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ class smt_utils {
     function fail404 ( $message='', $extra='' ) {
         header('HTTP/1.0 404 Not Found');
         $this->include_header();
-        $this->include_menu();
+        $this->include_menu( /*show_counts*/FALSE );
         if( !$message || !is_string($message) ) {
             $message = '404 Not Found';
         }
@@ -234,7 +234,7 @@ class smt_page EXTENDS smt_utils {
 
         if( $this->is_admin() ) {
             print '<br /><br />'
-            . '<div style="text-align:left; word-wrap:none; font-family:monospace; font-size:10pt;">'
+            . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
             . '<a href="' . $this->url('home') . '?logoff">LOGOFF</a>'
             . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC';
 
@@ -264,20 +264,27 @@ class smt_page EXTENDS smt_utils {
     } // end include_footer()
 
     //////////////////////////////////////////////////////////
-    function include_menu() {
+    function include_menu( $show_counts=TRUE ) {
         $space = ' &nbsp; &nbsp; ';
+		$count_files = $count_categories = $count_reviews = $count_users = '';
+		if( $show_counts ) {
+			$count_files = number_format($this->get_image_count());
+			$count_categories = number_format($this->get_categories_count());
+			$count_reviews = number_format($this->get_total_review_count());
+			$count_users = number_format($this->get_user_count());
+		}
         print ''
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
         . $space
-        . '<a href="' . $this->url('home') . '">' . number_format($this->get_image_count()) . '&nbsp;Files' . '</a>'
+        . '<a href="' . $this->url('home') . '">' . $count_files . '&nbsp;Files' . '</a>'
         . $space
-        . '<a href="' . $this->url('categories') . '">' . number_format($this->get_categories_count()) . '&nbsp;Categories</a>'
+        . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
         . $space
-        . '<a href="' . $this->url('reviews') . '">' . number_format($this->get_total_review_count()) . '&nbsp;Reviews</a>'
+        . '<a href="' . $this->url('reviews') . '">' . $count_reviews . '&nbsp;Reviews</a>'
         . $space
         . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
-        . number_format($this->get_user_count()) .'&nbsp;Users</a>'
+        . $count_users .'&nbsp;Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
         . $space
@@ -336,6 +343,8 @@ class smt_database_utils EXTENDS smt_page {
     //////////////////////////////////////////////////////////
     function query_as_array( $sql, $bind=array() ) {
 
+		$this->debug("query_as_array( <pre>$sql</pre>, bind:".sizeof($bind)." ) ");
+		
         if( !$this->db ) { $this->init_database(); }
         if( !$this->db ) { return FALSE; }
 
@@ -363,16 +372,18 @@ class smt_database_utils EXTENDS smt_page {
             $this->error('::query_as_array(): ERROR FETCH: '.print_r($this->db->errorInfo(),1));
             $response = array();
         }
-        $this->debug('::query_as_array(): OK. rowcount=' . count($response) );
-        $this->debug('query_as_array: result: ' . print_r($response,1) );
+
+        $this->debug('query_as_array: OK:'. count($response). ': ' . htmlentities($sql)
+		. ' | response: <pre>' . htmlentities(print_r($response,1)) . '</pre>' );
+
         return $response;
     }
 
     //////////////////////////////////////////////////////////
     function query_as_bool( $sql, $bind=array() ) {
 
-        $this->debug("query_as_bool: $sql");
-        if( $bind ) { $this->debug('BIND: ' . print_r($bind,1) ); }
+        $this->debug("query_as_bool: <pre>$sql</pre>");
+        if( $bind ) { $this->debug('query_as_bool: BIND: <pre>' . htmlentities(print_r($bind,1)) . '</pre>' ); }
 
         if( !$this->db ) { $this->init_database(); }
         if( !$this->db ) { return FALSE; }
@@ -813,18 +824,24 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
+		
+		//$this->notice("get_category( $name )");
+		
         $response = $this->query_as_array(
             'SELECT * FROM category WHERE name = :name',
             array(':name'=>$name)
         );
         if( !isset($response[0]['id']) ) {
+			$this->error("get_category( $name ) = ERROR: Category Not Found in Database");
             return array();
         }
+		$this->debug("get_category( $name ) = <pre>" . print_r($response[0],1) . '</pre>');
         return $response[0];
     }
 
     //////////////////////////////////////////////////////////
     function get_category_size( $category_name ) {
+		$this->debug("get_category_size( $category_name )");
         $response = $this->query_as_array(
             'SELECT count(c2m.id) AS size
             FROM category2media AS c2m, category AS c
@@ -834,10 +851,10 @@ class smt_category EXTENDS smt_user {
             array(':name'=>$category_name)
         );
         if( !isset($response[0]['size']) ) {
-            $this->error('get_category_size: no size found');
+            $this->error('get_category_size: no size found. returning 0');
             return 0;
         }
-        //$this->notice("get_category_size( $category_name ) = " . $response[0]['size']);
+        $this->debug("get_category_size( $category_name ) = " . $response[0]['size']);
         return $response[0]['size'];
     }
 
@@ -897,14 +914,17 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function get_category_id_from_name( $category_name ) {
+		
         $response = $this->query_as_array(
             'SELECT id FROM category WHERE name = :name',
             array(':name'=>$category_name)
         );
 
         if( !isset($response[0]['id']) ) {
+			$this->debug("get_category_id_from_name( $category_name ) ERROR = 0");
             return 0;
         }
+		$this->debug("get_category_id_from_name( $category_name ) = " . $response[0]['id']);
         return $response[0]['id'];
     }
 
@@ -923,7 +943,7 @@ class smt_category EXTENDS smt_user {
             array(':category_id'=>$category_id)
         );
         if( $response === FALSE ) {
-            $this->notice('ERROR: unable to access categor2media table.');
+            $this->error('ERROR: unable to access categor2media table.');
             return array();
         }
         if( !$response ) {
@@ -1262,8 +1282,6 @@ class smt EXTENDS smt_tag {
         if( is_array($setup) ) {
             $this->setup = $setup;
         }
-
-        $this->debug = FALSE;
 
         $this->install_directory = __DIR__;
 

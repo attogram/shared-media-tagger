@@ -24,9 +24,9 @@ $sql = 'SELECT id, name, local_files, hidden
         FROM category
         WHERE local_files > 0';
 if( $hidden ) {
-    $sql .= ' AND hidden = 1';
+    $sql .= ' AND hidden > 0';
 } else {
-    $sql .= ' AND hidden != 1';
+    $sql .= ' AND hidden < 1';
 }
 if( $search ) {
     $sql .= ' AND name LIKE :search';
@@ -42,7 +42,7 @@ if( $hidden ) { $smt->title .= ' Technical'; }
 $smt->title .= ' Categories - ' . $smt->site_name;
 
 $smt->include_header();
-$smt->include_menu();
+$smt->include_menu( /*show_counts*/FALSE );
 ?>
 
 <div class="box white">
