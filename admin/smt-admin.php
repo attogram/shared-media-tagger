@@ -1009,7 +1009,7 @@ class smt_admin_category extends smt_admin_media {
         }
 
         if( $category_info['categoryinfo']['subcats'] != $category_row['subcats'] ) {
-            $bind[':subcats'] = $category_info['categoryinfo']['files'];
+            $bind[':subcats'] = $category_info['categoryinfo']['subcats'];
             //$this->notice('NEW: subcats: ' . $bind[':subcats']);
         }
 
