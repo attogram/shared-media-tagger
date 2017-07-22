@@ -541,7 +541,7 @@ class smt_admin_media extends smt_commons_API {
             }
 
             $this->notice('SAVED MEDIA: ' . $new[':pageid'] . ' = <a href="' . $this->url('info')
-            . '?i=' . $new[':pageid'] . '">' . $new[':title'] . '</a>');
+            . '?i=' . $new[':pageid'] . '">' . $this->strip_prefix($new[':title']) . '</a>');
 
             if( !$this->link_media_categories($new[':pageid']) ) {
                 $this->error('::: FAILED to link media categories - p:' . $new[':pageid']);
@@ -560,7 +560,7 @@ class smt_admin_media extends smt_commons_API {
     //////////////////////////////////////////////////////////
     function get_media_from_category( $category='' ) {
 
-		$this->notice("get_media_from_category( $category )");
+		$this->debug("get_media_from_category( $category )");
 
         $category = trim($category);
         if( !$category ) { return false; }
@@ -605,7 +605,7 @@ class smt_admin_media extends smt_commons_API {
     //////////////////////////////////////////////////////////
     function get_api_categorymembers( $category ) {
 
-		$this->notice("get_api_categorymembers( $category )");
+		$this->debug("get_api_categorymembers( $category )");
 			
         $url = $this->commons_api_url . '?action=query&format=json'
         . '&list=categorymembers'  // https://www.mediawiki.org/wiki/API:Categorymembers
@@ -685,7 +685,7 @@ class smt_admin_media extends smt_commons_API {
     ////////////////////////////////////////////////////
     function delete_media( $pageid, $no_block=FALSE ) {
 		
-		$this->notice("delete_media( $pageid, $no_block )");
+		$this->debug("delete_media( $pageid, $no_block )");
 		
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('delete_media: Invalid PageID');
@@ -699,6 +699,9 @@ class smt_admin_media extends smt_commons_API {
             $response .= '<p>Media Not Found</p></div>';
             return $response;
         }
+
+		$response .='<BR />DEV TODO:  UPDATE CATEGORY SIZES = -1';
+
         $sqls = array();
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
         $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
@@ -707,7 +710,7 @@ class smt_admin_media extends smt_commons_API {
         $bind = array(':pageid'=>$pageid);
         foreach( $sqls as $sql ) {
             if( $this->query_as_bool($sql, $bind) ) {
-                $response .= '<br />OK: ' . $sql;
+                //$response .= '<br />OK: ' . $sql;
             } else {
                 $response .= '<br />ERROR: ' . $sql;
             }
@@ -724,7 +727,7 @@ class smt_admin_media extends smt_commons_API {
             ':thumb'=>@$media[0]['thumburl'],
         );
         if( $this->query_as_bool($sql, $bind) ) {
-            $response .= '<br />OK: ' . $sql;
+            //$response .= '<br />OK: ' . $sql;
         } else {
             $response .= '<br />ERROR: ' . $sql;
         }

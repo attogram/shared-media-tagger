@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.3');
+define('__SMT__', '0.7.4');
 
 ob_start('ob_gzhandler');
 
@@ -571,7 +571,7 @@ class smt_site_admin EXTENDS smt_media {
             return '<p>ADMIN: category not in database</p>';
         }
         $response = '
-<br /><br /><br />
+<br clear="all" /><br />
 <div class="left pre" style="display:inline-block; border:1px solid red; padding:10px;">
 <input type="submit" value="Delete selected media">
 <br />
@@ -825,14 +825,14 @@ class smt_category EXTENDS smt_user {
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
 		
-		//$this->notice("get_category( $name )");
+		$this->debug("get_category( $name )");
 		
         $response = $this->query_as_array(
             'SELECT * FROM category WHERE name = :name',
             array(':name'=>$name)
         );
         if( !isset($response[0]['id']) ) {
-			$this->error("get_category( $name ) = ERROR: Category Not Found in Database");
+			$this->debug("get_category( $name ) = ERROR: Category Not Found in Database");
             return array();
         }
 		$this->debug("get_category( $name ) = <pre>" . print_r($response[0],1) . '</pre>');
