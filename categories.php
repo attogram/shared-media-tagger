@@ -29,8 +29,8 @@ if( $hidden ) {
     $sql .= ' AND hidden != 1';
 }
 if( $search ) {
-    $sql .= ' AND name LIKE %:search%';
-    $bind[':search'] = $search;
+    $sql .= ' AND name LIKE :search';
+    $bind[':search'] = '%' . $search . '%';
 }
 $sql .= ' ORDER BY local_files DESC';
 $sql .= ' LIMIT ' . $page_limit;
