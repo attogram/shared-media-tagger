@@ -69,9 +69,6 @@ if( !$category || !is_array($category) ) {
 $smt->include_header();
 $smt->include_menu( /*show_counts*/FALSE );
 
-if( $smt->is_admin() ) {
-     print '<form action="" name="media" method="POST">';
-}
 
 print '<div class="box white">'
     . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">'
@@ -84,7 +81,7 @@ print '<div class="box white">'
     ;
 
 if( $smt->is_admin() ) {
-    print '<form action="' . $smt->url('admin') .'media.php" method="GET">';
+    print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
 }
 
 foreach( $category as $media ) {
