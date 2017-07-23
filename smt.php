@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.8');
+define('__SMT__', '0.7.9');
 
 ob_start('ob_gzhandler');
 
@@ -239,7 +239,7 @@ class smt_page EXTENDS smt_utils {
             . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC';
 
             while( list($timer_name,$result) = each($this->timer_results) ) {
-                print '<br />TIMER: ' . round($result,5) . ' - ' . $timer_name;
+                print '<br />TIMER: ' . str_pad( round($result,5), 7, '0' ) . ' - ' . $timer_name;
             }
             print '<br />SQL count: ' . number_format($this->sql_count)
             . '<br />MEMORY usage: ' . number_format(memory_get_usage())
@@ -342,15 +342,16 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function query_as_array( $sql, $bind=array() ) {
-
+		$this->start_timer('query_as_array');
 		$this->debug("query_as_array( <pre>$sql</pre>, bind:".sizeof($bind)." ) ");
 		
         if( !$this->db ) { $this->init_database(); }
-        if( !$this->db ) { return FALSE; }
+        if( !$this->db ) { $this->end_timer('query_as_array'); return FALSE; }
 
         $statement = $this->db->prepare($sql);
         if( !$statement ) {
             $this->debug('::query_as_array(): ERROR PREPARE'); // '. $this->db->errorInfo()[2]);
+			$this->end_timer('query_as_array');
             return array();
         }
         while( $xbind = each($bind) ) {
@@ -359,9 +360,7 @@ class smt_database_utils EXTENDS smt_page {
         }
         $this->start_timer('sql');
         if( !$statement->execute() ) {
-            $this->error('::query_as_array(): ERROR EXECUTE: '
-                //. $sql
-                . ' == '.print_r($this->db->errorInfo(),1));
+            $this->error('::query_as_array(): ERROR EXECUTE: '.print_r($this->db->errorInfo(),1));
             $this->end_timer('sql');
             return array();
         }
@@ -376,17 +375,18 @@ class smt_database_utils EXTENDS smt_page {
         $this->debug('query_as_array: OK:'. count($response). ': ' . htmlentities($sql)
 		. ' | response: <pre>' . htmlentities(print_r($response,1)) . '</pre>' );
 
+		$this->end_timer('query_as_array');
         return $response;
     }
 
     //////////////////////////////////////////////////////////
     function query_as_bool( $sql, $bind=array() ) {
-
+		$this->start_timer('query_as_bool');
         $this->debug("query_as_bool: <pre>$sql</pre>");
         if( $bind ) { $this->debug('query_as_bool: BIND: <pre>' . htmlentities(print_r($bind,1)) . '</pre>' ); }
 
         if( !$this->db ) { $this->init_database(); }
-        if( !$this->db ) { return FALSE; }
+        if( !$this->db ) { $this->end_timer('query_as_bool'); return FALSE; }
         $this->last_insert_id = $this->last_error = FALSE;
         $this->sql_count++;
         $statement = $this->db->prepare($sql);
@@ -394,6 +394,7 @@ class smt_database_utils EXTENDS smt_page {
             $this->last_error = $this->db->errorInfo();
             $this->debug('query_as_bool: prepare failed. SQL:<br />'
                 . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
+			$this->end_timer('query_as_bool');
             return FALSE;
         }
         while( $xbind = each($bind) ) {
@@ -406,25 +407,33 @@ class smt_database_utils EXTENDS smt_page {
             $this->debug($this->last_error);
             if( $this->last_error[0] == '00000' ) {
                 $this->debug('NULL EVENT: ' . trim($sql));
+				$this->end_timer('sql');
+				$this->end_timer('query_as_bool');
                 return TRUE;
             }
             $this->debug('query_as_bool: prepare failed. SQL: '
                 . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
+			$this->end_timer('sql');
+			$this->end_timer('query_as_bool');
             return FALSE;
         }
         $this->end_timer('sql');
         $this->last_error = $this->db->errorInfo();
         $this->last_insert_id = $this->db->lastInsertId();
         $this->debug('OK: ' . trim($sql));
+		$this->end_timer('query_as_bool');	
         return TRUE;
     } // end function query_as_bool()
 
     //////////////////////////////////////////////////////////
     function vacuum() {
+		$this->start_timer('vacuum');
         if( $this->query_as_bool('VACUUM') ) {
+			$this->end_timer('vacuum');
             return TRUE;
         }
         $this->error('FAILED to VACUUM');
+		$this->end_timer('vacuum');
         return FALSE;
     }
 
@@ -571,32 +580,32 @@ class smt_site_admin EXTENDS smt_media {
         if( !$category ) {
             return '<p>ADMIN: category not in database</p>';
         }
-        $response = '
-<br clear="all" /><br />
-<div class="left pre" style="display:inline-block; border:1px solid red; padding:10px;">
+        $response = '<br clear="all" />
+<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
 <input type="submit" value="Delete selected media">
-<br />
-<pre>' . print_r($category,1) . '</pre>
-<br />
-<br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
+<script type="text/javascript" language="javascript">
+'
+. "function checkAll(formname, checktoggle) { var checkboxes = new Array(); 
+checkboxes = document[formname].getElementsByTagName('input');
+for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+</script>"
+. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+. '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
 . $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
-<br />
-<br /><a href="' . $this->url('admin') . 'category.php/?c='
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
 . $this->category_urlencode($category['name']) . '">Get Category Info</a>
-<br />
-<br /><a href="' . $this->url('admin') . 'category.php/?i='
-. $this->category_urlencode($category['name']) . '">Import Media to Category</a>
-<br />
-<br /><a href="' . $this->url('admin') . 'media.php?dc='
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
+. $this->category_urlencode($category['name']) 
+. '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
+<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
 . $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Clear Media from '
-. $category['name']. ' ?\');">Clear Media from Category</a>
-<br />
-<br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
-. '" onclick="return confirm(\'Confirm: Delete ' . $category['name']. ' ?\');">Delete Category</a>
+. '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
+. '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>
+<br /><pre>' . print_r($category,1) . '</pre>
 </form>
-</div>
-<br /><br />';
+</div><br /><br />';
         return $response;
     }
 
@@ -978,127 +987,20 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function is_hidden_category( $category_name ) {
+		//$this->notice("is_hidden_category( $category_name )");
         if( !$category_name ) {
-            $this->error('::is_hidden_category: category_name NOT FOUND');
+            $this->debug('ERROR: is_hidden_category: category_name NOT FOUND');
             return FALSE;
         }
-        foreach( $this->get_hidden_categories_match() as $pattern ) {
-            if( preg_match('/'.$pattern.'/', $this->strip_prefix($category_name)) ) {
-                return TRUE;
-            }
-        }
+		$sql = 'SELECT id FROM category WHERE hidden = 1 AND name = :category_name';
+		$bind = array(':category_name'=>$category_name);
+		if( $this->query_as_array($sql, $bind) ) {
+			return TRUE;
+		}
         return FALSE;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_hidden_categories_match() {
-        return array (
-'^Self-published work',
-'^Personality rights warning',
-'^CC-',
-'^Flickr files ',
-'^Flickr images ',
-' OTRS',
-'GFDL',
-'^License migration ',
-
-' photos requiring renaming$',
-' reviewed by ',
-' uploaded by ',
-'^Artworks with ',
-'^Artworks without ',
-'^Author died more than 100 years ago public domain images',
-'^Author matching ',
-'^Created with ',
-'^Edited versions of Flickr ',
-'^Exposure time ',
-'^F-number f',
-'^Featured pictures on ',
-'^Formerly featured pictures on ',
-'^Files by ',
-'^Files created by ',
-'^Files from ',
-'^Files moved ',
-'^Files uploaded by',
-'^Files with ',
-' uploaded from ',
-'^GPL',
-'Faebot',
-'High-resolution TIFF',
-'^Photos from Panoramio',
-'Picasa Web Albums files',
-'Year of birth missing',
-'^ISO speed rating ',
-'^Images by ',
-'^Images from ',
-'^Images taken by ',
-'^Images uploaded by ',
-'^Images which had ',
-'^Images with ',
-'^Import by ',
-'^Lens focal length ',
-'^Library of Congress-no known copyright restrictions',
-'^Media contributed by ',
-'^Media created by ',
-'^Media lacking ',
-'^Media missing ',
-'^Media needing ',
-'^Media renaming ',
-'^Media with ',
-'^Mobile uploads ',
-'^Ogv videos',
-'^PD ',
-'^PD-',
-'^PNG version available',
-'^Content created by  ',
-'^Pages with ',
-'^Photographs by ',
-'^Photographs taken on ',
-'^Photographs taken with ',
-'^Photos by ',
-'^Photos uploaded from ',
-'^Pictures taken by ',
-'^Animated GIF files',
-'^Picturing Canada images missing ',
-'^Quality Images by ',
-'^Retouched pictures',
-'^Symbol images that ',
-'^Taken with ',
-'^Template Unknown ',
-'^Temporary for ',
-'^UK Government artistic works',
-'^UW uploads ',
-'^Uploaded by ',
-'^Uploaded via ',
-'^Uploaded with ',
-'^User page images',
-'^User-created GFDL images',
-'^User:',
-'^Vector images using ',
-'^Vector version available',
-'^Video display resolution ',
-'^Videos available on ',
-'^Videos created with ',
-'^Videos needing ',
-'^WebM videos',
-'^Derivative versions',
-'^Extracted images',
-'^All media needing ',
-'^Photos edited by ',
-'^Large images',
-'^Long exposure photography',
-' created or edited with ',
-'^Supported by Wikimedia',
-'^Gif animations assembled with ',
-'^Bitmap version available',
-'^JPG images that should use ',
-'^Uploads by ',
-'^Valid SVG created ',
-'^Attribution$',
-
-        );
-    } // end get_hidden_categories_match
-
+ 
 } // END class category
 
 //////////////////////////////////////////////////////////

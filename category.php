@@ -38,13 +38,12 @@ if( $category_size > $page_limit ) {
     $pager = 'pages: ';
     for( $x = 0; $x < $category_size; $x+=$page_limit ) {
         if( $x == $offset ) {
-            $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">&nbsp;'
-            . ++$page_count . '&nbsp;</span>';
+            $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
+			. '&nbsp;' . ++$page_count . '&nbsp;</span> ';
             continue;
         }
-        $pager .= '<a href="?o=' . $x . '&amp;c='
-        . $smt->category_urlencode($smt->strip_prefix($category_name))
-        . '">&nbsp;' . ++$page_count . '&nbsp;</a>';
+        $pager .= '<a href="?o=' . $x . '&amp;c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
+		. '&nbsp;' . ++$page_count . '&nbsp;</a> ';
     }
 }
 
@@ -70,18 +69,18 @@ if( !$category || !is_array($category) ) {
 $smt->include_header();
 $smt->include_menu( /*show_counts*/FALSE );
 
+if( $smt->is_admin() ) {
+	 print '<form action="" name="media" method="POST">';
+}
+
 print '<div class="box white">'
-    . '<p>'
     . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">'
         . $smt->get_reviews_per_category( $category_info['id'] )
     . '</div>'
-    . '<h1>'
-    . $smt->strip_prefix($category_name)
-    . '</h1>'
-    . '<br /><b>' . $category_size
-    . '</b> files'
+    . '<h1>' . $smt->strip_prefix($category_name) . '</h1>'
+    . '<br /><b>' . $category_size . '</b> files'
     . ($pager ? ', '.$pager : '')
-    . '</p><br clear="all" />'
+    . '<br clear="all" />'
     ;
 
 if( $smt->is_admin() ) {

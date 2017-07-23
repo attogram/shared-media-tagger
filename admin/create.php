@@ -48,11 +48,14 @@ print '<ul>'
 . '</ul>';
 
 if( empty($_GET['montage']) ) {
-	print '</div>';
-	$smt->include_footer();
-	return;
+	print '</div>'; $smt->include_footer(); return;
 }
 
+
+if( !function_exists('imagecreatetruecolor') ) {
+	$smt->error('PHP GD Library NOT FOUND');
+	print '</div>'; $smt->include_footer(); return;
+}
 /*
 $sql = '
 SELECT m.*, t.count
@@ -79,6 +82,7 @@ if( !$images ) {
 	return;
 }
 
+$smt->start_timer('imagecreate');
 $montage = imagecreatetruecolor($montage_width, $montage_height + $footer_height);
 $x_index = $y_index = 0;
 foreach($images as $image) {
@@ -133,8 +137,9 @@ $image_data = ob_get_contents();
 ob_end_clean();
 
 imagedestroy($montage);
+$smt->end_timer('imagecreate');
 
-$data_url = 'data:image/pgn;base64,' . base64_encode($image_data);
+$data_url = 'data:image/png;base64,' . base64_encode($image_data);
 
 print '<p>'
 . '<img src="' . $data_url 

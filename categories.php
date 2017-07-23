@@ -71,6 +71,7 @@ print '';
     margin:0;
     padding:0;
 	display:table-row;
+	background-color:white;
 }
 .catfiles {
     display:table-cell;
