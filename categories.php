@@ -37,103 +37,59 @@ $sql .= ' LIMIT ' . $page_limit;
 
 $categories = $smt->query_as_array($sql, $bind);
 
-$smt->title = number_format(sizeof($categories));
-if( $hidden ) { $smt->title .= ' Technical'; }
-$smt->title .= ' Categories - ' . $smt->site_name;
+$page_name = number_format(sizeof($categories));
+if( $hidden ) { $page_name .= ' Technical'; } else { $page_name .= ' Active'; }
+$page_name .= ' Categories';
+
+$smt->title = $page_name . ' - ' . $smt->site_name;
 
 $smt->include_header();
 $smt->include_menu( /*show_counts*/FALSE );
-?>
-
-<div class="box white">
-<?php
 
 $smt->start_timer('print_category_table');
 
-print '';
-?>
-<div style="padding:10px 0px 0px 0px; float:right; display:inline-block;"><form method="GET">
-
-<a href="<?php print $smt->url('categories'); ?>" style="font-size:80%;">Active</a>
-&nbsp;
-<a href="<?php print $smt->url('categories'); ?>?h=1"  style="font-size:80%;">Tech</a>
-&nbsp;
-&nbsp;
+?><div class="box white">
 
 
+<div style="padding:10px 0px 10px 0px; float:right;"><form method="GET">
+<a href="<?php print $smt->url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;
+<a href="<?php print $smt->url('categories'); ?>?h=1"  style="font-size:80%;">Tech</a> &nbsp;
 <?php if( $hidden ) { print '<input type="hidden" name="h" value="1">'; } ?>
-<input type="text" name="s" value="<?php $search ? print htmlentities(urldecode($search)) : print ''; ?>" size="20">
+<input type="text" name="s" value="<?php $search ? print htmlentities(urldecode($search)) : print ''; ?>" size="16">
 <input type="submit" value="search">
 </form></div>
-<p style="display:inline-block;"><b><?php print $smt->title; ?></b></p>
-<style>
-.catcon {
-    margin:0;
-    padding:0;
-    display:table-row;
-    background-color:white;
-}
-.catfiles {
-    display:table-cell;
-    min-width:42px;
-    padding:0px 10px 0px 0px;
-    margin:0;
-    text-align:right;
-    font-size:90%;
-    border:1px solid #eee;
-}
-.catname {
-    display:table-cell;
-    padding:0px 0px 0px 10px;
-    margin:0;
-    border:1px solid #eee;
-    text-align:left;
-}
-.catname:hover {
-    background-color:yellow;
-}
-.cathead {
-    font-weight:bold;
-    font-size:80%;
-}
-</style>
+<br />
+
+
 <?php
-print '<div style="display:table;">';
-print '<div class="catcon"><div class="catfiles cathead"># Files</div><div class="catname cathead">Category</div></div>';
+
+print '<div class="cattable">'
+. '<div class="catcon">'
+. '<div class="catfiles cathead">Files</div>'
+. '<div class="catname cathead">' . $page_name . '</div>'
+. '</div>';
+
 ob_flush(); flush();
 
 foreach( $categories as $category ) {
-
     $local_url = $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix(@$category['name']));
-
     print '<div class="catcon">'
-    . '<div class="catfiles">'
-    //. '<a href="' . $local_url . '">'
-    . number_format(@$category['local_files'])
-    //. '</a>'
-    . '</div><div class="catname" onclick="window.location=\'' . $local_url . '\'">'
+    . '<div class="catfiles">' . number_format(@$category['local_files']) . '</div>'
+	. '<div class="catname" onclick="window.location=\'' . $local_url . '\'">'
     . '<a href="' . $local_url . '">' . $smt->strip_prefix(@$category['name']) . '</a>'
     . '</div>'
     . '</div>';
-    ;
     ob_flush(); flush();
 }
-
 print '</div>';
 
 $smt->end_timer('print_category_table');
 
 print '<br /><br />'
 . '<p class="center" style="padding:10px;">'
-. 'View: <a href="' . $smt->url('categories') . '">Active Categories</a>'
-. '  -  '
-. '<a href="' . $smt->url('categories') . '?h=1">Technical Categories</a>'
-. '</p>';
+. '<a href="' . $smt->url('categories') . '">Active Categories</a>'
+. '  -  <a href="' . $smt->url('categories') . '?h=1">Technical Categories</a>'
+. '</p><br /><br />'
+. '</div>';
 
-?>
-<br /><br />
-</div>
-<?php
 $smt->include_footer();
-
-

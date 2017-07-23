@@ -46,3 +46,9 @@ audio { border:1px solid black; background-color:white; background-clip:content-
 .tagbutton { display:inline-block; vertical-align:middle; text-align:center; white-space:pre; padding:0px 0px 0px 0px; border:1px solid #333; }
 .tagbutton:hover { border:1px solid yellow; background-color:black; }
 .tagbutton a { font-size:270%; }
+.cattable { display:table; margin:0 auto; min-width:80%; }
+.catcon { display:table-row; margin:0; padding:0;  background-color:white; }
+.catfiles { display:table-cell; min-width:42px; padding:0px 10px 0px 0px; margin:0; text-align:right; font-size:90%; border:1px solid #eee; }
+.catname { display:table-cell; padding:0px 0px 0px 10px; margin:0; border:1px solid #eee; text-align:left; }
+.catname:hover { background-color:yellow; }
+.cathead { font-style:italic; font-size:95%; background-color:#e3e3e3; }

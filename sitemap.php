@@ -52,7 +52,8 @@ $media = $smt->query_as_array('SELECT pageid FROM media');
 foreach( $media as $pageid ) {
     url( $smt->url('info') . '?i=' . $pageid['pageid'] );
 }
-print '</urlset>' . $cr;
+
+print $cr . '</urlset>' . $cr;
 
 //////////////////////////////////////////////////////////
 function url($loc) {

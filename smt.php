@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.13');
+define('__SMT__', '0.7.14');
 
 ob_start('ob_gzhandler');
 
@@ -128,9 +128,9 @@ class smt_utils {
         }
         if(
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || 
-			(isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
-		) {
+            ||
+            (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+        ) {
             return $this->protocol = 'https:';
         }
         return $this->protocol = 'http:';
@@ -248,7 +248,6 @@ class smt_page EXTENDS smt_utils {
             print '</div><br /><br /><br />';
         }
 
-
         print '</div></footer>';
 
         // Site footers
@@ -260,7 +259,6 @@ class smt_page EXTENDS smt_utils {
                 include($site_footer);
             }
         }
-
         print '</body></html>';
     } // end include_footer()
 
@@ -277,8 +275,10 @@ class smt_page EXTENDS smt_utils {
         print ''
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
-        . $space
-        . '<a href="' . $this->url('home') . '">' . $count_files . '&nbsp;Files' . '</a>'
+        .   ( $show_counts
+                ? $space . '<a href="' . $this->url('home') . '">' . $count_files . '&nbsp;Files' . '</a>'
+                : ''
+            )
         . $space
         . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
         . $space
