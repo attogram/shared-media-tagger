@@ -1161,11 +1161,18 @@ class smt_admin_category extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
     function update_category_local_files_count( $category_name ) {
-        $this->debug("update_category_local_files_count( $category_name )");
+        
+		$this->debug("update_category_local_files_count( $category_name )");
+		
         $sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
-        $bind[':local_files'] = $this->get_category_size( $category_name );
-        $bind[':id'] = $this->get_category_id_from_name( $category_name );
-        if( !$bind[':id'] ) {
+ 		$bind[':local_files'] = $this->get_category_size( $category_name );
+		if( is_int($category_name) ) {
+			$bind['id'] = $category_name;
+		} else {
+			$bind[':id'] = $this->get_category_id_from_name( $category_name );
+		}
+        
+		if( !$bind[':id'] ) {
             $this->error("update_category_local_files_count( $category_name ) - Category Not Found in Database");
             return FALSE;
         }

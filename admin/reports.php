@@ -15,19 +15,73 @@ $smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
-<li><a href="' . $smt->url('admin') .'reports.php?r=catclean">Clean Category Table</a></li>
+<li><a href="' . $smt->url('admin') . 'reports.php?r=localfiles">Update: Count of Local Files per Category</a>
+<li><a href="' . $smt->url('admin') . 'reports.php?r=catclean">Clean Category Table</a></li>
 </ul>
 <hr />';
 
 
 switch( @$_GET['r'] ) {
     default: print '<p>Please choose a report above</p>'; break;
-    case 'cat0local': cat0local(); break;
+    case 'localfiles': localfiles(); break;
     case 'catclean': catclean(); break;
 } // end switch
 
 print '</div>';
 $smt->include_footer();
+
+////////////////////////////////
+function localfiles() {
+
+	global $smt;
+	
+	print '<p>Updating Count of Local Files per Category</p>';
+	
+	$sql = 'SELECT c2m.category_id, count(c2m.id) AS size, c.local_files
+			FROM category2media AS c2m, category AS c
+			WHERE c2m.category_id = c.id
+			GROUP BY c2m.category_id
+			ORDER BY size DESC';
+	$category_new_sizes = $smt->query_as_array($sql);
+	if( !$category_new_sizes ) {
+		$category_new_sizes = array();
+		print '<p>No Categories with files found</p>';
+	}
+
+	print "<pre>ID \t OLD-C \t NEW-C \t STATUS";
+	print "<br />-- \t ----- \t ----- \t -----------------------------";
+	foreach( $category_new_sizes as $cat ) {
+		print '<br />' . $cat['category_id'] 
+		. " \t " . $cat['local_files']
+		. " \t " . $cat['size'] 
+		. " \t ";
+		
+		if( $cat['local_files'] == $cat['size'] ) {
+			print 'OK';
+			continue;
+		}
+		
+		if( localfiles_update_category( $cat['category_id'], $cat['size'] ) ) {
+			print 'UPDATED @ ' . $smt->time_now();
+		} else {
+			print 'ERROR';
+		}
+	}
+	print '</pre>';
+	
+} // end function localfiles
+
+function localfiles_update_category($category_id, $category_size) {
+	global $smt;
+	$sql = 'UPDATE category SET local_files = :category_size, updated = :updated WHERE id = :category_id';
+	$bind[':category_size'] = $category_size;
+	$bind[':updated'] = $smt->time_now();
+	$bind[':category_id'] = $category_id;
+	if( $smt->query_as_bool($sql,$bind) ) {
+		return TRUE;
+	}
+	return FALSE;
+}
 
 
 

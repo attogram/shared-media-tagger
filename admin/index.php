@@ -45,6 +45,7 @@ print '<p>Installation:
 <ul>
 <li>Server: ' . $smt->server . '</li>
 <li>URL: <a href="' . $smt->url('home') . '">' . $smt->url('home') . '</a></li>
+<li>Protocol: ' . $smt->get_protocol() . '</li>
 <li>Directory: ' . $smt->install_directory . '</li>
 <li>Setup: ' . ($smt->setup ? print_r($smt->setup,1) : 'none') . '</li>
 <li>Global Header: '
