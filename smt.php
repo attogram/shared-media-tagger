@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.12');
+define('__SMT__', '0.7.13');
 
 ob_start('ob_gzhandler');
 
@@ -127,9 +127,10 @@ class smt_utils {
             return $this->protocol;
         }
         if(
-            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || $_SERVER['SERVER_PORT'] == 443 )
-        {
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || 
+			(isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+		) {
             return $this->protocol = 'https:';
         }
         return $this->protocol = 'http:';

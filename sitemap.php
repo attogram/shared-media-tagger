@@ -2,37 +2,39 @@
 // Shared Media Tagger
 // Sitemap
 
-header('Content-type: application/xml');
-
-print '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-';
-
 $init = __DIR__.'/smt.php';
 if( !file_exists($init) || !is_readable($init) ){
-    print '</urlset>';
     exit;
 }
-require_once($init);
+include_once($init);
 
 $smt = new smt();
 
-$cr = ''; // "\n";
+$cr = "\n";
 
-$protocol = $smt->get_protocol();
+$protocol = @$smt->get_protocol();
+if( !$protocol ) { $protocol = 'http:'; }
+
+header('Content-type: application/xml');
+
+print '<?xml version="1.0" encoding="UTF-8"?>' . $cr
+. '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . $cr;
 
 print '<url><loc>' . $protocol . $smt->url('home') . '</loc>'
 . '<lastmod>' . gmdate('Y-m-d') . '</lastmod>'
 . '<changefreq>always</changefreq>'
 . '</url>' . $cr;
 
+
 url( $smt->url('about') );
 url( $smt->url('reviews') );
-// TODO - all review report pages
 url( $smt->url('users') );
-// TODO - all users report pages
 url( $smt->url('contact') );
 url( $smt->url('categories') );
+// TODO - all review report pages
+// TODO - all users report pages
+
+print $cr;
 
 // all categories
 $cats = $smt->query_as_array('
@@ -43,16 +45,17 @@ foreach( $cats as $cat ) {
     url( $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($cat['name']) ) );
 }
 
+print $cr;
+
 // all media files
 $media = $smt->query_as_array('SELECT pageid FROM media');
 foreach( $media as $pageid ) {
     url( $smt->url('info') . '?i=' . $pageid['pageid'] );
 }
-
 print '</urlset>' . $cr;
 
 //////////////////////////////////////////////////////////
 function url($loc) {
     global $protocol;
-    print '<url><loc>' . $protocol . $loc . '</loc></url>'; // . "\n";
+    print '<url><loc>' . $protocol . $loc . '</loc></url>'; 
 }
