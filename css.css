@@ -1,39 +1,12 @@
-.admin a { background-color:blue; color:yellow;}
-.admin {font-size:110%; font-weight:bold; background-color:blue; }
-.attribution { font-size:65%; }
-.box { text-align:left; margin:0px; padding:5px 20px 20px 20px; }
-.categories { padding:5px; margin:auto; text-align:left; font-size:90%; }
-.center { text-align:center; margin:auto; }
-.debug { color:black; background-color:yellow; font-size:90%; }
-.error { color:black; background-color:yellow; font-size:90%; }
-.fail { color:black; background-color:yellow; font-size:110%; }
-.grey a { background-color:inherit; color:yellow; }
-.grey a:hover { background-color:inherit; color:white; }
-.grey { background-color:#333; color:#9c9; }
-.left { text-align:left; }
-.mediatitle { font-size:80%; }
-.menu a { background-color:#222; color:#ccc; }
-.menu a:hover { color:yellow }
-.menu a:visited { color:#ddd }
-.menu { background-color:#222; color:#ccc; padding:3px 0px 3px 8px; margin:0px; line-height:2; text-align:center; font-size:85%; }
-.message { margin:0; padding:2px; text-align:left; }
-.nobr { white-space:nowrap; }
-.notice { color:black; background-color:lightsalmon; font-size:90%; }
-.pre { white-space:nowrap; font-family:monospace; }
-.reviewbutton { display:inline-block; white-space:nowrap; padding:10px; margin:4px; border:1px solid black; font-weight:bold; }
-.right { text-align:right; }
-.tagbutton a { font-size:270%; }
-.tagbutton { display:inline-block; vertical-align:middle; text-align:center; white-space:pre; padding:0px 0px 0px 0px; border:1px solid #333; }
-.tagbutton:hover { border:1px solid yellow; background-color:black; }
-.thumbnail_box { background-color:#ccc; border:1px solid grey; display:inline-block; text-align:center; vertical-align:top; margin:3px; padding:3px; }
-.thumbnail_reviews { background-color:inherit; display:inline-block; text-align:left; margin:0px; padding:1px; font-size:80%; }
-.white { background-color:white; color:black; }
-a { text-decoration:none !important; color:darkblue; }
-a:hover { background-color:yellow; color:darkblue; }
-a:visited { color:darkblue; }
-audio { border:1px solid black; background-color:white; background-clip:content-box; }
 body { background-color:#222; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
+a { text-decoration:none !important; color:darkblue; }
+a:visited { color:darkblue; }
+a:hover { background-color:yellow; color:darkblue; }
+table { border-spacing:0; border:1px solid grey; border-collapse:collapse; margin:auto; background-color:white; }
+table td { padding:2px; vertical-align:top; }
+table th { padding:4px; vertical-align:center; font-size:75%; background-color:#ccc; }
 form { display:inline; }
+ul { line-height:1.3; display:block; }
 h1 { display:inline; font-size:150% !important; font-weight:bold !important; }
 h2 { display:inline; font-size:110% !important; font-weight:bold !important; }
 h3 { font-size:95%; display:inline; }
@@ -41,8 +14,35 @@ h4 { font-size:70%; display:inline; }
 h5 { font-size:60%; display:inline; }
 img { border:1px solid black; background-color:white; background-clip:content-box; }
 img:hover { border:1px solid red; background-color:white; }
-table td { padding:2px; vertical-align:top; }
-table th { padding:4px; vertical-align:center; font-size:75%; background-color:#ccc; }
-table { border-spacing:0; border:1px solid grey; border-collapse:collapse; margin:auto; background-color:white; }
-ul { line-height:1.3; display:block; }
 video { border:1px solid black; background-color:white; background-clip:content-box; }
+audio { border:1px solid black; background-color:white; background-clip:content-box; }
+.menu { background-color:#222; color:#ccc; padding:3px 0px 3px 8px; margin:0px; line-height:2; text-align:center; font-size:85%; }
+.menu a { background-color:#222; color:#ccc; }
+.menu a:visited { color:#ddd }
+.menu a:hover { color:yellow }
+.admin {font-size:110%; font-weight:bold; background-color:blue; }
+.admin a { background-color:blue; color:yellow;}
+.box { text-align:left; margin:0px; padding:5px 20px 20px 20px; }
+.white { background-color:white; color:black; }
+.grey { background-color:#333; color:#9c9; }
+.grey a { background-color:inherit; color:yellow; }
+.grey a:hover { background-color:inherit; color:white; }
+.center { text-align:center; margin:auto; }
+.nobr { white-space:nowrap; }
+.pre { white-space:nowrap; font-family:monospace; }
+.right { text-align:right; }
+.left { text-align:left; }
+.categories { padding:5px; margin:auto; text-align:left; font-size:90%; }
+.thumbnail_box { background-color:#ccc; border:1px solid grey; display:inline-block; text-align:center; vertical-align:top; margin:3px; padding:3px; }
+.thumbnail_reviews { background-color:inherit; display:inline-block; text-align:left; margin:0px; padding:1px; font-size:80%; }
+.message { margin:0; padding:2px; text-align:left; }
+.debug { color:black; background-color:yellow; font-size:90%; }
+.notice { color:black; background-color:lightsalmon; font-size:90%; }
+.error { color:black; background-color:yellow; font-size:90%; }
+.fail { color:black; background-color:yellow; font-size:110%; }
+.mediatitle { font-size:80%; }
+.attribution { font-size:65%; }
+.reviewbutton { display:inline-block; white-space:nowrap; padding:10px; margin:4px; border:1px solid black; font-weight:bold; }
+.tagbutton { display:inline-block; vertical-align:middle; text-align:center; white-space:pre; padding:0px 0px 0px 0px; border:1px solid #333; }
+.tagbutton:hover { border:1px solid yellow; background-color:black; }
+.tagbutton a { font-size:270%; }
