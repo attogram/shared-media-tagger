@@ -26,6 +26,7 @@ if( isset($_GET['i']) && $_GET['i'] ) {
     . htmlentities($smt->strip_prefix($category_name)) . '</a>';
     print '<p>Importing media from <b>' . $cat_url . '</b></p>';
     $smt->get_media_from_category( $category_name );
+	$smt->update_categories_local_files_count();
     print '<p>Imported media from <b>' . $cat_url . '</b></p>';
     print '</div>';
     $smt->include_footer();
@@ -36,6 +37,7 @@ if( isset($_GET['i']) && $_GET['i'] ) {
 ///////////////////////////////////////////////////////////////////////////////
 if( isset($_POST['cats']) && $_POST['cats'] ) {
     $smt->import_categories( $_POST['cats'] );
+	$smt->update_categories_local_files_count();
     print '</div>';
     $smt->include_footer();
     return;
@@ -48,6 +50,7 @@ if( isset($_GET['c']) && $_GET['c'] ) {
         . $smt->strip_prefix($smt->category_urlencode($_GET['c']))
         . '">' . htmlentities($smt->category_urldecode($_GET['c']))) . '</a></b>';
     }
+	//$smt->update_categories_local_files_count();
     print '</div>';
     $smt->include_footer();
     return;
@@ -55,6 +58,7 @@ if( isset($_GET['c']) && $_GET['c'] ) {
 
 if( isset($_GET['d']) && $_GET['d'] ) {
     delete_category($smt);
+	$smt->update_categories_local_files_count();
     print '</div>';
     $smt->include_footer();
     return;
@@ -69,6 +73,7 @@ if( isset($_GET['s']) && $_GET['s'] ) {
 
 if( isset($_GET['sc']) && $_GET['sc'] ) {
     $smt->get_subcats( $smt->category_urldecode($_GET['sc']) );
+	$smt->update_categories_local_files_count();
     print '</div>';
     $smt->include_footer();
     return;
