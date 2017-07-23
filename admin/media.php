@@ -17,26 +17,26 @@ print '<div class="box white"><p>Media Admin:</p>';
 
 if( isset($_GET['am']) ) {
     print $smt->add_media($_GET['am']);
-	$smt->update_categories_local_files_count();	
-	print '<hr />';
+    $smt->update_categories_local_files_count();
+    print '<hr />';
 }
 
 if( isset($_GET['media'])  ) {
     print multi_delete_media($_GET['media']);
-	$smt->update_categories_local_files_count();	
-	print '<hr />';
+    $smt->update_categories_local_files_count();
+    print '<hr />';
 }
 
 if( isset($_GET['dm']) ) {
     print $smt->delete_media($_GET['dm']);
-	$smt->update_categories_local_files_count();	
-	print '<hr />';
+    $smt->update_categories_local_files_count();
+    print '<hr />';
 }
 
 if( isset($_GET['dc']) ) {
     print delete_media_in_category( $smt->category_urldecode($_GET['dc']));
-	$smt->update_categories_local_files_count();	
-	print '<hr />';	
+    $smt->update_categories_local_files_count();
+    print '<hr />';
 }
 
 

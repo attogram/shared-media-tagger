@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.16');
+define('__SMT__', '0.7.17');
 
 ob_start('ob_gzhandler');
 

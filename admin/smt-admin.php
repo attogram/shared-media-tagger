@@ -342,7 +342,7 @@ class smt_commons_API extends smt_admin_database_utils {
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
 
-        $this->notice('call_commons( url:<a target="commons" href="'.$url.'">'
+        $this->debug('call_commons( url:<a target="commons" href="'.$url.'">'
         . $this->truncate(str_replace('https://commons.wikimedia.org/w/api.php?action=query&format=json','',$url), 100)."</a>, $key )");
 
         if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; }
@@ -459,7 +459,7 @@ class smt_admin_media extends smt_commons_API {
         //$response .= $this->display_thumbnail_box($media[$pageid]);
 
         $response .= '</div>';
-		
+
         return $response;
     }
 
@@ -739,7 +739,7 @@ class smt_admin_media extends smt_commons_API {
         } else {
             $response .= '<br />ERROR: ' . $sql;
         }
-		
+
         return $response . '</div>';
 
     }
@@ -1095,7 +1095,7 @@ class smt_admin_category extends smt_admin_media {
                     ':local_files'=>$local_files,
                     ':hidden'=>'0',
                     ':missing'=>'0',
-					':updated'=>$this->time_now()
+                    ':updated'=>$this->time_now()
                 ) )
 
         ) {
@@ -1160,18 +1160,18 @@ class smt_admin_category extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
     function update_category_local_files_count( $category_name ) {
-        
-		$this->debug("update_category_local_files_count( $category_name )");
-		
+
+        $this->debug("update_category_local_files_count( $category_name )");
+
         $sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
- 		$bind[':local_files'] = $this->get_category_size( $category_name );
-		if( is_int($category_name) ) {
-			$bind['id'] = $category_name;
-		} else {
-			$bind[':id'] = $this->get_category_id_from_name( $category_name );
-		}
-        
-		if( !$bind[':id'] ) {
+        $bind[':local_files'] = $this->get_category_size( $category_name );
+        if( is_int($category_name) ) {
+            $bind['id'] = $category_name;
+        } else {
+            $bind[':id'] = $this->get_category_id_from_name( $category_name );
+        }
+
+        if( !$bind[':id'] ) {
             $this->error("update_category_local_files_count( $category_name ) - Category Not Found in Database");
             return FALSE;
         }
@@ -1184,51 +1184,51 @@ class smt_admin_category extends smt_admin_media {
     }
 
     //////////////////////////////////////////////////////////
-	function update_categories_local_files_count() {
+    function update_categories_local_files_count() {
 
-		$sql = 'SELECT c2m.category_id, count(c2m.id) AS size, c.local_files
-				FROM category2media AS c2m, category AS c
-				WHERE c2m.category_id = c.id
-				GROUP BY c2m.category_id
-				ORDER BY size DESC';
-		$category_new_sizes = $this->query_as_array($sql);
-		if( !$category_new_sizes ) {
-			$category_new_sizes = array();
-			$this->notice('Updated 0 Categories Local Files count');
-			return;
-		}
+        $sql = 'SELECT c2m.category_id, count(c2m.id) AS size, c.local_files
+                FROM category2media AS c2m, category AS c
+                WHERE c2m.category_id = c.id
+                GROUP BY c2m.category_id
+                ORDER BY size DESC';
+        $category_new_sizes = $this->query_as_array($sql);
+        if( !$category_new_sizes ) {
+            $category_new_sizes = array();
+            $this->notice('Updated 0 Categories Local Files count');
+            return;
+        }
 
-		$updates = 0;
-		$this->begin_transaction();
-		foreach( $category_new_sizes as $cat ) {		
-			if( $cat['local_files'] == $cat['size'] ) {
-				continue;
-			}
-			if( !$cat['size'] ) {
-				continue;
-			}
-			if( $this->insert_category_local_files_count( $cat['category_id'], $cat['size'] ) ) {
-				$updates++;
-			} else {
-				$this->error('ERROR: UPDATE FAILED: Category ID:' . $cat['category_id'] . ' local_files=' . $cat['size']);
-			}
-		}
-		$this->commit();
-		$this->notice('Updated ' . $updates . ' Categories Local Files count');
-		$this->vacuum();
-	} 
+        $updates = 0;
+        $this->begin_transaction();
+        foreach( $category_new_sizes as $cat ) {
+            if( $cat['local_files'] == $cat['size'] ) {
+                continue;
+            }
+            if( !$cat['size'] ) {
+                continue;
+            }
+            if( $this->insert_category_local_files_count( $cat['category_id'], $cat['size'] ) ) {
+                $updates++;
+            } else {
+                $this->error('ERROR: UPDATE FAILED: Category ID:' . $cat['category_id'] . ' local_files=' . $cat['size']);
+            }
+        }
+        $this->commit();
+        $this->notice('Updated ' . $updates . ' Categories Local Files count');
+        $this->vacuum();
+    }
 
     //////////////////////////////////////////////////////////
-	function insert_category_local_files_count($category_id, $category_size) {
-		$sql = 'UPDATE category SET local_files = :category_size, updated = :updated WHERE id = :category_id';
-		$bind[':category_size'] = $category_size;
-		$bind[':updated'] = $this->time_now();
-		$bind[':category_id'] = $category_id;
-		if( $this->query_as_bool($sql,$bind) ) {
-			return TRUE;
-		}
-		return FALSE;
-	}
+    function insert_category_local_files_count($category_id, $category_size) {
+        $sql = 'UPDATE category SET local_files = :category_size, updated = :updated WHERE id = :category_id';
+        $bind[':category_size'] = $category_size;
+        $bind[':updated'] = $this->time_now();
+        $bind[':category_id'] = $category_id;
+        if( $this->query_as_bool($sql,$bind) ) {
+            return TRUE;
+        }
+        return FALSE;
+    }
 
     //////////////////////////////////////////////////////////
     function empty_category_tables() {
