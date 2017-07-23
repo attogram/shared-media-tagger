@@ -156,14 +156,16 @@ class smt_admin_database_utils extends smt_admin_utils {
     'id' INTEGER PRIMARY KEY,
     'name' TEXT,
     'about' TEXT,
-    CONSTRAINT su UNIQUE (name) )",
+    CONSTRAINT su UNIQUE (name)
+)",
 
 'tag' =>
     "CREATE TABLE IF NOT EXISTS 'tag' (
     'id' INTEGER PRIMARY KEY,
     'position' INTEGER,
     'name' TEXT,
-    'display_name' TEXT )",
+    'display_name' TEXT
+)",
 
 'tagging' =>
     "CREATE TABLE IF NOT EXISTS 'tagging' (
@@ -171,8 +173,9 @@ class smt_admin_database_utils extends smt_admin_utils {
     'tag_id' INTEGER,
     'media_pageid' INTEGER,
     'count' INTEGER,
-    CONSTRAINT tmu UNIQUE (tag_id, media_pageid) )",
-'tagging_upgrade_001' => "ALTER TABLE 'tagging' ADD COLUMN 'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL",
+    'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL,
+    CONSTRAINT tmu UNIQUE (tag_id, media_pageid)
+)",
 
 'category' =>
     "CREATE TABLE IF NOT EXISTS 'category' (
@@ -181,19 +184,21 @@ class smt_admin_database_utils extends smt_admin_utils {
     'pageid' INTEGER,
     'files' INTEGER,
     'subcats' INTEGER,
-    CONSTRAINT cu UNIQUE (name) )",
-'category_upgrade_001' => "ALTER TABLE 'category' ADD COLUMN 'local_files' INTEGER DEFAULT '0' NOT NULL",
-'category_upgrade_002' => "ALTER TABLE 'category' ADD COLUMN 'missing' INTEGER DEFAULT '0' NOT NULL",
-'category_upgrade_003' => "ALTER TABLE 'category' ADD COLUMN 'hidden' INTEGER DEFAULT '0' NOT NULL",
-'category_upgrade_004' => "ALTER TABLE 'category' ADD COLUMN 'force' INTEGER",
-'category_upgrade_005' => "ALTER TABLE 'category' ADD COLUMN 'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL",
+    'local_files' INTEGER DEFAULT '0' NOT NULL,
+    'missing' INTEGER DEFAULT '0' NOT NULL,
+    'hidden' INTEGER DEFAULT '0' NOT NULL,
+    'force' INTEGER,
+    'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL,
+    CONSTRAINT cu UNIQUE (name)
+)",
 
 'category2media' =>
     "CREATE TABLE IF NOT EXISTS 'category2media' (
     'id' INTEGER PRIMARY KEY,
     'category_id' INTEGER,
     'media_pageid' INTEGER,
-    CONSTRAINT tmu UNIQUE (category_id, media_pageid) )",
+    CONSTRAINT tmu UNIQUE (category_id, media_pageid)
+)",
 
 'media' =>
     "CREATE TABLE IF NOT EXISTS 'media' (
@@ -223,23 +228,26 @@ class smt_admin_database_utils extends smt_admin_utils {
     'user' TEXT,
     'userid' TEXT,
     'duration' TEXT,
-    'timestamp' TEXT )",
-'media_upgrade_001' => "ALTER TABLE 'media' ADD COLUMN 'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL",
+    'timestamp' TEXT,
+    'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL
+)",
 
 'contact' =>
     "CREATE TABLE IF NOT EXISTS 'contact' (
     'id' INTEGER PRIMARY KEY,
     'comment' TEXT,
     'datetime' TEXT,
-    'ip' TEXT )",
+    'ip' TEXT
+)",
 
 'block' =>
     "CREATE TABLE IF NOT EXISTS 'block' (
     'pageid' INTEGER PRIMARY KEY,
     'title' TEXT,
-    'thumb' TEXT )",
-'block_upgrade_001' => "ALTER TABLE 'block' ADD COLUMN 'ns' INTEGER",
-'block_upgrade_002' => "ALTER TABLE 'block' ADD COLUMN 'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL",
+    'thumb' TEXT,
+    'ns' INTEGER,
+    'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL
+)",
 
 'user' =>
     "CREATE TABLE IF NOT EXISTS 'user' (
@@ -249,7 +257,8 @@ class smt_admin_database_utils extends smt_admin_utils {
     'user_agent' TEXT,
     'page_views' INTEGER,
     'last' TEXT,
-    CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
+    CONSTRAINT uc UNIQUE (ip, host, user_agent)
+)",
 
 'user_tagging' =>
     "CREATE TABLE IF NOT EXISTS 'user_tagging' (
@@ -258,8 +267,9 @@ class smt_admin_database_utils extends smt_admin_utils {
     'tag_id' INTEGER,
     'media_pageid' INTEGER,
     'count' INTEGER,
-    CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
-'user_tagging_upgrade_001' => "ALTER TABLE 'user_tagging' ADD COLUMN 'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL",
+    'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL,
+    CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid)
+)",
 
 
 // Default Demo Site setup
