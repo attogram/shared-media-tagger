@@ -70,8 +70,8 @@ print '';
 .catcon {
     margin:0;
     padding:0;
-	display:table-row;
-	background-color:white;
+    display:table-row;
+    background-color:white;
 }
 .catfiles {
     display:table-cell;
@@ -87,10 +87,10 @@ print '';
     padding:0px 0px 0px 10px;
     margin:0;
     border:1px solid #eee;
-	text-align:left;
+    text-align:left;
 }
 .catname:hover {
-	background-color:yellow;
+    background-color:yellow;
 }
 .cathead {
     font-weight:bold;

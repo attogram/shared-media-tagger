@@ -266,13 +266,13 @@ class smt_page EXTENDS smt_utils {
     //////////////////////////////////////////////////////////
     function include_menu( $show_counts=TRUE ) {
         $space = ' &nbsp; &nbsp; ';
-		$count_files = $count_categories = $count_reviews = $count_users = '';
-		if( $show_counts ) {
-			$count_files = number_format($this->get_image_count());
-			$count_categories = number_format($this->get_categories_count());
-			$count_reviews = number_format($this->get_total_review_count());
-			$count_users = number_format($this->get_user_count());
-		}
+        $count_files = $count_categories = $count_reviews = $count_users = '';
+        if( $show_counts ) {
+            $count_files = number_format($this->get_image_count());
+            $count_categories = number_format($this->get_categories_count());
+            $count_reviews = number_format($this->get_total_review_count());
+            $count_users = number_format($this->get_user_count());
+        }
         print ''
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
@@ -342,16 +342,16 @@ class smt_database_utils EXTENDS smt_page {
 
     //////////////////////////////////////////////////////////
     function query_as_array( $sql, $bind=array() ) {
-		$this->start_timer('query_as_array');
-		$this->debug("query_as_array( <pre>$sql</pre>, bind:".sizeof($bind)." ) ");
-		
+        $this->start_timer('query_as_array');
+        $this->debug("query_as_array( <pre>$sql</pre>, bind:".sizeof($bind)." ) ");
+
         if( !$this->db ) { $this->init_database(); }
         if( !$this->db ) { $this->end_timer('query_as_array'); return FALSE; }
 
         $statement = $this->db->prepare($sql);
         if( !$statement ) {
             $this->debug('::query_as_array(): ERROR PREPARE'); // '. $this->db->errorInfo()[2]);
-			$this->end_timer('query_as_array');
+            $this->end_timer('query_as_array');
             return array();
         }
         while( $xbind = each($bind) ) {
@@ -373,15 +373,15 @@ class smt_database_utils EXTENDS smt_page {
         }
 
         $this->debug('query_as_array: OK:'. count($response). ': ' . htmlentities($sql)
-		. ' | response: <pre>' . htmlentities(print_r($response,1)) . '</pre>' );
+        . ' | response: <pre>' . htmlentities(print_r($response,1)) . '</pre>' );
 
-		$this->end_timer('query_as_array');
+        $this->end_timer('query_as_array');
         return $response;
     }
 
     //////////////////////////////////////////////////////////
     function query_as_bool( $sql, $bind=array() ) {
-		$this->start_timer('query_as_bool');
+        $this->start_timer('query_as_bool');
         $this->debug("query_as_bool: <pre>$sql</pre>");
         if( $bind ) { $this->debug('query_as_bool: BIND: <pre>' . htmlentities(print_r($bind,1)) . '</pre>' ); }
 
@@ -394,7 +394,7 @@ class smt_database_utils EXTENDS smt_page {
             $this->last_error = $this->db->errorInfo();
             $this->debug('query_as_bool: prepare failed. SQL:<br />'
                 . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
-			$this->end_timer('query_as_bool');
+            $this->end_timer('query_as_bool');
             return FALSE;
         }
         while( $xbind = each($bind) ) {
@@ -407,33 +407,33 @@ class smt_database_utils EXTENDS smt_page {
             $this->debug($this->last_error);
             if( $this->last_error[0] == '00000' ) {
                 $this->debug('NULL EVENT: ' . trim($sql));
-				$this->end_timer('sql');
-				$this->end_timer('query_as_bool');
+                $this->end_timer('sql');
+                $this->end_timer('query_as_bool');
                 return TRUE;
             }
             $this->debug('query_as_bool: prepare failed. SQL: '
                 . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
-			$this->end_timer('sql');
-			$this->end_timer('query_as_bool');
+            $this->end_timer('sql');
+            $this->end_timer('query_as_bool');
             return FALSE;
         }
         $this->end_timer('sql');
         $this->last_error = $this->db->errorInfo();
         $this->last_insert_id = $this->db->lastInsertId();
         $this->debug('OK: ' . trim($sql));
-		$this->end_timer('query_as_bool');	
+        $this->end_timer('query_as_bool');
         return TRUE;
     } // end function query_as_bool()
 
     //////////////////////////////////////////////////////////
     function vacuum() {
-		$this->start_timer('vacuum');
+        $this->start_timer('vacuum');
         if( $this->query_as_bool('VACUUM') ) {
-			$this->end_timer('vacuum');
+            $this->end_timer('vacuum');
             return TRUE;
         }
         $this->error('FAILED to VACUUM');
-		$this->end_timer('vacuum');
+        $this->end_timer('vacuum');
         return FALSE;
     }
 
@@ -585,7 +585,7 @@ class smt_site_admin EXTENDS smt_media {
 <input type="submit" value="Delete selected media">
 <script type="text/javascript" language="javascript">
 '
-. "function checkAll(formname, checktoggle) { var checkboxes = new Array(); 
+. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
 checkboxes = document[formname].getElementsByTagName('input');
 for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
 </script>"
@@ -596,7 +596,7 @@ for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') 
 <br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
 . $this->category_urlencode($category['name']) . '">Get Category Info</a>
 <br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
-. $this->category_urlencode($category['name']) 
+. $this->category_urlencode($category['name'])
 . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
 <br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
 . $this->category_urlencode($category['name'])
@@ -834,24 +834,24 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function get_category( $name ) {
-		
-		$this->debug("get_category( $name )");
-		
+
+        $this->debug("get_category( $name )");
+
         $response = $this->query_as_array(
             'SELECT * FROM category WHERE name = :name',
             array(':name'=>$name)
         );
         if( !isset($response[0]['id']) ) {
-			$this->debug("get_category( $name ) = ERROR: Category Not Found in Database");
+            $this->debug("get_category( $name ) = ERROR: Category Not Found in Database");
             return array();
         }
-		$this->debug("get_category( $name ) = <pre>" . print_r($response[0],1) . '</pre>');
+        $this->debug("get_category( $name ) = <pre>" . print_r($response[0],1) . '</pre>');
         return $response[0];
     }
 
     //////////////////////////////////////////////////////////
     function get_category_size( $category_name ) {
-		$this->debug("get_category_size( $category_name )");
+        $this->debug("get_category_size( $category_name )");
         $response = $this->query_as_array(
             'SELECT count(c2m.id) AS size
             FROM category2media AS c2m, category AS c
@@ -924,17 +924,17 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function get_category_id_from_name( $category_name ) {
-		
+
         $response = $this->query_as_array(
             'SELECT id FROM category WHERE name = :name',
             array(':name'=>$category_name)
         );
 
         if( !isset($response[0]['id']) ) {
-			$this->debug("get_category_id_from_name( $category_name ) ERROR = 0");
+            $this->debug("get_category_id_from_name( $category_name ) ERROR = 0");
             return 0;
         }
-		$this->debug("get_category_id_from_name( $category_name ) = " . $response[0]['id']);
+        $this->debug("get_category_id_from_name( $category_name ) = " . $response[0]['id']);
         return $response[0]['id'];
     }
 
@@ -987,20 +987,20 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function is_hidden_category( $category_name ) {
-		//$this->notice("is_hidden_category( $category_name )");
+        //$this->notice("is_hidden_category( $category_name )");
         if( !$category_name ) {
             $this->debug('ERROR: is_hidden_category: category_name NOT FOUND');
             return FALSE;
         }
-		$sql = 'SELECT id FROM category WHERE hidden = 1 AND name = :category_name';
-		$bind = array(':category_name'=>$category_name);
-		if( $this->query_as_array($sql, $bind) ) {
-			return TRUE;
-		}
+        $sql = 'SELECT id FROM category WHERE hidden = 1 AND name = :category_name';
+        $bind = array(':category_name'=>$category_name);
+        if( $this->query_as_array($sql, $bind) ) {
+            return TRUE;
+        }
         return FALSE;
     }
 
- 
+
 } // END class category
 
 //////////////////////////////////////////////////////////

@@ -331,9 +331,9 @@ class smt_commons_API extends smt_admin_database_utils {
 
     //////////////////////////////////////////////////////////
     function call_commons($url, $key='') {
-		
+
         $this->debug('call_commons( url:<a target="commons" href="'.$url.'">'
-		. $this->truncate(str_replace('https://commons.wikimedia.org/w/api.php?action=query&format=json','',$url), 100)."</a>, $key )");
+        . $this->truncate(str_replace('https://commons.wikimedia.org/w/api.php?action=query&format=json','',$url), 100)."</a>, $key )");
 
         if( !$url ) { $this->error('::call_commons: ERROR: no url'); return FALSE; }
         $this->start_timer('call_commons');
@@ -410,9 +410,9 @@ class smt_admin_media extends smt_commons_API {
 
     //////////////////////////////////////////////////////////
     function add_media($pageid) {
-		
-		$this->debug("add_media( $pageid )");
-		
+
+        $this->debug("add_media( $pageid )");
+
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('add_media: Invalid PageID');
             return FALSE;
@@ -456,8 +456,8 @@ class smt_admin_media extends smt_commons_API {
     //////////////////////////////////////////////////////////
     function save_media_to_database( $media=array() ) {
 
-		$this->debug('save_media_to_database( media:'.sizeof($media).' )');
-		
+        $this->debug('save_media_to_database( media:'.sizeof($media).' )');
+
         if( !$media || !is_array($media) ) {
             $this->error('::save_media_to_database: no media array');
             return FALSE;
@@ -560,7 +560,7 @@ class smt_admin_media extends smt_commons_API {
     //////////////////////////////////////////////////////////
     function get_media_from_category( $category='' ) {
 
-		$this->debug("get_media_from_category( $category )");
+        $this->debug("get_media_from_category( $category )");
 
         $category = trim($category);
         if( !$category ) { return false; }
@@ -595,9 +595,9 @@ class smt_admin_media extends smt_commons_API {
         }
 
         $this->debug('END of get_media_from_category: ' . sizeof($categorymembers) . ' files');
-		
-		$this->update_category_local_files_count( $category );
-		
+
+        $this->update_category_local_files_count( $category );
+
         $this->save_category_info( $category );
 
     } // end function get_media_from_category()
@@ -605,8 +605,8 @@ class smt_admin_media extends smt_commons_API {
     //////////////////////////////////////////////////////////
     function get_api_categorymembers( $category ) {
 
-		$this->debug("get_api_categorymembers( $category )");
-			
+        $this->debug("get_api_categorymembers( $category )");
+
         $url = $this->commons_api_url . '?action=query&format=json'
         . '&list=categorymembers'  // https://www.mediawiki.org/wiki/API:Categorymembers
         . '&cmtype=file'
@@ -633,10 +633,10 @@ class smt_admin_media extends smt_commons_API {
 
     //////////////////////////////////////////////////////////
     function get_api_imageinfo( $pageids, $recurse_count=0 ) {
-	
-		$this->debug("get_api_imageinfo( pageids, $recurse_count )");
 
-	
+        $this->debug("get_api_imageinfo( pageids, $recurse_count )");
+
+
         //$this->notice('::get_api_imageinfo: pageids size: ' . sizeof($pageids) . ' recurse=' . $recurse_count);
         $call = $this->commons_api_url . '?action=query&format=json'
         . $this->prop_imageinfo
@@ -684,9 +684,9 @@ class smt_admin_media extends smt_commons_API {
 
     ////////////////////////////////////////////////////
     function delete_media( $pageid, $no_block=FALSE ) {
-		
-		$this->debug("delete_media( $pageid, $no_block )");
-		
+
+        $this->debug("delete_media( $pageid, $no_block )");
+
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('delete_media: Invalid PageID');
             return FALSE;
@@ -700,7 +700,7 @@ class smt_admin_media extends smt_commons_API {
             return $response;
         }
 
-		$response .='<BR />DEV TODO:  UPDATE CATEGORY SIZES = -1';
+        $response .='<BR />DEV TODO:  UPDATE CATEGORY SIZES = -1';
 
         $sqls = array();
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
@@ -833,11 +833,11 @@ class smt_admin_media extends smt_commons_API {
 class smt_admin_category extends smt_admin_media {
 
     var $categories;
-	var $category_id;
-	
+    var $category_id;
+
     //////////////////////////////////////////////////////////
     function get_categories_from_media( $pageid ) {
-		
+
         if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('::get_categories_from_media: invalid pageid');
             return FALSE;
@@ -851,20 +851,20 @@ class smt_admin_category extends smt_admin_media {
             return FALSE;
         }
         $this->categories = @$this->commons_response['query']['pages'][$pageid]['categories'];
-		$this->debug("get_categories_from_media( $pageid ) = " . sizeof($this->categories) . ' categories');
+        $this->debug("get_categories_from_media( $pageid ) = " . sizeof($this->categories) . ' categories');
         return TRUE;
     }
 
     //////////////////////////////////////////////////////////
     function link_media_categories( $pageid ) {
 
-		$this->debug("link_media_categories( $pageid )");
-        
-		if( !$pageid || !$this->is_positive_number($pageid) ) {
+        $this->debug("link_media_categories( $pageid )");
+
+        if( !$pageid || !$this->is_positive_number($pageid) ) {
             $this->error('link_media_categories: invalid pageid');
             return FALSE;
         }
-	
+
         if( !$this->get_categories_from_media($pageid) ) {
             $this->error('link_media_categories: unable to get categories from API');
             return FALSE;
@@ -876,7 +876,7 @@ class smt_admin_category extends smt_admin_media {
             array(':pageid'=>$pageid)
         );
 
-		//$this->notice("link_media_categories: DELETED ALL links in category2media");
+        //$this->notice("link_media_categories: DELETED ALL links in category2media");
 
         foreach( $this->categories as $category ) {
 
@@ -897,7 +897,7 @@ class smt_admin_category extends smt_admin_media {
                     continue;
                 }
                 $category_id = $this->category_id;
-				//$this->notice('link_media_categories: new category_id = ' . $category_id);
+                //$this->notice('link_media_categories: new category_id = ' . $category_id);
             }
             //$this->notice('link_media_categories: pageid:'.$pageid.' = ' . $category['title'] . ' == cat_id:'.$category_id);
 
@@ -912,9 +912,9 @@ class smt_admin_category extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
     function link_media_to_category( $pageid, $category_id ) {
-		
-		$this->debug("link_media_to_category( $pageid, $category_id )");
-		
+
+        $this->debug("link_media_to_category( $pageid, $category_id )");
+
         $response = $this->query_as_bool(
             'INSERT INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
             array('category_id'=>$category_id, 'pageid'=>$pageid)
@@ -948,9 +948,9 @@ class smt_admin_category extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
     function get_category_info( $category ) {
-		
-		$this->debug("get_category_info( $category )");
-		
+
+        $this->debug("get_category_info( $category )");
+
         if( !$category || $category=='' || !is_string($category) ) {
             $this->error('::get_category_info: no category');
             return FALSE;
@@ -963,10 +963,10 @@ class smt_admin_category extends smt_admin_media {
             return FALSE;
         }
         if( isset($this->commons_response['query']['pages']) ) {
-			
-			$this->debug("get_category_info( $category ) = <pre>" . print_r($this->commons_response['query']['pages'],1) . '</pre>');
-            
-			return $this->commons_response['query']['pages'];
+
+            $this->debug("get_category_info( $category ) = <pre>" . print_r($this->commons_response['query']['pages'],1) . '</pre>');
+
+            return $this->commons_response['query']['pages'];
         }
         $this->error('::get_category_info: API: no pages');
         return FALSE;
@@ -974,8 +974,8 @@ class smt_admin_category extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
     function save_category_info( $category_name ) {
-		
-		$this->debug("save_category_info( $category_name )");
+
+        $this->debug("save_category_info( $category_name )");
 
         $category_name = $this->category_urldecode($category_name);
 
@@ -1041,9 +1041,9 @@ class smt_admin_category extends smt_admin_media {
             . $this->category_urlencode($this->strip_prefix($category_name))
             . '">' . $category_name . '</a>';
 
-		if( !$bind ) {
-			return TRUE; // nothing to update
-		}
+        if( !$bind ) {
+            return TRUE; // nothing to update
+        }
         $sql = 'UPDATE category SET ';
         $sets = array();
         foreach( array_keys($bind) as $set ) {
@@ -1069,48 +1069,48 @@ class smt_admin_category extends smt_admin_media {
     //////////////////////////////////////////////////////////
     function insert_category( $name='', $fill_info=TRUE, $local_files=0 ) {
 
-		$this->debug("insert_category( $name, $fill_info, $local_files )");
+        $this->debug("insert_category( $name, $fill_info, $local_files )");
 
         if( !$name ) {
             $this->error('insert_category: no name found');
             return FALSE;
         }
-        
-		if( !$this->query_as_bool(
+
+        if( !$this->query_as_bool(
                 'INSERT INTO category (
-					name, local_files, hidden, missing
-				) VALUES (
-					:name, :local_files, :hidden, :missing
-				)',
+                    name, local_files, hidden, missing
+                ) VALUES (
+                    :name, :local_files, :hidden, :missing
+                )',
                 array(
-					':name'=>$name, 
-					':local_files'=>$local_files,
-					':hidden'=>'0',
-					':missing'=>'0',
-				) )
+                    ':name'=>$name,
+                    ':local_files'=>$local_files,
+                    ':hidden'=>'0',
+                    ':missing'=>'0',
+                ) )
 
         ) {
             $this->error('insert_category: FAILED to insert: ' . $name);
             return FALSE;
         }
-		
-		$this->category_id = $this->last_insert_id;
-		
+
+        $this->category_id = $this->last_insert_id;
+
         if( $fill_info ) {
             $this->save_category_info($name);
         }
-        
-		$this->notice('SAVED CATEGORY: ' . $this->category_id . ' = +<a href="'
+
+        $this->notice('SAVED CATEGORY: ' . $this->category_id . ' = +<a href="'
             . $this->url('category') . '?c='
             . $this->category_urlencode($this->strip_prefix($name))
             . '">'
             . htmlentities($this->strip_prefix($name)) . '</a>'
-			//. " (local_files=$local_files)"
-		);
+            //. " (local_files=$local_files)"
+        );
         $this->vacuum();
         return TRUE;
     }
-	
+
     //////////////////////////////////////////////////////////
     function get_subcats( $category ) {
         if( !$category || $category=='' || !is_string($category) ) {
@@ -1138,9 +1138,9 @@ class smt_admin_category extends smt_admin_media {
 
     ///////////////////////////////////////////////////////////////////////////////
     function import_categories( $category_name_array ) {
-		
-		$this->notice("import_categories( category_name_array )");
-		
+
+        $this->notice("import_categories( category_name_array )");
+
         $this->begin_transaction();
         foreach( $category_name_array as $category_name ) {
             $category_name = $this->category_urldecode($category_name);
@@ -1150,22 +1150,22 @@ class smt_admin_category extends smt_admin_media {
     }
 
     //////////////////////////////////////////////////////////
-	function update_category_local_files_count( $category_name ) {
-		$this->debug("update_category_local_files_count( $category_name )");
-		$sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
-		$bind[':local_files'] = $this->get_category_size( $category_name );
-		$bind[':id'] = $this->get_category_id_from_name( $category_name );
-		if( !$bind[':id'] ) {
-			$this->error("update_category_local_files_count( $category_name ) - Category Not Found in Database");
-			return FALSE;
-		}
-		if( $this->query_as_bool($sql,$bind) ) {
-			$this->notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $category_name);
-			return TRUE;
-		}
-		$this->error("update_category_local_files_count( $category_name ) - UPDATE ERROR");
-		return FALSE;
-	}
+    function update_category_local_files_count( $category_name ) {
+        $this->debug("update_category_local_files_count( $category_name )");
+        $sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
+        $bind[':local_files'] = $this->get_category_size( $category_name );
+        $bind[':id'] = $this->get_category_id_from_name( $category_name );
+        if( !$bind[':id'] ) {
+            $this->error("update_category_local_files_count( $category_name ) - Category Not Found in Database");
+            return FALSE;
+        }
+        if( $this->query_as_bool($sql,$bind) ) {
+            $this->notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $category_name);
+            return TRUE;
+        }
+        $this->error("update_category_local_files_count( $category_name ) - UPDATE ERROR");
+        return FALSE;
+    }
 
 
     //////////////////////////////////////////////////////////
@@ -1222,23 +1222,23 @@ class smt_admin extends smt_admin_block {
     //////////////////////////////////////////////////////////
     function __construct() {
 
-		parent::__construct();
-		
-		$this->debug = FALSE;
-				
+        parent::__construct();
+
+        $this->debug = FALSE;
+
         $this->commons_api_url = 'https://commons.wikimedia.org/w/api.php';
-        
-		ini_set('user_agent','Shared Media Tagger v' . __SMT__);
-        
-		$this->api_count = 0;
-        
-		$this->prop_imageinfo = '&prop=imageinfo'
+
+        ini_set('user_agent','Shared Media Tagger v' . __SMT__);
+
+        $this->api_count = 0;
+
+        $this->prop_imageinfo = '&prop=imageinfo'
         . '&iiprop=url|size|mime|thumbmime|user|userid|sha1|timestamp|extmetadata'
         . '&iiextmetadatafilter=LicenseShortName|UsageTerms|AttributionRequired|Restrictions|Artist|ImageDescription|DateTimeOriginal';
-        
-		$this->set_admin_cookie();
 
-	}
+        $this->set_admin_cookie();
+
+    }
 
     //////////////////////////////////////////////////////////
     function include_admin_menu() {

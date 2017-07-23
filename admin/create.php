@@ -28,9 +28,9 @@ if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance';
 
 $smt = new smt_admin();
 
-$tag_id = (!empty($_GET['t']) && $smt->is_positive_number($_GET['t'])) 
-	? (int)$_GET['t'] 
-	: 1;
+$tag_id = (!empty($_GET['t']) && $smt->is_positive_number($_GET['t']))
+    ? (int)$_GET['t']
+    : 1;
 
 
 $smt->title = 'Create';
@@ -48,26 +48,26 @@ print '<ul>'
 . '</ul>';
 
 if( empty($_GET['montage']) ) {
-	print '</div>'; $smt->include_footer(); return;
+    print '</div>'; $smt->include_footer(); return;
 }
 
 
 if( !function_exists('imagecreatetruecolor') ) {
-	$smt->error('PHP GD Library NOT FOUND');
-	print '</div>'; $smt->include_footer(); return;
+    $smt->error('PHP GD Library NOT FOUND');
+    print '</div>'; $smt->include_footer(); return;
 }
 /*
 $sql = '
 SELECT m.*, t.count
 FROM  media AS m, tagging AS t, tag as tg
-WHERE t.media_pageid = m.pageid 
+WHERE t.media_pageid = m.pageid
 AND   t.tag_id = :tag_id
 AND   tg.id = t.tag_id
 AND   m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
 ' . $order_by . ' LIMIT ' . $number_of_images;
 */
 $sql = '
-SELECT m.* 
+SELECT m.*
 FROM media AS m
 WHERE m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
 ORDER BY RANDOM() LIMIT ' . $number_of_images;
@@ -76,35 +76,35 @@ ORDER BY RANDOM() LIMIT ' . $number_of_images;
 $images = $smt->query_as_array($sql /*,array(':tag_id'=>$tag_id)*/ );
 
 if( !$images ) {
-	$smt->error('No tagged images for tag ID ' . $tag_id);
-	print '</div>';
-	$smt->include_footer();
-	return;
+    $smt->error('No tagged images for tag ID ' . $tag_id);
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
 $smt->start_timer('imagecreate');
 $montage = imagecreatetruecolor($montage_width, $montage_height + $footer_height);
 $x_index = $y_index = 0;
 foreach($images as $image) {
-	$url = str_replace('325px', $thumb_width.'px', $image['thumburl']);
-	switch( $image['thumbmime'] ) {
-		case 'image/gif': $current_image = imagecreatefromgif($url); break;
-		case 'image/jpeg': $current_image = imagecreatefromjpeg($url); break;
-		case 'image/png': $current_image = imagecreatefrompng($url);
-		default: 
-			//print '<P>ERROR: unknown mime type</P>'; 
-			continue; 
-	}
+    $url = str_replace('325px', $thumb_width.'px', $image['thumburl']);
+    switch( $image['thumbmime'] ) {
+        case 'image/gif': $current_image = imagecreatefromgif($url); break;
+        case 'image/jpeg': $current_image = imagecreatefromjpeg($url); break;
+        case 'image/png': $current_image = imagecreatefrompng($url);
+        default:
+            //print '<P>ERROR: unknown mime type</P>';
+            continue;
+    }
     imagecopy(
-		$montage, // Destination image link resource
-		$current_image, // Source image link resource
-		$x_index * $montage_index_step, // x-coordinate of destination point
-		$y_index * $montage_index_step, // y-coordinate of destination point 
-		0, // x-coordinate of source point
-		0, // y-coordinate of source point
-		$montage_index_step, // Source width
-		$montage_index_step  // Source height
-	);
+        $montage, // Destination image link resource
+        $current_image, // Source image link resource
+        $x_index * $montage_index_step, // x-coordinate of destination point
+        $y_index * $montage_index_step, // y-coordinate of destination point
+        0, // x-coordinate of source point
+        0, // y-coordinate of source point
+        $montage_index_step, // Source width
+        $montage_index_step  // Source height
+    );
     imagedestroy($current_image);
     $x_index++;
     if ($x_index > ($montage_images_per_row - 1) ) {
@@ -115,19 +115,19 @@ foreach($images as $image) {
 
 $yellow = imagecolorallocate($montage, 255, 255, 0);
 
-imagestring( $montage, 
-	4, // font 1-5
-	5, // x
-	$montage_height + 6, // y
-	$smt->site_name, 
-	$yellow 
+imagestring( $montage,
+    4, // font 1-5
+    5, // x
+    $montage_height + 6, // y
+    $smt->site_name,
+    $yellow
 );
-imagestring( $montage, 
-	2, // font 1-5
-	5, // x
-	$montage_height + 24, // y
-	str_replace('//','',$smt->site_url), 
-	$yellow 
+imagestring( $montage,
+    2, // font 1-5
+    5, // x
+    $montage_height + 24, // y
+    str_replace('//','',$smt->site_url),
+    $yellow
 );
 
 
@@ -142,8 +142,8 @@ $smt->end_timer('imagecreate');
 $data_url = 'data:image/png;base64,' . base64_encode($image_data);
 
 print '<p>'
-. '<img src="' . $data_url 
-. '" width="' . $montage_width 
+. '<img src="' . $data_url
+. '" width="' . $montage_width
 . '" height="' . ($montage_height + $footer_height) . '">'
 . '</p>';
 
@@ -151,12 +151,12 @@ print '<p><b>' . sizeof($images) . '</b> images used in this montage:<br />';
 
 $count = 0;
 foreach( $images as $image ) {
-	$count++;
-	print '<br />#' . $count . ': ' 
- 	. '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">' 
-	. htmlspecialchars($smt->strip_prefix($image['title'])) . '</a>'
-	. ' - ' . $smt->display_licensing($image)
-	;
+    $count++;
+    print '<br />#' . $count . ': '
+    . '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">'
+    . htmlspecialchars($smt->strip_prefix($image['title'])) . '</a>'
+    . ' - ' . $smt->display_licensing($image)
+    ;
 }
 
 print '</p>';

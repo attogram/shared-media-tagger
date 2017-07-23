@@ -39,11 +39,11 @@ if( $category_size > $page_limit ) {
     for( $x = 0; $x < $category_size; $x+=$page_limit ) {
         if( $x == $offset ) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
-			. '&nbsp;' . ++$page_count . '&nbsp;</span> ';
+            . '&nbsp;' . ++$page_count . '&nbsp;</span> ';
             continue;
         }
         $pager .= '<a href="?o=' . $x . '&amp;c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
-		. '&nbsp;' . ++$page_count . '&nbsp;</a> ';
+        . '&nbsp;' . ++$page_count . '&nbsp;</a> ';
     }
 }
 
@@ -70,7 +70,7 @@ $smt->include_header();
 $smt->include_menu( /*show_counts*/FALSE );
 
 if( $smt->is_admin() ) {
-	 print '<form action="" name="media" method="POST">';
+     print '<form action="" name="media" method="POST">';
 }
 
 print '<div class="box white">'

@@ -43,11 +43,11 @@ if( isset($_POST['cats']) && $_POST['cats'] ) {
 
 if( isset($_GET['c']) && $_GET['c'] ) {
     if( $smt->save_category_info( urldecode($_GET['c']) ) ) {
-		$smt->notice('OK: Refreshed Category Info: ' 
-		. '<b><a href="' . $smt->url('category') . '?c='
-		. $smt->strip_prefix($smt->category_urlencode($_GET['c']))		
-		. '">' . htmlentities($smt->category_urldecode($_GET['c']))) . '</a></b>';
-	}
+        $smt->notice('OK: Refreshed Category Info: '
+        . '<b><a href="' . $smt->url('category') . '?c='
+        . $smt->strip_prefix($smt->category_urlencode($_GET['c']))
+        . '">' . htmlentities($smt->category_urldecode($_GET['c']))) . '</a></b>';
+    }
     print '</div>';
     $smt->include_footer();
     return;
