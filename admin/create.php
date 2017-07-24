@@ -2,14 +2,15 @@
 // Shared Media Tagger
 // User Admin
 
-$number_of_images = 9;
-$thumb_width = 100;
-$montage_width = 300;
-$montage_height = 300;
-$montage_images_per_row = 3;
+$number_of_images = 4;
+$thumb_width = 50;
+$montage_width = 100;
+$montage_height = 100;
+$montage_images_per_row = 2;
 $montage_index_step = $thumb_width;
 
-$footer_height = 40;
+$show_footer = FALSE;
+$footer_height = 0;
 
 $order_by = 'ORDER BY RANDOM()';
 //$order_by = 'ORDER BY t.count DESC';
@@ -39,24 +40,31 @@ $smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="create.php">Create</a></p>';
 print '<ul>'
-. '<li>Create Montag: '
-. ' <a href="create.php?montage=1&amp;t=1">Tag:1</a>'
-. ' <a href="create.php?montage=1&amp;t=2">Tag:2</a>'
-. ' <a href="create.php?montage=1&amp;t=3">Tag:3</a>'
-. ' <a href="create.php?montage=1&amp;t=4">Tag:4</a>'
-. ' <a href="create.php?montage=1&amp;t=5">Tag:5</a></li>'
-. '</ul>';
+. '<li>Montage 100px 2x2: Random Images</li>';
 
+foreach( $smt->get_tags() as $tag ) {
+	print '<li>Montage 100px 2x2: <a href="create.php?montage=1&amp;t=' . $tag['id'] . '">Images tagged: ' 
+		. $tag['name'] . '</a></li>';
+}
+print '</ul>';
+
+//print '<p>gd_info: ' . print_r(@gd_info(),1) . '</p>';
 if( empty($_GET['montage']) ) {
     print '</div>'; $smt->include_footer(); return;
 }
-
 
 if( !function_exists('imagecreatetruecolor') ) {
     $smt->error('PHP GD Library NOT FOUND');
     print '</div>'; $smt->include_footer(); return;
 }
-/*
+//$smt->notice('PHP GD Library FOUND OK');
+
+if( !class_exists("Imagick") ) {
+	//$smt->error('Imagick NOT FOUND');
+} else {
+	//$smt->notice('Imagick FOUND OK');
+}
+	
 $sql = '
 SELECT m.*, t.count
 FROM  media AS m, tagging AS t, tag as tg
@@ -65,15 +73,15 @@ AND   t.tag_id = :tag_id
 AND   tg.id = t.tag_id
 AND   m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
 ' . $order_by . ' LIMIT ' . $number_of_images;
-*/
+/*
 $sql = '
 SELECT m.*
 FROM media AS m
 WHERE m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
 ORDER BY RANDOM() LIMIT ' . $number_of_images;
+*/
 
-
-$images = $smt->query_as_array($sql /*,array(':tag_id'=>$tag_id)*/ );
+$images = $smt->query_as_array($sql,array(':tag_id'=>$tag_id) );
 
 if( !$images ) {
     $smt->error('No tagged images for tag ID ' . $tag_id);
@@ -113,23 +121,24 @@ foreach($images as $image) {
     }
 }
 
-$yellow = imagecolorallocate($montage, 255, 255, 0);
+if( $show_footer ) {
+	$yellow = imagecolorallocate($montage, 255, 255, 0);
 
-imagestring( $montage,
-    4, // font 1-5
-    5, // x
-    $montage_height + 6, // y
-    $smt->site_name,
-    $yellow
-);
-imagestring( $montage,
-    2, // font 1-5
-    5, // x
-    $montage_height + 24, // y
-    str_replace('//','',$smt->site_url),
-    $yellow
-);
-
+	imagestring( $montage,
+		4, // font 1-5
+		5, // x
+		$montage_height + 6, // y
+		$smt->site_name,
+		$yellow
+	);
+	imagestring( $montage,
+		2, // font 1-5
+		5, // x
+		$montage_height + 24, // y
+		str_replace('//','',$smt->site_url),
+		$yellow
+	);
+}
 
 ob_start();
 imagepng($montage);
@@ -163,5 +172,6 @@ print '</p>';
 
 
 //print '<pre>tag: ' . $tag_id . '<br />' . $sql .  '</pre>';
+
 print '</div>';
 $smt->include_footer();

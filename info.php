@@ -124,6 +124,17 @@ if( $media['duration'] > 0 ) {
 </ul>
 </p>
 
+<p><em>Media hash:</em>
+<ul>
+<li>sha1: <b><?php print $media['sha1']; ?></b></li>
+<?php /*
+<li>Perceptive Hash (pHash): -</li>
+<li>Average Hash (aHash): -</li>
+<li>Difference Hash: (dHash): -</li>
+*/ ?>
+</ul>
+</p>
+
 <p><a href="<?php
 print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a></p>
 

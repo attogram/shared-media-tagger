@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.17');
+define('__SMT__', '0.7.18');
 
 ob_start('ob_gzhandler');
 
@@ -310,6 +310,7 @@ class smt_page EXTENDS smt_utils {
             . '<a href="' . $this->url('reviews') . '">Reviews</a>'
             . $space
             . '<a href="' . $this->url('about') . '">About</a>'
+			. ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>' : '')
           . '</div>'
         . '</div>'
         ;
