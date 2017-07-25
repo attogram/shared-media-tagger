@@ -12,10 +12,6 @@ $montage_index_step = $thumb_width;
 $show_footer = FALSE;
 $footer_height = 0;
 
-$order_by = 'ORDER BY RANDOM()';
-//$order_by = 'ORDER BY t.count DESC';
-
-
 $mimetypes[] = 'image/jpeg';
 $mimetypes[] = 'image/gif';
 $mimetypes[] = 'image/png';
@@ -40,11 +36,11 @@ $smt->include_menu( /*show_counts*/FALSE );
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="create.php">Create</a></p>';
 print '<ul>'
-. '<li>Montage 100px 2x2: Random Images</li>';
+. '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t=R">Random Images</a></li>';
 
 foreach( $smt->get_tags() as $tag ) {
-	print '<li>Montage 100px 2x2: <a href="create.php?montage=1&amp;t=' . $tag['id'] . '">Images tagged: ' 
-		. $tag['name'] . '</a></li>';
+	print '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t=' 
+	. $tag['id'] . '">Images tagged: ' . $tag['name'] . '</a></li>';
 }
 print '</ul>';
 
@@ -64,22 +60,32 @@ if( !class_exists("Imagick") ) {
 } else {
 	//$smt->notice('Imagick FOUND OK');
 }
+
+switch( $tag_id ) {
 	
-$sql = '
-SELECT m.*, t.count
-FROM  media AS m, tagging AS t, tag as tg
-WHERE t.media_pageid = m.pageid
-AND   t.tag_id = :tag_id
-AND   tg.id = t.tag_id
-AND   m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
-' . $order_by . ' LIMIT ' . $number_of_images;
-/*
-$sql = '
-SELECT m.*
-FROM media AS m
-WHERE m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
-ORDER BY RANDOM() LIMIT ' . $number_of_images;
-*/
+	default:
+		$sql = '
+		SELECT m.*, t.count
+		FROM  media AS m, tagging AS t, tag as tg
+		WHERE t.media_pageid = m.pageid
+		AND   t.tag_id = :tag_id
+		AND   tg.id = t.tag_id
+		AND   m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
+		AND   m.thumburl LIKE "%325px%"
+		ORDER BY RANDOM()
+		LIMIT ' . $number_of_images;
+		break;
+		
+	case 'R':
+		$sql = '
+		SELECT m.*
+		FROM media AS m
+		WHERE m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
+		AND   m.thumburl LIKE "%325px%"
+		ORDER BY RANDOM() 
+		LIMIT ' . $number_of_images;
+		break;
+}
 
 $images = $smt->query_as_array($sql,array(':tag_id'=>$tag_id) );
 
@@ -94,15 +100,36 @@ $smt->start_timer('imagecreate');
 $montage = imagecreatetruecolor($montage_width, $montage_height + $footer_height);
 $x_index = $y_index = 0;
 foreach($images as $image) {
-    $url = str_replace('325px', $thumb_width.'px', $image['thumburl']);
+    
+	$url = str_replace('325px', $thumb_width.'px', $image['thumburl']);
+	
     switch( $image['thumbmime'] ) {
-        case 'image/gif': $current_image = imagecreatefromgif($url); break;
-        case 'image/jpeg': $current_image = imagecreatefromjpeg($url); break;
-        case 'image/png': $current_image = imagecreatefrompng($url);
+        case 'image/gif': $current_image = @imagecreatefromgif($url); break;
+        case 'image/jpeg': $current_image = @imagecreatefromjpeg($url); break;
+        case 'image/png': $current_image = @imagecreatefrompng($url);
         default:
             //print '<P>ERROR: unknown mime type</P>';
             continue;
     }
+	if( !$current_image ) {
+		print '<p>ERROR: cannot get image: ' . $url . '</p>';
+		continue;
+	}
+	if( imagesx($current_image) < $thumb_width ) {
+		$current_image = imagescale(
+			$current_image, 
+			$thumb_width, 
+			imagesy($current_image)
+		);
+	}
+	if( imagesy($current_image) < $thumb_width ) {
+		$current_image = imagescale(
+			$current_image,  
+			imagesx($current_image),
+			$thumb_width
+		);
+	}
+	
     imagecopy(
         $montage, // Destination image link resource
         $current_image, // Source image link resource
@@ -151,9 +178,9 @@ $smt->end_timer('imagecreate');
 $data_url = 'data:image/png;base64,' . base64_encode($image_data);
 
 print '<p>'
-. '<img src="' . $data_url
-. '" width="' . $montage_width
-. '" height="' . ($montage_height + $footer_height) . '">'
+. '<img src="' . $data_url . '"'
+. ' width="' . $montage_width . '"'
+. ' height="' . ($montage_height + $footer_height) . '">'
 . '</p>';
 
 print '<p><b>' . sizeof($images) . '</b> images used in this montage:<br />';
@@ -167,11 +194,10 @@ foreach( $images as $image ) {
     . ' - ' . $smt->display_licensing($image)
     ;
 }
-
 print '</p>';
 
-
-//print '<pre>tag: ' . $tag_id . '<br />' . $sql .  '</pre>';
+print '<p>Data URL: ' . number_format(strlen($data_url)) 
+. ' characters<pre>' . $data_url . '</pre><br /></p>';
 
 print '</div>';
 $smt->include_footer();

@@ -2,6 +2,8 @@
 // Shared Media Tagger
 // Admin Reports
 
+if( function_exists('set_time_limit') ) { set_time_limit( 1000 ); }
+
 $init = __DIR__.'/../smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 $init = __DIR__.'/smt-admin.php';
@@ -16,9 +18,10 @@ $smt->include_admin_menu();
 print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
 <li><a href="' . $smt->url('admin') . 'reports.php?r=localfiles">update_categories_local_files_count()</a>
-<br />
-<br />
-<li><a href="' . $smt->url('admin') . 'reports.php?r=catclean">Clean Category Table</a></li>
+<br /><br />
+<li><a href="' . $smt->url('admin') . 'reports.php?r=category2media">Check: category2media</a>
+<br /><br />
+<li><a href="' . $smt->url('admin') . 'reports.php?r=catclean">Check/Clean: category</a></li>
 </ul>
 <hr />';
 
@@ -27,12 +30,59 @@ switch( @$_GET['r'] ) {
     default: print '<p>Please choose a report above</p>'; break;
     case 'localfiles': $smt->update_categories_local_files_count(); break;
     case 'catclean': catclean(); break;
+    case 'category2media': category2media(); break;
 } // end switch
 
 print '</div>';
 $smt->include_footer();
 
+////////////////////////////////
+function category2media() {
+	
+	global $smt;
+    $tab = "\t";
 
+	$c2ms = $smt->query_as_array('
+	SELECT * FROM category2media');
+	print '<p>' . number_format(sizeof($c2ms)) . ' category2media</p>';
+
+	$categories_raw = $smt->query_as_array('SELECT id FROM category');
+	print '<p>' . number_format(sizeof($categories_raw)) . ' Categories</p>';
+	$categories = array();
+	$smt->start_timer('c_id_sort');
+	foreach( $categories_raw as $cats ) { $categories[$cats['id']] = TRUE; }
+	
+	$media_raw = $smt->query_as_array('SELECT pageid FROM media');
+	print '<p>' . number_format(sizeof($media_raw)) . ' Media</p>';
+	$media = array();
+	foreach( $media_raw as $med ) { $media[$med['pageid']] = TRUE; }	
+
+	$checked = 0;
+	$errors = array();
+	print '<pre>';
+	foreach( $c2ms as $c2m ) {
+		$checked++;	
+		if( !isset($categories[$c2m['category_id']]) ) {
+			$errors[] = $c2m['id'];
+			print '<br />c2m_id:' . $c2m['id'] . ' CATEGORY NOT FOUND'  
+			. ' c:' . $c2m['category_id'] 
+			. ' m:' . $c2m['media_pageid'];
+		}
+		if( !isset($media[$c2m['media_pageid']]) ) {
+			$errors[] = $c2m['id'];
+			print '<br />c2m_id:' . $c2m['id'] . ' MEDIA NOT FOUND'
+			. ' c:' . $c2m['category_id'] 
+			. ' m:' . $c2m['media_pageid'];
+		}
+	}
+	print '</pre>';
+	print '<p>' . number_format($checked) . ' checked</p>';
+	print '<p>' . number_format(sizeof($errors)) . ' ERRORS</p>';
+	
+	$sql = 'DELETE FROM category2media WHERE id IN ( '
+		. implode($errors, ', ') . ' );';
+	print '<p>'.$sql.'</p>';
+}
 
 
 ////////////////////////////////
