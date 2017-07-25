@@ -180,20 +180,41 @@ $data_url = 'data:image/png;base64,' . base64_encode($image_data);
 print '<p>'
 . '<img src="' . $data_url . '"'
 . ' width="' . $montage_width . '"'
-. ' height="' . ($montage_height + $footer_height) . '">'
+. ' height="' . ($montage_height + $footer_height) . '"'
+. ' usemap="#montage"'
+. '>'
 . '</p>';
 
 print '<p><b>' . sizeof($images) . '</b> images used in this montage:<br />';
 
 $count = 0;
+$areas = array();
+$descs = array();
 foreach( $images as $image ) {
     $count++;
+	$areas[$count] = $smt->url('info') . '?i=' . $image['pageid'];
+	$descs[$count] = htmlspecialchars($smt->strip_prefix($image['title']))
+		. "\n" . $smt->display_licensing($image);
     print '<br />#' . $count . ': '
     . '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">'
     . htmlspecialchars($smt->strip_prefix($image['title'])) . '</a>'
     . ' - ' . $smt->display_licensing($image)
     ;
 }
+
+print ''
+. '<map name="montage">'
+. '<area shape="rect" coords="0,0,50,50" href="' 
+. $areas[1] . '" title="#1: ' . $descs[1] . '">'
+. '<area shape="rect" coords="50,0,100,50" href="' 
+. $areas[2] . '" title="#2: ' . $descs[2] . '">'
+. '<area shape="rect" coords="0,50,50,100" href="' 
+. $areas[3] . '" title="#3: ' . $descs[3] . '">'
+. '<area shape="rect" coords="50,50,100,100" href="' 
+. $areas[4] . '" title="#4: ' . $descs[4] . '">'
+. '</map>';
+
+
 print '</p>';
 
 print '<p>Data URL: ' . number_format(strlen($data_url)) 
