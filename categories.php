@@ -32,6 +32,7 @@ if( $category_size > $page_limit ) {
         if( $x == $offset ) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
             . '&nbsp;' . ++$page_count . '&nbsp;</span> ';
+			$pager_count = $page_count;
             continue;
         }
         $pager .= '<a href="?o=' . $x 
@@ -55,15 +56,21 @@ if( $search ) {
     $sql .= ' AND name LIKE :search';
     $bind[':search'] = '%' . $search . '%';
 }
-$sql .= ' ORDER BY local_files DESC';
+$sql .= ' ORDER BY local_files DESC, name ';
 $sql .= $sql_limit;
 
 $categories = $smt->query_as_array($sql, $bind);
 
-$page_name = number_format(sizeof($categories));
-if( $hidden ) { $page_name .= ' Technical'; } else { $page_name .= ' Active'; }
+$page_name = number_format($category_size);
+if( $hidden ) {
+	$page_name .= ' Technical'; 
+} else { 
+	$page_name .= ' Active'; 
+}
 $page_name .= ' Categories';
-
+if( isset($pager_count) ) { 
+	$page_name .= ', page #' . $pager_count; 
+}
 $smt->title = $page_name . ' - ' . $smt->site_name;
 
 $smt->include_header();
