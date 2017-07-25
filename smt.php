@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.20');
+define('__SMT__', '0.7.21');
 
 ob_start('ob_gzhandler');
 
@@ -871,13 +871,19 @@ class smt_category EXTENDS smt_user {
     }
 
     //////////////////////////////////////////////////////////
-    function get_categories_count( $redo=FALSE ) {
+    function get_categories_count( $redo=FALSE, $hidden=0 ) {
         if( isset($this->category_count) && !$redo ) {
             return $this->category_count;
         }
-        $response = $this->query_as_array('
-            SELECT count( distinct(category_id) ) AS count
-            FROM category2media');
+		$sql = 'SELECT count(distinct(c2m.category_id)) AS count 
+				FROM category2media AS c2m';
+		if( $hidden ) {
+			$sql .= ', category AS c
+			WHERE c.id = c2m.category_id
+			AND c.hidden = 1
+			';
+		}
+        $response = $this->query_as_array($sql);
         if( !$response ) {
             $this->debug('::get_categories_count() ERROR query failed');
             return 0;

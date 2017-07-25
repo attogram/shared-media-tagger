@@ -2,7 +2,7 @@
 // Shared Media Tagger
 // Categories
 
-$page_limit = 10000;
+$page_limit = 1000;
 
 $init = __DIR__.'/smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
@@ -19,6 +19,29 @@ if( isset($_GET['h']) && $_GET['h'] ) {
 
 $smt = new smt();
 
+$category_size = $smt->get_categories_count(/*redo*/FALSE, $hidden);
+
+$pager = '';
+$sql_limit = '';
+if( $category_size > $page_limit ) {
+    $offset = isset($_GET['o']) ? $_GET['o'] : 0;
+    $sql_limit = " LIMIT $page_limit OFFSET $offset";
+    $page_count = 0;
+    $pager = ': ';
+    for( $x = 0; $x < $category_size; $x+=$page_limit ) {
+        if( $x == $offset ) {
+            $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
+            . '&nbsp;' . ++$page_count . '&nbsp;</span> ';
+            continue;
+        }
+        $pager .= '<a href="?o=' . $x 
+		. ($hidden ? '&amp;h=1' : '')
+		. '">&nbsp;' . ++$page_count . '&nbsp;</a> ';
+    }
+}
+$pager = '<b>' . number_format($category_size) . '</b> '
+. ($hidden ? 'Technical' : 'Active') . ' Categories' . $pager;
+
 $bind = array();
 $sql = 'SELECT id, name, local_files, hidden
         FROM category
@@ -33,7 +56,7 @@ if( $search ) {
     $bind[':search'] = '%' . $search . '%';
 }
 $sql .= ' ORDER BY local_files DESC';
-$sql .= ' LIMIT ' . $page_limit;
+$sql .= $sql_limit;
 
 $categories = $smt->query_as_array($sql, $bind);
 
@@ -47,10 +70,7 @@ $smt->include_header();
 $smt->include_menu( /*show_counts*/FALSE );
 
 $smt->start_timer('print_category_table');
-
 ?><div class="box white">
-
-
 <div style="padding:10px 0px 10px 0px; float:right;"><form method="GET">
 <a href="<?php print $smt->url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;
 <a href="<?php print $smt->url('categories'); ?>?h=1"  style="font-size:80%;">Tech</a> &nbsp;
@@ -58,15 +78,14 @@ $smt->start_timer('print_category_table');
 <input type="text" name="s" value="<?php $search ? print htmlentities(urldecode($search)) : print ''; ?>" size="16">
 <input type="submit" value="search">
 </form></div>
-<br />
-
-
 <?php
+
+print $pager;
 
 print '<div class="cattable">'
 . '<div class="catcon">'
 . '<div class="catfiles cathead">Files</div>'
-. '<div class="catname cathead">' . $page_name . '</div>'
+. '<div class="catname cathead">Category</div>'
 . '</div>';
 
 ob_flush(); flush();
@@ -82,6 +101,8 @@ foreach( $categories as $category ) {
     ob_flush(); flush();
 }
 print '</div>';
+
+print '<br />' . $pager;
 
 $smt->end_timer('print_category_table');
 
