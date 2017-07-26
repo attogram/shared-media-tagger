@@ -111,9 +111,10 @@ li { margin-bottom:6px; }
 
 <p><em>Media info:</em>
 <ul>
-<li>width x height: <b><?php print $media['width']; ?> x <?php print $media['height']; ?></b> pixels</li>
+<li>width x height: <b><?php print number_format($media['width']); 
+?> x <?php print number_format($media['height']); ?></b> pixels</li>
 <li>mime: <b><?php print $media['mime']; ?></b></li>
-<li>size: <b><?php print $media['size']; ?></b> bytes</li>
+<li>size: <b><?php print number_format($media['size']); ?></b> bytes</li>
 <?php
 if( $media['duration'] > 0 ) {
     //print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
@@ -143,7 +144,7 @@ print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; 
 <?php
 
 if( $smt->is_admin() ) {
-	// print '<pre>ADMIN: media: ' . print_r($media,1) . '</pre>';
+	print '<pre>ADMIN: media: ' . print_r($media,1) . '</pre>';
 }
 
 ?>

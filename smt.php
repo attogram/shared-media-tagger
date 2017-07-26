@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.25');
+define('__SMT__', '0.7.26');
 
 ob_start('ob_gzhandler');
 
@@ -150,6 +150,13 @@ class smt_utils {
         return implode($response, ', ');
     }
 
+	//////////////////////////////////////////////////////////
+	function is_selected($one, $two) {
+		if( $one == $two ) { 
+			return ' selected="selected"';
+		}
+	}
+	
 } //end class smt_utils
 
 //////////////////////////////////////////////////////////
@@ -275,10 +282,8 @@ class smt_page EXTENDS smt_utils {
         print ''
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
-        .   ( $show_counts
-                ? $space . '<a href="' . $this->url('home') . '">' . $count_files . '&nbsp;Files' . '</a>'
-                : ''
-            )
+        .  $space 
+		. '<a href="' . $this->url('browse') . '">' . $count_files . '&nbsp;Files' . '</a>'
         . $space
         . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
         . $space
@@ -303,16 +308,15 @@ class smt_page EXTENDS smt_utils {
         print ''
         . '<div class="menu" style="font-weight:bold;">'
           . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
-          . '<div style="float:right; margin-right:10px; font-size:80%;">'
-            . $space
-            . '<a href="' . $this->url('categories') . '">Categories</a>'
-            . $space
-            . '<a href="' . $this->url('reviews') . '">Reviews</a>'
-            . $space
-            . '<a href="' . $this->url('about') . '">About</a>'
+          . '<span style="display:inline; float:right; margin-right:10px; font-size:80%;">'
+            . $space . '<a href="' . $this->url('categories') . '">Categories</a>'
+            . $space . '<a href="' . $this->url('browse') . '">Browse</a>'
+            . $space . '<a href="' . $this->url('reviews') . '">Reviews</a>'
+            . $space . '<a href="' . $this->url('about') . '">About</a>'
 			. ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🆒</a>' : '')
-          . '</div>'
+          . '</span>'
         . '</div>'
+		. '<div style="clear:both;"></div>'
         ;
     }
 
@@ -1221,6 +1225,7 @@ class smt EXTENDS smt_tag {
             'bootstrap_js'  => $this->site_url . 'use/bootstrap/js/bootstrap.min.js',
             'bootstrap_css' => $this->site_url . 'use/bootstrap/css/bootstrap.min.css',
             'info'       => $this->site_url . 'info.php',
+            'browse'     => $this->site_url . 'browse.php',
             'categories' => $this->site_url . 'categories.php',
             'category'   => $this->site_url . 'category.php',
             'about'      => $this->site_url . 'about.php',

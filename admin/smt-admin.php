@@ -844,18 +844,28 @@ class smt_admin_media_analysis extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
 	function get_media_skin_percentage( $pageid ) {
+		
+		if( !function_exists('imagecreatetruecolor') ) {
+			$this->error('get_media_skin_percentage: PHP GD Library NOT FOUND');
+			return FALSE;
+		}
+
 		$file = $this->query_as_array(
 			'SELECT * FROM media WHERE pageid = :pageid', 
 			array(':pageid'=>$pageid) 
 		);
 		if( !$file ) {
+			$this->error('get_media_skin_percentage: Media NOT FOUND');
 			return FALSE;
 		}
-		$file_url = $file[0]['thumburl'];	
-		require_once('./use/skin-detection.php');
+		$file_url = $file[0]['thumburl'];
 		$this->start_timer('skin_detection');
+
+		require_once('./use/skin-detection.php');
 		$skin = new SkinDetection($file_url);
+
 		$skin_percentage = $skin->get_skin_percentage();
+		
 		$this->end_timer('skin_detection');
 		$this->update_media_skin_percentage( $pageid, $skin_percentage );
 	}
@@ -867,7 +877,7 @@ class smt_admin_media_analysis extends smt_admin_media {
 			$this->error("update_media_skin_percentage: pageid NOT FOUND");
 			return FALSE;
 		}
-		if( !$skin ) {
+		if( !$skin || $skin == 'NAN' || $skin == '0.0' ) {
 			$skin = '0';
 		}
 		$result = $this->query_as_bool(

@@ -48,28 +48,31 @@ function skin_report() {
 		if( !$limit || !$smt->is_positive_number($limit) ) {
 			$limit = 5;
 		}
-		$updates = $smt->query_as_array('SELECT pageid, updated FROM media ORDER BY updated LIMIT ' . $limit);
+		$updates = $smt->query_as_array('
+			SELECT pageid, updated 
+			FROM media
+			WHERE skin IS NULL
+			ORDER BY updated 
+			LIMIT ' . $limit);
 		foreach( $updates as $update ) {
 			$smt->get_media_skin_percentage( $update['pageid'] );
 		}
 	}
 		
-	$medias = $smt->query_as_array('SELECT pageid, skin, updated FROM media ORDER BY skin DESC');
-	$null_skin = $null_updated = 0;
+	$medias = $smt->query_as_array('
+		SELECT pageid, skin, updated 
+		FROM media 
+		WHERE skin IS NOT NULL
+		ORDER BY skin DESC
+	');
+	$null_skin = 0;
 	
 	foreach( $medias as $media ) {
-		if( $media['skin'] == NULL ) { 
-			$null_skin++;
-			$media['skin'] = 'NULL '; 
-		}
-		if( $media['updated'] == NULL ) { 
-			$null_updated++;
-			$media['updated'] = 'NULL'; 
-		}
+		if( !$media['skin'] ) { $null_skin++; continue; }
 		$report .= '<br />' 
 		. '<a target="site" href="' . $smt->url('info') . '?i=' . $media['pageid'] . '">'
 		. str_pad($media['pageid'], 10, ' ') . '</a> '
-		. str_pad($media['skin'], 5, '0') . '   '
+		. str_pad($media['skin'], 5, ' ') . '   '
 		. $media['updated']
 		;
 	}
@@ -80,9 +83,8 @@ function skin_report() {
 	$header = '';
 	$header .= '<p><a href="?report&amp;update=5">Update Skin Percentages - Update x5 files</a></p>';
 	$header .= '<pre>Skin Percentage Report @ ' . $smt->time_now() . ' UTC<br />';
-	$header .= '<br />' . number_format(sizeof($medias)) . ' media filles';
-	$header .= '<br />' . number_format($null_skin) . ' NULL skins';
-	$header .= '<br />' . number_format($null_updated) . ' NULL updated<br />';	
+	$header .= '<br />' . number_format(sizeof($medias)) . ' media files';
+	$header .= '<br />' . number_format($null_skin) . ' NULL skin';
 	$header .= '<br />Pageid     Skin      Updated';
 	$header .= '<br />------     -----     -------------------';
 	
