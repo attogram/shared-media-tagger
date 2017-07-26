@@ -96,7 +96,9 @@ if( $media['restrictions'] && $media['restrictions'] != 'false' ) {
 </div>
 <br />
 <br />
-
+<style>
+li { margin-bottom:6px; }
+</style>
 <p><em>View this file on:</em>
 <ul>
 <li><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">commons.wikimedia.org</a></li>
@@ -124,23 +126,33 @@ if( $media['duration'] > 0 ) {
 </ul>
 </p>
 
-<p><em>Media hash:</em>
+<p><em>Media analysis:</em>
 <ul>
-<li>sha1: <b><?php print $media['sha1']; ?></b></li>
-<?php /*
-<li>Perceptive Hash (pHash): -</li>
-<li>Average Hash (aHash): -</li>
-<li>Difference Hash: (dHash): -</li>
-*/ ?>
+<?php 
+if( $media['skin'] != NULL ) {
+	print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
+} 
+?>
+<li>Sha1: <b><?php print $media['sha1']; ?></b></li>
 </ul>
 </p>
 
+<br />
 <p><a href="<?php
 print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a></p>
+<?php
 
+if( $smt->is_admin() ) {
+	// print '<pre>ADMIN: media: ' . print_r($media,1) . '</pre>';
+}
+
+?>
 </div><?php /* end right */ ?>
 </div><?php /* end row */ ?>
 </div><?php /* end container */ ?>
 <br />
 <?php
+
+
 $smt->include_footer();
+

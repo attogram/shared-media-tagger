@@ -232,6 +232,8 @@ class smt_admin_database_utils extends smt_admin_utils {
     'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL
 )",
 
+'media_upgrade_201' => "ALTER TABLE media ADD COLUMN 'skin' REAL",
+
 'contact' =>
     "CREATE TABLE IF NOT EXISTS 'contact' (
     'id' INTEGER PRIMARY KEY,
@@ -838,7 +840,54 @@ class smt_admin_media extends smt_commons_API {
 } // end class smt_admin_media
 
 //////////////////////////////////////////////////////////
-class smt_admin_category extends smt_admin_media {
+class smt_admin_media_analysis extends smt_admin_media {
+
+    //////////////////////////////////////////////////////////
+	function get_media_skin_percentage( $pageid ) {
+		$file = $this->query_as_array(
+			'SELECT * FROM media WHERE pageid = :pageid', 
+			array(':pageid'=>$pageid) 
+		);
+		if( !$file ) {
+			return FALSE;
+		}
+		$file_url = $file[0]['thumburl'];	
+		require_once('./use/skin-detection.php');
+		$this->start_timer('skin_detection');
+		$skin = new SkinDetection($file_url);
+		$skin_percentage = $skin->get_skin_percentage();
+		$this->end_timer('skin_detection');
+		$this->update_media_skin_percentage( $pageid, $skin_percentage );
+	}
+
+    //////////////////////////////////////////////////////////
+	function update_media_skin_percentage( $pageid, $skin ) {
+		//$this->notice("update_media_skin_percentage( $pageid, $skin )");
+		if( !$this->is_positive_number($pageid) ) {
+			$this->error("update_media_skin_percentage: pageid NOT FOUND");
+			return FALSE;
+		}
+		if( !$skin ) {
+			$skin = '0';
+		}
+		$result = $this->query_as_bool(
+			'UPDATE media SET skin = :skin, updated = :updated WHERE pageid = :pageid',
+			array(':skin'=>$skin, ':updated'=>$this->time_now(), ':pageid'=>$pageid)
+		);
+		if( $result ) {
+			$this->notice('Updated Skin Percentage for <a href="' 
+			. $this->url('info') . '?i=' . $pageid . '">'
+			. $pageid . '</a>: ' . $skin . ' %');
+			return TRUE;
+		}
+		$this->error("update_media_skin_percentage( $pageid, $skin ) update FAILED");
+		return FALSE;
+	}
+	
+} // end class smt_admin_media_analysis
+
+//////////////////////////////////////////////////////////
+class smt_admin_category extends smt_admin_media_analysis {
 
     var $categories;
     var $category_id;

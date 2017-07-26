@@ -2,7 +2,6 @@
 // Skin Detection
 // $skin = new SkinDetection($file);  $skin_percent = $skin->get_skin_percentage();
 //
-//
 // Modified from: PHP Nudity Detector: https://github.com/FreebieStock/php-nudity-detector
 // Based on Algorithm by J. Marcial-Basilio et al. (2011): http://www.naun.org/multimedia/NAUN/computers/20-462.pdf
 

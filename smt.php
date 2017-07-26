@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.24');
+define('__SMT__', '0.7.25');
 
 ob_start('ob_gzhandler');
 
@@ -310,7 +310,7 @@ class smt_page EXTENDS smt_utils {
             . '<a href="' . $this->url('reviews') . '">Reviews</a>'
             . $space
             . '<a href="' . $this->url('about') . '">About</a>'
-			. ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>' : '')
+			. ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🆒</a>' : '')
           . '</div>'
         . '</div>'
         ;
@@ -572,6 +572,9 @@ class smt_site_admin EXTENDS smt_media {
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
         . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
         . $media_id . ' ?\');">♻</a>'
+		
+		. ' <a style="font-size:140%;" href="' . $this->url('admin') 
+		. 'media-analysis.php?skin=' . $media_id. '">👙</a>'
         . '</div>';
     }
 
