@@ -39,6 +39,25 @@ if( isset($_GET['dc']) ) {
     print '<hr />';
 }
 
+if( isset($_GET['skin']) ) {
+    $id = $_GET['skin'];
+	$file = $smt->query_as_array('SELECT * FROM media WHERE pageid = :pageid', array(':pageid'=>$id) );
+	if( $file ) { 
+		$file = $file[0];
+		$file_url = $file['thumburl'];
+		require_once('./use/skin-detection.php');
+		$smt->start_timer('skin_detection');
+		$skin = new SkinDetection($file_url);  
+		print 'Skin Percentage: <h1>' . $skin->get_skin_percentage() . ' %</h1>';
+		$smt->end_timer('skin_detection');
+		print '<br /><img src="' . $file_url . '" width="' . $file['thumbwidth'] . '" height="' . $file['thumbheight'] . '">';
+		print '<br />Pageid: ' . $id;
+		print '<br />File: ' . $file_url;
+	}
+    print '<hr />';
+}
+
+
 
 ////////////////////////////////////////////////////
 function multi_delete_media( $list ) {
@@ -74,6 +93,14 @@ function multi_delete_media( $list ) {
 </form>
 <br /><br />
 * <a target="sqlite" href="<?php print $smt->url('admin'); ?>sqladmin.php?table=block&action=row_view">View/Edit Blocked Media</a>
+<br /><br />
+<form action="" method="GET">
+* Skin Detection:
+<input type="text" name="skin" value="" size="10" />
+<input type="submit" value="  Skin Detection via pageid  "/>
+</form>
+<br /><br />
+
 <?php
 
 print '</div>';
