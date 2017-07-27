@@ -57,7 +57,7 @@ if( isset($_GET['c']) && $_GET['c'] ) {
 }
 
 if( isset($_GET['d']) && $_GET['d'] ) {
-    delete_category($smt);
+    $smt->delete_category($_GET['d']);
     $smt->update_categories_local_files_count();
     print '</div>';
     $smt->include_footer();
@@ -227,29 +227,6 @@ print '</div>';
 $smt->include_footer();
 
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
-function delete_category($smt) {
-    $category_id = $_GET['d'];
-    $smt->notice("Deleting category ID #$category_id");
-    $sqls = array(
-        'DELETE FROM category WHERE id = :category_id',
-        'DELETE FROM category2media WHERE category_id = :category_id',
-    );
-    $response = array();
-    foreach( $sqls as $sql ) {
-        if( $smt->query_as_bool($sql, array(':category_id'=>$category_id) ) ) {
-            $response[] = 'Delete OK  : ' . $sql;
-            continue;
-        }
-        $response[] = 'Delete FAIL: ' . $sql;
-    }
-    $smt->notice($response);
-    return;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 function get_search_results($smt) {

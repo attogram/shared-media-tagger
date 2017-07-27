@@ -1245,31 +1245,38 @@ class smt_admin_category extends smt_admin_media_analysis {
     //////////////////////////////////////////////////////////
     function update_categories_local_files_count() {
 
-        $sql = 'SELECT c2m.category_id, count(c2m.id) AS size, c.local_files
-                FROM category2media AS c2m, category AS c
-                WHERE c2m.category_id = c.id
-                GROUP BY c2m.category_id
-                ORDER BY size DESC';
+	
+		$sql = '
+			SELECT c.id, c.local_files, count(c2m.category_id) AS size
+			FROM category AS c
+			LEFT JOIN category2media AS c2m ON c.id = c2m.category_id
+			GROUP BY c.id
+			ORDER by c.local_files ASC';
+	
         $category_new_sizes = $this->query_as_array($sql);
         if( !$category_new_sizes ) {
             $category_new_sizes = array();
-            $this->notice('Updated 0 Categories Local Files count');
+            $this->error('NOT FOUND: Updated 0 Categories Local Files count');
             return;
         }
 
         $updates = 0;
         $this->begin_transaction();
         foreach( $category_new_sizes as $cat ) {
+
+			if( !$cat['size'] ) {
+				//$this->delete_category( $cat['id'] );
+                //continue;
+            }
+			
             if( $cat['local_files'] == $cat['size'] ) {
                 continue;
             }
-            if( !$cat['size'] ) {
-                continue;
-            }
-            if( $this->insert_category_local_files_count( $cat['category_id'], $cat['size'] ) ) {
+ 
+            if( $this->insert_category_local_files_count( $cat['id'], $cat['size'] ) ) {
                 $updates++;
             } else {
-                $this->error('ERROR: UPDATE FAILED: Category ID:' . $cat['category_id'] . ' local_files=' . $cat['size']);
+                $this->error('ERROR: UPDATE FAILED: Category ID:' . $cat['id'] . ' local_files=' . $cat['size']);
             }
         }
         $this->commit();
@@ -1288,6 +1295,23 @@ class smt_admin_category extends smt_admin_media_analysis {
         }
         return FALSE;
     }
+
+    //////////////////////////////////////////////////////////
+	function delete_category( $category_id ) {
+		if( !$this->is_positive_number($category_id) ) { return FALSE; }
+		$bind = array(':category_id'=>$category_id);
+		if( $this->query_as_bool('DELETE FROM category WHERE id = :category_id', $bind) ) {
+			$this->notice('DELETED Category #'. $category_id);
+		} else {
+			$this->error('UNABLE to delete category #' . $category_id);
+		}
+		if( $this->query_as_bool('DELETE FROM category2media WHERE category_id = :category_id', $bind) ) {
+			$this->notice('DELETED Links to Category #'. $category_id);
+		} else {
+			$this->error('UNABLE to delete links to category #' . $category_id);
+		}
+	}
+
 
     //////////////////////////////////////////////////////////
     function empty_category_tables() {

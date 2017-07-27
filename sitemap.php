@@ -25,14 +25,12 @@ print '<url><loc>' . $protocol . $smt->url('home') . '</loc>'
 . '<changefreq>always</changefreq>'
 . '</url>' . $cr;
 
-
 url( $smt->url('about') );
+url( $smt->url('categories') );
+url( $smt->url('browse') );
 url( $smt->url('reviews') );
 url( $smt->url('users') );
 url( $smt->url('contact') );
-url( $smt->url('categories') );
-// TODO - all review report pages
-// TODO - all users report pages
 
 print $cr;
 

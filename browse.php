@@ -137,23 +137,32 @@ Browse Files, sorty by <select name="s">
 ' . number_format($result_size) . ' Files' . ($pager ? ', '.$pager : '') . '<br clear="all" />';
 
 
+if( $smt->is_admin() ) {
+    print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
+}
+
 foreach($medias as $media) {
 	print $smt->display_thumbnail_box($media);
 }
-
-
-
-
-
-
-
-
-
 
 if( $pager ) {
     print '<p>' . $pager . '</p>';
 }
 
+if( $smt->is_admin() ) {
+print '<br clear="all" />
+	<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
+	<input type="submit" value="Delete selected media">
+	<script type="text/javascript" language="javascript">
+	'
+	. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
+	checkboxes = document[formname].getElementsByTagName('input');
+	for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+	</script>"
+	. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+	. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+	. '</div>';
+}
 
 print '</div>';
 $smt->include_footer();

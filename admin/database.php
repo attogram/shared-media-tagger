@@ -18,6 +18,19 @@ print '<div class="box white">';
 <p>Database Admin:</p>
 <p>- <a href="sqladmin.php" target="sqlite">SQLite ADMIN</a></p>
 <p>- <a href="reports.php" >Reports</a></p>
+<?php print '
+<ul>
+<li>File: ' . $smt->database_name . '</li>
+<li>Permissions: '
+. ( is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY' )
+. '</li>
+<li>Size: '
+. (file_exists($smt->database_name) ? number_format(filesize($smt->database_name)) : 'NULL')
+. ' bytes</li>
+
+<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
+</ul>';
+?>
 <br />
 <p>- <a href="database.php?a=c">CREATE tables</a></p>
 <br /><br /><br />

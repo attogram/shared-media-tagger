@@ -90,7 +90,7 @@ switch( $tag_id ) {
 $images = $smt->query_as_array($sql,array(':tag_id'=>$tag_id) );
 
 if( !$images ) {
-    $smt->error('No tagged images for tag ID ' . $tag_id);
+    $smt->error('No images found in criteria');
     print '</div>';
     $smt->include_footer();
     return;
