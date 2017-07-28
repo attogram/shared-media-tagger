@@ -27,7 +27,7 @@ $smt = new smt_admin();
 
 $tag_id = (!empty($_GET['t']) && $smt->is_positive_number($_GET['t']))
     ? (int)$_GET['t']
-    : 1;
+    : 'R';
 
 
 $smt->title = 'Create';
@@ -74,21 +74,20 @@ switch( $tag_id ) {
 		AND   m.thumburl LIKE "%325px%"
 		ORDER BY RANDOM()
 		LIMIT ' . $number_of_images;
+		$bind = array(':tag_id'=>$tag_id);
 		break;
 		
 	case 'R':
 		$sql = '
 		SELECT m.*
 		FROM media AS m
-		WHERE m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
-		AND   m.thumburl LIKE "%325px%"
 		ORDER BY RANDOM() 
 		LIMIT ' . $number_of_images;
+		$bind = array();
 		break;
 }
 
-$images = $smt->query_as_array($sql,array(':tag_id'=>$tag_id) );
-
+$images = $smt->query_as_array($sql, $bind);
 if( !$images ) {
     $smt->error('No images found in criteria');
     print '</div>';
@@ -218,7 +217,7 @@ print ''
 print '</p>';
 
 print '<p>Data URL: ' . number_format(strlen($data_url)) 
-. ' characters<pre>' . $data_url . '</pre><br /></p>';
+. ' characters<br /><textarea cols="60" rows="20">' . $data_url . '</textarea><br /></p>';
 
 print '</div>';
 $smt->include_footer();
