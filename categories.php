@@ -20,6 +20,8 @@ if( isset($_GET['h']) && $_GET['h'] ) {
 $smt = new smt();
 
 $category_size = $smt->get_categories_count(/*redo*/FALSE, $hidden);
+// todo - get real selection size, not full category count
+
 
 $pager = '';
 $sql_limit = '';
@@ -37,6 +39,7 @@ if( $category_size > $page_limit ) {
         }
         $pager .= '<a href="?o=' . $x 
 		. ($hidden ? '&amp;h=1' : '')
+		//. ($search ? '&amp;s=' . urlencode($search) : '')
 		. '">&nbsp;' . ++$page_count . '&nbsp;</a> ';
     }
 }
