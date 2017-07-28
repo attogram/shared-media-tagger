@@ -130,7 +130,7 @@ if( $media['duration'] > 0 ) {
 <p><em>Media analysis:</em>
 <ul>
 <?php 
-if( $media['skin'] != NULL ) {
+if( isset($media['skin']) && $media['skin'] != NULL ) {
 	print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
 } 
 ?>

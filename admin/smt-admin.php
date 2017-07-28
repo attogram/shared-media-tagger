@@ -523,6 +523,7 @@ class smt_admin_media extends smt_commons_API {
 
             $new[':duration'] = @$media_file['imageinfo'][0]['duration'];
             $new[':timestamp'] = @$media_file['imageinfo'][0]['timestamp'];
+            $new[':updated'] = $this->time_now();
 
             $sql = "INSERT OR REPLACE INTO MEDIA (
                         pageid, title, url,
@@ -531,7 +532,7 @@ class smt_admin_media extends smt_commons_API {
                         licenseuri, licensename, licenseshortname, usageterms, attributionrequired, restrictions,
                         size, width, height, sha1, mime,
                         thumburl, thumbwidth, thumbheight, thumbmime,
-                        user, userid, duration, timestamp
+                        user, userid, duration, timestamp, updated
                     ) VALUES (
                         :pageid, :title, :url,
                         :descriptionurl, :descriptionshorturl, :imagedescription,
@@ -539,7 +540,7 @@ class smt_admin_media extends smt_commons_API {
                         :licenseuri, :licensename, :licenseshortname, :usageterms, :attributionrequired, :restrictions,
                         :size, :width, :height, :sha1, :mime,
                         :thumburl, :thumbwidth, :thumbheight, :thumbmime,
-                        :user, :userid, :duration, :timestamp
+                        :user, :userid, :duration, :timestamp, :updated
                     )";
 
             $response = $this->query_as_bool($sql, $new);
