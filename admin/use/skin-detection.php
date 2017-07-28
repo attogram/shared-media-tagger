@@ -49,7 +49,13 @@ class SkinDetection_Image {
 	function __construct($file) {
 		$this->file = $file;
 		$this->extension = substr($file, strrpos($file, '.') + 1);
-		$this->info = getimagesize($file);
+		$this->info = @getimagesize($file);
+		
+		// SMT ************************
+		if( !$this->info ) { 
+			return FALSE;
+		}
+		// SMT ************************
 		
 		$this->create();
 	}
