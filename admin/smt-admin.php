@@ -11,7 +11,7 @@ class smt_admin_utils extends smt {
         if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == '1' ) {
             return;
         }
-        setcookie('admin','1',time()+60*60,'/'); // 1 hour admin cookie
+        setcookie('admin','1',time()+60*60*4,'/'); // 4 hour admin cookie
         //$this->notice('Admin cookie set');
     }
 
@@ -232,6 +232,12 @@ class smt_admin_database_utils extends smt_admin_utils {
     'skin' REAL,
     'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL
 )",
+
+'media_upgrade_301' => 'ALTER TABLE media ADD COLUMN ahash TEXT',
+'media_upgrade_302' => 'ALTER TABLE media ADD COLUMN dhash TEXT',
+'media_upgrade_303' => 'ALTER TABLE media ADD COLUMN phash TEXT',
+
+
 
 'contact' =>
     "CREATE TABLE IF NOT EXISTS 'contact' (

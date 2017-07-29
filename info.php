@@ -133,8 +133,19 @@ if( $media['duration'] > 0 ) {
 if( isset($media['skin']) && $media['skin'] != NULL ) {
 	print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
 } 
+if( isset($media['ahash']) && $media['ahash'] != NULL ) {
+	print '<li>Average Hash: <b>' . $media['ahash'] . ' </b></li>';
+} 
+if( isset($media['dhash']) && $media['dhash'] != NULL ) {
+	print '<li>Difference Hash: <b>' . $media['dhash'] . ' </b></li>';
+} 
+if( isset($media['phash']) && $media['phash'] != NULL ) {
+	print '<li>Perceptual Hash: <b>' . $media['phash'] . ' </b></li>';
+} 
+if( isset($media['sha1']) && $media['sha1'] != NULL ) {
+	print '<li>SHA1 Hash: <b>' . $media['sha1'] . ' </b></li>';
+} 
 ?>
-<li>Sha1: <b><?php print $media['sha1']; ?></b></li>
 </ul>
 </p>
 

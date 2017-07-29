@@ -36,6 +36,9 @@ switch( $sort ) {
 	case 'duration': $orderby = ' ORDER BY duration'; $extra = 'duration';  break;
 	case 'sha1': $orderby = ' ORDER BY sha1'; break;
 	case 'skin': $orderby = ' ORDER BY skin'; $where = ' WHERE skin IS NOT NULL'; $extra = 'skin'; break;
+	case 'ahash': $orderby = ' ORDER BY ahash'; $where = ' WHERE ahash IS NOT NULL'; break;
+	case 'dhash': $orderby = ' ORDER BY dhash'; $where = ' WHERE dhash IS NOT NULL'; break;
+	case 'phash': $orderby = ' ORDER BY phash'; $where = ' WHERE phash IS NOT NULL'; break;
 }
 
 $dir = 'd'; $sql_dir = ' DESC';
@@ -158,6 +161,9 @@ Browse Files, sorty by <select name="s">
 <option value="duration"' . $smt->is_selected('duration', $sort) . '>Duration</option>
 <option value="sha1"' . $smt->is_selected('sha1', $sort) . '>Sha1 Hash</option>
 <option value="skin"' . $smt->is_selected('skin', $sort) . '>Skin Percentage</option>
+<option value="dhash"' . $smt->is_selected('dhash', $sort) . '>Difference Hash</option>
+<option value="phash"' . $smt->is_selected('phash', $sort) . '>Perceptual Hash</option>
+<option value="ahash"' . $smt->is_selected('ahash', $sort) . '>Average Hash</option>
 </select>
 <select name="d">
 <option value="d"' . $smt->is_selected('d', $dir) . '>Descending</option>

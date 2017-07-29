@@ -21,7 +21,8 @@ class ImageHash
      *
      * @var Implementation
      */
-    protected $implementation;
+    //protected $implementation;
+    public $implementation;  // SMT
 
     /**
      * @var string

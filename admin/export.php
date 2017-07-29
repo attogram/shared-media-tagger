@@ -45,43 +45,35 @@ function network_export() {
     $tab = "\t";
     $site = $smt->get_protocol() . $smt->site_url;
 
+	$export = 'SMT_NETWORK_SITE: ' . $site . $cr
+    . 'SMT_DATETIME: ' . $smt->time_now() . $cr
+    . 'SMT_VERSION: ' . __SMT__ . $cr;
+	
     $cats = $smt->query_as_array('
         SELECT pageid, name
         FROM category
         WHERE local_files > 0
         ORDER BY name');
-
-    $medias = $smt->query_as_array('
-        SELECT pageid, title
-        FROM media
-        ORDER BY title');
-
-    $export = ''
-
-    . 'SMT_NETWORK_SITE: ' . $site . $cr
-    . 'SMT_DATETIME: ' . $smt->time_now() . $cr
-    . 'SMT_VERSION: ' . __SMT__ . $cr
-    ;
     foreach( $cats as $cat ) {
         if( !$cat['pageid'] ) { $cat['pageid'] = 'NULL'; }
         if( !$cat['name'] ) { $cat['name'] = 'NULL'; }
         $export .= $cat['pageid'] . $tab . '14' . $tab . $smt->strip_prefix($cat['name']) . $cr;
     }
+	unset($cats);
+
+    $medias = $smt->query_as_array('
+        SELECT pageid, title
+        FROM media
+        ORDER BY title');
     foreach( $medias as $media ) {
         if( !$media['pageid'] ) { $media['pageid'] = 'NULL'; }
         if( !$media['title'] ) { $media['title'] = 'NULL'; }
         $export .= $media['pageid'] . $tab . '6' . $tab . $smt->strip_prefix($media['title']) . $cr;
     }
-
-    print '<pre># Network Export: ' . $site . $cr
-    . '# Exported at: ' . $smt->time_now() . $cr
-    . '# ' . number_format(sizeof($cats)) . ' Categories' . $cr
-    . '# ' . number_format(sizeof($medias)) . ' Files' . $cr
-    . '# PAGEID' . $tab . 'NAMESPACE' . $tab . 'NAME' . '</pre>';
+	unset($medias);
 
     print '<textarea cols="90" rows="20">' . $export . '</textarea>';
 }
-
 
 //////////////////////////////////////////////
 function tag_report( $tag_id='' ) {
@@ -90,7 +82,6 @@ function tag_report( $tag_id='' ) {
         $smt->error('Tag Report: Tag ID NOT FOUND');
         return FALSE;
     }
-
 
     $tag_name = $smt->get_tag_name_by_id( $tag_id );
 
@@ -115,7 +106,7 @@ function tag_report( $tag_id='' ) {
     foreach( $medias as $media ) {
         print $media['title'] . '|+' . $media['count'] . $cr;
     }
-
+	print '</textarea>';
 }
 
 //////////////////////////////////////////////

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.37');
+define('__SMT__', '0.7.38');
 
 ob_start('ob_gzhandler');
 
@@ -249,8 +249,7 @@ class smt_page EXTENDS smt_utils {
             while( list($timer_name,$result) = each($this->timer_results) ) {
                 print '<br />TIMER: ' . str_pad( round($result,5), 7, '0' ) . ' - ' . $timer_name;
             }
-            print '<br />SQL count: ' . number_format($this->sql_count)
-            . '<br />MEMORY usage: ' . number_format(memory_get_usage())
+            print '<br />MEMORY usage: ' . number_format(memory_get_usage())
             . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage());
             print '</div><br /><br /><br />';
         }
@@ -1167,6 +1166,9 @@ class smt_menus EXTENDS smt_tag {
 
         . ' <a style="font-size:140%;" href="' . $this->url('admin')
         . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
+		
+        . ' <a style="font-size:140%;" href="' . $this->url('admin')
+        . 'media-analysis.php?hash=' . $media_id. '">H</a>'
         . '</div>';
     }
 
