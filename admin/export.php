@@ -42,34 +42,44 @@ function network_export() {
     global $smt;
 
     $cr = "\n";
-    $export = 'SITE, NS, PAGEID, NAME' . $cr;
+    $tab = "\t";
     $site = $smt->get_protocol() . $smt->site_url;
 
     $cats = $smt->query_as_array('
         SELECT pageid, name
         FROM category
-        WHERE hidden != 1
-        ORDER BY pageid');
-    foreach( $cats as $cat ) {
-        if( !$cat['pageid'] ) { $cat['pageid'] = 'NULL'; }
-        if( !$cat['name'] ) { $cat['name'] = 'NULL'; }
-        $export .= $site . ', 14, ' . $cat['pageid'] . ', ' . $smt->strip_prefix($cat['name']) . $cr;
-    }
+        WHERE local_files > 0
+        ORDER BY name');
 
     $medias = $smt->query_as_array('
         SELECT pageid, title
         FROM media
-        ORDER BY pageid
-    ');
+        ORDER BY title');
+
+    $export = ''
+
+    . 'SMT_NETWORK_SITE: ' . $site . $cr
+    . 'SMT_DATETIME: ' . $smt->time_now() . $cr
+    . 'SMT_VERSION: ' . __SMT__ . $cr
+    ;
+    foreach( $cats as $cat ) {
+        if( !$cat['pageid'] ) { $cat['pageid'] = 'NULL'; }
+        if( !$cat['name'] ) { $cat['name'] = 'NULL'; }
+        $export .= $cat['pageid'] . $tab . '14' . $tab . $smt->strip_prefix($cat['name']) . $cr;
+    }
     foreach( $medias as $media ) {
         if( !$media['pageid'] ) { $media['pageid'] = 'NULL'; }
         if( !$media['title'] ) { $media['title'] = 'NULL'; }
-        $export .= $site . ', 6, ' . $media['pageid'] . ', ' . $smt->strip_prefix($media['title']) . $cr;
+        $export .= $media['pageid'] . $tab . '6' . $tab . $smt->strip_prefix($media['title']) . $cr;
     }
 
+    print '<pre># Network Export: ' . $site . $cr
+    . '# Exported at: ' . $smt->time_now() . $cr
+    . '# ' . number_format(sizeof($cats)) . ' Categories' . $cr
+    . '# ' . number_format(sizeof($medias)) . ' Files' . $cr
+    . '# PAGEID' . $tab . 'NAMESPACE' . $tab . 'NAME' . '</pre>';
 
     print '<textarea cols="90" rows="20">' . $export . '</textarea>';
-
 }
 
 
