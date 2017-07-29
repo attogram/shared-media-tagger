@@ -18,10 +18,11 @@ video { border:1px solid black; background-color:white; background-clip:content-
 audio { border:1px solid black; background-color:white; background-clip:content-box; }
 .menu { background-color:#222; color:#ccc; padding:3px 0px 3px 8px; margin:0px; line-height:2; text-align:center; font-size:85%; }
 .menu a { background-color:#222; color:#ccc; }
-.menu a:visited { color:#ddd }
-.menu a:hover { color:yellow }
-.admin {font-size:110%; font-weight:bold; background-color:blue; }
+.menu a:visited { color:#ddd; }
+.menu a:hover { color:yellow; }
+.admin { font-weight:bold; background-color:blue; }
 .admin a { background-color:blue; color:yellow;}
+.admin a:visited { color:yellow; }
 .box { text-align:left; margin:0px; padding:5px 20px 20px 20px; }
 .white { background-color:white; color:black; }
 .grey { background-color:#333; color:#9c9; }

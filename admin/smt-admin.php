@@ -1104,6 +1104,8 @@ class smt_admin_category extends smt_admin_media_analysis {
         //    $this->notice('NEW: local_files: ' . $bind[':local_files']);
         //}
 
+		$bind[':updated'] = $this->time_now();
+		
         $url = '<a href="' . $this->url('category') . '?c='
             . $this->category_urlencode($this->strip_prefix($category_name))
             . '">' . $category_name . '</a>';
@@ -1397,6 +1399,7 @@ class smt_admin extends smt_admin_block {
         . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
         . $space . '<a href="' . $admin . 'user.php">USER</a>'
         . $space . '<a href="' . $admin . 'create.php">CREATE</a>'
+        . $space . '<a href="' . $admin . 'export.php">EXPORT</a>'
         . $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
         . '</div>';
 

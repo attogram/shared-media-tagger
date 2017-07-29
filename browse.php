@@ -35,7 +35,7 @@ switch( $sort ) {
 	case 'user': $orderby = ' ORDER BY user'; $extra = 'user'; break;
 	case 'duration': $orderby = ' ORDER BY duration'; $extra = 'duration';  break;
 	case 'sha1': $orderby = ' ORDER BY sha1'; break;
-	case 'skin': $orderby = ' ORDER BY skin'; $where = ' WHERE skin IS NOT NULL AND skin > 0'; $extra = 'skin'; break;
+	case 'skin': $orderby = ' ORDER BY skin'; $where = ' WHERE skin IS NOT NULL'; $extra = 'skin'; break;
 }
 
 $dir = 'd'; $sql_dir = ' DESC';

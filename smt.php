@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.33');
+define('__SMT__', '0.7.34');
 
 ob_start('ob_gzhandler');
 
@@ -269,57 +269,6 @@ class smt_page EXTENDS smt_utils {
         print '</body></html>';
     } // end include_footer()
 
-    //////////////////////////////////////////////////////////
-    function include_menu( $show_counts=TRUE ) {
-        $space = ' &nbsp; &nbsp; ';
-        $count_files = $count_categories = $count_reviews = $count_users = '';
-        if( $show_counts ) {
-            $count_files = number_format($this->get_image_count());
-            $count_categories = number_format($this->get_categories_count());
-            $count_reviews = number_format($this->get_total_review_count());
-            $count_users = number_format($this->get_user_count());
-        }
-        print ''
-        . '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
-        .  $space
-        . '<a href="' . $this->url('browse') . '">' . $count_files . '&nbsp;Files' . '</a>'
-        . $space
-        . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
-        . $space
-        . '<a href="' . $this->url('reviews') . '">' . $count_reviews . '&nbsp;Reviews</a>'
-        . $space
-        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
-        . $count_users .'&nbsp;Users</a>'
-        . $space
-        . '<a href="' . $this->url('contact') . '">Contact</a>'
-        . $space
-        . '<a href="'. $this->url('about') . '">About</a>'
-
-        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>' : '')
-
-        . '</div>';
-
-    }  // end function include_menu()
-
-    //////////////////////////////////////////////////////////
-    function include_small_menu() {
-        $space = ' &nbsp; ';
-        print ''
-        . '<div class="menu" style="font-weight:bold;">'
-          . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
-          . '<span style="display:inline; float:right; margin-right:10px; font-size:80%;">'
-            . $space . '<a href="' . $this->url('categories') . '">Categories</a>'
-            . $space . '<a href="' . $this->url('browse') . '">Browse</a>'
-            . $space . '<a href="' . $this->url('reviews') . '">Reviews</a>'
-            . $space . '<a href="' . $this->url('about') . '">About</a>'
-            . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🆒</a>' : '')
-          . '</span>'
-        . '</div>'
-        . '<div style="clear:both;"></div>'
-        ;
-    }
-
 } // end class smt_page
 
 //////////////////////////////////////////////////////////
@@ -557,80 +506,6 @@ class smt_site_admin EXTENDS smt_media {
         }
         unset($_COOKIE['admin']);
         setcookie('admin', null, -1, '/');
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_admin_media_list_functions() {
-        return
-        '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
-        . '<input type="submit" value="Delete selected media">'
-        . '<script type="text/javascript" language="javascript">'
-        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-        checkboxes = document[formname].getElementsByTagName('input');
-        for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
-        </script>"
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-        . '</div>';
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_admin_media_functions( $media_id ) {
-        if( !$this->is_admin() ) {
-            return;
-        }
-        if( !$this->is_positive_number($media_id) ) {
-            return;
-        }
-        return ''
-        . '<div class="attribution left" style=" display:inline-block; float:right;">'
-        . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
-        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
-        . $media_id . ' ?\');">❌</a>'
-        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
-        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
-        . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
-        . $media_id . ' ?\');">♻</a>'
-
-        . ' <a style="font-size:140%;" href="' . $this->url('admin')
-        . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
-        . '</div>';
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_admin_category_functions( $category_name ) {
-        if( !$this->is_admin() ) { return; }
-        $category = $this->get_category($category_name);
-        if( !$category ) {
-            return '<p>ADMIN: category not in database</p>';
-        }
-        $response = '<br clear="all" />
-<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
-<input type="submit" value="Delete selected media">
-<script type="text/javascript" language="javascript">
-'
-. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-checkboxes = document[formname].getElementsByTagName('input');
-for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
-</script>"
-. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-. '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
-. $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
-. $this->category_urlencode($category['name']) . '">Get Category Info</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
-. $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
-<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
-. $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
-. '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>
-<br /><pre>' . print_r($category,1) . '</pre>
-</form>
-</div><br /><br />';
-        return $response;
     }
 
 } // END class smt_admin
@@ -1192,8 +1067,150 @@ class smt_tag EXTENDS smt_category {
 } // END clss smt_tag
 
 //////////////////////////////////////////////////////////
+// SMT - Menus
+class smt_menus EXTENDS smt_tag {
+
+    //////////////////////////////////////////////////////////
+    function include_menu( $show_counts=TRUE ) {
+        $space = ' &nbsp; &nbsp; ';
+        $count_files = $count_categories = $count_reviews = $count_users = '';
+        if( $show_counts ) {
+            $count_files = number_format($this->get_image_count());
+            $count_categories = number_format($this->get_categories_count());
+            $count_reviews = number_format($this->get_total_review_count());
+            $count_users = number_format($this->get_user_count());
+        }
+        print ''
+        . '<div class="menu" style="font-weight:bold;">'
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
+        .  $space
+        . '<a href="' . $this->url('browse') . '">' . $count_files . '&nbsp;Files' . '</a>'
+        . $space
+        . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
+        . $space
+        . '<a href="' . $this->url('reviews') . '">' . $count_reviews . '&nbsp;Reviews</a>'
+        . $space
+        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
+        . $count_users .'&nbsp;Users</a>'
+        . $space
+        . '<a href="' . $this->url('contact') . '">Contact</a>'
+        . $space
+        . '<a href="'. $this->url('about') . '">About</a>'
+
+        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>' : '')
+
+        . '</div>';
+
+    }  // end function include_menu()
+
+    //////////////////////////////////////////////////////////
+	function include_medium_menu() {
+		
+	}
+
+    //////////////////////////////////////////////////////////
+    function include_small_menu() {
+        $space = ' &nbsp;&nbsp; ';
+        print '
+<style>
+.menuj { font-size:170%; padding:0px; margin:0px; }
+</style>		
+		'
+        . '<div class="menu" style="font-weight:bold;">'
+          . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+          . '<span style="display:inline; float:right; margin-right:10px; font-size:80%;">'
+            . '<a class="menuj" title="Browse" href="' . $this->url('browse') . '">🔎</a>' . $space
+            . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
+            . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
+            . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
+            . ($this->is_admin() 
+				? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>'  . $space
+				: '')
+          . '</span>'
+        . '</div><div style="clear:both;"></div>';
+		
+		// 🌐 🏷 📂 🔗 🔎 🔖 🖇 ⛓  ❓  ❔  📢
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_media_list_functions() {
+        return
+        '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
+        . '<input type="submit" value="Delete selected media">'
+        . '<script type="text/javascript" language="javascript">'
+        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();
+        checkboxes = document[formname].getElementsByTagName('input');
+        for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+        </script>"
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+        . '</div>';
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_media_functions( $media_id ) {
+        if( !$this->is_admin() ) {
+            return;
+        }
+        if( !$this->is_positive_number($media_id) ) {
+            return;
+        }
+        return ''
+        . '<div class="attribution left" style=" display:inline-block; float:right;">'
+        . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
+        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
+        . $media_id . ' ?\');">❌</a>'
+        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
+        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
+        . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
+        . $media_id . ' ?\');">♻</a>'
+
+        . ' <a style="font-size:140%;" href="' . $this->url('admin')
+        . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
+        . '</div>';
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_category_functions( $category_name ) {
+        if( !$this->is_admin() ) { return; }
+        $category = $this->get_category($category_name);
+        if( !$category ) {
+            return '<p>ADMIN: category not in database</p>';
+        }
+        $response = '<br clear="all" />
+<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
+<input type="submit" value="Delete selected media">
+<script type="text/javascript" language="javascript">
+'
+. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
+checkboxes = document[formname].getElementsByTagName('input');
+for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+</script>"
+. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+. '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
+. $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
+. $this->category_urlencode($category['name']) . '">Get Category Info</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
+. $this->category_urlencode($category['name'])
+. '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
+<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
+. $this->category_urlencode($category['name'])
+. '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
+. '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>
+<br /><pre>' . print_r($category,1) . '</pre>
+</form>
+</div><br /><br />';
+        return $response;
+    }
+
+} // end class menus
+
+//////////////////////////////////////////////////////////
 // SMT - Shared Media Tagger
-class smt EXTENDS smt_tag {
+class smt EXTENDS smt_menus {
 
     var $setup;
     var $install_directory;
