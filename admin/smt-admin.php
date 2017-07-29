@@ -216,7 +216,7 @@ class smt_admin_database_utils extends smt_admin_utils {
     'usageterms' TEXT,
     'attributionrequired' TEXT,
     'restrictions' TEXT,
-    'size' TEXT,
+    'size' INTEGER,
     'width' INTEGER,
     'height' INTEGER,
     'sha1' TEXT,
@@ -224,15 +224,14 @@ class smt_admin_database_utils extends smt_admin_utils {
     'thumburl' TEXT,
     'thumbwidth' INTEGER,
     'thumbheight' INTEGER,
-    'thumbmime' INTEGER,
+    'thumbmime' TEXT,
     'user' TEXT,
-    'userid' TEXT,
-    'duration' TEXT,
+    'userid' INTEGER,
+    'duration' REAL,
     'timestamp' TEXT,
+    'skin' REAL,
     'updated' TEXT DEFAULT '0000-00-00 00:00:00' NOT NULL
 )",
-
-'media_upgrade_201' => "ALTER TABLE media ADD COLUMN 'skin' REAL",
 
 'contact' =>
     "CREATE TABLE IF NOT EXISTS 'contact' (
@@ -844,57 +843,57 @@ class smt_admin_media extends smt_commons_API {
 class smt_admin_media_analysis extends smt_admin_media {
 
     //////////////////////////////////////////////////////////
-	function get_media_skin_percentage( $pageid ) {
-		
-		if( !function_exists('imagecreatetruecolor') ) {
-			$this->error('get_media_skin_percentage: PHP GD Library NOT FOUND');
-			return FALSE;
-		}
+    function get_media_skin_percentage( $pageid ) {
 
-		$file = $this->query_as_array(
-			'SELECT * FROM media WHERE pageid = :pageid', 
-			array(':pageid'=>$pageid) 
-		);
-		if( !$file ) {
-			$this->error('get_media_skin_percentage: Media NOT FOUND');
-			return FALSE;
-		}
-		$file_url = $file[0]['thumburl'];
-		$this->start_timer('skin_detection');
+        if( !function_exists('imagecreatetruecolor') ) {
+            $this->error('get_media_skin_percentage: PHP GD Library NOT FOUND');
+            return FALSE;
+        }
 
-		require_once('./use/skin-detection.php');
-		$skin = new SkinDetection($file_url);
+        $file = $this->query_as_array(
+            'SELECT * FROM media WHERE pageid = :pageid',
+            array(':pageid'=>$pageid)
+        );
+        if( !$file ) {
+            $this->error('get_media_skin_percentage: Media NOT FOUND');
+            return FALSE;
+        }
+        $file_url = $file[0]['thumburl'];
+        $this->start_timer('skin_detection');
 
-		$skin_percentage = $skin->get_skin_percentage();
-		
-		$this->end_timer('skin_detection');
-		$this->update_media_skin_percentage( $pageid, $skin_percentage );
-	}
+        require_once('./use/skin-detection.php');
+        $skin = new SkinDetection($file_url);
+
+        $skin_percentage = $skin->get_skin_percentage();
+
+        $this->end_timer('skin_detection');
+        $this->update_media_skin_percentage( $pageid, $skin_percentage );
+    }
 
     //////////////////////////////////////////////////////////
-	function update_media_skin_percentage( $pageid, $skin ) {
-		//$this->notice("update_media_skin_percentage( $pageid, $skin )");
-		if( !$this->is_positive_number($pageid) ) {
-			$this->error("update_media_skin_percentage: pageid NOT FOUND");
-			return FALSE;
-		}
-		if( !$skin || $skin == 'NAN' || $skin == '0.0' ) {
-			$skin = '0';
-		}
-		$result = $this->query_as_bool(
-			'UPDATE media SET skin = :skin, updated = :updated WHERE pageid = :pageid',
-			array(':skin'=>$skin, ':updated'=>$this->time_now(), ':pageid'=>$pageid)
-		);
-		if( $result ) {
-			$this->notice('Updated Skin Percentage for <a href="' 
-			. $this->url('info') . '?i=' . $pageid . '">'
-			. $pageid . '</a>: ' . $skin . ' %');
-			return TRUE;
-		}
-		$this->error("update_media_skin_percentage( $pageid, $skin ) update FAILED");
-		return FALSE;
-	}
-	
+    function update_media_skin_percentage( $pageid, $skin ) {
+        //$this->notice("update_media_skin_percentage( $pageid, $skin )");
+        if( !$this->is_positive_number($pageid) ) {
+            $this->error("update_media_skin_percentage: pageid NOT FOUND");
+            return FALSE;
+        }
+        if( !$skin || $skin == 'NAN' || $skin == '0.0' ) {
+            $skin = '0';
+        }
+        $result = $this->query_as_bool(
+            'UPDATE media SET skin = :skin, updated = :updated WHERE pageid = :pageid',
+            array(':skin'=>$skin, ':updated'=>$this->time_now(), ':pageid'=>$pageid)
+        );
+        if( $result ) {
+            $this->notice('Updated Skin Percentage for <a href="'
+            . $this->url('info') . '?i=' . $pageid . '">'
+            . $pageid . '</a>: ' . $skin . ' %');
+            return TRUE;
+        }
+        $this->error("update_media_skin_percentage( $pageid, $skin ) update FAILED");
+        return FALSE;
+    }
+
 } // end class smt_admin_media_analysis
 
 //////////////////////////////////////////////////////////
@@ -1246,14 +1245,14 @@ class smt_admin_category extends smt_admin_media_analysis {
     //////////////////////////////////////////////////////////
     function update_categories_local_files_count() {
 
-	
-		$sql = '
-			SELECT c.id, c.local_files, count(c2m.category_id) AS size
-			FROM category AS c
-			LEFT JOIN category2media AS c2m ON c.id = c2m.category_id
-			GROUP BY c.id
-			ORDER by c.local_files ASC';
-	
+
+        $sql = '
+            SELECT c.id, c.local_files, count(c2m.category_id) AS size
+            FROM category AS c
+            LEFT JOIN category2media AS c2m ON c.id = c2m.category_id
+            GROUP BY c.id
+            ORDER by c.local_files ASC';
+
         $category_new_sizes = $this->query_as_array($sql);
         if( !$category_new_sizes ) {
             $category_new_sizes = array();
@@ -1265,15 +1264,15 @@ class smt_admin_category extends smt_admin_media_analysis {
         $this->begin_transaction();
         foreach( $category_new_sizes as $cat ) {
 
-			if( !$cat['size'] ) {
-				//$this->delete_category( $cat['id'] );
+            if( !$cat['size'] ) {
+                //$this->delete_category( $cat['id'] );
                 //continue;
             }
-			
+
             if( $cat['local_files'] == $cat['size'] ) {
                 continue;
             }
- 
+
             if( $this->insert_category_local_files_count( $cat['id'], $cat['size'] ) ) {
                 $updates++;
             } else {
@@ -1298,20 +1297,20 @@ class smt_admin_category extends smt_admin_media_analysis {
     }
 
     //////////////////////////////////////////////////////////
-	function delete_category( $category_id ) {
-		if( !$this->is_positive_number($category_id) ) { return FALSE; }
-		$bind = array(':category_id'=>$category_id);
-		if( $this->query_as_bool('DELETE FROM category WHERE id = :category_id', $bind) ) {
-			$this->notice('DELETED Category #'. $category_id);
-		} else {
-			$this->error('UNABLE to delete category #' . $category_id);
-		}
-		if( $this->query_as_bool('DELETE FROM category2media WHERE category_id = :category_id', $bind) ) {
-			$this->notice('DELETED Links to Category #'. $category_id);
-		} else {
-			$this->error('UNABLE to delete links to category #' . $category_id);
-		}
-	}
+    function delete_category( $category_id ) {
+        if( !$this->is_positive_number($category_id) ) { return FALSE; }
+        $bind = array(':category_id'=>$category_id);
+        if( $this->query_as_bool('DELETE FROM category WHERE id = :category_id', $bind) ) {
+            $this->notice('DELETED Category #'. $category_id);
+        } else {
+            $this->error('UNABLE to delete category #' . $category_id);
+        }
+        if( $this->query_as_bool('DELETE FROM category2media WHERE category_id = :category_id', $bind) ) {
+            $this->notice('DELETED Links to Category #'. $category_id);
+        } else {
+            $this->error('UNABLE to delete links to category #' . $category_id);
+        }
+    }
 
 
     //////////////////////////////////////////////////////////

@@ -54,7 +54,7 @@ function tag_report( $tag_id='' ) {
 	LIMIT 200';
 	$medias = $smt->query_as_array($sql, array(':tag_id'=>$tag_id));
 	$cr = "\n";
-	$report_name = 'Tag Report: ' . $tags[$tag_id]['name'] . ' - Top ' . sizeof($medias) . ' Files';
+	$report_name = 'Tag Report: ' . $tags[$tag_id]['title'] . ' - Top ' . sizeof($medias) . ' Files';
 	
 	print '<textarea cols="90" rows="20">'
 	. '== ' . $report_name . ' ==' . $cr

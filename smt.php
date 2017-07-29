@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.32');
+define('__SMT__', '0.7.33');
 
 ob_start('ob_gzhandler');
 
@@ -150,13 +150,13 @@ class smt_utils {
         return implode($response, ', ');
     }
 
-	//////////////////////////////////////////////////////////
-	function is_selected($one, $two) {
-		if( $one == $two ) { 
-			return ' selected="selected"';
-		}
-	}
-	
+    //////////////////////////////////////////////////////////
+    function is_selected($one, $two) {
+        if( $one == $two ) {
+            return ' selected="selected"';
+        }
+    }
+
 } //end class smt_utils
 
 //////////////////////////////////////////////////////////
@@ -282,8 +282,8 @@ class smt_page EXTENDS smt_utils {
         print ''
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
-        .  $space 
-		. '<a href="' . $this->url('browse') . '">' . $count_files . '&nbsp;Files' . '</a>'
+        .  $space
+        . '<a href="' . $this->url('browse') . '">' . $count_files . '&nbsp;Files' . '</a>'
         . $space
         . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
         . $space
@@ -313,10 +313,10 @@ class smt_page EXTENDS smt_utils {
             . $space . '<a href="' . $this->url('browse') . '">Browse</a>'
             . $space . '<a href="' . $this->url('reviews') . '">Reviews</a>'
             . $space . '<a href="' . $this->url('about') . '">About</a>'
-			. ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🆒</a>' : '')
+            . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🆒</a>' : '')
           . '</span>'
         . '</div>'
-		. '<div style="clear:both;"></div>'
+        . '<div style="clear:both;"></div>'
         ;
     }
 
@@ -560,20 +560,20 @@ class smt_site_admin EXTENDS smt_media {
     }
 
     //////////////////////////////////////////////////////////
-	function display_admin_media_list_functions() {
-		return 
-		'<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
-		. '<input type="submit" value="Delete selected media">'
-		. '<script type="text/javascript" language="javascript">'
-		. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-		checkboxes = document[formname].getElementsByTagName('input');
-		for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
-		</script>"
-		. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-		. ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-		. '</div>';		
-	}
-	
+    function display_admin_media_list_functions() {
+        return
+        '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
+        . '<input type="submit" value="Delete selected media">'
+        . '<script type="text/javascript" language="javascript">'
+        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();
+        checkboxes = document[formname].getElementsByTagName('input');
+        for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+        </script>"
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+        . '</div>';
+    }
+
     //////////////////////////////////////////////////////////
     function display_admin_media_functions( $media_id ) {
         if( !$this->is_admin() ) {
@@ -591,9 +591,9 @@ class smt_site_admin EXTENDS smt_media {
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
         . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
         . $media_id . ' ?\');">♻</a>'
-		
-		. ' <a style="font-size:140%;" href="' . $this->url('admin') 
-		. 'media-analysis.php?skin=' . $media_id. '">👙</a>'
+
+        . ' <a style="font-size:140%;" href="' . $this->url('admin')
+        . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
         . '</div>';
     }
 
@@ -897,10 +897,10 @@ class smt_category EXTENDS smt_user {
         if( isset($this->category_count) && !$redo ) {
             return $this->category_count;
         }
-		$sql = 'SELECT count(distinct(c2m.category_id)) AS count 
-				FROM category2media AS c2m, category AS c
-				WHERE c.id = c2m.category_id
-				AND c.hidden = ' . ($hidden ? '1' : '0');
+        $sql = 'SELECT count(distinct(c2m.category_id)) AS count
+                FROM category2media AS c2m, category AS c
+                WHERE c.id = c2m.category_id
+                AND c.hidden = ' . ($hidden ? '1' : '0');
         $response = $this->query_as_array($sql);
         if( !$response ) {
             $this->debug('::get_categories_count() ERROR query failed');
