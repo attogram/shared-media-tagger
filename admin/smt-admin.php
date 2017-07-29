@@ -273,6 +273,23 @@ class smt_admin_database_utils extends smt_admin_utils {
 )",
 
 
+'network' =>
+    "CREATE TABLE IF NOT EXISTS 'network' (
+    'id' INTEGER PRIMARY KEY,
+    'site_id' INTEGER NOT NULL,
+    'ns' INTEGER NOT NULL,
+    'pageid' INTEGER,
+    'name' TEXT,
+    CONSTRAINT nu UNIQUE (ns, pageid)
+)",
+
+'network_site' =>
+    "CREATE TABLE IF NOT EXISTS 'network_site' (
+    'id' INTEGER PRIMARY KEY,
+    'url' TEXT,
+    CONSTRAINT nsu UNIQUE (url)
+)",
+
 // Default Demo Site setup
 
 'default_site' => "INSERT INTO site (id, name, about) VALUES (1, 'Shared Media Tagger Demo', 'This is a demonstration of the Shared Media Tagger software.')",
@@ -1104,8 +1121,8 @@ class smt_admin_category extends smt_admin_media_analysis {
         //    $this->notice('NEW: local_files: ' . $bind[':local_files']);
         //}
 
-		$bind[':updated'] = $this->time_now();
-		
+        $bind[':updated'] = $this->time_now();
+
         $url = '<a href="' . $this->url('category') . '?c='
             . $this->category_urlencode($this->strip_prefix($category_name))
             . '">' . $category_name . '</a>';

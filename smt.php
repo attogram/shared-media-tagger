@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.35');
+define('__SMT__', '0.7.36');
 
 ob_start('ob_gzhandler');
 
@@ -1104,9 +1104,9 @@ class smt_menus EXTENDS smt_tag {
     }  // end function include_menu()
 
     //////////////////////////////////////////////////////////
-	function include_medium_menu() {
-		
-	}
+    function include_medium_menu() {
+
+    }
 
     //////////////////////////////////////////////////////////
     function include_small_menu() {
@@ -1114,8 +1114,8 @@ class smt_menus EXTENDS smt_tag {
         print '
 <style>
 .menuj { font-size:170%; padding:0px; margin:0px; }
-</style>		
-		'
+</style>
+        '
         . '<div class="menu" style="font-weight:bold;">'
           . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
           . '<span style="display:inline; float:right; margin-right:10px; font-size:80%;">'
@@ -1123,13 +1123,13 @@ class smt_menus EXTENDS smt_tag {
             . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
             . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
             . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
-            . ($this->is_admin() 
-				? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>'  . $space
-				: '')
+            . ($this->is_admin()
+                ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>'  . $space
+                : '')
           . '</span>'
         . '</div><div style="clear:both;"></div>';
-		
-		// 🌐 🏷 📂 🔗 🔎 🔖 🖇 ⛓  ❓  ❔  📢
+
+        // 🌐 🏷 📂 🔗 🔎 🔖 🖇 ⛓  ❓  ❔  📢
     }
 
     //////////////////////////////////////////////////////////
