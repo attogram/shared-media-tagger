@@ -884,7 +884,7 @@ class smt_admin_media_analysis extends smt_admin_media {
         $file_url = $file[0]['thumburl'];
         $this->start_timer('skin_detection');
 
-        require_once('./use/skin-detection.php');
+        require_once('../use/skin-detection.php');
         $skin = new SkinDetection($file_url);
 
         $skin_percentage = $skin->get_skin_percentage();

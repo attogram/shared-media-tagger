@@ -40,8 +40,8 @@ print '<div class="box white"><p><a href="./media-analysis.php">' . $smt->title 
 <?php
 
 switch( @$_GET['r'] ) {
-	case 'skin': skin_report(); break;
-	case 'hash': hash_report(); break;
+    case 'skin': skin_report(); break;
+    case 'hash': hash_report(); break;
 }
 
 if( isset($_GET['skin']) ) {
@@ -58,112 +58,112 @@ $smt->include_footer();
 ////////////////////
 function get_perceptual_hash( $pageid ) {
 
-	global $smt;
+    global $smt;
 
-	$media = $smt->get_media($pageid);
-	if( !$media ) { 
-		$smt->error('Media Not Found');
-		return FALSE;
-	}
-	$url = str_replace('325px','64px', $media[0]['thumburl']);
-	
-	//print '<p>' . $media[0]['pageid'] . ': ' . $url . '</p>';
-	
-	// TMP until composer setup	
-	require_once('./use/imagehash/src/ImageHash.php');
-	require_once('./use/imagehash/src/Implementation.php');
-	require_once('./use/imagehash/src/Implementations/AverageHash.php');
-	require_once('./use/imagehash/src/Implementations/DifferenceHash.php');
-	require_once('./use/imagehash/src/Implementations/PerceptualHash.php');
+    $media = $smt->get_media($pageid);
+    if( !$media ) {
+        $smt->error('Media Not Found');
+        return FALSE;
+    }
+    $url = str_replace('325px','64px', $media[0]['thumburl']);
 
-	$hashes = array();
-	
-	$smt->start_timer('hasher');
-	
-	$hasher = new Jenssegers\ImageHash\ImageHash(NULL, 'dec');  // dec, hex
-		
-	$hasher->implementation = new Jenssegers\ImageHash\Implementations\AverageHash;
-	$hashes[':ahash'] = str_pad(decbin($hasher->hash($url)), 32, '0', STR_PAD_LEFT);
+    //print '<p>' . $media[0]['pageid'] . ': ' . $url . '</p>';
 
-	$hasher->implementation = new Jenssegers\ImageHash\Implementations\DifferenceHash;
-	$hashes[':dhash'] = str_pad(decbin($hasher->hash($url)), 32, '0', STR_PAD_LEFT);
-	
-	$hasher->implementation = new Jenssegers\ImageHash\Implementations\PerceptualHash;
-	$hashes[':phash'] = str_pad(decbin($hasher->hash($url)), 32, '0', STR_PAD_LEFT);	
-	
-	$smt->end_timer('hasher');
+    // TMP until composer setup
+    require_once('../use/imagehash/src/ImageHash.php');
+    require_once('../use/imagehash/src/Implementation.php');
+    require_once('../use/imagehash/src/Implementations/AverageHash.php');
+    require_once('../use/imagehash/src/Implementations/DifferenceHash.php');
+    require_once('../use/imagehash/src/Implementations/PerceptualHash.php');
 
-	save_hashes($pageid, $hashes);
-	
+    $hashes = array();
+
+    $smt->start_timer('hasher');
+
+    $hasher = new Jenssegers\ImageHash\ImageHash(NULL, 'dec');  // dec, hex
+
+    $hasher->implementation = new Jenssegers\ImageHash\Implementations\AverageHash;
+    $hashes[':ahash'] = str_pad(decbin($hasher->hash($url)), 32, '0', STR_PAD_LEFT);
+
+    $hasher->implementation = new Jenssegers\ImageHash\Implementations\DifferenceHash;
+    $hashes[':dhash'] = str_pad(decbin($hasher->hash($url)), 32, '0', STR_PAD_LEFT);
+
+    $hasher->implementation = new Jenssegers\ImageHash\Implementations\PerceptualHash;
+    $hashes[':phash'] = str_pad(decbin($hasher->hash($url)), 32, '0', STR_PAD_LEFT);
+
+    $smt->end_timer('hasher');
+
+    save_hashes($pageid, $hashes);
+
 }
 
 ////////////////////
 function save_hashes($pageid, $hashes) {
-	global $smt;
-	while( list($name,$hash) = each($hashes) ) {
+    global $smt;
+    while( list($name,$hash) = each($hashes) ) {
 
-	}
-	$sql = 'UPDATE media 
-	SET ahash = :ahash, dhash = :dhash, phash = :phash, updated = :updated
-	WHERE pageid = :pageid';
-	$hashes[':updated'] = $smt->time_now();
-	$hashes[':pageid'] = $pageid;
-	
-	$response = $smt->query_as_bool($sql, $hashes);
-	if( $response ) {
-		$smt->notice('<a href="' . $smt->url('info') 
-		. '?i=' . $pageid . '">' . "$pageid</a>: " . print_r($hashes,1) );
-		return TRUE;
-	}
-	$smt->error('ERROR saving hashes');
-	return FALSE;
+    }
+    $sql = 'UPDATE media
+    SET ahash = :ahash, dhash = :dhash, phash = :phash, updated = :updated
+    WHERE pageid = :pageid';
+    $hashes[':updated'] = $smt->time_now();
+    $hashes[':pageid'] = $pageid;
+
+    $response = $smt->query_as_bool($sql, $hashes);
+    if( $response ) {
+        $smt->notice('<a href="' . $smt->url('info')
+        . '?i=' . $pageid . '">' . "$pageid</a>: " . print_r($hashes,1) );
+        return TRUE;
+    }
+    $smt->error('ERROR saving hashes');
+    return FALSE;
 }
 
 ////////////////////
 function hash_report() {
-	global $smt;
-	$tab = " ";
-	$cr = "\n";
-	
-	print '<p><a href="?r=hash&update=1">Update Image Hashes x1</a></p>';
-	if( isset($_GET['update']) && $_GET['update'] && $smt->is_positive_number($_GET['update']) ) {
-		$runs = $_GET['update'];
-		print '<p>UPDATING x' . $runs . '</p>'; 
-		
-		$medias = $smt->query_as_array('
-			SELECT pageid
-			FROM media
-			WHERE ahash IS NULL
-			OR dhash IS NULL
-			OR phash IS NULL
-			ORDER BY updated ASC
-			LIMIT ' . $runs);
-		foreach($medias as $media) {
-			get_perceptual_hash( $media['pageid'] );
-		}
-	}
-	
-	
-	$report = 'Image Hash Report:' . $cr . $cr;
-	$medias = $smt->query_as_array('
-		SELECT pageid, ahash, dhash, phash, updated 
-		FROM media
-		WHERE ahash IS NOT NULL
-		AND dhash IS NOT NULL
-		and phash IS NOT NULL
-		ORDER BY dhash DESC
-		');
-	$report .= 'PageID     Difference Hash                  Perceptual Hash                  Average Hash                     Updated' . $cr
-	         . '---------- -------------------------------- -------------------------------- -------------------------------- -------------------' . $cr;
-	foreach( $medias as $media ) {
-		$report .= '<a target="site" href="' . $smt->url('info') . '?i=' . $media['pageid'] . '">'
-		. str_pad($media['pageid'], 10, ' ') . '</a>' . $tab
-		. str_pad($media['dhash'], 32, '0', STR_PAD_LEFT) . $tab
-		. str_pad($media['phash'], 32, '0', STR_PAD_LEFT) . $tab
-		. str_pad($media['ahash'], 32, '0', STR_PAD_LEFT) . $tab
-		. $media['updated'] . $cr;
-	}
-	print "<pre>$report</pre>";
+    global $smt;
+    $tab = " ";
+    $cr = "\n";
+
+    print '<p><a href="?r=hash&update=1">Update Image Hashes x1</a></p>';
+    if( isset($_GET['update']) && $_GET['update'] && $smt->is_positive_number($_GET['update']) ) {
+        $runs = $_GET['update'];
+        print '<p>UPDATING x' . $runs . '</p>';
+
+        $medias = $smt->query_as_array('
+            SELECT pageid
+            FROM media
+            WHERE ahash IS NULL
+            OR dhash IS NULL
+            OR phash IS NULL
+            ORDER BY updated ASC
+            LIMIT ' . $runs);
+        foreach($medias as $media) {
+            get_perceptual_hash( $media['pageid'] );
+        }
+    }
+
+
+    $report = 'Image Hash Report:' . $cr . $cr;
+    $medias = $smt->query_as_array('
+        SELECT pageid, ahash, dhash, phash, updated
+        FROM media
+        WHERE ahash IS NOT NULL
+        AND dhash IS NOT NULL
+        and phash IS NOT NULL
+        ORDER BY dhash DESC
+        ');
+    $report .= 'PageID     Difference Hash                  Perceptual Hash                  Average Hash                     Updated' . $cr
+             . '---------- -------------------------------- -------------------------------- -------------------------------- -------------------' . $cr;
+    foreach( $medias as $media ) {
+        $report .= '<a target="site" href="' . $smt->url('info') . '?i=' . $media['pageid'] . '">'
+        . str_pad($media['pageid'], 10, ' ') . '</a>' . $tab
+        . str_pad($media['dhash'], 32, '0', STR_PAD_LEFT) . $tab
+        . str_pad($media['phash'], 32, '0', STR_PAD_LEFT) . $tab
+        . str_pad($media['ahash'], 32, '0', STR_PAD_LEFT) . $tab
+        . $media['updated'] . $cr;
+    }
+    print "<pre>$report</pre>";
 }
 
 
@@ -211,9 +211,9 @@ function skin_report() {
     $report .= '</pre>';
 
     $header = '';
-    $header .= '<p><a href="?report&amp;update=5">Update Skin Percentages - Update x5 files</a></p>';
+    $header .= '<p><a href="?r=skin&amp;update=5">Update Skin Percentages - Update x5 files</a></p>';
     $header .= '<pre>Skin Percentage Report @ ' . $smt->time_now() . ' UTC<br />';
-    $header .= '<br />' . $smt->get_image_count() . ' media files in collection';
+    $header .= '<br />' . number_format($smt->get_image_count()) . ' media files in collection';
     $header .= '<br />' . number_format(sizeof($medias)) . ' media files analysed';
     $header .= '<br />Pageid     Skin      Updated';
     $header .= '<br />------     -----     -------------------';
