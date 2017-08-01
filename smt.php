@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.43');
+define('__SMT__', '0.7.44');
 
 ob_start('ob_gzhandler');
 
@@ -1083,20 +1083,20 @@ class smt_menus EXTENDS smt_tag {
         . '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
         .  $space
-        . '<a href="' . $this->url('browse') . '">' . $count_files . '&nbsp;Files' . '</a>'
+        . '<a href="' . $this->url('browse') . '">🔎' . $count_files . '&nbsp;Files' . '</a>'
         . $space
-        . '<a href="' . $this->url('categories') . '">' . $count_categories . '&nbsp;Categories</a>'
+        . '<a href="' . $this->url('categories') . '">📂' . $count_categories . '&nbsp;Categories</a>'
         . $space
-        . '<a href="' . $this->url('reviews') . '">' . $count_reviews . '&nbsp;Reviews</a>'
+        . '<a href="' . $this->url('reviews') . '">🗳' . $count_reviews . '&nbsp;Reviews</a>'
         . $space
         . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
         . $count_users .'&nbsp;Users</a>'
         . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>'
         . $space
-        . '<a href="'. $this->url('about') . '">About</a>'
+        . '<a href="'. $this->url('about') . '">❔About</a>'
 
-        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">ADMIN</a>' : '')
+        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧ADMIN</a>' : '')
 
         . '</div>';
 
@@ -1109,21 +1109,26 @@ class smt_menus EXTENDS smt_tag {
 
     //////////////////////////////////////////////////////////
     function include_small_menu() {
-        $space = ' &nbsp;&nbsp; ';
+        $space = ' ';
         print '
 <style>
-.menuj { font-size:170%; padding:0px; margin:0px; }
+.menujcon { background-color:#222; text-align:center; vertical-align:middle; }
+.menujcon a { background-color:#222; color:#ccc; }
+.menujcon a:visited { color:#ddd; }
+.menujcon a:hover { color:yellow; }
+.menuj { font-size:120%; padding:1px; margin:0px; border:1px solid #555; }
+.menuj:hover { border:1px solid yellow; }
 </style>
         '
-        . '<div class="menu" style="font-weight:bold;">'
-          . '<a href="' . $this->url('home') . '">' . $this->site_name . '</a>'
-          . '<span style="display:inline; float:right; margin-right:10px; font-size:80%;">'
+        . '<div class="menujcon">'
+          . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+          . '<span style="float:right;">'
             . '<a class="menuj" title="Browse" href="' . $this->url('browse') . '">🔎</a>' . $space
             . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
             . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
             . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
             . ($this->is_admin()
-                ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>'  . $space
+                ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>'
                 : '')
           . '</span>'
         . '</div><div style="clear:both;"></div>';
