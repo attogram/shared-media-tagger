@@ -62,6 +62,7 @@ function multi_delete_media( $list ) {
 <input type="submit" value="  Add via pageid  "/>
 </form>
 <br /><br />
+<form action="" method="GET">
 * Delete &amp; Block Media:
 <input type="text" name="dm" value="" size="10" />
 <input type="submit" value="  Delete via pageid  "/>
