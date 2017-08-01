@@ -111,7 +111,7 @@ li { margin-bottom:6px; }
 
 <p><em>Media info:</em>
 <ul>
-<li>width x height: <b><?php print number_format($media['width']); 
+<li>width x height: <b><?php print number_format($media['width']);
 ?> x <?php print number_format($media['height']); ?></b> pixels</li>
 <li>mime: <b><?php print $media['mime']; ?></b></li>
 <li>size: <b><?php print number_format($media['size']); ?></b> bytes</li>
@@ -129,22 +129,22 @@ if( $media['duration'] > 0 ) {
 
 <p><em>Media analysis:</em>
 <ul>
-<?php 
+<?php
 if( isset($media['skin']) && $media['skin'] != NULL ) {
-	print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
-} 
+    print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
+}
 if( isset($media['ahash']) && $media['ahash'] != NULL ) {
-	print '<li>Average Hash: <b>' . $media['ahash'] . ' </b></li>';
-} 
+    print '<li>Average Hash: <b>' . $media['ahash'] . ' </b></li>';
+}
 if( isset($media['dhash']) && $media['dhash'] != NULL ) {
-	print '<li>Difference Hash: <b>' . $media['dhash'] . ' </b></li>';
-} 
+    print '<li>Difference Hash: <b>' . $media['dhash'] . ' </b></li>';
+}
 if( isset($media['phash']) && $media['phash'] != NULL ) {
-	print '<li>Perceptual Hash: <b>' . $media['phash'] . ' </b></li>';
-} 
+    print '<li>Perceptual Hash: <b>' . $media['phash'] . ' </b></li>';
+}
 if( isset($media['sha1']) && $media['sha1'] != NULL ) {
-	print '<li>SHA1 Hash: <b>' . $media['sha1'] . ' </b></li>';
-} 
+    print '<li>SHA1 Hash: <b>' . $media['sha1'] . ' </b></li>';
+}
 ?>
 </ul>
 </p>
@@ -155,7 +155,7 @@ print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; 
 <?php
 
 if( $smt->is_admin() ) {
-	print '<pre>ADMIN: media: ' . print_r($media,1) . '</pre>';
+    print '<pre>ADMIN: media: ' . print_r($media,1) . '</pre>';
 }
 
 ?>

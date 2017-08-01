@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.40');
+define('__SMT__', '0.7.41');
 
 ob_start('ob_gzhandler');
 
@@ -1166,7 +1166,7 @@ class smt_menus EXTENDS smt_tag {
 
         . ' <a style="font-size:140%;" href="' . $this->url('admin')
         . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
-		
+
         . ' <a style="font-size:140%;" href="' . $this->url('admin')
         . 'media-analysis.php?hash=' . $media_id. '">H</a>'
         . '</div>';

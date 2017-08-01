@@ -10,58 +10,58 @@ $smt = new smt();
 
 $sort = 'random';
 if( isset($_GET['s']) ) {
-	$sort = $_GET['s'];
+    $sort = $_GET['s'];
 }
 $where = '';
 switch( $sort ) {
-	default:
-	case '':
-	case 'random': $orderby = ' ORDER BY RANDOM()'; break;
-	case 'pageid': $orderby = ' ORDER BY pageid'; $extra = 'pageid'; break;
-	case 'size': $orderby = ' ORDER BY size'; $extra = 'size'; $extra_numberformat = 1; break;
-	case 'title':  $orderby = ' ORDER BY title'; break;
-	case 'mime': $orderby = ' ORDER BY mime'; $extra = 'mime'; break;
-	case 'width': $orderby = ' ORDER BY width'; $extra = 'width'; $extra_numberformat = 1; break;
-	case 'height': $orderby = ' ORDER BY height'; $extra = 'height'; $extra_numberformat = 1; break;
-	case 'datetimeoriginal': $orderby = ' ORDER BY datetimeoriginal'; break;
-	case 'timestamp': $orderby = ' ORDER BY timestamp'; $extra = 'timestamp'; break;
-	case 'updated': $orderby = ' ORDER BY updated'; $extra = 'updated'; break;
-	case 'licenseuri': $orderby = ' ORDER BY licenseuri'; break;
-	case 'licensename': $orderby = ' ORDER BY licensename'; break;
-	case 'licenseshortname': $orderby = ' ORDER BY licenseshortname'; $extra = 'licenseshortname'; break;
-	case 'usageterms': $orderby = ' ORDER BY usageterms'; $extra = 'usageterms'; break;
-	case 'attributionrequired': $orderby = ' ORDER BY attributionrequired'; $extra = 'attributionrequired'; break;
-	case 'restrictions': $orderby = ' ORDER BY restrictions'; $extra = 'restrictions'; break;
-	case 'user': $orderby = ' ORDER BY user'; $extra = 'user'; break;
-	case 'duration': $orderby = ' ORDER BY duration'; $extra = 'duration';  break;
-	case 'sha1': $orderby = ' ORDER BY sha1'; break;
-	case 'skin': $orderby = ' ORDER BY skin'; $where = ' WHERE skin IS NOT NULL'; $extra = 'skin'; break;
-	case 'ahash': $orderby = ' ORDER BY ahash'; $where = ' WHERE ahash IS NOT NULL'; break;
-	case 'dhash': $orderby = ' ORDER BY dhash'; $where = ' WHERE dhash IS NOT NULL'; break;
-	case 'phash': $orderby = ' ORDER BY phash'; $where = ' WHERE phash IS NOT NULL'; break;
+    default:
+    case '':
+    case 'random': $orderby = ' ORDER BY RANDOM()'; break;
+    case 'pageid': $orderby = ' ORDER BY pageid'; $extra = 'pageid'; break;
+    case 'size': $orderby = ' ORDER BY size'; $extra = 'size'; $extra_numberformat = 1; break;
+    case 'title':  $orderby = ' ORDER BY title'; break;
+    case 'mime': $orderby = ' ORDER BY mime'; $extra = 'mime'; break;
+    case 'width': $orderby = ' ORDER BY width'; $extra = 'width'; $extra_numberformat = 1; break;
+    case 'height': $orderby = ' ORDER BY height'; $extra = 'height'; $extra_numberformat = 1; break;
+    case 'datetimeoriginal': $orderby = ' ORDER BY datetimeoriginal'; break;
+    case 'timestamp': $orderby = ' ORDER BY timestamp'; $extra = 'timestamp'; break;
+    case 'updated': $orderby = ' ORDER BY updated'; $extra = 'updated'; break;
+    case 'licenseuri': $orderby = ' ORDER BY licenseuri'; break;
+    case 'licensename': $orderby = ' ORDER BY licensename'; break;
+    case 'licenseshortname': $orderby = ' ORDER BY licenseshortname'; $extra = 'licenseshortname'; break;
+    case 'usageterms': $orderby = ' ORDER BY usageterms'; $extra = 'usageterms'; break;
+    case 'attributionrequired': $orderby = ' ORDER BY attributionrequired'; $extra = 'attributionrequired'; break;
+    case 'restrictions': $orderby = ' ORDER BY restrictions'; $extra = 'restrictions'; break;
+    case 'user': $orderby = ' ORDER BY user'; $extra = 'user'; break;
+    case 'duration': $orderby = ' ORDER BY duration'; $extra = 'duration';  break;
+    case 'sha1': $orderby = ' ORDER BY sha1'; break;
+    case 'skin': $orderby = ' ORDER BY skin'; $where = ' WHERE skin IS NOT NULL'; $extra = 'skin'; break;
+    case 'ahash': $orderby = ' ORDER BY ahash'; $where = ' WHERE ahash IS NOT NULL'; break;
+    case 'dhash': $orderby = ' ORDER BY dhash'; $where = ' WHERE dhash IS NOT NULL'; break;
+    case 'phash': $orderby = ' ORDER BY phash'; $where = ' WHERE phash IS NOT NULL'; break;
 }
 
 $dir = 'd'; $sql_dir = ' DESC';
 if( isset($_GET['d']) ) {
-	switch($_GET['d']) {
-		case 'a': $dir = 'a'; $sql_dir = ' ASC'; break;
-		case 'd': $dir = 'd'; $sql_dir = ' DESC'; break;
-	}
+    switch($_GET['d']) {
+        case 'a': $dir = 'a'; $sql_dir = ' ASC'; break;
+        case 'd': $dir = 'd'; $sql_dir = ' DESC'; break;
+    }
 }
 
 switch( $sort ) {
-	default:
-		$sql_count = 'SELECT count(pageid) AS count FROM media' . $where;
-		$raw_count = $smt->query_as_array($sql_count);
-		$result_size = 0;
-		if( $raw_count ) {
-			$result_size = $raw_count[0]['count'];
-		}
-		break;
-		
-	case 'random': 
-		$result_size = $page_limit; 
-		break;
+    default:
+        $sql_count = 'SELECT count(pageid) AS count FROM media' . $where;
+        $raw_count = $smt->query_as_array($sql_count);
+        $result_size = 0;
+        if( $raw_count ) {
+            $result_size = $raw_count[0]['count'];
+        }
+        break;
+
+    case 'random':
+        $result_size = $page_limit;
+        break;
 }
 
 
@@ -69,17 +69,17 @@ switch( $sort ) {
 
 ///////////////
 function pager_link($offset) {
-	global $sort, $dir;
-	$link = '<a href="?o=' . $offset;
-	if( $sort ) { 
-		$link .= '&amp;s=' . $sort; 
-	}
-	if( $dir ) {
-		$link .= '&amp;d=' . $dir;
-	}
-	$link .= '">';
-	return $link;
-	
+    global $sort, $dir;
+    $link = '<a href="?o=' . $offset;
+    if( $sort ) {
+        $link .= '&amp;s=' . $sort;
+    }
+    if( $dir ) {
+        $link .= '&amp;d=' . $dir;
+    }
+    $link .= '">';
+    return $link;
+
 }
 
 //////////////////////////////////////////
@@ -94,35 +94,35 @@ $number_of_pages = ceil($result_size / $page_limit);
 //$smt->notice("page_limit:$page_limit , number_of_pages:$number_of_pages ,  offset:$offset ,  current_page:$current_page , result_size:$result_size ,  sort:$sort");
 
 if( $sort != 'random' && ($result_size > $page_limit) ) {
-    
+
     $sql_offset = " OFFSET $offset";
     $page_count = 0;
     $pager = '<small>page: ';
     for( $x = 0; $x < $result_size; $x+=$page_limit ) {
-		
-		$page_count++;
-		
-		if( $current_page == $page_count ) {
+
+        $page_count++;
+
+        if( $current_page == $page_count ) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
-			. pager_link($x) . '&nbsp;' . $page_count . '&nbsp;</a> </span>';
+            . pager_link($x) . '&nbsp;' . $page_count . '&nbsp;</a> </span>';
             continue;
         }
-		
-		$edge_buffer = 3; // always show first and last pages
-		$buffer = 5; // always show pages before/after current page
-		if(    $page_count <= $edge_buffer 
-			|| $page_count > ($number_of_pages-$edge_buffer)
-			|| (  ($page_count > ($current_page-$buffer)) && ($page_count < ($current_page+$buffer))  )
-		) {  
-			$pager .= pager_link($x) . '&nbsp;' . $page_count . ' </a>';
-			continue;
-		}
-		
-		if( $page_count % 50 == 0 ) {
-			$pager .= pager_link($x) . '. </a>';
-		}
-	}
-	$pager .= '</small>';
+
+        $edge_buffer = 3; // always show first and last pages
+        $buffer = 5; // always show pages before/after current page
+        if(    $page_count <= $edge_buffer
+            || $page_count > ($number_of_pages-$edge_buffer)
+            || (  ($page_count > ($current_page-$buffer)) && ($page_count < ($current_page+$buffer))  )
+        ) {
+            $pager .= pager_link($x) . '&nbsp;' . $page_count . ' </a>';
+            continue;
+        }
+
+        if( $page_count % 50 == 0 ) {
+            $pager .= pager_link($x) . '. </a>';
+        }
+    }
+    $pager .= '</small>';
 }
 //////////////////////////////////////////
 
@@ -173,36 +173,36 @@ Browse Files, sorty by <select name="s">
 </form><br />' . number_format($result_size) . ' Files' . ($pager ? ', '.$pager : '');
 
 
-if( $smt->is_admin() ) { 
+if( $smt->is_admin() ) {
     print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
-	print $smt->display_admin_media_list_functions(); 
+    print $smt->display_admin_media_list_functions();
 }
 
 print '<br clear="all" />';
 
 
 foreach($medias as $media) {
-	if( isset($extra) ) { 
-		print '<div style="display:inline-block;">'
-		. '<span style="background-color:#eee; border:1px solid #f99; font-size:80%;">';
-		
-		if( isset($extra_numberformat) ) {
-			print number_format($media[$extra]);
-		} else {
-			print $media[$extra];
-		}
-		print '</span><br />';
-	}
-	print $smt->display_thumbnail_box($media);
-	if( isset($extra) ) { 
-		print '</div>';
-	}
+    if( isset($extra) ) {
+        print '<div style="display:inline-block;">'
+        . '<span style="background-color:#eee; border:1px solid #f99; font-size:80%;">';
+
+        if( isset($extra_numberformat) ) {
+            print number_format($media[$extra]);
+        } else {
+            print $media[$extra];
+        }
+        print '</span><br />';
+    }
+    print $smt->display_thumbnail_box($media);
+    if( isset($extra) ) {
+        print '</div>';
+    }
 }
 
 print '<br clear="all" />';
 
-if( $smt->is_admin() ) { 
-	 print $smt->display_admin_media_list_functions(). '</form>'; 
+if( $smt->is_admin() ) {
+     print $smt->display_admin_media_list_functions(). '</form>';
 }
 
 if( $pager ) {

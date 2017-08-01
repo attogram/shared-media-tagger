@@ -34,13 +34,13 @@ if( $category_size > $page_limit ) {
         if( $x == $offset ) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
             . '&nbsp;' . ++$page_count . '&nbsp;</span> ';
-			$pager_count = $page_count;
+            $pager_count = $page_count;
             continue;
         }
-        $pager .= '<a href="?o=' . $x 
-		. ($hidden ? '&amp;h=1' : '')
-		//. ($search ? '&amp;s=' . urlencode($search) : '')
-		. '">&nbsp;' . ++$page_count . '&nbsp;</a> ';
+        $pager .= '<a href="?o=' . $x
+        . ($hidden ? '&amp;h=1' : '')
+        //. ($search ? '&amp;s=' . urlencode($search) : '')
+        . '">&nbsp;' . ++$page_count . '&nbsp;</a> ';
     }
 }
 $pager = '<b>' . number_format($category_size) . '</b> '
@@ -66,13 +66,13 @@ $categories = $smt->query_as_array($sql, $bind);
 
 $page_name = number_format($category_size);
 if( $hidden ) {
-	$page_name .= ' Technical'; 
-} else { 
-	$page_name .= ' Active'; 
+    $page_name .= ' Technical';
+} else {
+    $page_name .= ' Active';
 }
 $page_name .= ' Categories';
-if( isset($pager_count) ) { 
-	$page_name .= ', page #' . $pager_count; 
+if( isset($pager_count) ) {
+    $page_name .= ', page #' . $pager_count;
 }
 $smt->title = $page_name . ' - ' . $smt->site_name;
 
@@ -104,7 +104,7 @@ foreach( $categories as $category ) {
     $local_url = $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix(@$category['name']));
     print '<div class="catcon">'
     . '<div class="catfiles">' . number_format(@$category['local_files']) . '</div>'
-	. '<div class="catname" onclick="window.location=\'' . $local_url . '\'">'
+    . '<div class="catname" onclick="window.location=\'' . $local_url . '\'">'
     . '<a href="' . $local_url . '">' . $smt->strip_prefix(@$category['name']) . '</a>'
     . '</div>'
     . '</div>';

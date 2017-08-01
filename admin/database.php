@@ -2,9 +2,9 @@
 // Shared Media Tagger
 // Database Admin
 
-$f = __DIR__.'/../smt.php'; 
+$f = __DIR__.'/../smt.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
-$f = __DIR__.'/smt-admin.php'; 
+$f = __DIR__.'/smt-admin.php';
 if(!file_exists($f)||!is_readable($f)){ print 'Site down for maintenance'; exit; } require_once($f);
 $smt = new smt_admin();
 
@@ -17,11 +17,11 @@ print '<div class="box white">';
 if( isset($_GET['a']) ) {
     print '<hr /><pre>';
     switch( $_GET['a'] ) {
-        case 'c': 
+        case 'c':
             print '<p>Creating Database tables:</p>'; print $smt->create_tables(); break;
         case 'd':
             print '<p>Dropping Database tables:</p>'; print $smt->drop_tables(); break;
-        case 'em': 
+        case 'em':
             print '<p>Emptying Media tables:</p>'; print_r( $smt->empty_media_tables() ); break;
         case 'ec':
             print '<p>Emptying Category tables:</p>'; print_r( $smt->empty_category_tables() ); break;
@@ -29,7 +29,7 @@ if( isset($_GET['a']) ) {
             print '<p>Emptying Tagging tables:</p>'; print_r( $smt->empty_tagging_tables() ); break;
         case 'eu':
             print '<p>Emptying User tables:</p>'; print_r( $smt->empty_user_tables() ); break;
-            
+
     }
 }
 print '</pre><hr />';

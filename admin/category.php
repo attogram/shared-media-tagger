@@ -141,8 +141,8 @@ print '<p><form action="" method="GET">'
 . '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
-if( 
-	$smt->get_categories_count() > 1000 
+if(
+    $smt->get_categories_count() > 1000
 ) {
     print '</div>';
     $smt->include_footer();

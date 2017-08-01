@@ -38,50 +38,50 @@ $smt->include_footer();
 
 ////////////////////////////////
 function category2media() {
-	
-	global $smt;
+
+    global $smt;
     $tab = "\t";
 
-	$c2ms = $smt->query_as_array('
-	SELECT * FROM category2media');
-	print '<p>' . number_format(sizeof($c2ms)) . ' category2media</p>';
+    $c2ms = $smt->query_as_array('
+    SELECT * FROM category2media');
+    print '<p>' . number_format(sizeof($c2ms)) . ' category2media</p>';
 
-	$categories_raw = $smt->query_as_array('SELECT id FROM category');
-	print '<p>' . number_format(sizeof($categories_raw)) . ' Categories</p>';
-	$categories = array();
-	$smt->start_timer('c_id_sort');
-	foreach( $categories_raw as $cats ) { $categories[$cats['id']] = TRUE; }
-	
-	$media_raw = $smt->query_as_array('SELECT pageid FROM media');
-	print '<p>' . number_format(sizeof($media_raw)) . ' Media</p>';
-	$media = array();
-	foreach( $media_raw as $med ) { $media[$med['pageid']] = TRUE; }	
+    $categories_raw = $smt->query_as_array('SELECT id FROM category');
+    print '<p>' . number_format(sizeof($categories_raw)) . ' Categories</p>';
+    $categories = array();
+    $smt->start_timer('c_id_sort');
+    foreach( $categories_raw as $cats ) { $categories[$cats['id']] = TRUE; }
 
-	$checked = 0;
-	$errors = array();
-	print '<pre>';
-	foreach( $c2ms as $c2m ) {
-		$checked++;	
-		if( !isset($categories[$c2m['category_id']]) ) {
-			$errors[] = $c2m['id'];
-			print '<br />c2m_id:' . $c2m['id'] . ' CATEGORY NOT FOUND'  
-			. ' c:' . $c2m['category_id'] 
-			. ' m:' . $c2m['media_pageid'];
-		}
-		if( !isset($media[$c2m['media_pageid']]) ) {
-			$errors[] = $c2m['id'];
-			print '<br />c2m_id:' . $c2m['id'] . ' MEDIA NOT FOUND'
-			. ' c:' . $c2m['category_id'] 
-			. ' m:' . $c2m['media_pageid'];
-		}
-	}
-	print '</pre>';
-	print '<p>' . number_format($checked) . ' checked</p>';
-	print '<p>' . number_format(sizeof($errors)) . ' ERRORS</p>';
-	
-	$sql = 'DELETE FROM category2media WHERE id IN ( '
-		. implode($errors, ', ') . ' );';
-	print '<p>'.$sql.'</p>';
+    $media_raw = $smt->query_as_array('SELECT pageid FROM media');
+    print '<p>' . number_format(sizeof($media_raw)) . ' Media</p>';
+    $media = array();
+    foreach( $media_raw as $med ) { $media[$med['pageid']] = TRUE; }
+
+    $checked = 0;
+    $errors = array();
+    print '<pre>';
+    foreach( $c2ms as $c2m ) {
+        $checked++;
+        if( !isset($categories[$c2m['category_id']]) ) {
+            $errors[] = $c2m['id'];
+            print '<br />c2m_id:' . $c2m['id'] . ' CATEGORY NOT FOUND'
+            . ' c:' . $c2m['category_id']
+            . ' m:' . $c2m['media_pageid'];
+        }
+        if( !isset($media[$c2m['media_pageid']]) ) {
+            $errors[] = $c2m['id'];
+            print '<br />c2m_id:' . $c2m['id'] . ' MEDIA NOT FOUND'
+            . ' c:' . $c2m['category_id']
+            . ' m:' . $c2m['media_pageid'];
+        }
+    }
+    print '</pre>';
+    print '<p>' . number_format($checked) . ' checked</p>';
+    print '<p>' . number_format(sizeof($errors)) . ' ERRORS</p>';
+
+    $sql = 'DELETE FROM category2media WHERE id IN ( '
+        . implode($errors, ', ') . ' );';
+    print '<p>'.$sql.'</p>';
 }
 
 

@@ -11,7 +11,7 @@ class smt_admin_utils extends smt {
         if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == '1' ) {
             return;
         }
-        setcookie('admin','1',time()+60*60*4,'/'); // 4 hour admin cookie
+        setcookie('admin','1',time()+28800,'/'); // 8 hour admin cookie
         //$this->notice('Admin cookie set');
     }
 
@@ -102,172 +102,172 @@ class smt_admin_utils extends smt {
 class smt_admin_database_tables extends smt_admin_utils {
 
     //////////////////////////////////////////////////////////
-	function get_database_tables() {
+    function get_database_tables() {
         return array(
 
-		'site' =>
-			"CREATE TABLE IF NOT EXISTS 'site' (
-			'id' INTEGER PRIMARY KEY,
-			'name' TEXT,
-			'about' TEXT,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT su UNIQUE (name) )",
+        'site' =>
+            "CREATE TABLE IF NOT EXISTS 'site' (
+            'id' INTEGER PRIMARY KEY,
+            'name' TEXT,
+            'about' TEXT,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT su UNIQUE (name) )",
 
-		'tag' =>
-			"CREATE TABLE IF NOT EXISTS 'tag' (
-			'id' INTEGER PRIMARY KEY,
-			'position' INTEGER,
-			'name' TEXT,
-			'display_name' TEXT,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
+        'tag' =>
+            "CREATE TABLE IF NOT EXISTS 'tag' (
+            'id' INTEGER PRIMARY KEY,
+            'position' INTEGER,
+            'name' TEXT,
+            'display_name' TEXT,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
 
-		'tagging' =>
-			"CREATE TABLE IF NOT EXISTS 'tagging' (
-			'id' INTEGER PRIMARY KEY,
-			'tag_id' INTEGER,
-			'media_pageid' INTEGER,
-			'count' INTEGER,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT tmu UNIQUE (tag_id, media_pageid) )",
+        'tagging' =>
+            "CREATE TABLE IF NOT EXISTS 'tagging' (
+            'id' INTEGER PRIMARY KEY,
+            'tag_id' INTEGER,
+            'media_pageid' INTEGER,
+            'count' INTEGER,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT tmu UNIQUE (tag_id, media_pageid) )",
 
-		'category' =>
-			"CREATE TABLE IF NOT EXISTS 'category' (
-			'id' INTEGER PRIMARY KEY,
-			'name' TEXT,
-			'pageid' INTEGER,
-			'files' INTEGER,
-			'subcats' INTEGER,
-			'local_files' INTEGER DEFAULT '0',
-			'missing' INTEGER DEFAULT '0',
-			'hidden' INTEGER DEFAULT '0',
-			'force' INTEGER,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT cu UNIQUE (name) )",
+        'category' =>
+            "CREATE TABLE IF NOT EXISTS 'category' (
+            'id' INTEGER PRIMARY KEY,
+            'name' TEXT,
+            'pageid' INTEGER,
+            'files' INTEGER,
+            'subcats' INTEGER,
+            'local_files' INTEGER DEFAULT '0',
+            'missing' INTEGER DEFAULT '0',
+            'hidden' INTEGER DEFAULT '0',
+            'force' INTEGER,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT cu UNIQUE (name) )",
 
-		'category2media' =>
-			"CREATE TABLE IF NOT EXISTS 'category2media' (
-			'id' INTEGER PRIMARY KEY,
-			'category_id' INTEGER,
-			'media_pageid' INTEGER,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT tmu UNIQUE (category_id, media_pageid) )",
+        'category2media' =>
+            "CREATE TABLE IF NOT EXISTS 'category2media' (
+            'id' INTEGER PRIMARY KEY,
+            'category_id' INTEGER,
+            'media_pageid' INTEGER,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT tmu UNIQUE (category_id, media_pageid) )",
 
-		'media' =>
-			"CREATE TABLE IF NOT EXISTS 'media' (
-			'pageid' INTEGER PRIMARY KEY,
-			'title' TEXT,
-			'url' TEXT,
-			'descriptionurl' TEXT,
-			'descriptionshorturl' TEXT,
-			'imagedescription' TEXT,
-			'artist' TEXT,
-			'datetimeoriginal' TEXT,
-			'licenseuri' TEXT,
-			'licensename' TEXT,
-			'licenseshortname' TEXT,
-			'usageterms' TEXT,
-			'attributionrequired' TEXT,
-			'restrictions' TEXT,
-			'size' INTEGER,
-			'width' INTEGER,
-			'height' INTEGER,
-			'sha1' TEXT,
-			'mime' TEXT,
-			'thumburl' TEXT,
-			'thumbwidth' INTEGER,
-			'thumbheight' INTEGER,
-			'thumbmime' TEXT,
-			'user' TEXT,
-			'userid' INTEGER,
-			'duration' REAL,
-			'timestamp' TEXT,
-			'skin' REAL,
-			'ahash' TEXT,
-			'dhash' TEXT,
-			'phash' TEXT,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
+        'media' =>
+            "CREATE TABLE IF NOT EXISTS 'media' (
+            'pageid' INTEGER PRIMARY KEY,
+            'title' TEXT,
+            'url' TEXT,
+            'descriptionurl' TEXT,
+            'descriptionshorturl' TEXT,
+            'imagedescription' TEXT,
+            'artist' TEXT,
+            'datetimeoriginal' TEXT,
+            'licenseuri' TEXT,
+            'licensename' TEXT,
+            'licenseshortname' TEXT,
+            'usageterms' TEXT,
+            'attributionrequired' TEXT,
+            'restrictions' TEXT,
+            'size' INTEGER,
+            'width' INTEGER,
+            'height' INTEGER,
+            'sha1' TEXT,
+            'mime' TEXT,
+            'thumburl' TEXT,
+            'thumbwidth' INTEGER,
+            'thumbheight' INTEGER,
+            'thumbmime' TEXT,
+            'user' TEXT,
+            'userid' INTEGER,
+            'duration' REAL,
+            'timestamp' TEXT,
+            'skin' REAL,
+            'ahash' TEXT,
+            'dhash' TEXT,
+            'phash' TEXT,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
 
-		'contact' =>
-			"CREATE TABLE IF NOT EXISTS 'contact' (
-			'id' INTEGER PRIMARY KEY,
-			'comment' TEXT,
-			'datetime' TEXT,
-			'ip' TEXT )",
+        'contact' =>
+            "CREATE TABLE IF NOT EXISTS 'contact' (
+            'id' INTEGER PRIMARY KEY,
+            'comment' TEXT,
+            'datetime' TEXT,
+            'ip' TEXT )",
 
-		'block' =>
-			"CREATE TABLE IF NOT EXISTS 'block' (
-			'pageid' INTEGER PRIMARY KEY,
-			'title' TEXT,
-			'thumb' TEXT,
-			'ns' INTEGER,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
+        'block' =>
+            "CREATE TABLE IF NOT EXISTS 'block' (
+            'pageid' INTEGER PRIMARY KEY,
+            'title' TEXT,
+            'thumb' TEXT,
+            'ns' INTEGER,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
 
-		'user' =>
-			"CREATE TABLE IF NOT EXISTS 'user' (
-			'id' INTEGER PRIMARY KEY,
-			'ip' TEXT,
-			'host' TEXT,
-			'user_agent' TEXT,
-			'page_views' INTEGER,
-			'last' TEXT,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
+        'user' =>
+            "CREATE TABLE IF NOT EXISTS 'user' (
+            'id' INTEGER PRIMARY KEY,
+            'ip' TEXT,
+            'host' TEXT,
+            'user_agent' TEXT,
+            'page_views' INTEGER,
+            'last' TEXT,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
 
-		'user_tagging' =>
-			"CREATE TABLE IF NOT EXISTS 'user_tagging' (
-			'id' INTEGER PRIMARY KEY,
-			'user_id' INTEGER,
-			'tag_id' INTEGER,
-			'media_pageid' INTEGER,
-			'count' INTEGER,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
+        'user_tagging' =>
+            "CREATE TABLE IF NOT EXISTS 'user_tagging' (
+            'id' INTEGER PRIMARY KEY,
+            'user_id' INTEGER,
+            'tag_id' INTEGER,
+            'media_pageid' INTEGER,
+            'count' INTEGER,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
 
-		'network' =>
-			"CREATE TABLE IF NOT EXISTS 'network' (
-			'id' INTEGER PRIMARY KEY,
-			'site_id' INTEGER NOT NULL,
-			'ns' INTEGER NOT NULL,
-			'pageid' INTEGER,
-			'name' TEXT,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT nu UNIQUE (ns, pageid) )",
+        'network' =>
+            "CREATE TABLE IF NOT EXISTS 'network' (
+            'id' INTEGER PRIMARY KEY,
+            'site_id' INTEGER NOT NULL,
+            'ns' INTEGER NOT NULL,
+            'pageid' INTEGER,
+            'name' TEXT,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT nu UNIQUE (ns, pageid) )",
 
-		'network_site' =>
-			"CREATE TABLE IF NOT EXISTS 'network_site' (
-			'id' INTEGER PRIMARY KEY,
-			'url' TEXT,
-			'name' TEXT,
-			'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-			CONSTRAINT nsu UNIQUE (url) )",
-	
-		);
-	} // end function get_database_tables
+        'network_site' =>
+            "CREATE TABLE IF NOT EXISTS 'network_site' (
+            'id' INTEGER PRIMARY KEY,
+            'url' TEXT,
+            'name' TEXT,
+            'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT nsu UNIQUE (url) )",
 
-	//////////////////////////////////////////////////////////
-	function get_default_database_setup() {
-		return array(
-			'default_site' => 
-				"INSERT INTO site (
-					id, name, about
-				) VALUES (
-					1, 
-					'Shared Media Tagger Demo', 
-					'This is a demonstration of the Shared Media Tagger software.'
-				)",
+        );
+    } // end function get_database_tables
 
-			'default_tag1' => 
-				"INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
-			'default_tag2' => 
-				"INSERT INTO tag (id, position, name, display_name) VALUES (2, 2, '🙁 Bad',    '🙁')",
-			'default_tag3' => 
-				"INSERT INTO tag (id, position, name, display_name) VALUES (3, 3, '😐 Unsure', '😐')",
-			'default_tag4' => 
-				"INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙂 Good',   '🙂')",
-			'default_tag5' => 
-				"INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
-		);
-	}
+    //////////////////////////////////////////////////////////
+    function get_default_database_setup() {
+        return array(
+            'default_site' =>
+                "INSERT INTO site (
+                    id, name, about
+                ) VALUES (
+                    1,
+                    'Shared Media Tagger Demo',
+                    'This is a demonstration of the Shared Media Tagger software.'
+                )",
+
+            'default_tag1' =>
+                "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
+            'default_tag2' =>
+                "INSERT INTO tag (id, position, name, display_name) VALUES (2, 2, '🙁 Bad',    '🙁')",
+            'default_tag3' =>
+                "INSERT INTO tag (id, position, name, display_name) VALUES (3, 3, '😐 Unsure', '😐')",
+            'default_tag4' =>
+                "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙂 Good',   '🙂')",
+            'default_tag5' =>
+                "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
+        );
+    }
 
 } // end class smt_admin_database_tables
 
@@ -289,14 +289,14 @@ class SQLiteTableStructureUpdater extends smt_admin_database_tables {
                 return FALSE;
             }
         }
-		$this->set_database_file($this->database_name);
-		
-		$this->set_new_structures( $this->get_database_tables() );
-		
-		$this->update();
-		
-		/*
-		$tables = $this->get_default_database_setup();
+        $this->set_database_file($this->database_name);
+
+        $this->set_new_structures( $this->get_database_tables() );
+
+        $this->update();
+
+        /*
+        $tables = $this->get_default_database_setup();
         $response = false;
         while( list($name,$create) = each($tables) ) {
             if( $this->query_as_bool($create) ) {
@@ -306,10 +306,10 @@ class SQLiteTableStructureUpdater extends smt_admin_database_tables {
             }
         }
         $this->vacuum();
-		*/
+        */
     } // end function create_tables()
 
-	
+
     public function set_database_file( $file ) {
         $this->debug("set_database_file($file)");
         $this->database_file = $file;
@@ -554,6 +554,8 @@ class smt_admin_database_utils extends SQLiteTableStructureUpdater {
         'DROP TABLE IF EXISTS tagging',
         'DROP TABLE IF EXISTS user',
         'DROP TABLE IF EXISTS user_tagging',
+        'DROP TABLE IF EXISTS network',
+        'DROP TABLE IF EXISTS network_site',
         );
         $response = false;
         while( list(,$sql) = each($sqls) ) {

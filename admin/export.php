@@ -45,10 +45,10 @@ function network_export() {
     $tab = "\t";
     $site = $smt->get_protocol() . $smt->site_url;
 
-	$export = 'SMT_NETWORK_SITE: ' . $site . $cr
+    $export = 'SMT_NETWORK_SITE: ' . $site . $cr
     . 'SMT_DATETIME: ' . $smt->time_now() . $cr
     . 'SMT_VERSION: ' . __SMT__ . $cr;
-	
+
     $cats = $smt->query_as_array('
         SELECT pageid, name
         FROM category
@@ -59,7 +59,7 @@ function network_export() {
         if( !$cat['name'] ) { $cat['name'] = 'NULL'; }
         $export .= $cat['pageid'] . $tab . '14' . $tab . $smt->strip_prefix($cat['name']) . $cr;
     }
-	unset($cats);
+    unset($cats);
 
     $medias = $smt->query_as_array('
         SELECT pageid, title
@@ -70,7 +70,7 @@ function network_export() {
         if( !$media['title'] ) { $media['title'] = 'NULL'; }
         $export .= $media['pageid'] . $tab . '6' . $tab . $smt->strip_prefix($media['title']) . $cr;
     }
-	unset($medias);
+    unset($medias);
 
     print '<textarea cols="90" rows="20">' . $export . '</textarea>';
 }
@@ -106,7 +106,7 @@ function tag_report( $tag_id='' ) {
     foreach( $medias as $media ) {
         print $media['title'] . '|+' . $media['count'] . $cr;
     }
-	print '</textarea>';
+    print '</textarea>';
 }
 
 //////////////////////////////////////////////
