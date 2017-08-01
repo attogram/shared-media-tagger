@@ -29,7 +29,6 @@ if( isset($r[0]['count']) ) {
 print '<p>Site: <b><a href="./site.php">' . $smt->site_name . '</a></b>
 <ul>
 <li><b>' . $msg_count . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
-<li><b>' . number_format($smt->get_categories_count()) . '</b> <a href="./category.php">Categories</a> Active</li>
 <li><b>' . sizeof($smt->get_tags()) . '</b> <a href="./site.php">Tags</a></li>
 <li><b>' . number_format($smt->get_image_count()) . '</b> Files</li>
 <li><b>' . number_format($smt->get_block_count()) . '</b> Blocked Files</li>

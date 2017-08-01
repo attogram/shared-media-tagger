@@ -64,7 +64,7 @@ if( isset($_GET['d']) && $_GET['d'] ) {
     return;
 }
 
-if( isset($_GET['s']) && $_GET['s'] ) {
+if( isset($_GET['scommons']) && $_GET['scommons'] ) {
     get_search_results($smt);
     print '</div>';
     $smt->include_footer();
@@ -113,10 +113,10 @@ if( isset($_GET['sca']) && $_GET['sca']=='all' ) {
     $sql = 'SELECT * FROM category WHERE files > 0 ' . $order_by;
     $smt->notice('SHOWING only categories with files');
 
-} elseif( isset($_POST['s']) ) {
+} elseif( isset($_GET['s']) ) {
     $sql = 'SELECT * FROM category WHERE name LIKE :search ' . $order_by;
-    $bind = array(':search'=>'%' . $_POST['s']. '%');
-    $smt->notice('SHOWING only categories with search text: ' . $_POST['s'] );
+    $bind = array(':search'=>'%' . $_GET['s']. '%');
+    $smt->notice('SHOWING only categories with search text: ' . $_GET['s'] );
 
 } else {
     $sql = 'SELECT * FROM category ' . $order_by;
@@ -129,10 +129,23 @@ if( !is_array($cats) ) { $cats = array(); }
 
 
 $spacer = ' &nbsp; &nbsp; &nbsp; ';
-print '<p><form action="" method="GET">'
-. '<input id="s" name="s" type="text" size="35" value=""/>'
-. '<input type="submit" value="   Find Categories on Commons  " /></form>'
+
+print ''
+. '<ul>'
+. '<li><b>' . number_format($smt->get_categories_count()) . '</b> Active Categories</li>'
+. '<li><b>?</b> Technical Categories</li>'
+. '<li><b>?</b> Empty Categories</li>'
+. '</ul>'
+. '<p><form action="" method="GET">'
+. '<input name="scommons" type="text" size="35" value="">'
+. '<input type="submit" value="   Find Categories on COMMONS  "></form>'
 . '<br /><br />'
+. '<p><form action="" method="GET">'
+. '<input type="hidden" name="v" value="1">'
+. '<input type="text" name="s" value="" size="20">'
+. '<input type="submit" value="   Search LOCAL Categories   "></form>'
+. '<br /><br />'
+
 . '<a href="' . $smt->url('admin') . 'category.php?v=1">[View&nbsp;Category&nbsp;List]</a>'
 . $spacer
 . ' <a href="./sqladmin.php?table=category&action=row_create" target="sqlite">'
@@ -141,9 +154,7 @@ print '<p><form action="" method="GET">'
 . '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
-if(
-    $smt->get_categories_count() > 1000
-) {
+if( ($smt->get_categories_count() > 1000) && (@$_GET['v'] != 1) ) {
     print '</div>';
     $smt->include_footer();
     return;
@@ -151,8 +162,7 @@ if(
 
 print '<table border="1">'
 . '<tr style="background-color:lightblue;font-style:italic;">'
-. '<td><form method="POST"><input type="text" name="s" value="" size="20"><input type="submit" value="search"></form>
-</td>'
+. '<td>Category:</td>'
 . '<td><small>Loc<br />files</small></td>'
 . '<td><small><a href="./'. basename(__FILE__) . '?wf=1">Com<br/>files</a></small></td>'
 . '<td><small><a href="./' . basename(__FILE__) . '?sca=all">Sub<br />cats</a></small></td>'
@@ -233,7 +243,7 @@ $smt->include_footer();
 ///////////////////////////////////////////////////////////////////////////////
 function get_search_results($smt) {
 
-    $search = urldecode($_GET['s']);
+    $search = urldecode($_GET['scommons']);
 
     if( !$smt->find_categories($search) ) {
         $smt->notice('Error: no categories found');
