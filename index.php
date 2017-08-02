@@ -17,7 +17,7 @@ if( !$image || !isset($image[0]) ) {
 $image = $image[0];
 
 $smt->title = $smt->site_name;
-$smt->include_header();
+$smt->include_header( /*show_site_header*/FALSE );
 $smt->include_small_menu();
 
 print ''

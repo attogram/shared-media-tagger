@@ -52,7 +52,25 @@ The Shared Media Tagger is dual licensed under
 
 # Alpha Release
 
-This is an early alpha release.
+This is an alpha release.
 
 Dev tools:
 * https://www.codacy.com/app/attogram-project/shared-media-tagger
+
+## TODO
+[ ] admin: setup: option to use CDN or local for bootstrap and jquery
+[ ] pagination on ./reviews.php
+[ ] pagination on ./users.php
+[ ] ./categories.php: sort by name
+[ ] admin: categories: sort by name
+[ ] admin: media: download files to local filesystem
+[ ] admin: database: default site name/about
+[ ] admin: database: default tags
+[ ] BUGFIX: admin: categories: import category information (multi)
+[ ] admin: support continue on api calls with 500+ returns (api limit is 500 per call)
+[ ] Network setup (network export, network import, 404 to redir on files categories, Also See on ./category.php )
+[ ] system for category status:  Master, Supporting
+[ ] admin: users: remove user: delete user, move tagging to system anonymous user
+[ ] admin: users: delete user: delete user, delete tagging
+[ ] admin: site: basic css/color settings in database
+[ ] admin: header.php and footer.php settings in database

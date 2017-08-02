@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.44');
+define('__SMT__', '0.7.45');
 
 ob_start('ob_gzhandler');
 
@@ -81,7 +81,7 @@ class smt_utils {
     //////////////////////////////////////////////////////////
     function fail404 ( $message='', $extra='' ) {
         header('HTTP/1.0 404 Not Found');
-        $this->include_header();
+        $this->include_header( /*show_site_header*/FALSE );
         $this->include_menu( /*show_counts*/FALSE );
         if( !$message || !is_string($message) ) {
             $message = '404 Not Found';
@@ -92,7 +92,7 @@ class smt_utils {
             print '<br />' . $extra;
         }
         print '</div>';
-        $this->include_footer();
+        $this->include_footer( /*show_site_footer*/FALSE );
         exit;
     }
 
@@ -178,7 +178,7 @@ class smt_page EXTENDS smt_utils {
     }
 
     //////////////////////////////////////////////////////////
-    function include_header() {
+    function include_header( $show_site_header=TRUE ) {
 
         if( !$this->title ) {
             $this->title = $this->site_name;
@@ -208,7 +208,7 @@ class smt_page EXTENDS smt_utils {
         . '</head><body>';
 
         // Site headers
-        if( $this->is_admin() || get_class($this) == 'smt_admin') {
+        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_header ) {
             return;
         }
         $site_header = __DIR__.'/header.php';
@@ -219,7 +219,7 @@ class smt_page EXTENDS smt_utils {
     } // end function include_header()
 
     //////////////////////////////////////////////////////////
-    function include_footer() {
+    function include_footer( $show_site_footer=TRUE ) {
 
         $this->include_menu();
 
@@ -257,14 +257,14 @@ class smt_page EXTENDS smt_utils {
         print '</div></footer>';
 
         // Site footers
-        if( $this->is_admin() || get_class($this) == 'smt_admin') {
-            //
-        } else {
-            $site_footer = __DIR__.'/footer.php';
-            if( is_readable($site_footer) ) {
-                include($site_footer);
-            }
+        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_footer ) {
+            return;
         }
+        $site_footer = __DIR__.'/footer.php';
+        if( is_readable($site_footer) ) {
+            include($site_footer);
+        }
+	
         print '</body></html>';
     } // end include_footer()
 
