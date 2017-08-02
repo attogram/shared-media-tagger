@@ -1,4 +1,4 @@
-# Shared Media Tagger 
+# Shared Media Tagger
 
 ALPHA RELEASE
 
@@ -28,7 +28,7 @@ ALPHA RELEASE
 * (optional) create extra site header/footers: header.php, footer.php
 * (optional) change db web admin password:  admin/phpliteadmin.config.php  (default password:  test)
 * Create Database tables: autocreated on first load of admin homepage:  //example.com/admin/
-* Set site name and description: //example.com/admin/site.php  
+* Set site name and description: //example.com/admin/site.php
 * (optional) setup tags: //example.com/admin/site.php
 * goto admin category page:  //example.com/admin/category.php
 * Find categories from commons: search and save categories
@@ -58,19 +58,19 @@ Dev tools:
 * https://www.codacy.com/app/attogram-project/shared-media-tagger
 
 ## TODO
-[ ] admin: setup: option to use CDN or local for bootstrap and jquery
-[ ] pagination on ./reviews.php
-[ ] pagination on ./users.php
-[ ] ./categories.php: sort by name
-[ ] admin: categories: sort by name
-[ ] admin: media: download files to local filesystem
-[ ] admin: database: default site name/about
-[ ] admin: database: default tags
-[ ] BUGFIX: admin: categories: import category information (multi)
-[ ] admin: support continue on api calls with 500+ returns (api limit is 500 per call)
-[ ] Network setup (network export, network import, 404 to redir on files categories, Also See on ./category.php )
-[ ] system for category status:  Master, Supporting
-[ ] admin: users: remove user: delete user, move tagging to system anonymous user
-[ ] admin: users: delete user: delete user, delete tagging
-[ ] admin: site: basic css/color settings in database
-[ ] admin: header.php and footer.php settings in database
+- [ ] admin: setup: option to use CDN or local for bootstrap and jquery
+- [ ] pagination on ./reviews.php
+- [ ] pagination on ./users.php
+- [ ] ./categories.php: sort by name
+- [ ] admin: categories: sort by name
+- [ ] admin: media: download files to local filesystem
+- [ ] admin: database: default site name/about
+- [ ] admin: database: default tags
+- [ ] BUGFIX: admin: categories: import category information (multi)
+- [ ] admin: support continue on api calls with 500+ returns (api limit is 500 per call)
+- [ ] Network setup (network export, network import, 404 to redir on files categories, Also See on ./category.php )
+- [ ] system for category status:  Master, Supporting
+- [ ] admin: users: remove user: delete user, move tagging to system anonymous user
+- [ ] admin: users: delete user: delete user, delete tagging
+- [ ] admin: site: basic css/color settings in database
+- [ ] admin: header.php and footer.php settings in database

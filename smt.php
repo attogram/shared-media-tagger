@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.45');
+define('__SMT__', '0.7.46');
 
 ob_start('ob_gzhandler');
 
@@ -264,7 +264,7 @@ class smt_page EXTENDS smt_utils {
         if( is_readable($site_footer) ) {
             include($site_footer);
         }
-	
+
         print '</body></html>';
     } // end include_footer()
 
