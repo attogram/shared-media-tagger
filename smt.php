@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.47');
+define('__SMT__', '0.7.48');
 
 ob_start('ob_gzhandler');
 
@@ -178,6 +178,16 @@ class smt_page EXTENDS smt_utils {
     }
 
     //////////////////////////////////////////////////////////
+	function display_site_header() {
+		print @$this->site_info['header'];
+	}
+
+    //////////////////////////////////////////////////////////
+	function display_site_footer() {
+		print @$this->site_info['footer'];
+	}
+	
+    //////////////////////////////////////////////////////////
     function include_header( $show_site_header=TRUE ) {
 
         if( !$this->title ) {
@@ -211,10 +221,7 @@ class smt_page EXTENDS smt_utils {
         if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_header ) {
             return;
         }
-        $site_header = __DIR__.'/header.php';
-        if( is_readable($site_header) ) {
-            include($site_header);
-        }
+        $this->display_site_header();
 
     } // end function include_header()
 
@@ -258,12 +265,10 @@ class smt_page EXTENDS smt_utils {
 
         // Site footers
         if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_footer ) {
-            return;
+            print '</body></html>';
+			return;
         }
-        $site_footer = __DIR__.'/footer.php';
-        if( is_readable($site_footer) ) {
-            include($site_footer);
-        }
+        $this->display_site_footer();
 
         print '</body></html>';
     } // end include_footer()
@@ -415,16 +420,20 @@ class smt_database_utils EXTENDS smt_page {
 // SMT - Database
 class smt_database EXTENDS smt_database_utils {
 
+	var $site_info;
     var $site_name;
 
     //////////////////////////////////////////////////////////
-    function set_site_name() {
-        $response = $this->query_as_array('SELECT name FROM site WHERE id = 1');
+    function set_site_info() {
+        $response = $this->query_as_array('SELECT * FROM site WHERE id = 1');
         if( !$response || !isset($response[0]['name']) ) {
             $this->site_name = 'Shared Media Tagger';
+			$this->site_info = array();
             return FALSE;
         }
         $this->site_name = $response[0]['name'];
+		$this->site_info = $response[0];
+		$this->debug('site_info = ' . print_r($this->site_info,1));
         return TRUE;
     }
 
@@ -1255,7 +1264,7 @@ class smt EXTENDS smt_menus {
             $this->debug('Site URL Not Set.  Using: ' . $this->site_url);
         }
 
-        $this->set_site_name();
+        $this->set_site_info();
 
         $this->links = array(
             'home'       => $this->site_url . '',

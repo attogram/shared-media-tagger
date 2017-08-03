@@ -38,7 +38,7 @@ print ''
 . '<input type="submit" value="           Save Site Setup           ">'
 
 . '<br /><br />Name:<br />'
-. '<input name="name" type="text" size="30" value="' . urlencode(@$site['name']) . '">'
+. '<input name="name" type="text" size="30" value="' . htmlentities(@$site['name']) . '">'
 
 . '<br /><br />About:<br />'
 . '<textarea name="about" rows="5" cols="70">' . htmlentities(@$site['about']) . '</textarea>'
