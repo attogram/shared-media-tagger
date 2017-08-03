@@ -47,45 +47,27 @@ print '<p>Installation:
 <li>Protocol: ' . $smt->get_protocol() . '</li>
 <li>Directory: ' . $smt->install_directory . '</li>
 <li>Setup: ' . ($smt->setup ? print_r($smt->setup,1) : 'none') . '</li>
-<li>Global Header: '
-. ( is_readable($smt->install_directory.'/header.php') ? 'ACTIVE: ./header.php ' : 'none' )
-. '</li>
-<li>Global Footer: '
-. ( is_readable($smt->install_directory.'/footer.php') ? 'ACTIVE: ./footer.php' : 'none' )
-. '</li>
 </ul>
 </p>';
 
 
 print '<p>Discovery / Restrictions:
 <ul>
-<li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>:
-<span style="font-family:monospace;">'
-    . $smt->check_robotstxt()
-. '</span></li>
-<li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a>
 <li>./admin/.htaccess: '
 . ( is_readable($smt->install_directory.'/admin/.htaccess') ? '✔ACTIVE: ' : '❌MISSING' )
 . '</li>
 <li>./admin/.htpasswd: '
 . ( is_readable($smt->install_directory.'/admin/.htpasswd') ? '✔ACTIVE: ' : '❌MISSING' )
 . '</li>
+<li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a></li>
+<li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>:
+<span style="font-family:monospace;">'
+    . $smt->check_robotstxt()
+. '</span></li>
+
 </ul>
 </p>';
 
-print '<p>Database:
-<ul>
-<li>File: ' . $smt->database_name . '</li>
-<li>Permissions: '
-. ( is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY' )
-. '</li>
-<li>Size: '
-. (file_exists($smt->database_name) ? number_format(filesize($smt->database_name)) : 'NULL')
-. ' bytes</li>
-
-<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
-</ul>
-</p>';
 
 print '<p>About Shared Media Tagger:
 <ul>

@@ -110,8 +110,8 @@ class smt_admin_database_tables extends smt_admin_utils {
             'id' INTEGER PRIMARY KEY,
             'name' TEXT,
             'about' TEXT,
-			'header' TEXT,
-			'footer' TEXT,		
+            'header' TEXT,
+            'footer' TEXT,
             'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT su UNIQUE (name) )",
 
@@ -766,7 +766,6 @@ class smt_admin_media extends smt_commons_API {
 
             $new[':duration'] = @$media_file['imageinfo'][0]['duration'];
             $new[':timestamp'] = @$media_file['imageinfo'][0]['timestamp'];
-            $new[':updated'] = $this->time_now();
 
             $sql = "INSERT OR REPLACE INTO MEDIA (
                         pageid, title, url,
@@ -775,7 +774,7 @@ class smt_admin_media extends smt_commons_API {
                         licenseuri, licensename, licenseshortname, usageterms, attributionrequired, restrictions,
                         size, width, height, sha1, mime,
                         thumburl, thumbwidth, thumbheight, thumbmime,
-                        user, userid, duration, timestamp, updated
+                        user, userid, duration, timestamp
                     ) VALUES (
                         :pageid, :title, :url,
                         :descriptionurl, :descriptionshorturl, :imagedescription,
@@ -783,7 +782,7 @@ class smt_admin_media extends smt_commons_API {
                         :licenseuri, :licensename, :licenseshortname, :usageterms, :attributionrequired, :restrictions,
                         :size, :width, :height, :sha1, :mime,
                         :thumburl, :thumbwidth, :thumbheight, :thumbmime,
-                        :user, :userid, :duration, :timestamp, :updated
+                        :user, :userid, :duration, :timestamp
                     )";
 
             $response = $this->query_as_bool($sql, $new);
@@ -1125,8 +1124,8 @@ class smt_admin_media_analysis extends smt_admin_media {
             $skin = '0';
         }
         $result = $this->query_as_bool(
-            'UPDATE media SET skin = :skin, updated = :updated WHERE pageid = :pageid',
-            array(':skin'=>$skin, ':updated'=>$this->time_now(), ':pageid'=>$pageid)
+            'UPDATE media SET skin = :skin WHERE pageid = :pageid',
+            array(':skin'=>$skin, ':pageid'=>$pageid)
         );
         if( $result ) {
             $this->notice('Updated Skin Percentage for <a href="'
@@ -1342,14 +1341,6 @@ class smt_admin_category extends smt_admin_media_analysis {
             //$this->notice('NEW: missing: ' . $bind[':missing']);
         }
 
-        //$local_files = $this->get_category_size( $category_name );
-        //if( $local_files != $category_row['local_files'] ) {
-        //    $bind[':local_files'] = $local_files;
-        //    $this->notice('NEW: local_files: ' . $bind[':local_files']);
-        //}
-
-        $bind[':updated'] = $this->time_now();
-
         $url = '<a href="' . $this->url('category') . '?c='
             . $this->category_urlencode($this->strip_prefix($category_name))
             . '">' . $category_name . '</a>';
@@ -1391,16 +1382,15 @@ class smt_admin_category extends smt_admin_media_analysis {
 
         if( !$this->query_as_bool(
                 'INSERT INTO category (
-                    name, local_files, hidden, missing, updated
+                    name, local_files, hidden, missing
                 ) VALUES (
-                    :name, :local_files, :hidden, :missing, :updated
+                    :name, :local_files, :hidden, :missing
                 )',
                 array(
                     ':name'=>$name,
                     ':local_files'=>$local_files,
                     ':hidden'=>'0',
-                    ':missing'=>'0',
-                    ':updated'=>$this->time_now()
+                    ':missing'=>'0'
                 ) )
 
         ) {
@@ -1532,9 +1522,8 @@ class smt_admin_category extends smt_admin_media_analysis {
 
     //////////////////////////////////////////////////////////
     function insert_category_local_files_count($category_id, $category_size) {
-        $sql = 'UPDATE category SET local_files = :category_size, updated = :updated WHERE id = :category_id';
+        $sql = 'UPDATE category SET local_files = :category_size WHERE id = :category_id';
         $bind[':category_size'] = $category_size;
-        $bind[':updated'] = $this->time_now();
         $bind[':category_id'] = $category_id;
         if( $this->query_as_bool($sql,$bind) ) {
             return TRUE;

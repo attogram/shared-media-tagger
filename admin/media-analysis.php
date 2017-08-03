@@ -104,9 +104,8 @@ function save_hashes($pageid, $hashes) {
 
     }
     $sql = 'UPDATE media
-    SET ahash = :ahash, dhash = :dhash, phash = :phash, updated = :updated
+    SET ahash = :ahash, dhash = :dhash, phash = :phash
     WHERE pageid = :pageid';
-    $hashes[':updated'] = $smt->time_now();
     $hashes[':pageid'] = $pageid;
 
     $response = $smt->query_as_bool($sql, $hashes);

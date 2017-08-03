@@ -56,24 +56,18 @@ $smt->include_footer();
 function save_tag() {
     global $smt;
 
-    $sql = 'UPDATE tag SET
-        position = :position,
-        name = :name, display_name = :display_name,
-        color = :color, bgcolor = :bgcolor,
-        hover_color = :hover_color, hover_bgcolor = :hover_bgcolor,
-        padding = :padding
+    $sql = '
+    UPDATE tag
+    SET position = :position,
+        name = :name,
+        display_name = :display_name
     WHERE id = :id
     ';
     $bind = array(
         ':id'    => @$_GET['tagid'],
         ':position'    => @$_GET['position'],
         ':name'    => @$_GET['name'],
-        ':display_name'    => @$_GET['display_name'],
-        ':color'    => @$_GET['color'],
-        ':bgcolor'    => @$_GET['bgcolor'],
-        ':hover_color'    => @$_GET['hover_color'],
-        ':hover_bgcolor'    => @$_GET['hover_bgcolor'],
-        ':padding'    => @$_GET['padding'],
+        ':display_name'    => @$_GET['display_name']
     );
 
     if( $smt->query_as_bool($sql, $bind) ) {
