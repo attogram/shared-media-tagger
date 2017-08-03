@@ -110,6 +110,8 @@ class smt_admin_database_tables extends smt_admin_utils {
             'id' INTEGER PRIMARY KEY,
             'name' TEXT,
             'about' TEXT,
+			'header' TEXT,
+			'footer' TEXT,		
             'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT su UNIQUE (name) )",
 
@@ -270,7 +272,6 @@ class smt_admin_database_tables extends smt_admin_utils {
     }
 
 } // end class smt_admin_database_tables
-
 
 //////////////////////////////////////////////////////////
 class SQLiteTableStructureUpdater extends smt_admin_database_tables {
@@ -496,7 +497,6 @@ class SQLiteTableStructureUpdater extends smt_admin_database_tables {
     }
 
 } // end class SQLiteTableStructureUpdater
-
 
 //////////////////////////////////////////////////////////
 // SMT Admin - Database Utils
@@ -1639,6 +1639,7 @@ class smt_admin extends smt_admin_block {
         print '<div class="menu admin">'
         . '<a href="' . $admin . '">ADMIN</a>'
         . $space . '<a href="' . $admin . 'site.php">SITE</a>'
+        . $space . '<a href="' . $admin . 'tag.php">TAG</a>'
         . $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
         . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
         . $space . '<a href="' . $admin . 'user.php">USER</a>'
