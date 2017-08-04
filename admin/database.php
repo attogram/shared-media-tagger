@@ -2,11 +2,13 @@
 // Shared Media Tagger
 // Database Admin
 
+////////////////////////////////////////////////////////////////////
 $init = __DIR__.'/../smt.php'; // Shared Media Tagger Main Class
 if( !is_readable($init) ) {
     print 'ERROR: not readable: ' . $init;
     return;
 }
+require_once($init);
 $init = __DIR__.'/smt-admin.php'; // Shared Media Tagger Admin Class
 if( !is_readable($init) ) {
     print 'ERROR: not readable: ' . $init;
@@ -14,7 +16,8 @@ if( !is_readable($init) ) {
 }
 require_once($init);
 $smt = new smt_admin(); // The Shared Media Tagger Admin Object
-/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
 
 $smt->title = 'Database Admin';
 $smt->include_header();
