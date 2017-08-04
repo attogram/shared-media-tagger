@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.51');
+define('__SMT__', '0.7.52');
 
 ob_start('ob_gzhandler');
 
@@ -52,7 +52,7 @@ class smt_utils {
             default: return;
         }
         if( is_array($message) ) {
-            $message = '<pre>' . print_r($message,1) . '</pre>';
+            $message = '<pre>' . htmlentities(print_r($message,1)) . '</pre>';
         }
         print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
     }

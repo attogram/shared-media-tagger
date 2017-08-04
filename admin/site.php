@@ -49,6 +49,9 @@ print ''
 . '<br /><br />Footer:<br />'
 . '<textarea name="footer" rows="5" cols="70">' . htmlentities(@$site['footer']) . '</textarea>'
 
+. '<br /><br /><input type="checkbox" name="use_cdn"'
+. ( @$site['use_cdn'] ? ' checked="checked"' : '' ) . '/> Use CDN for jquery, bootstrap'
+
 . '<br /><br /><input type="submit" value="           Save Site Setup           ">'
 . '</form>'
 . '<br /><br />'
@@ -63,6 +66,7 @@ print '<br /><br /><br /><br /><br /><hr />Modify Database directly:<ul>'
 . 'CREATE NEW site</a></li>'
 . '</ul>';
 
+print '<hr>DEBUG: site: <pre>' . htmlentities(print_r($site,1)) . '</pre>';
 
 print '</div>';
 $smt->include_footer();
@@ -89,6 +93,12 @@ function save_site_info() {
                 $bind[":$name"] = $value;
                 break;
         }
+    }
+
+    if( isset($_POST['use_cdn']) && $_POST['use_cdn'] == 'on' ){
+        $set[] = "use_cdn = '1'";
+    } else {
+        $set[] = "use_cdn = '0'";
     }
 
     $sql = 'UPDATE site SET ' . implode($set,', ') . ' WHERE id = :id';

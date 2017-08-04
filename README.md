@@ -71,5 +71,4 @@ Dev tools:
 - [ ] admin: users: remove user: delete user, move tagging to system anonymous user
 - [ ] admin: users: delete user: delete user, delete tagging
 - [ ] admin: site: basic css/color settings in database
-- [ ] menus: 3 functions:  small, medium, large
 - [ ] admin: media:  Add Media via File Name
