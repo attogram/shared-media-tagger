@@ -18,7 +18,6 @@ ALPHA RELEASE
 * Web server has write access to database file  ( ./admin/db/media.sqlite )
 * Web server has internet access to the WikiMedia Commons API endpoint
 
-
 ## Setup
 
 * install the source code into web-accessible area on your server
@@ -40,7 +39,6 @@ ALPHA RELEASE
 Dev notes:
 * DB web admin password: test (set in: admin/phpliteadmin.config.php)
 
-
 ## License
 
 The Shared Media Tagger is an open source project.
@@ -48,7 +46,6 @@ The Shared Media Tagger is an open source project.
 The Shared Media Tagger is dual licensed under
 [The MIT License](http://opensource.org/licenses/MIT) or the
 [GNU General Public License](http://opensource.org/licenses/GPL-3.0), at your choosing.
-
 
 # Alpha Release
 
@@ -59,6 +56,7 @@ Dev tools:
 
 ## TODO
 - [ ] admin: setup: option to use CDN or local for bootstrap and jquery
+- [ ] global pagination function()
 - [ ] pagination on ./reviews.php
 - [ ] pagination on ./users.php
 - [ ] ./categories.php: sort by name
@@ -73,4 +71,5 @@ Dev tools:
 - [ ] admin: users: remove user: delete user, move tagging to system anonymous user
 - [ ] admin: users: delete user: delete user, delete tagging
 - [ ] admin: site: basic css/color settings in database
-- [ ] admin: header.php and footer.php settings in database
+- [ ] menus: 3 functions:  small, medium, large
+- [ ] admin: media:  Add Media via File Name

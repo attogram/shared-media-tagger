@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.49');
+define('__SMT__', '0.7.50');
 
 ob_start('ob_gzhandler');
 
@@ -16,6 +16,7 @@ class smt_utils {
     var $protocol; // http: or https:
     var $timer;
     var $timer_results;
+    var $links; // array of [page_name] = page_url
 
     //////////////////////////////////////////////////////////
     function time_now() {
@@ -157,17 +158,6 @@ class smt_utils {
         }
     }
 
-} //end class smt_utils
-
-//////////////////////////////////////////////////////////
-// SMT - Page
-class smt_page EXTENDS smt_utils {
-
-    var $links; // array of [page_name] = page_url
-    var $title; // Page <title>
-    var $use_bootstrap;
-    var $use_jquery;
-
     //////////////////////////////////////////////////////////
     function url( $link='' ) {
         if( !$link || !isset($this->links[$link]) ) {
@@ -177,107 +167,11 @@ class smt_page EXTENDS smt_utils {
         return $this->links[$link];
     }
 
-    //////////////////////////////////////////////////////////
-	function display_site_header() {
-		print @$this->site_info['header'];
-	}
-
-    //////////////////////////////////////////////////////////
-	function display_site_footer() {
-		print @$this->site_info['footer'];
-	}
-	
-    //////////////////////////////////////////////////////////
-    function include_header( $show_site_header=TRUE ) {
-
-        if( !$this->title ) {
-            $this->title = $this->site_name;
-        }
-
-        print "<!doctype html>\n"
-        . '<html><head><title>' . $this->title . '</title>'
-        . '<meta charset="utf-8" />'
-        . '<meta name="viewport" content="initial-scale=1" />'
-        . '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
-        if( $this->use_bootstrap ) {
-            print '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '" />'
-            . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<!--[if lt IE 9]>'
-            . '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
-            . '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
-            . '<![endif]-->';
-        }
-        if( $this->use_bootstrap || $this->use_jquery ) {
-            print '<script src="' . $this->url('jquery') . '"></script>';
-        }
-        if( $this->use_bootstrap ) {
-            print '<script src="' . $this->url('bootstrap_js') . '"></script>';
-        }
-        print '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
-        . '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
-        . '</head><body>';
-
-        // Site headers
-        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_header ) {
-            return;
-        }
-        $this->display_site_header();
-
-    } // end function include_header()
-
-    //////////////////////////////////////////////////////////
-    function include_footer( $show_site_footer=TRUE ) {
-
-        $this->include_menu();
-
-        print '<footer>'
-        . '<div class="menu" style="line-height:2; font-size:80%;">';
-
-
-        if( !@$this->setup['hide_hosted_by'] ) {
-            print '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
-            . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
-        }
-        print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
-        if( !@$this->setup['hide_powered_by'] ) {
-            print '<span class="nobr">Powered by <b>'
-            . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
-            . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
-        }
-
-        $this->end_timer('page');
-
-        if( $this->is_admin() ) {
-            print '<br /><br />'
-            . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
-            . '<a href="' . $this->url('home') . '?logoff">LOGOFF</a>'
-            . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC';
-
-            while( list($timer_name,$result) = each($this->timer_results) ) {
-                print '<br />TIMER: ' . str_pad( round($result,5), 7, '0' ) . ' - ' . $timer_name;
-            }
-            print '<br />MEMORY usage: ' . number_format(memory_get_usage())
-            . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage());
-            print '</div><br /><br /><br />';
-        }
-
-        print '</div></footer>';
-
-        // Site footers
-        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_footer ) {
-            print '</body></html>';
-			return;
-        }
-        $this->display_site_footer();
-
-        print '</body></html>';
-    } // end include_footer()
-
-} // end class smt_page
+} //end class smt_utils
 
 //////////////////////////////////////////////////////////
 // SMT - Database Utils
-class smt_database_utils EXTENDS smt_page {
+class smt_database EXTENDS smt_utils {
     var $database_name;
     var $db;
     var $sql_count;
@@ -417,29 +311,6 @@ class smt_database_utils EXTENDS smt_page {
 } // end class smt_database_utils
 
 //////////////////////////////////////////////////////////
-// SMT - Database
-class smt_database EXTENDS smt_database_utils {
-
-	var $site_info;
-    var $site_name;
-
-    //////////////////////////////////////////////////////////
-    function set_site_info() {
-        $response = $this->query_as_array('SELECT * FROM site WHERE id = 1');
-        if( !$response || !isset($response[0]['name']) ) {
-            $this->site_name = 'Shared Media Tagger';
-			$this->site_info = array();
-            return FALSE;
-        }
-        $this->site_name = $response[0]['name'];
-		$this->site_info = $response[0];
-		$this->debug('site_info = ' . print_r($this->site_info,1));
-        return TRUE;
-    }
-
-} // END class smt_database
-
-//////////////////////////////////////////////////////////
 // SMT - Media
 class smt_media EXTENDS smt_database {
 
@@ -454,6 +325,77 @@ class smt_media EXTENDS smt_database {
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
         return $this->query_as_array( $sql, array(':pageid'=>$pageid) );
+    }
+
+    //////////////////////////////////////////////////////////
+    function get_thumbnail( $media='', $thumb_width='' ) {
+
+        if( !$thumb_width || !$this->is_positive_number($thumb_width) ) {
+            $thumb_width = $this->size_thumb;
+        }
+
+        $default = array(
+            'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
+                    .'7+/Dw8HV1dfLy8ubm5vX19e3t7fr 6+nl5edra2nZ2dnx8fMHBwYODg/b29np6e'
+                    . 'ujo6JGRkeHh4eTk5LCwsN3d3dfX 13Jycp2dnevr6////yH5BAEAAB8ALAAAAAA'
+                    . 'LAA4AAAVq4NFw1DNAX/o9imAsB tKpxKRd1+YEWUoIiUoiEWEAApIDMLGoRCyWi'
+                    . 'KThenkwDgeGMiggDLEXQkDoTh CKNLpQDgjeAsY7MHgECgx8YR8oHwNHfwADBACG'
+                    . 'h4EDA4iGAYAEBAcQIg0Dk gcEIQA7',
+            'width' => $thumb_width,
+            'height' => $thumb_width);
+
+
+        if( !$media || !is_array($media) ) {
+            return $default;
+        }
+
+        $width = @$media['width'];
+        if( !$width ) { $width = $this->size_thumb; }
+        $height = @$media['height'];
+        if( !$height ) { $height = $this->size_thumb; }
+
+        //$this->notice("::get_thumbnail: new-w:$thumb_width  old-w:$width old-h:$height");
+        if( $thumb_width >= $width ) {
+            //$this->notice('::get_thumbnail: new-w >= old-w');
+            return array('url'=>@$media['thumburl'], 'width'=>@$width, 'height'=>@$height);
+        }
+
+
+        if( $height > $thumb_width ) {
+            //$this->notice("WARNING: TALL THUMB");
+        }
+
+        //$title = $media['title'];
+        $mime = $media['mime'];
+
+        $filename = $this->strip_prefix($media['title']);
+        $filename = str_replace(' ','_',$filename);
+
+        $md5 = md5($filename);
+        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
+        . '/' . $md5[0]
+        . '/' . $md5[0] . $md5[1]
+        . '/' . urlencode($filename)
+        . '/' . $thumb_width . 'px-' . urlencode($filename);
+
+        $ratio = $width / $height;
+        $thumb_height = round($thumb_width / $ratio);
+
+        switch( $mime ) {
+            case 'application/ogg':
+                $thumb_url = str_replace('px-','px--',$thumb_url);
+                $thumb_url .= '.jpg';
+                break;
+            case 'video/webm':
+                $thumb_url = str_replace('px-','px--',$thumb_url);
+                $thumb_url .= '.jpg';
+                break;
+            case 'image/svg+xml':
+                $thumb_url .= '.png';
+                break;
+        }
+
+        return array('url'=>$thumb_url, 'width'=>$thumb_width, 'height'=>$thumb_height);
     }
 
     //////////////////////////////////////////////////////////
@@ -514,6 +456,83 @@ class smt_site_admin EXTENDS smt_media {
         }
         unset($_COOKIE['admin']);
         setcookie('admin', null, -1, '/');
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_media_list_functions() {
+        return
+        '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
+        . '<input type="submit" value="Delete selected media">'
+        . '<script type="text/javascript" language="javascript">'
+        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();
+        checkboxes = document[formname].getElementsByTagName('input');
+        for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+        </script>"
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+        . '</div>';
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_media_functions( $media_id ) {
+        if( !$this->is_admin() ) {
+            return;
+        }
+        if( !$this->is_positive_number($media_id) ) {
+            return;
+        }
+        return ''
+        . '<div class="attribution left" style=" display:inline-block; float:right;">'
+        . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
+        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
+        . $media_id . ' ?\');">❌</a>'
+        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
+        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
+        . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
+        . $media_id . ' ?\');">♻</a>'
+
+        . ' <a style="font-size:140%;" href="' . $this->url('admin')
+        . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
+
+        . ' <a style="font-size:140%;" href="' . $this->url('admin')
+        . 'media-analysis.php?hash=' . $media_id. '">H</a>'
+        . '</div>';
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_admin_category_functions( $category_name ) {
+        if( !$this->is_admin() ) { return; }
+        $category = $this->get_category($category_name);
+        if( !$category ) {
+            return '<p>ADMIN: category not in database</p>';
+        }
+        $response = '<br clear="all" />
+<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
+<input type="submit" value="Delete selected media">
+<script type="text/javascript" language="javascript">
+'
+. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
+checkboxes = document[formname].getElementsByTagName('input');
+for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+</script>"
+. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+. '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
+. $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
+. $this->category_urlencode($category['name']) . '">Get Category Info</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
+. $this->category_urlencode($category['name'])
+. '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
+<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
+. $this->category_urlencode($category['name'])
+. '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>
+<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
+. '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>
+<br /><pre>' . print_r($category,1) . '</pre>
+</form>
+</div><br /><br />';
+        return $response;
     }
 
 } // END class smt_admin
@@ -1145,82 +1164,6 @@ class smt_menus EXTENDS smt_tag {
         // 🌐 🏷 📂 🔗 🔎 🔖 🖇 ⛓  ❓  ❔  📢
     }
 
-    //////////////////////////////////////////////////////////
-    function display_admin_media_list_functions() {
-        return
-        '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
-        . '<input type="submit" value="Delete selected media">'
-        . '<script type="text/javascript" language="javascript">'
-        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-        checkboxes = document[formname].getElementsByTagName('input');
-        for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
-        </script>"
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-        . '</div>';
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_admin_media_functions( $media_id ) {
-        if( !$this->is_admin() ) {
-            return;
-        }
-        if( !$this->is_positive_number($media_id) ) {
-            return;
-        }
-        return ''
-        . '<div class="attribution left" style=" display:inline-block; float:right;">'
-        . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
-        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
-        . $media_id . ' ?\');">❌</a>'
-        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
-        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
-        . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
-        . $media_id . ' ?\');">♻</a>'
-
-        . ' <a style="font-size:140%;" href="' . $this->url('admin')
-        . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
-
-        . ' <a style="font-size:140%;" href="' . $this->url('admin')
-        . 'media-analysis.php?hash=' . $media_id. '">H</a>'
-        . '</div>';
-    }
-
-    //////////////////////////////////////////////////////////
-    function display_admin_category_functions( $category_name ) {
-        if( !$this->is_admin() ) { return; }
-        $category = $this->get_category($category_name);
-        if( !$category ) {
-            return '<p>ADMIN: category not in database</p>';
-        }
-        $response = '<br clear="all" />
-<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
-<input type="submit" value="Delete selected media">
-<script type="text/javascript" language="javascript">
-'
-. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-checkboxes = document[formname].getElementsByTagName('input');
-for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
-</script>"
-. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-. '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
-. $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
-. $this->category_urlencode($category['name']) . '">Get Category Info</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
-. $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
-<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
-. $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
-. '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>
-<br /><pre>' . print_r($category,1) . '</pre>
-</form>
-</div><br /><br />';
-        return $response;
-    }
 
 } // end class menus
 
@@ -1228,11 +1171,18 @@ for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') 
 // SMT - Shared Media Tagger
 class smt EXTENDS smt_menus {
 
-    var $setup;
     var $install_directory;
     var $server;
-    var $site, $site_url, $title;
-    var $size_medium, $size_thumb;
+    var $setup;
+    var $site;
+    var $site_info;
+    var $site_name;
+    var $site_url;
+    var $size_medium;
+    var $size_thumb;
+    var $title; // Page <title>
+    var $use_bootstrap;
+    var $use_jquery;
 
     //////////////////////////////////////////////////////////
     function __construct() {
@@ -1295,74 +1245,17 @@ class smt EXTENDS smt_menus {
     } // end function __construct()
 
     //////////////////////////////////////////////////////////
-    function get_thumbnail( $media='', $thumb_width='' ) {
-
-        if( !$thumb_width || !$this->is_positive_number($thumb_width) ) {
-            $thumb_width = $this->size_thumb;
+    function set_site_info() {
+        $response = $this->query_as_array('SELECT * FROM site WHERE id = 1');
+        if( !$response || !isset($response[0]['name']) ) {
+            $this->site_name = 'Shared Media Tagger';
+            $this->site_info = array();
+            return FALSE;
         }
-
-        $default = array(
-            'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
-                    .'7+/Dw8HV1dfLy8ubm5vX19e3t7fr 6+nl5edra2nZ2dnx8fMHBwYODg/b29np6e'
-                    . 'ujo6JGRkeHh4eTk5LCwsN3d3dfX 13Jycp2dnevr6////yH5BAEAAB8ALAAAAAA'
-                    . 'LAA4AAAVq4NFw1DNAX/o9imAsB tKpxKRd1+YEWUoIiUoiEWEAApIDMLGoRCyWi'
-                    . 'KThenkwDgeGMiggDLEXQkDoTh CKNLpQDgjeAsY7MHgECgx8YR8oHwNHfwADBACG'
-                    . 'h4EDA4iGAYAEBAcQIg0Dk gcEIQA7',
-            'width' => $thumb_width,
-            'height' => $thumb_width);
-
-
-        if( !$media || !is_array($media) ) {
-            return $default;
-        }
-
-        $width = @$media['width'];
-        if( !$width ) { $width = $this->size_thumb; }
-        $height = @$media['height'];
-        if( !$height ) { $height = $this->size_thumb; }
-
-        //$this->notice("::get_thumbnail: new-w:$thumb_width  old-w:$width old-h:$height");
-        if( $thumb_width >= $width ) {
-            //$this->notice('::get_thumbnail: new-w >= old-w');
-            return array('url'=>@$media['thumburl'], 'width'=>@$width, 'height'=>@$height);
-        }
-
-
-        if( $height > $thumb_width ) {
-            //$this->notice("WARNING: TALL THUMB");
-        }
-
-        //$title = $media['title'];
-        $mime = $media['mime'];
-
-        $filename = $this->strip_prefix($media['title']);
-        $filename = str_replace(' ','_',$filename);
-
-        $md5 = md5($filename);
-        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
-        . '/' . $md5[0]
-        . '/' . $md5[0] . $md5[1]
-        . '/' . urlencode($filename)
-        . '/' . $thumb_width . 'px-' . urlencode($filename);
-
-        $ratio = $width / $height;
-        $thumb_height = round($thumb_width / $ratio);
-
-        switch( $mime ) {
-            case 'application/ogg':
-                $thumb_url = str_replace('px-','px--',$thumb_url);
-                $thumb_url .= '.jpg';
-                break;
-            case 'video/webm':
-                $thumb_url = str_replace('px-','px--',$thumb_url);
-                $thumb_url .= '.jpg';
-                break;
-            case 'image/svg+xml':
-                $thumb_url .= '.png';
-                break;
-        }
-
-        return array('url'=>$thumb_url, 'width'=>$thumb_width, 'height'=>$thumb_height);
+        $this->site_name = $response[0]['name'];
+        $this->site_info = $response[0];
+        $this->debug('site_info = ' . print_r($this->site_info,1));
+        return TRUE;
     }
 
     //////////////////////////////////////////////////////////
@@ -1529,5 +1422,101 @@ class smt EXTENDS smt_menus {
         . $this->display_licensing($media, $artist_truncate)
         . '</a></div>';
     }
+
+    //////////////////////////////////////////////////////////
+    function display_site_header() {
+        print @$this->site_info['header'];
+    }
+
+    //////////////////////////////////////////////////////////
+    function display_site_footer() {
+        print @$this->site_info['footer'];
+    }
+
+    //////////////////////////////////////////////////////////
+    function include_header( $show_site_header=TRUE ) {
+
+        if( !$this->title ) {
+            $this->title = $this->site_name;
+        }
+
+        print "<!doctype html>\n"
+        . '<html><head><title>' . $this->title . '</title>'
+        . '<meta charset="utf-8" />'
+        . '<meta name="viewport" content="initial-scale=1" />'
+        . '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
+        if( $this->use_bootstrap ) {
+            print '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '" />'
+            . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
+            . '<!--[if lt IE 9]>'
+            . '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
+            . '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
+            . '<![endif]-->';
+        }
+        if( $this->use_bootstrap || $this->use_jquery ) {
+            print '<script src="' . $this->url('jquery') . '"></script>';
+        }
+        if( $this->use_bootstrap ) {
+            print '<script src="' . $this->url('bootstrap_js') . '"></script>';
+        }
+        print '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
+        . '<link rel="icon" type="image/png" href="' . $this->url('home') . 'favicon.ico" />'
+        . '</head><body>';
+
+        // Site headers
+        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_header ) {
+            return;
+        }
+        $this->display_site_header();
+
+    } // end function include_header()
+
+    //////////////////////////////////////////////////////////
+    function include_footer( $show_site_footer=TRUE ) {
+
+        $this->include_menu();
+
+        print '<footer>'
+        . '<div class="menu" style="line-height:2; font-size:80%;">';
+
+
+        if( !@$this->setup['hide_hosted_by'] ) {
+            print '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
+            . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
+        }
+        print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+        if( !@$this->setup['hide_powered_by'] ) {
+            print '<span class="nobr">Powered by <b>'
+            . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
+            . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
+        }
+
+        $this->end_timer('page');
+
+        if( $this->is_admin() ) {
+            print '<br /><br />'
+            . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
+            . '<a href="' . $this->url('home') . '?logoff">LOGOFF</a>'
+            . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC';
+
+            while( list($timer_name,$result) = each($this->timer_results) ) {
+                print '<br />TIMER: ' . str_pad( round($result,5), 7, '0' ) . ' - ' . $timer_name;
+            }
+            print '<br />MEMORY usage: ' . number_format(memory_get_usage())
+            . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage());
+            print '</div><br /><br /><br />';
+        }
+
+        print '</div></footer>';
+
+        // Site footers
+        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_footer ) {
+            print '</body></html>';
+            return;
+        }
+        $this->display_site_footer();
+
+        print '</body></html>';
+    } // end include_footer()
 
 } // END class smt
