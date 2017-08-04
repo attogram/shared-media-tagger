@@ -16,7 +16,6 @@ $mimetypes[] = 'image/jpeg';
 $mimetypes[] = 'image/gif';
 $mimetypes[] = 'image/png';
 
-
 $init = __DIR__.'/../smt.php';
 if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
 
@@ -29,10 +28,9 @@ $tag_id = (!empty($_GET['t']) && $smt->is_positive_number($_GET['t']))
     ? (int)$_GET['t']
     : 'R';
 
-
 $smt->title = 'Create';
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="create.php">Create</a></p>';
 print '<ul>'

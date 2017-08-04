@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.50');
+define('__SMT__', '0.7.51');
 
 ob_start('ob_gzhandler');
 
@@ -1098,72 +1098,56 @@ class smt_tag EXTENDS smt_category {
 class smt_menus EXTENDS smt_tag {
 
     //////////////////////////////////////////////////////////
-    function include_menu( $show_counts=TRUE ) {
+    function include_menu() {
         $space = ' &nbsp; &nbsp; ';
-        $count_files = $count_categories = $count_reviews = $count_users = '';
-        if( $show_counts ) {
-            $count_files = number_format($this->get_image_count());
-            $count_categories = number_format($this->get_categories_count());
-            $count_reviews = number_format($this->get_total_review_count());
-            $count_users = number_format($this->get_user_count());
-        }
-        print ''
-        . '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>'
-        .  $space
-        . '<a href="' . $this->url('browse') . '">🔎' . $count_files . '&nbsp;Files' . '</a>'
-        . $space
-        . '<a href="' . $this->url('categories') . '">📂' . $count_categories . '&nbsp;Categories</a>'
-        . $space
-        . '<a href="' . $this->url('reviews') . '">🗳' . $count_reviews . '&nbsp;Reviews</a>'
-        . $space
+        $count_files = number_format($this->get_image_count());
+        $count_categories = number_format($this->get_categories_count());
+        $count_reviews = number_format($this->get_total_review_count());
+        $count_users = number_format($this->get_user_count());
+        print '<div class="menu" style="font-weight:bold;">'
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>' .  $space
+        . '<a href="' . $this->url('browse') . '">🔎' . $count_files . '&nbsp;Files' . '</a>' . $space
+        . '<a href="' . $this->url('categories') . '">📂' . $count_categories . '&nbsp;Categories</a>' . $space
+        . '<a href="' . $this->url('reviews') . '">🗳' . $count_reviews . '&nbsp;Reviews</a>' . $space
         . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
-        . $count_users .'&nbsp;Users</a>'
-        . $space
-        . '<a href="' . $this->url('contact') . '">Contact</a>'
-        . $space
+            . $count_users .'&nbsp;Users</a>' . $space
+        . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-
         . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧ADMIN</a>' : '')
-
         . '</div>';
-
-    }  // end function include_menu()
+    }
 
     //////////////////////////////////////////////////////////
     function include_medium_menu() {
-
+        $space = ' &nbsp; &nbsp; ';
+        print ''
+        . '<div class="menu" style="font-weight:bold;">'
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>' .  $space
+        . '<a href="' . $this->url('browse') . '">🔎Files' . '</a>' . $space
+        . '<a href="' . $this->url('categories') . '">📂Categories</a>' . $space
+        . '<a href="' . $this->url('reviews') . '">🗳Reviews</a>' . $space
+        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">Users</a>' . $space
+        . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
+        . '<a href="'. $this->url('about') . '">❔About</a>'
+        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧ADMIN</a>' : '')
+        . '</div>';
     }
 
     //////////////////////////////////////////////////////////
     function include_small_menu() {
         $space = ' ';
-        print '
-<style>
-.menujcon { background-color:#222; text-align:center; vertical-align:middle; }
-.menujcon a { background-color:#222; color:#ccc; }
-.menujcon a:visited { color:#ddd; }
-.menujcon a:hover { color:yellow; }
-.menuj { font-size:120%; padding:1px; margin:0px; border:1px solid #555; }
-.menuj:hover { border:1px solid yellow; }
-</style>
-        '
-        . '<div class="menujcon">'
-          . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . $this->site_name . '</a>'
-          . '<span style="float:right;">'
-            . '<a class="menuj" title="Browse" href="' . $this->url('browse') . '">🔎</a>' . $space
-            . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
-            . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
-            . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
-            . ($this->is_admin()
-                ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>'
-                : '')
-          . '</span>'
+        print '<div class="menujcon">'
+        . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+        . '<span style="float:right;">'
+        . '<a class="menuj" title="Browse" href="' . $this->url('browse') . '">🔎</a>' . $space
+        . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
+        . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
+        . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
+        . ($this->is_admin() ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>' : '')
+        . '</span>'
         . '</div><div style="clear:both;"></div>';
-
         // 🌐 🏷 📂 🔗 🔎 🔖 🖇 ⛓  ❓  ❔  📢
     }
-
 
 } // end class menus
 

@@ -135,7 +135,7 @@ $medias = $smt->query_as_array($sql);
 
 $smt->title = 'Browse ' . number_format($result_size) . ' Files, sorted by ' . $sort . ' ' . $sql_dir . ', page #'.$current_page.' - ' . $smt->site_name;
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 ////////////////////////////////////////////////////////////////////////
 
 print '<div class="box white">';

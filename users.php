@@ -30,7 +30,7 @@ if( $user_id ) {
     $smt->title = 'User:' . $user_id . ' - ' . $smt->site_name;
 }
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 print '<div class="box white">';
 
 

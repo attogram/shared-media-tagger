@@ -10,7 +10,7 @@ $smt = new smt_admin();
 
 $smt->title = 'Database Admin';
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 $smt->include_admin_menu();
 print '<div class="box white">';
 

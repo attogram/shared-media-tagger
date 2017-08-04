@@ -26,7 +26,7 @@ $smt->title = 'Info: ' . $smt->strip_prefix($media['title']);
 $smt->use_bootstrap = TRUE;
 $smt->use_jquery = TRUE;
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 
 ?>
 <div class="container">
@@ -165,6 +165,4 @@ if( $smt->is_admin() ) {
 <br />
 <?php
 
-
 $smt->include_footer();
-

@@ -10,15 +10,13 @@ $smt = new smt();
 $me = $smt->url('reviews');
 $tags = $smt->get_tags();
 
-//$smt->title = $smt->get_total_review_count() . ' Reviews - ' . $smt->site_name;
 $smt->title = 'Reviews - ' . $smt->site_name;
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 
 $order = isset($_GET['o']) ? $smt->category_urldecode($_GET['o']) : '';
 
-print '<div class="box white">';
-print 'Reviews:<br />';
+print '<div class="box white">Reviews:<br />';
 
 foreach( $tags as $tag ) {
     $tag_count = $smt->get_tagging_count( $tag['id'] );
@@ -26,9 +24,7 @@ foreach( $tags as $tag ) {
     . '<a href="' . $me . '?o=reviews.' . $smt->category_urlencode($tag['name']) . '">'
     . '+' . $tag_count . ' ' . $tag['name'] . '</a></span>';
 }
-print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+'
-. $smt->get_tagging_count() . ' Total</a></span>'
-. '<hr />';
+print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+' . $smt->get_tagging_count() . ' Total</a></span><hr />';
 
 // Reviews per tag
 if( (preg_match('/^reviews\.(.*)/', $order, $matches)) === 1 ) {
@@ -41,11 +37,9 @@ if( (preg_match('/^reviews\.(.*)/', $order, $matches)) === 1 ) {
         $order = 'PER.TAG';
     }
     //$smt->notice("PREG: tag_name=$tag_name tag_id=$tag_id matches=" . print_r($matches,1));
-
 }
 
-
-$limit = 100;
+$limit = 100;  // TMP DEV
 
 switch( $order ) {
 
@@ -53,7 +47,6 @@ switch( $order ) {
         print '<p>Please choose a report above.</p></div>';
         $smt->include_footer();
         exit;
-
 
     case 'PER.TAG':
         $tags = $smt->get_tags();
@@ -65,7 +58,6 @@ switch( $order ) {
         ORDER BY t.count DESC LIMIT ' . $limit;
         $bind = array(':tag_id'=>$tag_id);
         break;
-
 
     case 'total.reviews':
         $order_desc = 'Total # of reviews';
@@ -80,18 +72,14 @@ switch( $order ) {
         break;
 }
 
-$x = $smt->query_as_array($sql, $bind);
-if( !is_array($x) ) { $x = array(); }
+$rates = $smt->query_as_array($sql, $bind);
+if( !is_array($rates) ) { $rates = array(); }
 
-//$smt->notice($x);
-?>
-<p><b><?php print $order_desc; ?></b>: <?php print sizeof($x); ?> files reviewed.</p>
+print '<p><b>' . $order_desc . '</b>: ' . sizeof($rates) . ' files reviewed.</p>';
 
-<?php
-foreach( $x as $media ) {
+foreach( $rates as $media ) {
     print $smt->display_thumbnail_box($media);
 }
-?>
-</div>
-<?php
+
+print '</div>';
 $smt->include_footer();

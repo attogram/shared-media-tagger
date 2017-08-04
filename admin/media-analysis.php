@@ -12,7 +12,7 @@ $smt = new smt_admin();
 
 $smt->title = 'Media Analysis Admin';
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="./media-analysis.php">' . $smt->title . '</a>:</p>';
 

@@ -22,7 +22,6 @@ $smt = new smt();
 $category_size = $smt->get_categories_count(/*redo*/FALSE, $hidden);
 // todo - get real selection size, not full category count
 
-
 $pager = '';
 $sql_limit = '';
 if( $category_size > $page_limit ) {
@@ -77,7 +76,7 @@ if( isset($pager_count) ) {
 $smt->title = $page_name . ' - ' . $smt->site_name;
 
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 
 $smt->start_timer('print_category_table');
 ?><div class="box white">

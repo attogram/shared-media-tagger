@@ -13,7 +13,7 @@ $smt = new smt_admin();
 
 $smt->title = 'Admin Reports';
 $smt->include_header();
-$smt->include_menu( /*show_counts*/FALSE );
+$smt->include_medium_menu();
 $smt->include_admin_menu();
 print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
