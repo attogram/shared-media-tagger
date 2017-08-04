@@ -2,11 +2,19 @@
 // Shared Media Tagger
 // Export Admin
 
-$init = __DIR__.'/../smt.php';
-if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
-$init = __DIR__.'/smt-admin.php';
-if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
-$smt = new smt_admin();
+$init = __DIR__.'/../smt.php'; // Shared Media Tagger Main Class
+if( !is_readable($init) ) {
+    print 'ERROR: not readable: ' . $init;
+    return;
+}
+$init = __DIR__.'/smt-admin.php'; // Shared Media Tagger Admin Class
+if( !is_readable($init) ) {
+    print 'ERROR: not readable: ' . $init;
+    return;
+}
+require_once($init);
+$smt = new smt_admin(); // The Shared Media Tagger Admin Object
+/////////////////////////////////////////////////////////////
 
 $smt->title = 'Export Admin';
 $smt->include_header();

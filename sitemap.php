@@ -2,13 +2,14 @@
 // Shared Media Tagger
 // Sitemap
 
-$init = __DIR__.'/smt.php';
-if( !file_exists($init) || !is_readable($init) ){
-    exit;
+$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
+if( !is_readable($init) ) {
+    print 'Site down for maintenance';
+    return;
 }
-include_once($init);
-
-$smt = new smt();
+require_once($init);
+$smt = new smt(); // The Shared Media Tagger Object
+/////////////////////////////////////////////////////////////
 
 $cr = "\n";
 

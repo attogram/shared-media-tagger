@@ -112,7 +112,7 @@ class smt_admin_database_tables extends smt_admin_utils {
             'about' TEXT,
             'header' TEXT,
             'footer' TEXT,
-			'use_cdn' BOOLEAN NOT NULL DEFAULT '0',
+            'use_cdn' BOOLEAN NOT NULL DEFAULT '0',
             'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT su UNIQUE (name) )",
 

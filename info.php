@@ -2,10 +2,14 @@
 // Shared Media Tagger
 // Media info
 
-$f = __DIR__.'/smt.php';
-if( !file_exists($f) || !is_readable($f) ) { print 'Site down for maintenance'; exit; } require_once($f);
-
-$smt = new smt();
+$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
+if( !is_readable($init) ) {
+    print 'Site down for maintenance';
+    return;
+}
+require_once($init);
+$smt = new smt(); // The Shared Media Tagger Object
+/////////////////////////////////////////////////////////////
 
 if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) ) {
     $smt->fail404('404 Media Not Found');

@@ -4,8 +4,14 @@
 
 $page_limit = 1000;
 
-$init = __DIR__.'/smt.php';
-if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
+$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
+if( !is_readable($init) ) {
+    print 'Site down for maintenance';
+    return;
+}
+require_once($init);
+$smt = new smt(); // The Shared Media Tagger Object
+/////////////////////////////////////////////////////////////
 
 $search = FALSE;
 if( isset($_GET['s']) && $_GET['s'] ) {

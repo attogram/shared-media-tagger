@@ -2,9 +2,14 @@
 // Shared Media Tagger
 // HOME PAGE
 
-$f = __DIR__.'/smt.php';
-if(!file_exists($f)||!is_readable($f)){print 'Site down for maintenance';exit;} require_once($f);
-$smt = new smt();
+$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
+if( !is_readable($init) ) {
+    print 'Site down for maintenance';
+    return;
+}
+require_once($init);
+$smt = new smt(); // The Shared Media Tagger Object
+/////////////////////////////////////////////////////////////
 
 if( isset($_GET['i']) && $smt->is_positive_number($_GET['i']) ) {
     $image = $smt->get_media($_GET['i']);
@@ -20,8 +25,7 @@ $smt->title = $smt->site_name;
 $smt->include_header( /*show_site_header*/FALSE );
 $smt->include_small_menu();
 
-print ''
-. '<div class="box grey center">'
+print '<div class="box grey center">'
 . $smt->display_tags($image['pageid'])
 . $smt->display_image($image)
 . '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
@@ -31,8 +35,6 @@ print ''
 . '<br />'
 . '<a href="' . $smt->url('contact') . '?r='
 . $image['pageid'] . '" style="color:#666; font-size:85%;">REPORT this file</a>'
-. '</div>'
-. '</div>'
-;
+. '</div></div>';
 
 $smt->include_footer();

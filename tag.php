@@ -2,10 +2,14 @@
 // Shared Media File
 // Tag
 
-$init = __DIR__.'/smt.php';
-if(!file_exists($init)||!is_readable($init)){ print 'Site down for maintenance'; exit; } require_once($init);
-
-$smt = new smt();
+$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
+if( !is_readable($init) ) {
+    print 'Site down for maintenance';
+    return;
+}
+require_once($init);
+$smt = new smt(); // The Shared Media Tagger Object
+/////////////////////////////////////////////////////////////
 
 $media_id = isset($_GET['m']) ? $_GET['m'] : FALSE;
 $tag_id = isset($_GET['t']) ? $_GET['t'] : FALSE;
