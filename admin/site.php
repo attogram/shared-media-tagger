@@ -53,6 +53,9 @@ print ''
 . '<br /><br />About:<br />'
 . '<textarea name="about" rows="5" cols="70">' . htmlentities(@$site['about']) . '</textarea>'
 
+. '<br /><br /><input type="checkbox" name="curation"'
+. ( @$site['curation'] ? ' checked="checked"' : '' ) . '/> Show only Curated Media'
+
 . '<br /><br />Header:<br />'
 . '<textarea name="header" rows="5" cols="70">' . htmlentities(@$site['header']) . '</textarea>'
 
@@ -109,6 +112,12 @@ function save_site_info() {
         $set[] = "use_cdn = '1'";
     } else {
         $set[] = "use_cdn = '0'";
+    }
+
+    if( isset($_POST['curation']) && $_POST['curation'] == 'on' ){
+        $set[] = "curation = '1'";
+    } else {
+        $set[] = "curation = '0'";
     }
 
     $sql = 'UPDATE site SET ' . implode($set,', ') . ' WHERE id = :id';

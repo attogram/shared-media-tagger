@@ -13,7 +13,7 @@ h3 { font-size:95%; display:inline; }
 h4 { font-size:70%; display:inline; }
 h5 { font-size:60%; display:inline; }
 img { border:1px solid black; background-color:white; background-clip:content-box; }
-img:hover { border:1px solid red; background-color:white; }
+.list img:hover { border:1px solid red; background-color:white; }
 video { border:1px solid black; background-color:white; background-clip:content-box; }
 audio { border:1px solid black; background-color:white; background-clip:content-box; }
 .menu { background-color:#222; color:#ccc; padding:3px 0px 3px 8px; margin:0px; line-height:2; text-align:center; font-size:85%; }

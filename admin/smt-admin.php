@@ -113,6 +113,7 @@ class smt_admin_database_tables extends smt_admin_utils {
             'header' TEXT,
             'footer' TEXT,
             'use_cdn' BOOLEAN NOT NULL DEFAULT '0',
+            'curation' BOOLEAN NOT NULL DEFAULT '0',
             'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT su UNIQUE (name) )",
 
@@ -158,6 +159,7 @@ class smt_admin_database_tables extends smt_admin_utils {
         'media' =>
             "CREATE TABLE IF NOT EXISTS 'media' (
             'pageid' INTEGER PRIMARY KEY,
+            'curated' BOOLEAN NOT NULL DEFAULT '0',
             'title' TEXT,
             'url' TEXT,
             'descriptionurl' TEXT,
@@ -768,7 +770,7 @@ class smt_admin_media extends smt_commons_API {
             $new[':duration'] = @$media_file['imageinfo'][0]['duration'];
             $new[':timestamp'] = @$media_file['imageinfo'][0]['timestamp'];
 
-            $sql = "INSERT OR REPLACE INTO MEDIA (
+            $sql = "INSERT OR REPLACE INTO media (
                         pageid, title, url,
                         descriptionurl, descriptionshorturl, imagedescription,
                         artist, datetimeoriginal,
@@ -1632,6 +1634,7 @@ class smt_admin extends smt_admin_block {
         . $space . '<a href="' . $admin . 'tag.php">TAG</a>'
         . $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
         . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
+        . $space . '<a href="' . $admin . 'curate.php">CURATE</a>'
         . $space . '<a href="' . $admin . 'user.php">USER</a>'
         . $space . '<a href="' . $admin . 'create.php">CREATE</a>'
         . $space . '<a href="' . $admin . 'export.php">EXPORT</a>'
