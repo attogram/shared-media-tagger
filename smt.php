@@ -1,13 +1,13 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.55');
+define('__SMT__', '0.7.56');
 
 ob_start('ob_gzhandler');
 
 $init = __DIR__.'/_setup.php'; // optional Site Setup options
 if( is_readable($init) ) {
-	include($init);
+    include($init);
 }
 
 //////////////////////////////////////////////////////////

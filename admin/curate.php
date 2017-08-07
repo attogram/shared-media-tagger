@@ -191,6 +191,7 @@ function curate_delete( $id_array ) {
         $smt->delete_media($pageid);
     }
     $smt->notice('OK: DELETED: ' . implode($id_array,', '));
+	$smt->update_categories_local_files_count();
     return TRUE;
 }
 

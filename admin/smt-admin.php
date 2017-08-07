@@ -949,7 +949,7 @@ class smt_admin_media extends smt_commons_API {
             $this->error('delete_media: Invalid PageID');
             return FALSE;
         }
-        $response = '<div style="white-space:nowrap;  font-family:monospace; background-color:lightsalmon;">'
+        $response = '<div style="white-space:nowrap;  font-family:monospace; color:black; background-color:lightsalmon;">'
         . 'Deleting Media :pageid = ' . $pageid;
 
         $media = $this->get_media($pageid);
