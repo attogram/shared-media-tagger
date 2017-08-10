@@ -44,6 +44,15 @@ switch( $sort ) {
     case 'phash': $orderby = ' ORDER BY phash'; $where = ' WHERE phash IS NOT NULL'; break;
 }
 
+if( $smt->site_info['curation'] == 1 ) {
+	if( $where ) {
+		$where .= " AND curated = '1'";
+	} else {
+		$where = " WHERE curated = '1'";
+	}
+}
+
+
 $dir = 'd'; $sql_dir = ' DESC';
 if( isset($_GET['d']) ) {
     switch($_GET['d']) {
@@ -70,20 +79,7 @@ switch( $sort ) {
 
 
 
-///////////////
-function pager_link($offset) {
-    global $sort, $dir;
-    $link = '<a href="?o=' . $offset;
-    if( $sort ) {
-        $link .= '&amp;s=' . $sort;
-    }
-    if( $dir ) {
-        $link .= '&amp;d=' . $dir;
-    }
-    $link .= '">';
-    return $link;
 
-}
 
 //////////////////////////////////////////
 $pager = '';
@@ -214,3 +210,20 @@ if( $pager ) {
 
 print '</div>';
 $smt->include_footer();
+
+
+
+/////////////////////////////////////////////////
+function pager_link($offset) {
+    global $sort, $dir;
+    $link = '<a href="?o=' . $offset;
+    if( $sort ) {
+        $link .= '&amp;s=' . $sort;
+    }
+    if( $dir ) {
+        $link .= '&amp;d=' . $dir;
+    }
+    $link .= '">';
+    return $link;
+
+}

@@ -50,21 +50,27 @@ if( $category_size > $page_limit ) {
     }
 }
 
+
 $sql = '
     SELECT m.*
     FROM category2media AS c2m, category AS c, media AS m
     WHERE c2m.category_id = c.id
     AND m.pageid = c2m.media_pageid
-    AND c.name = :category_name
-    ORDER BY m.pageid ASC
-    ' . $sql_limit;
+    AND c.name = :category_name';
+	
+if( $smt->site_info['curation'] == 1 ) {
+	$sql .= " AND m.curated ='1'";
+}
+$sql .= " ORDER BY m.pageid ASC $sql_limit";
+
+	
 $bind = array(':category_name'=>$category_name);
 
 $category = $smt->query_as_array( $sql, $bind );
 
 if( !$category || !is_array($category) ) {
     $smt->fail404(
-        '404 Category Not Found',
+        '404 Category In Curation Que',
         $smt->display_admin_category_functions($category_name)
     );
 }

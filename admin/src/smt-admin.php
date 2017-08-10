@@ -138,10 +138,12 @@ class smt_admin_database_tables extends smt_admin_utils {
             "CREATE TABLE IF NOT EXISTS 'category' (
             'id' INTEGER PRIMARY KEY,
             'name' TEXT,
+            'curated' BOOLEAN NOT NULL DEFAULT '0',
             'pageid' INTEGER,
             'files' INTEGER,
             'subcats' INTEGER,
             'local_files' INTEGER DEFAULT '0',
+            'curated_files' INTEGER DEFAULT '0',
             'missing' INTEGER DEFAULT '0',
             'hidden' INTEGER DEFAULT '0',
             'force' INTEGER,
