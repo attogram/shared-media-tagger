@@ -50,7 +50,6 @@ if( $category_size > $page_limit ) {
     }
 }
 
-
 $sql = '
     SELECT m.*
     FROM category2media AS c2m, category AS c, media AS m
@@ -58,7 +57,7 @@ $sql = '
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name';
 
-if( $smt->site_info['curation'] == 1 ) {
+if( $smt->site_info['curation'] == 1 && !$smt->is_admin() ) {
     $sql .= " AND m.curated ='1'";
 }
 $sql .= " ORDER BY m.pageid ASC $sql_limit";
