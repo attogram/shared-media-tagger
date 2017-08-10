@@ -42,29 +42,11 @@ $medias = $smt->query_as_array($sql);
 
 print '<form name="media" action="" method="GET">';
 
-print '<div style="background-color:#ddd; color:black; padding-left:10px;">'
-. '<b>' . number_format($uncurated_count) . '</b> Media Files in Curation Que.'
-. '  (curation mode: ' . $smt->site_info['curation'] . ')'
-. '<br />'
-. '<input type="submit" value="          Curate          " />'
-. ' &nbsp;
-Mark ALL:
-<a href="javascript:mark_all_keep();">[KEEP]</a>
-<a href="javascript:mark_all_delete();">[DELETE]</a>
-<a href="javascript:mark_all_que();">[QUE]</a>'
-. '</div>';
+curation_menu();
 
 print '<style>
-.curation_container {
-    background-color:#ddd;
-    color:black;
-    padding:10px;
-    display:flex;
-    flex-wrap:wrap;
-}
-.curation_container img {
-    margin:1px;
-}
+.curation_container { background-color:#ddd; color:black; padding:10px; display:flex; flex-wrap:wrap; }
+.curation_container img { margin:1px; }
 .curation_keep { border:12px solid green; }
 .curation_delete { border:12px solid red; }
 .curation_que { border:12px solid grey; }
@@ -143,19 +125,41 @@ foreach($medias as $media) {
     $height = $thumb['height'];
     $id = $media['pageid'];
     $img_info = str_replace("Array\n(",'',htmlentities(print_r($media,1)));
+
+    print '<div>';
+    print '<a target="site" style="font-size:10pt; text-align:center;" href="' . $smt->url('info') . '?i='.$id.'">'.$id.'</a><br />';
+
     print '<img name="'.$id.'" id="'.$id.'"  src="' . $url . '"'
         . ' width="' . $width . '" height="' . $height . '" title="'
         . $img_info . '" onclick="curation_click(this.id);" class="curation_que">';
+    print '</div>';
+
     print '<input style="display:none;" type="checkbox" name="keep[]" id="keep'.$id.'" value="'.$id.'">';
     print '<input style="display:none;" type="checkbox" name="delete[]" id="delete'.$id.'" value="'.$id.'">';
 }
 
-
+print '<br />';
+curation_menu();
 print '</div>'; // end curation_container
+
+
+
 
 print '</form>';
 $smt->include_footer();
 
+////////////////////////////////////////////////////////////////////////////
+function curation_menu() {
+    global $uncurated_count;
+    print '<div style="background-color:#ddd; color:black; padding-left:10px;">'
+    . '<input type="submit" value="          Curate Marked Files        " />'
+    . '&nbsp; <span style="display:inline-block">Mark ALL: '
+    . '&nbsp; <a href="javascript:mark_all_keep();">[KEEP]</a>'
+    . '&nbsp; <a href="javascript:mark_all_delete();">[DELETE]</a>'
+    . '&nbsp; <a href="javascript:mark_all_que();">[QUE]</a></span>'
+    . '&nbsp; <b>' . number_format($uncurated_count) . '</b> Files in Curation Que.'
+    . '</div>';
+}
 ////////////////////////////////////////////////////////////////////////////
 function curate_batch() {
     global $smt;
@@ -191,7 +195,7 @@ function curate_delete( $id_array ) {
         $smt->delete_media($pageid);
     }
     $smt->notice('OK: DELETED: ' . implode($id_array,', '));
-	$smt->update_categories_local_files_count();
+    $smt->update_categories_local_files_count();
     return TRUE;
 }
 
