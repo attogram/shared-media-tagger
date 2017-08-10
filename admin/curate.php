@@ -2,8 +2,6 @@
 // Shared Media Tagger
 // Curation Admin
 
-$page_limit = 20; // # of files per page
-
 ////////////////////////////////////////////////////////////////
 $init = __DIR__.'/src/smt.php'; // Shared Media Tagger Class
 if( !is_readable($init) ) { exit('Site down for maintenance'); }
@@ -26,6 +24,15 @@ if( isset($_GET) && $_GET ) {
 }
 
 $uncurated_count = get_uncurated_count();
+
+
+$page_limit = 20; // # of files per page
+if( isset($_GET['l']) && $smt->is_positive_number($_GET['l']) ) {
+	$page_limit = (int)$_GET['l'];
+}
+if( $page_limit > 1000 ) { $page_limit = 1000; }
+if( $page_limit < 1 ) { $page_limit = 1; }
+
 
 $sql = "SELECT *
         FROM media
@@ -146,14 +153,14 @@ $smt->include_footer();
 
 ////////////////////////////////////////////////////////////////////////////
 function curation_menu() {
-    global $uncurated_count;
+    global $uncurated_count, $page_limit;
     print '<div style="background-color:#ddd; color:black; padding-left:10px;">'
     . '<input type="submit" value="          Curate Marked Files        " />'
-    . '&nbsp; <span style="display:inline-block">Mark ALL: '
-    . '&nbsp; <a href="javascript:mark_all_keep();">[KEEP]</a>'
-    . '&nbsp; <a href="javascript:mark_all_delete();">[DELETE]</a>'
-    . '&nbsp; <a href="javascript:mark_all_que();">[QUE]</a></span>'
-    . '&nbsp; <b>' . number_format($uncurated_count) . '</b> Files in Curation Que.'
+    . ' <span style="display:inline-block; font-size:90%;">Mark ALL '
+    . ' <a href="javascript:mark_all_keep();">[KEEP]</a>'
+    . ' <a href="javascript:mark_all_delete();">[DELETE]</a>'
+    . ' <a href="javascript:mark_all_que();">[QUE]</a></span>'
+    . ' - <a href="./curate.php?l='.$page_limit.'">'.$page_limit.'</a> of ' . number_format($uncurated_count) . ' in que'
     . '</div>';
 }
 ////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.60');
+define('__SMT__', '0.7.61');
 
 ob_start('ob_gzhandler');
 
@@ -526,32 +526,42 @@ class smt_site_admin EXTENDS smt_media {
         if( !$category ) {
             return '<p>ADMIN: category not in database</p>';
         }
-        $response = '<br clear="all" />
-<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">
-<input type="submit" value="Delete selected media">
-<script type="text/javascript" language="javascript">
-'
-. "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-checkboxes = document[formname].getElementsByTagName('input');
-for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
-</script>"
-. ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-. ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-. '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
-. $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
-. $this->category_urlencode($category['name']) . '">Get Category Info</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
-. $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import Media to Category</a>
-<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
-. $this->category_urlencode($category['name'])
-. '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>
-<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
-. '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>
-<br /><pre>' . print_r($category,1) . '</pre>
-</form>
-</div><br /><br />';
+        $response = '<br clear="all" />'
+        . '<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">'
+        . '<input type="submit" value="Delete selected media">'
+        . '<script type="text/javascript" language="javascript">'
+        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();"
+        . " checkboxes = document[formname].getElementsByTagName('input');"
+        . " for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }"
+        . '</script>'
+        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
+        . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
+
+        . '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
+        . $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>'
+
+        . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
+        . $this->category_urlencode($category['name']) . '">Get Category Info</a>'
+
+        . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
+        . $this->category_urlencode($category['name'])
+        . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import ' . @$category['files'] . ' Files into Category</a>'
+
+        . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?sc='
+        . $this->category_urlencode($category['name'])
+        . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add ' . @$category['subcats'] . ' Sub-Categories</a>'
+
+        . '<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
+        . $this->category_urlencode($category['name'])
+        . '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>'
+
+        . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
+        . '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>'
+
+        . '<br /><pre>' . print_r($category,1) . '</pre>'
+
+        . '</form>'
+        . '</div><br /><br />';
         return $response;
     }
 
