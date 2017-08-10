@@ -1,11 +1,11 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.57');
+define('__SMT__', '0.7.58');
 
 ob_start('ob_gzhandler');
 
-$init = __DIR__.'/_setup.php'; // optional Site Setup options
+$init = __DIR__.'/../../_setup.php'; // optional Site Setup options
 if( is_readable($init) ) {
     include($init);
 }
@@ -85,7 +85,7 @@ class smt_utils {
     function fail404 ( $message='', $extra='' ) {
         header('HTTP/1.0 404 Not Found');
         $this->include_header( /*show_site_header*/FALSE );
-        $this->include_menu( /*show_counts*/FALSE );
+        $this->include_medium_menu();
         if( !$message || !is_string($message) ) {
             $message = '404 Not Found';
         }
@@ -1115,7 +1115,7 @@ class smt_menus EXTENDS smt_tag {
             . $count_users .'&nbsp;Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧ADMIN</a>' : '')
+        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -1131,7 +1131,7 @@ class smt_menus EXTENDS smt_tag {
         . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧ADMIN</a>' : '')
+        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -1181,7 +1181,7 @@ class smt EXTENDS smt_menus {
             $this->setup = $setup;
         }
 
-        $this->install_directory = __DIR__;
+        $this->install_directory = dirname(__DIR__,2);
 
         $this->database_name = $this->install_directory . '/admin/db/media.sqlite';
 
@@ -1194,7 +1194,7 @@ class smt EXTENDS smt_menus {
             $this->site_url = $setup['site_url'];
         } else {
             $this->site_url = '//' . $this->server . '/';
-            if( $base = basename(__DIR__) ) {
+            if( $base = basename($this->install_directory) ) {
                 $this->site_url .= $base . '/';
             }
             $this->debug('Site URL Not Set.  Using: ' . $this->site_url);
@@ -1233,12 +1233,12 @@ class smt EXTENDS smt_menus {
     //////////////////////////////////////////////////////////
     function set_site_info() {
         $response = $this->query_as_array('SELECT * FROM site WHERE id = 1');
-        if( !$response || !isset($response[0]['name']) ) {
+        if( !$response || !isset($response[0]['id']) ) {
             $this->site_name = 'Shared Media Tagger';
             $this->site_info = array();
             return FALSE;
         }
-        $this->site_name = $response[0]['name'];
+        $this->site_name = @$response[0]['name'];
         $this->site_info = $response[0];
         $this->debug('site_info = ' . print_r($this->site_info,1));
         return TRUE;

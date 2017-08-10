@@ -2,14 +2,12 @@
 // Shared Media File
 // Tag
 
-$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
-if( !is_readable($init) ) {
-    print 'Site down for maintenance';
-    return;
-}
+//////////////////////////////////////////////////////////////////
+$init = __DIR__.'/admin/src/smt.php'; // Shared Media Tagger Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$smt = new smt(); // The Shared Media Tagger Object
-/////////////////////////////////////////////////////////////
+$smt = new smt(); // Shared Media Tagger Object
+//////////////////////////////////////////////////////////////////
 
 $media_id = isset($_GET['m']) ? $_GET['m'] : FALSE;
 $tag_id = isset($_GET['t']) ? $_GET['t'] : FALSE;

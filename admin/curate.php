@@ -4,21 +4,16 @@
 
 $page_limit = 20; // # of files per page
 
-////////////////////////////////////////////////////////////////////
-$init = __DIR__.'/../smt.php'; // Shared Media Tagger Main Class
-if( !is_readable($init) ) {
-    print 'ERROR: not readable: ' . $init;
-    return;
-}
+////////////////////////////////////////////////////////////////
+$init = __DIR__.'/src/smt.php'; // Shared Media Tagger Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$init = __DIR__.'/smt-admin.php'; // Shared Media Tagger Admin Class
-if( !is_readable($init) ) {
-    print 'ERROR: not readable: ' . $init;
-    return;
-}
+$init = __DIR__.'/src/smt-admin.php'; // SMT ADMIN Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$smt = new smt_admin(); // The Shared Media Tagger Admin Object
-////////////////////////////////////////////////////////////////////
+$smt = new smt_admin(); // Shared Media Tagger Admin Object
+///////////////////////////////////////////////////////////////
+
 $smt->title = 'Curation Admin';
 $smt->use_jquery = TRUE;
 $smt->include_header();
@@ -177,7 +172,7 @@ function curate_keep( $id_array ) {
     $ids = implode($id_array,', ');
     $sql = "UPDATE media SET curated = '1' WHERE pageid IN ($ids)";
     if( $smt->query_as_bool($sql) ) {
-        $smt->notice('OK: KEPING: ' . $ids);
+        $smt->notice('Curate: KEEP ' . sizeof($id_array));
         return TRUE;
     }
     $smt->error('ERROR setting media curated to KEEP: ' . $smt->last_error);
@@ -194,7 +189,7 @@ function curate_delete( $id_array ) {
     foreach( $id_array as $pageid ) {
         $smt->delete_media($pageid);
     }
-    $smt->notice('OK: DELETED: ' . implode($id_array,', '));
+        $smt->notice('Curate: DELETE ' . sizeof($id_array));
     $smt->update_categories_local_files_count();
     return TRUE;
 }

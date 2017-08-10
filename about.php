@@ -2,14 +2,12 @@
 // Shared Media Tagger
 // About
 
-$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
-if( !is_readable($init) ) {
-    print 'Site down for maintenance';
-    return;
-}
+//////////////////////////////////////////////////////////////////
+$init = __DIR__.'/admin/src/smt.php'; // Shared Media Tagger Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$smt = new smt(); // The Shared Media Tagger Object
-/////////////////////////////////////////////////////////////
+$smt = new smt(); // Shared Media Tagger Object
+//////////////////////////////////////////////////////////////////
 
 $a = $smt->query_as_array('SELECT name, about FROM site WHERE id = 1');
 $about = @$a[0]['about'];

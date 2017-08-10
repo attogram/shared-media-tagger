@@ -2,14 +2,12 @@
 // Shared Media Tagger
 // Media info
 
-$init = __DIR__.'/smt.php'; // Shared Media Tagger Main Class
-if( !is_readable($init) ) {
-    print 'Site down for maintenance';
-    return;
-}
+//////////////////////////////////////////////////////////////////
+$init = __DIR__.'/admin/src/smt.php'; // Shared Media Tagger Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$smt = new smt(); // The Shared Media Tagger Object
-/////////////////////////////////////////////////////////////
+$smt = new smt(); // Shared Media Tagger Object
+//////////////////////////////////////////////////////////////////
 
 if( !isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i']) ) {
     $smt->fail404('404 Media Not Found');
@@ -24,7 +22,7 @@ if( !$media || !isset($media[0]) || !is_array($media[0]) ) {
 $media = @$media[0];
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 
 $smt->title = 'Info: ' . $smt->strip_prefix($media['title']);
 $smt->use_bootstrap = TRUE;

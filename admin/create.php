@@ -16,21 +16,15 @@ $mimetypes[] = 'image/jpeg';
 $mimetypes[] = 'image/gif';
 $mimetypes[] = 'image/png';
 
-////////////////////////////////////////////////////////////////////
-$init = __DIR__.'/../smt.php'; // Shared Media Tagger Main Class
-if( !is_readable($init) ) {
-    print 'ERROR: not readable: ' . $init;
-    return;
-}
+////////////////////////////////////////////////////////////////
+$init = __DIR__.'/src/smt.php'; // Shared Media Tagger Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$init = __DIR__.'/smt-admin.php'; // Shared Media Tagger Admin Class
-if( !is_readable($init) ) {
-    print 'ERROR: not readable: ' . $init;
-    return;
-}
+$init = __DIR__.'/src/smt-admin.php'; // SMT ADMIN Class
+if( !is_readable($init) ) { exit('Site down for maintenance'); }
 require_once($init);
-$smt = new smt_admin(); // The Shared Media Tagger Admin Object
-/////////////////////////////////////////////////////////////////////
+$smt = new smt_admin(); // Shared Media Tagger Admin Object
+///////////////////////////////////////////////////////////////
 
 $tag_id = (!empty($_GET['t']) && $smt->is_positive_number($_GET['t']))
     ? (int)$_GET['t']
