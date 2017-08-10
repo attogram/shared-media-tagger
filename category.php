@@ -57,13 +57,13 @@ $sql = '
     WHERE c2m.category_id = c.id
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name';
-	
+
 if( $smt->site_info['curation'] == 1 ) {
-	$sql .= " AND m.curated ='1'";
+    $sql .= " AND m.curated ='1'";
 }
 $sql .= " ORDER BY m.pageid ASC $sql_limit";
 
-	
+
 $bind = array(':category_name'=>$category_name);
 
 $category = $smt->query_as_array( $sql, $bind );

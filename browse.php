@@ -45,11 +45,11 @@ switch( $sort ) {
 }
 
 if( $smt->site_info['curation'] == 1 ) {
-	if( $where ) {
-		$where .= " AND curated = '1'";
-	} else {
-		$where = " WHERE curated = '1'";
-	}
+    if( $where ) {
+        $where .= " AND curated = '1'";
+    } else {
+        $where = " WHERE curated = '1'";
+    }
 }
 
 

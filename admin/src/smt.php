@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.59');
+define('__SMT__', '0.7.60');
 
 ob_start('ob_gzhandler');
 
@@ -327,9 +327,9 @@ class smt_media EXTENDS smt_database {
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
 
-		if( $this->site_info['curation'] == 1 && !$this->is_admin() ) {
-			$sql .= " AND curated = '1'";
-		}
+        if( $this->site_info['curation'] == 1 && !$this->is_admin() ) {
+            $sql .= " AND curated = '1'";
+        }
         return $this->query_as_array( $sql, array(':pageid'=>$pageid) );
     }
 
@@ -406,11 +406,11 @@ class smt_media EXTENDS smt_database {
 
     //////////////////////////////////////////////////////////
     function get_random_unreviewed_media($limit=1) {
-		
-		$and = '';
-		if( $this->site_info['curation'] == 1 ) { 
-			$and = "AND curated == '1'";
-		}
+
+        $and = '';
+        if( $this->site_info['curation'] == 1 ) {
+            $and = "AND curated == '1'";
+        }
 
         $sql = '
             SELECT m.*
@@ -424,22 +424,22 @@ class smt_media EXTENDS smt_database {
 
     //////////////////////////////////////////////////////////
     function get_random_media($limit=1) {
-		
-		if( mt_rand(1,7) == 1 ) { // 1 in 7 chance of getting UNREVIEWED media
-			$unreviewed = $this->get_random_unreviewed_media($limit);
-			if( $unreviewed ) {
-				return $unreviewed;
-			}
-		}
 
-		$where = '';
-		if( $this->site_info['curation'] == 1 ) { 
-			$where = "WHERE curated == '1'";
-		}		
-        $sql = 'SELECT * 
-				FROM media ' . $where . '
-				ORDER BY RANDOM() 
-				LIMIT :limit';
+        if( mt_rand(1,7) == 1 ) { // 1 in 7 chance of getting UNREVIEWED media
+            $unreviewed = $this->get_random_unreviewed_media($limit);
+            if( $unreviewed ) {
+                return $unreviewed;
+            }
+        }
+
+        $where = '';
+        if( $this->site_info['curation'] == 1 ) {
+            $where = "WHERE curated == '1'";
+        }
+        $sql = 'SELECT *
+                FROM media ' . $where . '
+                ORDER BY RANDOM()
+                LIMIT :limit';
         return $this->query_as_array($sql, array('limit'=>$limit));
     }
 
@@ -448,10 +448,10 @@ class smt_media EXTENDS smt_database {
         if( isset($this->image_count) && !$redo ) {
             return $this->image_count;
         }
-		$sql = 'SELECT count(pageid) AS count FROM media';
-		if( $this->site_info['curation'] == 1 ) {
-			$sql .= " WHERE curated = '1'";
-		}
+        $sql = 'SELECT count(pageid) AS count FROM media';
+        if( $this->site_info['curation'] == 1 ) {
+            $sql .= " WHERE curated = '1'";
+        }
         $response = $this->query_as_array($sql);
         if( !$response ) {
             $this->debug('::get_image_count() ERROR query failed.');
@@ -507,7 +507,7 @@ class smt_site_admin EXTENDS smt_media {
             return;
         }
         return ''
-        . '<div class="attribution left" style=" display:inline-block; float:right;">'
+        . '<div class="attribution left" style="display:inline-block; float:right;">'
         . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
         . $media_id . ' ?\');">❌</a>'
@@ -515,12 +515,7 @@ class smt_site_admin EXTENDS smt_media {
         . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
         . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
         . $media_id . ' ?\');">♻</a>'
-
-        . ' <a style="font-size:140%;" href="' . $this->url('admin')
-        . 'media-analysis.php?skin=' . $media_id. '">👙</a>'
-
-        . ' <a style="font-size:140%;" href="' . $this->url('admin')
-        . 'media-analysis.php?hash=' . $media_id. '">H</a>'
+        . ' <a style="font-size:140%;" href="' . $this->url('admin') . 'curate.php?i=' . $media_id. '">C</a>'
         . '</div>';
     }
 
@@ -804,23 +799,23 @@ class smt_category EXTENDS smt_user {
     function get_category_size( $category_name ) {
         $this->debug("get_category_size( $category_name )");
 
-		$sql = 'SELECT count(c2m.id) AS size
-				FROM category2media AS c2m, category AS c
-				WHERE c.name = :name
-				AND c2m.category_id = c.id';
-		if( $this->site_info['curation'] == 1 ) {
-				$sql = "SELECT count(c2m.id) AS size
-						FROM category2media AS c2m, category AS c, media as m
-						WHERE c.name = :name
-						AND c2m.category_id = c.id
-						AND m.pageid = c2m.media_pageid
-						AND m.curated = '1'";
-		}
+        $sql = 'SELECT count(c2m.id) AS size
+                FROM category2media AS c2m, category AS c
+                WHERE c.name = :name
+                AND c2m.category_id = c.id';
+        if( $this->site_info['curation'] == 1 ) {
+                $sql = "SELECT count(c2m.id) AS size
+                        FROM category2media AS c2m, category AS c, media as m
+                        WHERE c.name = :name
+                        AND c2m.category_id = c.id
+                        AND m.pageid = c2m.media_pageid
+                        AND m.curated = '1'";
+        }
         $response = $this->query_as_array($sql, array(':name'=>$category_name) );
         if( isset($response[0]['size']) ) {
             return $response[0]['size'];
         }
-		$this->error("get_category_size( $category_name ) ERROR: 0 size");
+        $this->error("get_category_size( $category_name ) ERROR: 0 size");
         return 0;
     }
 
@@ -833,14 +828,14 @@ class smt_category EXTENDS smt_user {
                 FROM category2media AS c2m, category AS c
                 WHERE c.id = c2m.category_id
                 AND c.hidden = ' . ($hidden ? '1' : '0');
-		if( $this->site_info['curation'] == 1 ) {
-			$sql = "SELECT count(distinct(c2m.category_id)) AS count
-					FROM category2media AS c2m, category AS c, media AS m
-					WHERE c.id = c2m.category_id
-					AND c.hidden = '" . ($hidden ? '1' : '0') . "'
-					AND c2m.media_pageid = m.pageid
-					AND m.curated = '1'";
-		}
+        if( $this->site_info['curation'] == 1 ) {
+            $sql = "SELECT count(distinct(c2m.category_id)) AS count
+                    FROM category2media AS c2m, category AS c, media AS m
+                    WHERE c.id = c2m.category_id
+                    AND c.hidden = '" . ($hidden ? '1' : '0') . "'
+                    AND c2m.media_pageid = m.pageid
+                    AND m.curated = '1'";
+        }
         $response = $this->query_as_array($sql);
         if( !$response ) {
             $this->debug('::get_categories_count() ERROR query failed');
@@ -906,16 +901,16 @@ class smt_category EXTENDS smt_user {
 
     //////////////////////////////////////////////////////////
     function get_media_in_category( $category_name ) {
-		$this->debug("get_media_in_category( $category_name )");
+        $this->debug("get_media_in_category( $category_name )");
         $category_id = $this->get_category_id_from_name( $category_name );
         if( !$category_id ) {
             $this->error('::get_media_in_category: No ID found for: ' . $category_name);
             return array();
         }
-		$sql = 'SELECT media_pageid
-				FROM category2media
-				WHERE category_id = :category_id
-				ORDER BY media_pageid';
+        $sql = 'SELECT media_pageid
+                FROM category2media
+                WHERE category_id = :category_id
+                ORDER BY media_pageid';
 
         $response = $this->query_as_array($sql, array(':category_id'=>$category_id));
         if( $response === FALSE ) {

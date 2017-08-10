@@ -33,7 +33,11 @@ $sql = "SELECT *
         ORDER BY updated ASC
         LIMIT " . $page_limit;
 
-$medias = $smt->query_as_array($sql);
+if( isset($_GET['i']) && $smt->is_positive_number($_GET['i']) ) {
+    $medias = $smt->get_media($_GET['i']);
+} else {
+    $medias = $smt->query_as_array($sql);
+}
 
 print '<form name="media" action="" method="GET">';
 
@@ -137,9 +141,6 @@ print '<br />';
 curation_menu();
 print '</div>'; // end curation_container
 
-
-
-
 print '</form>';
 $smt->include_footer();
 
@@ -162,7 +163,6 @@ function curate_batch() {
     curate_delete(@$_GET['delete']);
 }
 
-
 ////////////////////////////////////////////////////////////////////////////
 function curate_keep( $id_array ) {
     global $smt;
@@ -170,7 +170,7 @@ function curate_keep( $id_array ) {
         return FALSE;
     }
     $ids = implode($id_array,', ');
-    $sql = "UPDATE media SET curated = '1' WHERE pageid IN ($ids)";
+    $sql = "UPDATE media SET curated = '1', updated = CURRENT_TIMESTAMP WHERE pageid IN ($ids)";
     if( $smt->query_as_bool($sql) ) {
         $smt->notice('Curate: KEEP ' . sizeof($id_array));
         return TRUE;
