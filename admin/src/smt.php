@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.62');
+define('__SMT__', '0.7.63');
 
 ob_start('ob_gzhandler');
 
@@ -1222,7 +1222,7 @@ class smt EXTENDS smt_menus {
             $this->setup = $setup;
         }
 
-        $this->install_directory = dirname(__DIR__,2);
+        $this->install_directory = realpath(__DIR__.'/../..');
 
         $this->database_name = $this->install_directory . '/admin/db/media.sqlite';
 
