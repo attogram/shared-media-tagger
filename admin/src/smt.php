@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.64');
+define('__SMT__', '0.7.65');
 
 ob_start('ob_gzhandler');
 
@@ -110,7 +110,8 @@ class smt_utils {
         if( strlen($string) <= $length ) {
             return $string;
         }
-        return substr( $string, 0, $length-11 ) . '...' . substr( $string, -8);
+        //return substr( $string, 0, $length-11 ) . '...' . substr( $string, -8);
+        return substr( $string, 0, $length-2 ) . '..';
     }
 
     //////////////////////////////////////////////////////////
