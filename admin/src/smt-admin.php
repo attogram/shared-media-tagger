@@ -1109,7 +1109,7 @@ class smt_admin_media_analysis extends smt_admin_media {
         $file_url = $file[0]['thumburl'];
         $this->start_timer('skin_detection');
 
-        require_once('../use/skin-detection.php');
+        require_once('./use/skin-detection.php');
         $skin = new SkinDetection($file_url);
 
         $skin_percentage = $skin->get_skin_percentage();
@@ -1129,7 +1129,7 @@ class smt_admin_media_analysis extends smt_admin_media {
             $skin = '0';
         }
         $result = $this->query_as_bool(
-            'UPDATE media SET skin = :skin WHERE pageid = :pageid',
+            'UPDATE media SET skin = :skin, updated = CURRENT_TIMESTAMP WHERE pageid = :pageid',
             array(':skin'=>$skin, ':pageid'=>$pageid)
         );
         if( $result ) {

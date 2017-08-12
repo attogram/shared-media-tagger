@@ -75,11 +75,11 @@ function get_perceptual_hash( $pageid ) {
     //print '<p>' . $media[0]['pageid'] . ': ' . $url . '</p>';
 
     // TMP until composer setup
-    require_once('../use/imagehash/src/ImageHash.php');
-    require_once('../use/imagehash/src/Implementation.php');
-    require_once('../use/imagehash/src/Implementations/AverageHash.php');
-    require_once('../use/imagehash/src/Implementations/DifferenceHash.php');
-    require_once('../use/imagehash/src/Implementations/PerceptualHash.php');
+    require_once('./use/imagehash/src/ImageHash.php');
+    require_once('./use/imagehash/src/Implementation.php');
+    require_once('./use/imagehash/src/Implementations/AverageHash.php');
+    require_once('./use/imagehash/src/Implementations/DifferenceHash.php');
+    require_once('./use/imagehash/src/Implementations/PerceptualHash.php');
 
     $hashes = array();
 
@@ -215,12 +215,12 @@ function skin_report() {
     $report .= '</pre>';
 
     $header = '';
-    $header .= '<p><a href="?r=skin&amp;update=5">Update Skin Percentages - Update x5 files</a></p>';
+    $header .= '<p><a href="?r=skin&amp;update=1">Update Skin Percentages - Update x1 files</a></p>';
     $header .= '<pre>Skin Percentage Report @ ' . $smt->time_now() . ' UTC<br />';
     $header .= '<br />' . number_format($smt->get_image_count()) . ' media files in collection';
     $header .= '<br />' . number_format(sizeof($medias)) . ' media files analysed';
-    $header .= '<br />Pageid     Skin      Updated';
-    $header .= '<br />------     -----     -------------------';
+    $header .= '<br />Pageid     Skin    Updated';
+    $header .= '<br />------     -----   -------------------';
 
     print $header . $report;
 
