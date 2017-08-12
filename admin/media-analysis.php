@@ -105,18 +105,18 @@ function get_perceptual_hash( $pageid ) {
 ////////////////////
 function save_hashes($pageid, $hashes) {
     global $smt;
+    $bind = array();
     while( list($name,$hash) = each($hashes) ) {
-
+        $bind[$name] = $hash;
     }
     $sql = 'UPDATE media
-    SET ahash = :ahash, dhash = :dhash, phash = :phash
+    SET ahash = :ahash, dhash = :dhash, phash = :phash, updated = CURRENT_TIMESTAMP
     WHERE pageid = :pageid';
-    $hashes[':pageid'] = $pageid;
-
-    $response = $smt->query_as_bool($sql, $hashes);
+    $bind[':pageid'] = $pageid;
+    $response = $smt->query_as_bool($sql, $bind);
     if( $response ) {
         $smt->notice('<a href="' . $smt->url('info')
-        . '?i=' . $pageid . '">' . "$pageid</a>: " . print_r($hashes,1) );
+        . '?i=' . $pageid . '">' . "$pageid</a>: " . print_r($bind,1) );
         return TRUE;
     }
     $smt->error('ERROR saving hashes');
@@ -133,7 +133,6 @@ function hash_report() {
     if( isset($_GET['update']) && $_GET['update'] && $smt->is_positive_number($_GET['update']) ) {
         $runs = $_GET['update'];
         print '<p>UPDATING x' . $runs . '</p>';
-
         $medias = $smt->query_as_array('
             SELECT pageid
             FROM media
@@ -146,7 +145,6 @@ function hash_report() {
             get_perceptual_hash( $media['pageid'] );
         }
     }
-
 
     $report = 'Image Hash Report:' . $cr . $cr;
     $medias = $smt->query_as_array('
