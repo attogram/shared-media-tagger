@@ -128,7 +128,6 @@ if( $media['duration'] > 0 ) {
     print urlencode($media['user']); ?>">User:<?php print $media['user']; ?></a></b></li>
 </ul>
 </p>
-
 <p><em>Media analysis:</em>
 <ul>
 <?php
@@ -136,16 +135,16 @@ if( isset($media['skin']) && $media['skin'] != NULL ) {
     print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
 }
 if( isset($media['ahash']) && $media['ahash'] != NULL ) {
-    print '<li>Average Hash: <b>' . $media['ahash'] . ' </b></li>';
+    print '<li>Average Hash: <small><b>' . $media['ahash'] . ' </b></small></li>';
 }
 if( isset($media['dhash']) && $media['dhash'] != NULL ) {
-    print '<li>Difference Hash: <b>' . $media['dhash'] . ' </b></li>';
+    print '<li>Difference Hash: <small><b>' . $media['dhash'] . ' </b></small></li>';
 }
 if( isset($media['phash']) && $media['phash'] != NULL ) {
-    print '<li>Perceptual Hash: <b>' . $media['phash'] . ' </b></li>';
+    print '<li>Perceptual Hash: <small><b>' . $media['phash'] . ' </b></small></li>';
 }
 if( isset($media['sha1']) && $media['sha1'] != NULL ) {
-    print '<li>SHA1 Hash: <b>' . $media['sha1'] . ' </b></li>';
+    print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
 }
 ?>
 </ul>
@@ -153,7 +152,7 @@ if( isset($media['sha1']) && $media['sha1'] != NULL ) {
 
 <br />
 <p><a href="<?php
-print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:darkred; font-weight:bold;">REPORT this file</a></p>
+print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
 <?php
 
 if( $smt->is_admin() ) {
