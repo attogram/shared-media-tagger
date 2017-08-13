@@ -1,7 +1,7 @@
 <?php
 // Shared Media Tagger (SMT)
 
-define('__SMT__', '0.7.67');
+define('__SMT__', '0.7.68');
 
 ob_start('ob_gzhandler');
 
@@ -1278,10 +1278,15 @@ class smt EXTENDS smt_menus {
         if( !$response || !isset($response[0]['id']) ) {
             $this->site_name = 'Shared Media Tagger';
             $this->site_info = array();
+			$this->site_info['curation'] = 0;
             return FALSE;
         }
         $this->site_name = @$response[0]['name'];
         $this->site_info = $response[0];
+		
+		if( !isset($this->site_info['curation']) ) {
+			$this->site_info['curation'] = 0;
+		}
         $this->debug('site_info = ' . print_r($this->site_info,1));
         return TRUE;
     }
