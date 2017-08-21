@@ -12,7 +12,6 @@ require_once($init);
 $smt = new smt_admin(); // Shared Media Tagger Admin Object
 ///////////////////////////////////////////////////////////////
 
-
 $smt->title = 'Database Admin';
 $smt->include_header();
 $smt->include_medium_menu();
@@ -34,7 +33,6 @@ if( isset($_GET['a']) ) {
             print '<p>Emptying Tagging tables:</p>'; print_r( $smt->empty_tagging_tables() ); break;
         case 'eu':
             print '<p>Emptying User tables:</p>'; print_r( $smt->empty_user_tables() ); break;
-
     }
 }
 print '</pre><hr />';
