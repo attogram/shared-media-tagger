@@ -2,3 +2,6 @@ _setup.php
 header.php
 footer.php
 robots.txt
+.idea/
+vendor/
+

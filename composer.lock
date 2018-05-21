@@ -1,0 +1,58 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "13e39c9698a59801c5c2d3262b38935c",
+    "packages": [
+        {
+            "name": "attogram/router",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/attogram/router.git",
+                "reference": "ac441158dd8d96a42ddf6fa34d378e501c3568c0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/attogram/router/zipball/ac441158dd8d96a42ddf6fa34d378e501c3568c0",
+                "reference": "ac441158dd8d96a42ddf6fa34d378e501c3568c0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Attogram\\Router\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "The Attogram Router is a small PHP router. No dependencies. One simple class. Composer ready.",
+            "homepage": "https://github.com/attogram/router",
+            "time": "2018-05-21T06:04:41+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "attogram/router": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.0"
+    },
+    "platform-dev": []
+}
