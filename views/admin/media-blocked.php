@@ -23,34 +23,33 @@ $sql = "SELECT *
 		";
 
 $blocks = $smt->query_as_array($sql);
-if( !$blocks || !is_array($blocks) ) {
-	$blocks = array();
+if (!$blocks || !is_array($blocks)) {
+    $blocks = array();
 }
 
 print '<p><b>' . sizeof($blocks) . '</b> Blocked Media</p>';
 
-foreach( $blocks as $block ) {
+foreach ($blocks as $block) {
+    $url = $block['thumb'];
+    $width = 220;
+    $url = str_replace('325px', $width . 'px', $url);
 
-	$url = $block['thumb'];
-	$width = 220;
-	$url = str_replace('325px', $width . 'px', $url);
 
-
-	print ''
-	. '<img src="' . $url . '" width="' . $width . '" style="vertical-align:middle;">'
-	. '<div style="display:inline-block; border:1px solid red; padding:10px;">'
-	. $block['pageid']
-	. ': '
-	. '<a target="commmons" href="https://commons.wikimedia.org/w/index.php?curid=' . $block['pageid'] . '">'
-	. $smt->strip_prefix($block['title'])
-	. '<br />'
-	. '<br />'
-	. '<a target="sqlite" href="./sqladmin.php?table=block&action=row_editordelete&pk=%5B'
-		. $block['pageid'] . '%5D&type=delete">* Remove from Block List</a>'
-	. '</div>'
-	. '<br clear="all" />'
-	. '<br clear="all" />'
-	;
+    print ''
+    . '<img src="' . $url . '" width="' . $width . '" style="vertical-align:middle;">'
+    . '<div style="display:inline-block; border:1px solid red; padding:10px;">'
+    . $block['pageid']
+    . ': '
+    . '<a target="commmons" href="https://commons.wikimedia.org/w/index.php?curid=' . $block['pageid'] . '">'
+    . $smt->strip_prefix($block['title'])
+    . '<br />'
+    . '<br />'
+    . '<a target="sqlite" href="./sqladmin.php?table=block&action=row_editordelete&pk=%5B'
+        . $block['pageid'] . '%5D&type=delete">* Remove from Block List</a>'
+    . '</div>'
+    . '<br clear="all" />'
+    . '<br clear="all" />'
+    ;
 }
 
 

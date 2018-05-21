@@ -1,40 +1,46 @@
 <?php
-// Shared Media Tagger
-// Users
+/**
+ * Shared Media Tagger
+ * Users
+ *
+ * @var Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ */
 
-$all_users = $smt->get_users();
-$users = array();
+$allUsers = $smt->getUsers();
+$users = [];
 
-foreach( $all_users as $user ) {
-    $user['tag_count'] = $smt->get_user_tag_count( $user['id'] );
-    $user['user_tagging'] = $smt->get_user_tagging( $user['id'] );
+foreach ($allUsers as $user) {
+    $user['tag_count'] = $smt->getUserTagCount($user['id']);
+    $user['user_tagging'] = $smt->getUserTagging($user['id']);
     $users[$user['id']] = $user;
 }
 
-$user_id = FALSE;
+$userId = false;
 
-if( isset($_GET['i']) ) {
-    $user_id = $_GET['i'];
-    if( !array_key_exists($user_id, $users) ) {
+if (isset($_GET['i'])) {
+    $userId = $_GET['i'];
+    if (!array_key_exists($userId, $users)) {
         $smt->fail404('404 User Ratings Not Found');
     }
 }
 
-$smt->title = 'Users - ' . $smt->site_name;
-if( $user_id ) {
-    $smt->title = 'User:' . $user_id . ' - ' . $smt->site_name;
+$smt->title = 'Users - ' . $smt->siteName;
+if ($userId) {
+    $smt->title = 'User:' . $userId . ' - ' . $smt->siteName;
 }
-$smt->include_header();
-$smt->include_medium_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
 print '<div class="box white">';
 
 
-if( !$users ) {
+if (!$users) {
     print '<p>No users have reviewed files yet.</p>';
 }
 
-foreach( $users as $user ) {
-    if( !$user['tag_count'] ) { continue; }
+foreach ($users as $user) {
+    if (!$user['tag_count']) {
+        continue;
+    }
     print '<div style="display:inline-block; border:1px solid grey; padding:4px; margin:2px; ">'
     . '<h2><a href="' . $smt->url('users') . '?i=' . $user['id'] . '">'
     . '+' . $user['tag_count'] . '</h2>'
@@ -44,22 +50,15 @@ foreach( $users as $user ) {
 }
 print '<hr />';
 
-
-if( !$user_id ) {
-    goto footer;
+if ($userId) {
+    print '<p>+' . $smt->getUserTagCount($userId) . ' reviews by User:' . $userId . '</p>';
+    foreach ($smt->getUserTagging($userId) as $media) {
+        print '<div style="display:inline-block;">'
+            . '+' . $media['count'] . ' ' . $smt->getTagNameById($media['tag_id'])
+            . '<br />' . $smt->displayThumbnailBox($media)
+            . '</div>';
+    }
 }
 
-print '<p>+' . $smt->get_user_tag_count( $user_id ) . ' reviews by User:' . $user_id . '</p>';
-
-foreach( $smt->get_user_tagging($user_id) as $media ) {
-    print '<div style="display:inline-block;">'
-    . '+' . $media['count'] . ' ' . $smt->get_tag_name_by_id($media['tag_id'])
-    . '<br />'
-    . $smt->display_thumbnail_box($media)
-    . '</div>';
-}
-
-
-footer:
 print '</div>';
-$smt->include_footer();
+$smt->includeFooter();

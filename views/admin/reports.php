@@ -13,9 +13,9 @@ if (function_exists('set_time_limit')) {
 }
 
 $smt->title = 'Admin Reports';
-$smt->include_header();
-$smt->include_medium_menu();
-$smt->include_admin_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
+$smt->includeAdminMenu();
 print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
 <li><a href="' . $smt->url('admin') . 'reports.php?r=localfiles">update_categories_local_files_count()</a>
@@ -32,7 +32,7 @@ switch (@$_GET['r']) {
         print '<p>Please choose a report above</p>';
         break;
     case 'localfiles':
-        $smt->update_categories_local_files_count();
+        $smt->updateCategoriesLocalFilesCount();
         break;
     case 'catclean':
         catClean($smt);
@@ -43,25 +43,24 @@ switch (@$_GET['r']) {
 } // end switch
 
 print '</div>';
-$smt->include_footer();
+$smt->includeFooter();
 
 /**
  * @param SharedMediaTaggerAdmin $smt
  */
 function category2media(SharedMediaTaggerAdmin $smt)
 {
-    $c2ms = $smt->query_as_array('SELECT * FROM category2media');
+    $c2ms = $smt->queryAsArray('SELECT * FROM category2media');
     print '<p>' . number_format(sizeof($c2ms)) . ' category2media</p>';
 
-    $categoriesRaw = $smt->query_as_array('SELECT id FROM category');
+    $categoriesRaw = $smt->queryAsArray('SELECT id FROM category');
     print '<p>' . number_format(sizeof($categoriesRaw)) . ' Categories</p>';
     $categories = [];
-    $smt->start_timer('c_id_sort');
     foreach ($categoriesRaw as $cats) {
         $categories[$cats['id']] = true;
     }
 
-    $mediaRaw = $smt->query_as_array('SELECT pageid FROM media');
+    $mediaRaw = $smt->queryAsArray('SELECT pageid FROM media');
     print '<p>' . number_format(sizeof($mediaRaw)) . ' Media</p>';
     $media = [];
     foreach ($mediaRaw as $med) {
@@ -113,14 +112,14 @@ function catClean(SharedMediaTaggerAdmin $smt)
     . $checkerLimit. '</a>  (updates ALL category info.  Remote API calls.)</p>';
 
     if (isset($_GET['cleaner'])) {
-        $categories = $smt->query_as_array('SELECT * FROM category');
+        $categories = $smt->queryAsArray('SELECT * FROM category');
         //print '<p>START: CLEANER</p>';
-        $smt->begin_transaction();
+        $smt->beginTransaction();
         $result = '';
         foreach ($categories as $category) {
             //$result .= ' ' . $category['id'];
             $bind = array();
-            $bind[':local_files'] = $smt->get_category_size($category['name']);
+            $bind[':local_files'] = $smt->getCategorySize($category['name']);
             $bind[':hidden'] = 0;
             if ($category['hidden'] == 1) {
                 $bind[':hidden'] = 1;
@@ -130,7 +129,7 @@ function catClean(SharedMediaTaggerAdmin $smt)
                 $bind[':missing'] = 1;
             }
             $bind[':id'] = $category['id'];
-            $upd = $smt->query_as_bool('UPDATE category SET
+            $upd = $smt->queryAsBool('UPDATE category SET
                     local_files = :local_files,
                     hidden = :hidden,
                     missing = :missing
@@ -146,15 +145,15 @@ function catClean(SharedMediaTaggerAdmin $smt)
     }
 
     if (isset($_GET['checker'])) {
-        $categories = $smt->query_as_array(
+        $categories = $smt->queryAsArray(
             'SELECT * FROM category ORDER BY updated ASC LIMIT ' . $checkerLimit
         );
         //print '<p>START: CATEGORY-INFO CHECKER x' . $checker_limit . '</p>';
-        $smt->begin_transaction();
+        $smt->beginTransaction();
         $result = '';
         foreach ($categories as $category) {
             $result .= ' ' . $category['id'];
-            if ($smt->save_category_info($category['name'])) {
+            if ($smt->saveCategoryInfo($category['name'])) {
                 continue;
             }
             $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
@@ -164,7 +163,7 @@ function catClean(SharedMediaTaggerAdmin $smt)
         print '<p>OK: RAN: CATEGORY-INFO CHECKER: <span style="font-size:80%;">' . $result . '</span></p>';
     }
 
-    $categories = $smt->query_as_array(
+    $categories = $smt->queryAsArray(
         'SELECT * FROM category ORDER BY hidden ASC, local_files DESC, name ASC'
     );
     print '<p><b>' . number_format(sizeof($categories)) . '</b> Categories</p>';
@@ -182,9 +181,9 @@ function catClean(SharedMediaTaggerAdmin $smt)
         . $category['hidden'] . ' '
         . $category['missing'] . ' '
         . $category['id'] . $tab
-        . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00' ) . $tab
+        . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00') . $tab
         . '<a target="site" href="' . $smt->url('category') . '?c='
-        . $smt->category_urlencode($smt->strip_prefix($category['name']))
+        . $smt->categoryUrlencode($smt->stripPrefix($category['name']))
         . '">' . $category['name'] . '</a>'
         . '<br />';
     }

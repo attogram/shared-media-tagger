@@ -109,19 +109,19 @@ function setAdminRoutes(Router $router)
 }
 
 /**
- *
- */
-function shutdown()
-{
-    exit;
-}
-
-/**
  * @param string $message
  */
 function error(string $message)
 {
     header('HTTP/1.0 404 Not Found');
     print '<h1>' . $message . '</h1>';
+    shutdown();
+}
+
+/**
+ *
+ */
+function shutdown()
+{
     exit;
 }

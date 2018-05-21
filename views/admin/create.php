@@ -9,7 +9,7 @@ $montage_height = 100;
 $montage_images_per_row = 2;
 $montage_index_step = $thumb_width;
 
-$show_footer = FALSE;
+$show_footer = false;
 $footer_height = 0;
 
 $mimetypes[] = 'image/jpeg';
@@ -28,30 +28,34 @@ print '<div class="box white"><p><a href="create.php">Create</a></p>';
 print '<ul>'
 . '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t=R">Random Images</a></li>';
 
-foreach( $smt->get_tags() as $tag ) {
+foreach ($smt->get_tags() as $tag) {
     print '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t='
     . $tag['id'] . '">Images tagged: ' . $tag['name'] . '</a></li>';
 }
 print '</ul>';
 
 //print '<p>gd_info: ' . print_r(@gd_info(),1) . '</p>';
-if( empty($_GET['montage']) ) {
-    print '</div>'; $smt->include_footer(); return;
+if (empty($_GET['montage'])) {
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 
-if( !function_exists('imagecreatetruecolor') ) {
+if (!function_exists('imagecreatetruecolor')) {
     $smt->error('PHP GD Library NOT FOUND');
-    print '</div>'; $smt->include_footer(); return;
+    print '</div>';
+    $smt->include_footer();
+    return;
 }
 //$smt->notice('PHP GD Library FOUND OK');
 
-if( !class_exists("Imagick") ) {
+if (!class_exists("Imagick")) {
     //$smt->error('Imagick NOT FOUND');
 } else {
     //$smt->notice('Imagick FOUND OK');
 }
 
-switch( $tag_id ) {
+switch ($tag_id) {
 
     default:
         $sql = '
@@ -78,40 +82,39 @@ switch( $tag_id ) {
 }
 
 $images = $smt->query_as_array($sql, $bind);
-if( !$images ) {
+if (!$images) {
     $smt->error('No images found in criteria');
     print '</div>';
     $smt->include_footer();
     return;
 }
 
-$smt->start_timer('imagecreate');
 $montage = imagecreatetruecolor($montage_width, $montage_height + $footer_height);
 $x_index = $y_index = 0;
-foreach($images as $image) {
-
+foreach ($images as $image) {
     $url = str_replace('325px', $thumb_width.'px', $image['thumburl']);
 
-    switch( $image['thumbmime'] ) {
+    switch ($image['thumbmime']) {
         case 'image/gif': $current_image = @imagecreatefromgif($url); break;
         case 'image/jpeg': $current_image = @imagecreatefromjpeg($url); break;
         case 'image/png': $current_image = @imagecreatefrompng($url);
+        // no break
         default:
             //print '<P>ERROR: unknown mime type</P>';
             continue;
     }
-    if( !$current_image ) {
+    if (!$current_image) {
         print '<p>ERROR: cannot get image: ' . $url . '</p>';
         continue;
     }
-    if( imagesx($current_image) < $thumb_width ) {
+    if (imagesx($current_image) < $thumb_width) {
         $current_image = imagescale(
             $current_image,
             $thumb_width,
             imagesy($current_image)
         );
     }
-    if( imagesy($current_image) < $thumb_width ) {
+    if (imagesy($current_image) < $thumb_width) {
         $current_image = imagescale(
             $current_image,
             imagesx($current_image),
@@ -131,27 +134,29 @@ foreach($images as $image) {
     );
     imagedestroy($current_image);
     $x_index++;
-    if ($x_index > ($montage_images_per_row - 1) ) {
+    if ($x_index > ($montage_images_per_row - 1)) {
         $x_index = 0;
         $y_index++;
     }
 }
 
-if( $show_footer ) {
+if ($show_footer) {
     $yellow = imagecolorallocate($montage, 255, 255, 0);
 
-    imagestring( $montage,
+    imagestring(
+        $montage,
         4, // font 1-5
         5, // x
         $montage_height + 6, // y
         $smt->site_name,
         $yellow
     );
-    imagestring( $montage,
+    imagestring(
+        $montage,
         2, // font 1-5
         5, // x
         $montage_height + 24, // y
-        str_replace('//','',$smt->site_url),
+        str_replace('//', '', $smt->site_url),
         $yellow
     );
 }
@@ -162,7 +167,6 @@ $image_data = ob_get_contents();
 ob_end_clean();
 
 imagedestroy($montage);
-$smt->end_timer('imagecreate');
 
 $data_url = 'data:image/png;base64,' . base64_encode($image_data);
 
@@ -179,7 +183,7 @@ print '<p><b>' . sizeof($images) . '</b> images used in this montage:<br />';
 $count = 0;
 $areas = array();
 $descs = array();
-foreach( $images as $image ) {
+foreach ($images as $image) {
     $count++;
     $areas[$count] = $smt->url('info') . '?i=' . $image['pageid'];
     $descs[$count] = htmlspecialchars($smt->strip_prefix($image['title']))

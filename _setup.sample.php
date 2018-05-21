@@ -4,7 +4,7 @@
 //
 // To override system defaults, Copy this file to:  _setup.php
 
-$setup = array();
+$setup = [];
 
 // Site Full URL, with trailing slash
 // examples:

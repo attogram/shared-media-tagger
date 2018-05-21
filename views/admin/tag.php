@@ -3,26 +3,27 @@
  * Shared Media Tagger
  * Tag Admin
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var SharedMediaTaggerAdmin $smt
  */
 
+use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+
 $smt->title = 'Tag Admin';
-$smt->include_header();
-$smt->include_medium_menu();
-$smt->include_admin_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
+$smt->includeAdminMenu();
 print '<div class="box white">';
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['tagid']) && $smt->is_positive_number($_GET['tagid'])) {
+if (isset($_GET['tagid']) && $smt->isPositiveNumber($_GET['tagid'])) {
     saveTag($smt);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-
-$tags = $smt->get_tags();
+$tags = $smt->getTags();
 
 print '<br /><em>Tags preview:</em>'
-. $smt->display_tags(0)
+. $smt->displayTags(0)
 . '<br /><em>Tags setup:</em>'
 . '<table border="1" style="margin:0;"><tr>'
 . '<th>#</th>'
@@ -45,16 +46,14 @@ print '</table>';
 print '<br /><a href="./sqladmin.php?table=tag&action=row_create" target="sqlite">ADD NEW tag</a>'
  . '<br /><a href="./sqladmin.php?action=row_view&table=tag" target="sqlite">VIEW/EDIT tag table</a>';
 
-
 print '</div>';
-$smt->include_footer();
-
+$smt->includeFooter();
 
 /**
- * @param \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @param SharedMediaTaggerAdmin $smt
  * @return bool
  */
-function saveTag(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt)
+function saveTag(SharedMediaTaggerAdmin $smt)
 {
     $sql = '
     UPDATE tag
@@ -69,7 +68,7 @@ function saveTag(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt)
         ':display_name' => @$_GET['display_name']
     ];
 
-    if ($smt->query_as_bool($sql, $bind)) {
+    if ($smt->queryAsBool($sql, $bind)) {
         $smt->notice('OK: Saved Tag ID#'.$_GET['tagid']);
         return true;
     }

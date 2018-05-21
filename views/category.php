@@ -1,45 +1,50 @@
 <?php
-// Shared Media Tagger
-// Category
+/**
+ * Shared Media Tagger
+ * Category
+ *
+ * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ */
 
-$page_limit = 20; // # of files per page
+$pageLimit = 20; // # of files per page
 
-$category_name = isset($_GET['c']) ? $smt->category_urldecode($_GET['c']) : FALSE;
+$categoryName = isset($_GET['c']) ? $smt->categoryUrldecode($_GET['c']) : false;
 
-if( !$category_name ) {
+if (!$categoryName) {
     $smt->fail404('404 Category Name Not Found');
 }
 
-$smt->title = $category_name . ' - ' . $smt->site_name;
+$smt->title = $categoryName . ' - ' . $smt->siteName;
 
-$category_name = 'Category:' . $category_name;
+$categoryName = 'Category:' . $categoryName;
 
-$category_info = $smt->get_category($category_name);
+$categoryInfo = $smt->getCategory($categoryName);
 
-if( !$category_info ) {
+if (!$categoryInfo) {
     $smt->fail404(
         '404 Category Not Found',
-        $smt->display_admin_category_functions($category_name)
+        $smt->displayAdminCategoryFunctions($categoryName)
     );
 }
 
-$category_size = $smt->get_category_size( $category_name );
+$categorySize = $smt->getCategorySize($categoryName);
 
 $pager = '';
-$sql_limit = '';
-if( $category_size > $page_limit ) {
+$sqlLimit = '';
+if ($categorySize > $pageLimit) {
     $offset = isset($_GET['o']) ? $_GET['o'] : 0;
-    $sql_limit = " LIMIT $page_limit OFFSET $offset";
-    $page_count = 0;
+    $sqlLimit = " LIMIT $pageLimit OFFSET $offset";
+    $pageCount = 0;
     $pager = 'pages: ';
-    for( $x = 0; $x < $category_size; $x+=$page_limit ) {
-        if( $x == $offset ) {
+    for ($x = 0; $x < $categorySize; $x+=$pageLimit) {
+        if ($x == $offset) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
-            . '&nbsp;' . ++$page_count . '&nbsp;</span> ';
+            . '&nbsp;' . ++$pageCount . '&nbsp;</span> ';
             continue;
         }
-        $pager .= '<a href="?o=' . $x . '&amp;c=' . $smt->category_urlencode($smt->strip_prefix($category_name)) . '">'
-        . '&nbsp;' . ++$page_count . '&nbsp;</a> ';
+        $pager .= '<a href="?o=' . $x . '&amp;c='
+            . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
+                . '&nbsp;' . ++$pageCount . '&nbsp;</a> ';
     }
 }
 
@@ -50,52 +55,50 @@ $sql = '
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name';
 
-if( $smt->site_info['curation'] == 1 && !$smt->is_admin() ) {
+if ($smt->siteInfo['curation'] == 1 && !$smt->isAdmin()) {
     $sql .= " AND m.curated ='1'";
 }
-$sql .= " ORDER BY m.pageid ASC $sql_limit";
+$sql .= " ORDER BY m.pageid ASC $sqlLimit";
 
+$bind = [':category_name'=>$categoryName];
 
-$bind = array(':category_name'=>$category_name);
+$category = $smt->queryAsArray($sql, $bind);
 
-$category = $smt->query_as_array( $sql, $bind );
-
-if( !$category || !is_array($category) ) {
+if (!$category || !is_array($category)) {
     $smt->fail404(
         '404 Category In Curation Que',
-        $smt->display_admin_category_functions($category_name)
+        $smt->displayAdminCategoryFunctions($categoryName)
     );
 }
 
-$smt->include_header();
-$smt->include_medium_menu();
-
+$smt->includeHeader();
+$smt->includeMediumMenu();
 
 print '<div class="box white">'
     . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">'
-        . $smt->get_reviews_per_category( $category_info['id'] )
+        . $smt->getReviewsPerCategory($categoryInfo['id'])
     . '</div>'
-    . '<h1>' . $smt->strip_prefix($category_name) . '</h1>'
-    . '<br /><b>' . $category_size . '</b> files'
+    . '<h1>' . $smt->stripPrefix($categoryName) . '</h1>'
+    . '<br /><b>' . $categorySize . '</b> files'
     . ($pager ? ', '.$pager : '')
     . '<br clear="all" />'
     ;
 
-if( $smt->is_admin() ) {
+if ($smt->isAdmin()) {
     print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
 }
 
-foreach( $category as $media ) {
-    print $smt->display_thumbnail_box( $media );
+foreach ($category as $media) {
+    print $smt->displayThumbnailBox($media);
 }
 
-if( $pager ) {
+if ($pager) {
     print '<p>' . $pager . '</p>';
 }
 
-if( $smt->is_admin() ) {
-    print $smt->display_admin_category_functions($category_name);
+if ($smt->isAdmin()) {
+    print $smt->displayAdminCategoryFunctions($categoryName);
 }
 
 print '</div>';
-$smt->include_footer();
+$smt->includeFooter();

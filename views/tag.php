@@ -1,9 +1,13 @@
 <?php
-// Shared Media File
-// Tag
+/**
+ * Shared Media Tagger
+ * Tag
+ *
+ * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ */
 
-$media_id = isset($_GET['m']) ? $_GET['m'] : FALSE;
-$tag_id = isset($_GET['t']) ? $_GET['t'] : FALSE;
+$media_id = isset($_GET['m']) ? $_GET['m'] : false;
+$tag_id = isset($_GET['t']) ? $_GET['t'] : false;
 
 if( !$tag_id || !$smt->is_positive_number($tag_id) ) {
     $smt->fail404('404 Tag ID Not Found');
@@ -49,7 +53,7 @@ if( $rating ) {  // existing user rating for this media file
     }
 
     $smt->save_user_last_tag_time();
-    $add_user_tag = FALSE;
+    $add_user_tag = false;
 
     // user_tagging: Switch old tag to new tag
     $res = $smt->query_as_bool(

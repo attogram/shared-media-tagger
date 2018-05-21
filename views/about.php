@@ -1,23 +1,26 @@
 <?php
-// Shared Media Tagger
-// About
+/**
+ * Shared Media Tagger
+ * About page
+ *
+ * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ */
 
-
-$a = $smt->query_as_array('SELECT name, about FROM site WHERE id = 1');
+$a = $smt->queryAsArray('SELECT name, about FROM site WHERE id = 1');
 $about = @$a[0]['about'];
 $name = @$a[0]['name'];
 
-if( $about == '' ) {
+if ($about == '') {
     $about = 'Welcome!';
 }
-if( $name == '' ) {
+if ($name == '') {
     $name = 'Shared Media Tagger';
 }
 
 $smt->title = 'About ' . $name;
 
-$smt->include_header();
-$smt->include_medium_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
 
 print '
 <div class="box white" style="padding:30px;">
@@ -45,22 +48,15 @@ print '
     <br />
     <dt><h3><a href="' . $smt->url('contact') . '">Contact</a></h3></dt>
     <dd>Have a question or comment?  Contact the site administrators with this form.</dd>
-
-
 </dl>
-
 <hr /><h2>Reusing images, videos and audio files</h2>
 <br /><br />
 <p>All media files highlighted on this site are
 <b><a href="https://freedomdefined.org/Definition" target="commons">Free Cultural Works</a></b>.</p>
-
-<p>You may copy, use and modify these media files for commercial
-or non-commercial purposes, as long as you properly follow
-the licensing.<p>
-
+<p>You may copy, use and modify these media files for commercial or non-commercial purposes, 
+as long as you properly follow the licensing.<p>
 <p>See each media files info page for complete licensing information.<p>
-
 ';
 
 print '</div>';
-$smt->include_footer();
+$smt->includeFooter();

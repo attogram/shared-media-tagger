@@ -9,21 +9,21 @@ $smt->include_medium_menu();
 $smt->include_admin_menu();
 print '<div class="box white">';
 
-if( isset($_GET['a']) ) {
+if (isset($_GET['a'])) {
     print '<hr /><pre>';
-    switch( $_GET['a'] ) {
+    switch ($_GET['a']) {
         case 'c':
             print '<p>Creating Database tables:</p>'; print $smt->create_tables(); break;
         case 'd':
             print '<p>Dropping Database tables:</p>'; print $smt->drop_tables(); break;
         case 'em':
-            print '<p>Emptying Media tables:</p>'; print_r( $smt->empty_media_tables() ); break;
+            print '<p>Emptying Media tables:</p>'; print_r($smt->empty_media_tables()); break;
         case 'ec':
-            print '<p>Emptying Category tables:</p>'; print_r( $smt->empty_category_tables() ); break;
+            print '<p>Emptying Category tables:</p>'; print_r($smt->empty_category_tables()); break;
         case 'et':
-            print '<p>Emptying Tagging tables:</p>'; print_r( $smt->empty_tagging_tables() ); break;
+            print '<p>Emptying Tagging tables:</p>'; print_r($smt->empty_tagging_tables()); break;
         case 'eu':
-            print '<p>Emptying User tables:</p>'; print_r( $smt->empty_user_tables() ); break;
+            print '<p>Emptying User tables:</p>'; print_r($smt->empty_user_tables()); break;
     }
 }
 print '</pre><hr />';
@@ -36,7 +36,7 @@ print '</pre><hr />';
 <ul>
 <li>File: ' . $smt->database_name . '</li>
 <li>Permissions: '
-. ( is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY' )
+. (is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY')
 . '</li>
 <li>Size: '
 . (file_exists($smt->database_name) ? number_format(filesize($smt->database_name)) : 'NULL')

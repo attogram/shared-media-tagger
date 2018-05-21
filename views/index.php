@@ -2,12 +2,14 @@
 /**
  * Shared Media Tagger
  * HOME PAGE
+ *
+ * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
 */
 
-if (isset($_GET['i']) && $smt->is_positive_number($_GET['i'])) {
-    $media = $smt->get_media($_GET['i']);
+if (isset($_GET['i']) && $smt->isPositiveNumber($_GET['i'])) {
+    $media = $smt->getMedia($_GET['i']);
 } else {
-    $media =  $smt->get_random_media(1);
+    $media = $smt->getRandomMedia(1);
 }
 if (!$media || !isset($media[0])) {
     $smt->fail404('404 Media Not Found');
@@ -15,20 +17,20 @@ if (!$media || !isset($media[0])) {
 
 $media = $media[0];
 
-$smt->title = $smt->site_name;
-$smt->include_header(/*show_site_header*/false);
-$smt->include_small_menu();
+$smt->title = $smt->siteName;
+$smt->includeHeader(/*show_site_header*/false);
+$smt->includeSmallMenu();
 
 print '<div class="box grey center">'
-. $smt->display_tags($media['pageid'])
-. $smt->display_image($media)
-. '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
+. $smt->displayTags($media['pageid'])
+. $smt->displayImage($media)
+. '<div class="left" style="margin:auto; width:' . $smt->sizeMedium . 'px;">'
 . '<br />'
-. $smt->get_reviews($media['pageid'])
-. $smt->display_categories($media['pageid'])
+. $smt->getReviews($media['pageid'])
+. $smt->displayCategories($media['pageid'])
 . '<br />'
 . '<a href="' . $smt->url('contact') . '?r='
 . $media['pageid'] . '" style="color:#666; font-size:85%;">REPORT this file</a>'
 . '</div></div>';
 
-$smt->include_footer();
+$smt->includeFooter();

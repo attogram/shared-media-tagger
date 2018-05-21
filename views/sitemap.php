@@ -1,11 +1,17 @@
 <?php
-// Shared Media Tagger
-// Sitemap
+/**
+ * Shared Media Tagger
+ * Sitemap
+ *
+ * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ */
 
 $cr = "\n";
 
-$protocol = @$smt->get_protocol();
-if( !$protocol ) { $protocol = 'http:'; }
+$protocol = @$smt->getProtocol();
+if (!$protocol) {
+    $protocol = 'http:';
+}
 
 header('Content-type: application/xml');
 
@@ -17,36 +23,39 @@ print '<url><loc>' . $protocol . $smt->url('home') . '</loc>'
 . '<changefreq>always</changefreq>'
 . '</url>' . $cr;
 
-url( $smt->url('about') );
-url( $smt->url('categories') );
-url( $smt->url('browse') );
-url( $smt->url('reviews') );
-url( $smt->url('users') );
-url( $smt->url('contact') );
+printUrl($smt->url('about'));
+printUrl($smt->url('categories'));
+printUrl($smt->url('browse'));
+printUrl($smt->url('reviews'));
+printUrl($smt->url('users'));
+printUrl($smt->url('contact'));
 
 print $cr;
 
 // all categories
-$cats = $smt->query_as_array('
+$cats = $smt->queryAsArray('
     SELECT DISTINCT(c2m.category_id), c.name
     FROM category2media AS c2m, category AS c
     WHERE c2m.category_id = c.id');
-foreach( $cats as $cat ) {
-    url( $smt->url('category') . '?c=' . $smt->category_urlencode($smt->strip_prefix($cat['name']) ) );
+foreach ($cats as $cat) {
+    printUrl($smt->url('category') . '?c=' . $smt->categoryUrlencode($smt->stripPrefix($cat['name'])));
 }
 
 print $cr;
 
 // all media files
-$media = $smt->query_as_array('SELECT pageid FROM media');
-foreach( $media as $pageid ) {
-    url( $smt->url('info') . '?i=' . $pageid['pageid'] );
+$media = $smt->queryAsArray('SELECT pageid FROM media');
+foreach ($media as $pageid) {
+    printUrl($smt->url('info') . '?i=' . $pageid['pageid']);
 }
 
 print $cr . '</urlset>' . $cr;
 
-//////////////////////////////////////////////////////////
-function url($loc) {
+/**
+ * @param string $loc
+ */
+function printUrl($loc)
+{
     global $protocol;
     print '<url><loc>' . $protocol . $loc . '</loc></url>';
 }

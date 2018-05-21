@@ -74,4 +74,3 @@ $debug = false;
 
 // the user is allowed to create databases with only these extensions
 $allowed_extensions = array('db','db3','sqlite','sqlite3');
-

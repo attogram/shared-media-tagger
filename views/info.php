@@ -1,16 +1,18 @@
 <?php
 /**
  * Shared Media Tagger
- * Media info
+ * Media Info
+ *
+ * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
  */
 
-if (!isset($_GET['i']) || !$_GET['i'] || !$smt->is_positive_number($_GET['i'])) {
+if (!isset($_GET['i']) || !$_GET['i'] || !$smt->isPositiveNumber($_GET['i'])) {
     $smt->fail404('404 Media Not Found');
 }
 
-$pageid = (int)$_GET['i'];
+$pageid = (int) $_GET['i'];
 
-$media = $smt->get_media($pageid);
+$media = $smt->getMedia($pageid);
 if (!$media || !isset($media[0]) || !is_array($media[0])) {
     $smt->fail404('404 Media Not Found');
 }
@@ -18,50 +20,42 @@ $media = @$media[0];
 
 
 /////////////////////////////////////////////////////////////////////
-
-$smt->title = 'Info: ' . $smt->strip_prefix($media['title']);
+$smt->title = 'Info: ' . $smt->stripPrefix($media['title']);
 $smt->use_bootstrap = true;
 $smt->use_jquery = true;
-$smt->include_header();
-$smt->include_medium_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
 
 ?>
 <div class="container">
 <div class="row">
-
-<div class="col-sm-6 box grey center"><?php /* start left */ ?>
+<div class="col-sm-6 box grey center">
 <?php
 print ''
-. $smt->display_tags($pageid)
-. $smt->display_image($media)
-. '<div class="left" style="margin:auto; width:' . $smt->size_medium . 'px;">'
+. $smt->displayTags($pageid)
+. $smt->displayImage($media)
+. '<div class="left" style="margin:auto; width:' . $smt->sizeMedium . 'px;">'
 . '<br />'
-. $smt->get_reviews($pageid)
-. $smt->display_categories($pageid)
+. $smt->getReviews($pageid)
+. $smt->displayCategories($pageid)
 . '</div>';
 ?>
-</div><?php /* end left */ ?>
-
-<div class="col-sm-6 box white"><?php /* start right */ ?>
-
+</div>
+<div class="col-sm-6 box white">
 <br />
 <h1><a target="commons" href="<?php
     print $media['url']; ?>"><?php
-    print $smt->strip_prefix($media['title']); ?></a></h1>
+    print $smt->stripPrefix($media['title']); ?></a></h1>
 <br />
 <br />
-
 <p><?php print ($media['imagedescription']); ?></p>
-
 <p><em>by:</em> <b><?php print ($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
 <?php if ($media['datetimeoriginal']) {
     print ' / ' . $media['datetimeoriginal'];
 } ?></p>
-
 <div style="border:1px solid #ccc; display:inline-block; padding:10px; background-color:#eee;">
 <em>License:</em>
 <?php
-
 $fix = [
     'Public domain'=>'Public Domain',
     'CC-BY-SA-3.0'=>'CC BY-SA 3.0'
@@ -97,8 +91,7 @@ if ($media['restrictions'] && $media['restrictions'] != 'false') {
 }
 ?>
 </div>
-<br />
-<br />
+<br /><br />
 <style>
 li { margin-bottom:6px; }
 </style>
@@ -106,9 +99,9 @@ li { margin-bottom:6px; }
 <ul>
 <li><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">commons.wikimedia.org</a></li>
 <li><a target="commons" href="//en.wikipedia.org/wiki/<?php
-    print $smt->category_urlencode($media['title']); ?>">en.wikipedia.org</a></li>
+    print $smt->categoryUrlencode($media['title']); ?>">en.wikipedia.org</a></li>
 <li><a target="commons" href="//wikidata.org/wiki/<?php
-        print $smt->category_urlencode($media['title']); ?>">wikidata.org</a></li>
+        print $smt->categoryUrlencode($media['title']); ?>">wikidata.org</a></li>
 </ul>
 </p>
 
@@ -121,7 +114,7 @@ li { margin-bottom:6px; }
 <?php
 if ($media['duration'] > 0) {
     //print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
-    print '<li>duration: <b>' . $smt->seconds_to_time($media['duration']) . '</b></li>';
+    print '<li>duration: <b>' . $smt->secondsToTime($media['duration']) . '</b></li>';
 }
 ?>
 <li>timestamp: <b><?php print $media['timestamp']; ?></b></li>
@@ -132,18 +125,6 @@ if ($media['duration'] > 0) {
 <p><em>Media analysis:</em>
 <ul>
 <?php
-if (isset($media['skin']) && $media['skin'] != null) {
-    print '<li>Skin Percentage: <b>' . $media['skin'] . ' %</b></li>';
-}
-if (isset($media['ahash']) && $media['ahash'] != null) {
-    print '<li>Average Hash: <small><b>' . $media['ahash'] . ' </b></small></li>';
-}
-if (isset($media['dhash']) && $media['dhash'] != null) {
-    print '<li>Difference Hash: <small><b>' . $media['dhash'] . ' </b></small></li>';
-}
-if (isset($media['phash']) && $media['phash'] != null) {
-    print '<li>Perceptual Hash: <small><b>' . $media['phash'] . ' </b></small></li>';
-}
 if (isset($media['sha1']) && $media['sha1'] != null) {
     print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
 }
@@ -156,15 +137,15 @@ if (isset($media['sha1']) && $media['sha1'] != null) {
 print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
 <?php
 
-if ($smt->is_admin()) {
+if ($smt->isAdmin()) {
     print '<pre>ADMIN: media: ' . print_r($media, 1) . '</pre>';
 }
 
 ?>
-</div><?php /* end right */ ?>
-</div><?php /* end row */ ?>
-</div><?php /* end container */ ?>
+</div>
+</div>
+</div>
 <br />
 <?php
 
-$smt->include_footer();
+$smt->includeFooter();

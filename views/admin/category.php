@@ -3,78 +3,80 @@
  * Shared Media Tagger
  * Category Admin
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var SharedMediaTaggerAdmin $smt
  */
+
+use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
 
 if (function_exists('set_time_limit')) {
     set_time_limit(1000);
 }
 
 $smt->title = 'Category Admin';
-$smt->include_header();
-$smt->include_medium_menu();
-$smt->include_admin_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
+$smt->includeAdminMenu();
 print '<div class="box white">';
 
 ///////////////////////////////////////////////////////////////////////////////
 // Import images from a category
 if (isset($_GET['i']) && $_GET['i']) {
-    $categoryName = $smt->category_urldecode($_GET['i']);
+    $categoryName = $smt->categoryUrldecode($_GET['i']);
     $catUrl = '<a href="' . $smt->url('category')
-    . '?c=' . $smt->category_urlencode($smt->strip_prefix($categoryName)) . '">'
-    . htmlentities($smt->strip_prefix($categoryName)) . '</a>';
+    . '?c=' . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
+    . htmlentities($smt->stripPrefix($categoryName)) . '</a>';
     print '<p>Importing media from <b>' . $catUrl . '</b></p>';
-    $smt->get_media_from_category($categoryName);
-    $smt->update_categories_local_files_count();
+    $smt->getMediaFromCategory($categoryName);
+    $smt->updateCategoriesLocalFilesCount();
     print '<p>Imported media from <b>' . $catUrl . '</b></p>';
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 if (isset($_POST['cats']) && $_POST['cats']) {
-    $smt->import_categories($_POST['cats']);
-    $smt->update_categories_local_files_count();
+    $smt->importCategories($_POST['cats']);
+    $smt->updateCategoriesLocalFilesCount();
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
 if (isset($_GET['c']) && $_GET['c']) {
-    if ($smt->save_category_info(urldecode($_GET['c']))) {
+    if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
         $smt->notice(
             'OK: Refreshed Category Info: <b><a href="' . $smt->url('category')
-            . '?c=' . $smt->strip_prefix($smt->category_urlencode($_GET['c'])) . '">'
-            . htmlentities($smt->category_urldecode($_GET['c']))
+            . '?c=' . $smt->stripPrefix($smt->categoryUrlencode($_GET['c'])) . '">'
+            . htmlentities($smt->categoryUrldecode($_GET['c']))
         ) . '</a></b>';
     }
     //$smt->update_categories_local_files_count();
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
 if (isset($_GET['d']) && $_GET['d']) {
-    $smt->delete_category($_GET['d']);
-    $smt->update_categories_local_files_count();
+    $smt->deleteCategory($_GET['d']);
+    $smt->updateCategoriesLocalFilesCount();
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
 if (isset($_GET['scommons']) && $_GET['scommons']) {
     getSearchResults($smt);
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
 if (isset($_GET['sc']) && $_GET['sc']) {
-    $smt->get_subcats($smt->category_urldecode($_GET['sc']));
-    $smt->update_categories_local_files_count();
+    $smt->getSubcats($smt->categoryUrldecode($_GET['sc']));
+    $smt->updateCategoriesLocalFilesCount();
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
@@ -82,7 +84,7 @@ $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
 
 if (isset($_GET['g']) && $_GET['g']=='all') {
     $toget = [];
-    $cats = $smt->query_as_array('SELECT * FROM category ' . $orderBy);
+    $cats = $smt->queryAsArray('SELECT * FROM category ' . $orderBy);
     foreach ($cats as $cat) {
         if ($cat['subcats'] != '' && $cat['files'] != '' && $cat['pageid'] != '') {
             continue;
@@ -93,9 +95,9 @@ if (isset($_GET['g']) && $_GET['g']=='all') {
         $toget[] = $cat['name'];
     }
     $_GET['c'] = implode('|', $toget);
-    $smt->get_category_info($_GET['c']);
+    $smt->getCategoryInfo($_GET['c']);
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
@@ -104,24 +106,20 @@ if (isset($_GET['g']) && $_GET['g']=='all') {
 if (isset($_GET['sca']) && $_GET['sca']=='all') {
     $sql = 'SELECT * FROM category WHERE subcats > 0 ' . $orderBy;
     $smt->notice('SHOWING only categories with subcategories');
-
 } elseif (isset($_GET['wf'])) {
     $sql = 'SELECT * FROM category WHERE files > 0 ' . $orderBy;
     $smt->notice('SHOWING only categories with files');
-
 } elseif (isset($_GET['s'])) {
     $sql = 'SELECT * FROM category WHERE name LIKE :search ' . $orderBy;
     $bind = [':search'=>'%' . $_GET['s']. '%'];
     $smt->notice('SHOWING only categories with search text: ' . $_GET['s']);
-
 } else {
     $sql = 'SELECT * FROM category ' . $orderBy;
-
 }
 if (!isset($bind)) {
     $bind = [];
 }
-$cats = $smt->query_as_array($sql, $bind);
+$cats = $smt->queryAsArray($sql, $bind);
 
 if (!is_array($cats)) {
     $cats = [];
@@ -131,7 +129,7 @@ $spacer = ' &nbsp; &nbsp; &nbsp; ';
 
 print ''
 . '<ul>'
-. '<li><b>' . number_format($smt->get_categories_count()) . '</b> Active Categories</li>'
+. '<li><b>' . number_format($smt->getCategoriesCount()) . '</b> Active Categories</li>'
 . '<li><b>?</b> Technical Categories</li>'
 . '<li><b>?</b> Empty Categories</li>'
 . '</ul>'
@@ -153,9 +151,9 @@ print ''
 . '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
-if (($smt->get_categories_count() > 1000) && (@$_GET['v'] != 1)) {
+if (($smt->getCategoriesCount() > 1000) && (@$_GET['v'] != 1)) {
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
@@ -182,8 +180,8 @@ foreach ($cats as $cat) {
 
     print '<tr>'
     . '<td><b><a href="' . $smt->url('category') . '?c='
-    . $smt->category_urlencode($smt->strip_prefix($cat['name']))
-    . '">' . $smt->strip_prefix($cat['name']) . '</a></b></td>';
+    . $smt->categoryUrlencode($smt->stripPrefix($cat['name']))
+    . '">' . $smt->stripPrefix($cat['name']) . '</a></b></td>';
 
     $localFiles = '';
 
@@ -202,10 +200,11 @@ foreach ($cats as $cat) {
     }
     print ''
     . '<td class="right" ' . $alertTd . '>' . $localFiles . '</td>'
-    . '<td class="right">' . ($cat['files'] ? number_format($cat['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
+    . '<td class="right">'
+        . ($cat['files'] ? number_format($cat['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
     ;
     if ($cat['subcats'] > 0) {
-        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->category_urlencode($cat['name']) . '"">+'
+        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->categoryUrlencode($cat['name']) . '"">+'
         . $cat['subcats'] . '</a>';
     } else {
         $subcatslink = '';
@@ -217,13 +216,13 @@ foreach ($cats as $cat) {
 
     print ''
     . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/'
-        . $smt->category_urlencode($cat['name']) . '">View</a></td>'
+        . $smt->categoryUrlencode($cat['name']) . '">View</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
-        . '?c=' . $smt->category_urlencode($cat['name']) . '">Info</a></td>'
+        . '?c=' . $smt->categoryUrlencode($cat['name']) . '">Info</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
-        . '?i=' . $smt->category_urlencode($cat['name']) . '">Import</a></td>'
+        . '?i=' . $smt->categoryUrlencode($cat['name']) . '">Import</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./media.php?dc='
-        . $smt->category_urlencode($cat['name']) . '">Clear</a></td>'
+        . $smt->categoryUrlencode($cat['name']) . '">Clear</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
         . '?d=' . urlencode($cat['id']) . '">Delete</a></td>'
     . '</tr>'
@@ -235,27 +234,27 @@ print '<br /><b>' . $commonFilesCount . '</b> Total Files on Commons';
 ///////////////////////////////////////////////////////////////////////////////
 
 print '</div>';
-$smt->include_footer();
+$smt->includeFooter();
 
 
 /**
- * @param \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @param SharedMediaTaggerAdmin $smt
  */
-function getSearchResults(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt)
+function getSearchResults(SharedMediaTaggerAdmin $smt)
 {
     $search = urldecode($_GET['scommons']);
 
-    if (!$smt->find_categories($search)) {
+    if (!$smt->findCategories($search)) {
         $smt->notice('Error: no categories found');
         return;
     }
-    $cats = @$smt->commons_response['query']['search'];
+    $cats = @$smt->commonsResponse['query']['search'];
     if (!$cats || !is_array($cats)) {
         $smt->notice('Error: no categories returned');
         return;
     }
     print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>'
-        . $smt->totalhits . '</b> categories</p>';
+        . $smt->totalHits . '</b> categories</p>';
     print '
     <script type="text/javascript" language="javascript">// <![CDATA[
     function checkAll(formname, checktoggle)
@@ -276,12 +275,12 @@ function getSearchResults(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $s
     print '<form action="" name="cats" method="POST">'
     . '<input type="submit" value="  save to database  "><br /><br />';
 
-    while ((list(,$cat) = each($cats))) {
+    while ((list(, $cat) = each($cats))) {
         print '<input type="checkbox" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
         . $cat['title']
         . '</strong><small> '
         . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
-            . $smt->category_urlencode($cat['title']) . '">(view)</a> '
+            . $smt->categoryUrlencode($cat['title']) . '">(view)</a> '
         . ' (' . $cat['snippet'] . ')'
         . ' (size:' . $cat['size'] . ')</small><br />';
     }

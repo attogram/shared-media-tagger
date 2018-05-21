@@ -1,1099 +1,1305 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Attogram\SharedMedia\Tagger;
 
 /**
  * Class SharedMediaTagger
  */
-class SharedMediaTagger {
+class SharedMediaTagger
+{
 
-    //////////////////////////////////////////////////////////
+    /** @var bool debug mode */
+    public $debug;
+    /** @var string http: or https: */
+    public $protocol;
+    public $timer;
+    public $timerResults;
+    /** @var array array of [page_name] = page_url */
+    public $links;
+    /** @var string */
+    public $databaseName;
+    /** @var \PDO */
+    public $db;
+    public $sqlCount;
+    public $lastInsertId;
+    public $lastError;
+    public $imageCount;
+    public $userId;
+    public $userCount;
+    public $categoryCount;
+    public $installDirectory;
+    public $server;
+    public $setup;
+    public $site;
+    public $siteInfo;
+    public $siteName;
+    public $siteUrl;
+    public $sizeMedium;
+    public $sizeThumb;
+    public $tagId;
+    public $tagName;
+    public $totalReviewCount;
+    public $totalFilesReviewedCount;
+    /** @var string Page <title> */
+    public $title;
+    public $useBootstrap;
+    public $useJquery;
+
     // SMT - Utils
 
-    var $debug; // debug mode TRUE / FALSE;
-    var $protocol; // http: or https:
-    var $timer;
-    var $timer_results;
-    var $links; // array of [page_name] = page_url
-
-    //////////////////////////////////////////////////////////
-    function time_now() {
+    /**
+     * @return false|string
+     */
+    public function timeNow()
+    {
         return gmdate('Y-m-d H:i:s');
     }
 
-    //////////////////////////////////////////////////////////
-    function start_timer( $name ) {
-        $this->timer[$name] = microtime(1);
-    }
-
-    //////////////////////////////////////////////////////////
-    function end_timer( $name ) {
-        if( !isset($this->timer[$name]) ) {
-            $this->timer_results[$name] = 0;
-            return;
+    /**
+     * @param $message
+     * @param $type
+     */
+    public function logMessage($message, $type)
+    {
+        switch ($type) {
+            case 'debug':
+                $class = 'debug';
+                $head = '';
+                break;
+            case 'notice':
+                $class = 'notice';
+                $head = '';
+                break;
+            case 'error':
+                $class = 'error';
+                $head = 'ERROR:';
+                break;
+            case 'fail':
+                $class = 'fail';
+                $head = 'GURU MEDITATION FAILURE:';
+                break;
+            default:
+                return;
         }
-        $result = microtime(1) - $this->timer[$name];
-        if( isset($this->timer_results[$name]) ) {
-            $this->timer_results[$name] += $result;
-            return;
-        }
-        $this->timer_results[$name] = $result;
-    }
-
-    //////////////////////////////////////////////////////////
-    function log_message( $message, $type ) {
-        switch( $type ) {
-            case 'debug':  $class = 'debug';  $head = ''; break;
-            case 'notice': $class = 'notice'; $head = ''; break;
-            case 'error':  $class = 'error';  $head = 'ERROR:'; break;
-            case 'fail':   $class = 'fail';   $head = 'GURU MEDITATION FAILURE:'; break;
-            default: return;
-        }
-        if( is_array($message) ) {
-            $message = '<pre>' . htmlentities(print_r($message,1)) . '</pre>';
+        if (is_array($message)) {
+            $message = '<pre>' . htmlentities(print_r($message, true)) . '</pre>';
         }
         print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function debug( $message='' ) {
-        if( !$this->debug ) { return; }
-        $this->log_message( $message, 'debug' );
+    /**
+     * @param string $message
+     */
+    public function debug($message = '')
+    {
+        if (!$this->debug) {
+            return;
+        }
+        $this->logMessage($message, 'debug');
     }
 
-    //////////////////////////////////////////////////////////
-    function notice( $message='' ) {
-        $this->log_message( $message, 'notice' );
+    /**
+     * @param string $message
+     */
+    public function notice($message = '')
+    {
+        $this->logMessage($message, 'notice');
     }
 
-    //////////////////////////////////////////////////////////
-    function error( $message='' ) {
-        $this->log_message( $message, 'error' );
+    /**
+     * @param string $message
+     */
+    public function error($message = '')
+    {
+        $this->logMessage($message, 'error');
     }
 
-    //////////////////////////////////////////////////////////
-    function fail( $message='' ) {
-        $this->log_message( $message, 'fail' );
+    /**
+     * @param string $message
+     */
+    public function fail($message = '')
+    {
+        $this->logMessage($message, 'fail');
         exit;
     }
 
-    //////////////////////////////////////////////////////////
-    function fail404 ( $message='', $extra='' ) {
+    /**
+     * @param string $message
+     * @param string $extra
+     */
+    public function fail404($message = '', $extra = '')
+    {
         header('HTTP/1.0 404 Not Found');
-        $this->include_header( /*show_site_header*/FALSE );
-        //$this->include_medium_menu();
-        if( !$message || !is_string($message) ) {
+        $this->includeHeader(false);
+        if (!$message || !is_string($message)) {
             $message = '404 Not Found';
         }
         print '<div class="box center" style="background-color:yellow; color:black;">'
-        . '<h1>' . $message . '</h1>';
-        if( $extra && is_string($extra) ) {
+            . '<h1>' . $message . '</h1>';
+        if ($extra && is_string($extra)) {
             print '<br />' . $extra;
         }
         print '</div>';
-        $this->include_footer( /*show_site_footer*/FALSE );
+        $this->includeFooter(false);
+
         exit;
     }
 
-    //////////////////////////////////////////////////////////
-    function is_positive_number( $number='') {
-        if ( preg_match('/^[0-9]*$/', $number )) { return TRUE; }
-        return FALSE;
+    /**
+     * @param string $number
+     * @return bool
+     */
+    public function isPositiveNumber($number = '')
+    {
+        if (preg_match('/^[0-9]*$/', (string) $number)) {
+            return true;
+        }
+
+        return false;
     }
 
-    /////////////////////////////////////////////////////////
-    function truncate( $string, $length=50 ) {
-        if( strlen($string) <= $length ) {
+    /**
+     * @param $string
+     * @param int $length
+     * @return string
+     */
+    public function truncate($string, $length = 50)
+    {
+        if (strlen($string) <= $length) {
             return $string;
         }
-        //return substr( $string, 0, $length-11 ) . '...' . substr( $string, -8);
-        return substr( $string, 0, $length-2 ) . '..';
+
+        return substr($string, 0, $length-2) . '..';
     }
 
-    //////////////////////////////////////////////////////////
-    function centerpad( $string, $length ) {
-        if( !$length ) {
+    /**
+     * @param $string
+     * @param $length
+     * @return string
+     */
+    public function centerpad($string, $length)
+    {
+        if (!$length) {
             return $string;
         }
-        if( strlen($string) >= $length ) {
+        if (strlen($string) >= $length) {
             return $string;
         }
+
         return str_pad($string, $length, ' ', STR_PAD_BOTH);
     }
 
-    //////////////////////////////////////////////////////////
-    function get_protocol() {
-        if( isset($this->protocol) ) {
+    /**
+     * @return string
+     */
+    public function getProtocol()
+    {
+        if (isset($this->protocol)) {
             return $this->protocol;
         }
-        if(
-            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            ||
-            (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+        if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
         ) {
             return $this->protocol = 'https:';
         }
+
         return $this->protocol = 'http:';
     }
 
-    //////////////////////////////////////////////////////////
-    function seconds_to_time( $raw_seconds ) {
-        if( !$raw_seconds ) { return '0 seconds'; }
-        $hours = floor($raw_seconds / 3600);
-        $minutes = floor(($raw_seconds / 60) % 60);
-        $seconds = $raw_seconds % 60;
-        $seconds += round( $raw_seconds - floor($raw_seconds), 2);
-        $resonse = array();
-        if( $hours ) { $response[] = $hours . ' hours'; }
-        if( $minutes ) { $response[] = $minutes . ' minutes'; }
-        if( $seconds ) { $response[] = $seconds . ' seconds'; }
+    /**
+     * @param $rawSeconds
+     * @return string
+     */
+    public function secondsToTime($rawSeconds)
+    {
+        if (!$rawSeconds) {
+            return '0 seconds';
+        }
+        $hours = floor($rawSeconds / 3600);
+        $minutes = floor(($rawSeconds / 60) % 60);
+        $seconds = $rawSeconds % 60;
+        $seconds += round($rawSeconds - floor($rawSeconds), 2);
+        $response = [];
+        if ($hours) {
+            $response[] = $hours . ' hours';
+        }
+        if ($minutes) {
+            $response[] = $minutes . ' minutes';
+        }
+        if ($seconds) {
+            $response[] = $seconds . ' seconds';
+        }
         return implode($response, ', ');
     }
 
-    //////////////////////////////////////////////////////////
-    function is_selected($one, $two) {
-        if( $one == $two ) {
+    /**
+     * @param $one
+     * @param $two
+     * @return string
+     */
+    public function isSelected($one, $two)
+    {
+        if ($one == $two) {
             return ' selected="selected"';
         }
+
+        return '';
     }
 
-    //////////////////////////////////////////////////////////
-    function url( $link='' ) {
-        if( !$link || !isset($this->links[$link]) ) {
+    /**
+     * @param string $link
+     * @return bool|mixed
+     */
+    public function url($link = '')
+    {
+        if (!$link || !isset($this->links[$link])) {
             $this->error("::url: Link Not Found: $link");
-            return FALSE;
+
+            return false;
         }
+
         return $this->links[$link];
     }
 
-
-
-    //////////////////////////////////////////////////////////
     // SMT - Database Utils
 
-    var $database_name;
-    var $db;
-    var $sql_count;
-    var $last_insert_id;
-    var $last_error;
+    /**
+     * @return bool|\PDO
+     */
+    public function initDatabase()
+    {
+        if (!in_array('sqlite', \PDO::getAvailableDrivers())) {
+            $this->error('::initDatabase: ERROR: no sqlite Driver');
 
-    //////////////////////////////////////////////////////////
-    function init_database() {
-        $this->debug('::init_database()');
-        if( !in_array('sqlite', \PDO::getAvailableDrivers() ) ) {
-            $this->error('::init_database: ERROR: no sqlite Driver');
-            return $this->db = FALSE;
+            return $this->db = false;
         }
         try {
-            return $this->db = new \PDO('sqlite:'. $this->database_name);
-        } catch(\PDOException $e) {
-            $this->error('::init_database: ' . $this->database_name . '  ERROR: '. $e->getMessage());
-            return $this->db = FALSE;
+            return $this->db = new \PDO('sqlite:' . $this->databaseName);
+        } catch (\PDOException $error) {
+            $this->error('::initDatabase: ' . $this->databaseName . '  ERROR: ' . $error->getMessage());
+
+            return $this->db = false;
         }
     }
 
-    //////////////////////////////////////////////////////////
-    function query_as_array( $sql, $bind=array() ) {
-        $this->start_timer('query_as_array');
-        $this->debug("query_as_array( <pre>$sql</pre>, bind:".sizeof($bind)." ) ");
-
-        if( !$this->db ) { $this->init_database(); }
-        if( !$this->db ) { $this->end_timer('query_as_array'); return FALSE; }
+    /**
+     * @param $sql
+     * @param array $bind
+     * @return array|bool
+     */
+    public function queryAsArray($sql, array $bind = [])
+    {
+        if (!$this->db) {
+            $this->initDatabase();
+        }
+        if (!$this->db) {
+            return false;
+        }
 
         $statement = $this->db->prepare($sql);
-        if( !$statement ) {
-            $this->debug('::query_as_array(): ERROR PREPARE'); // '. $this->db->errorInfo()[2]);
-            $this->end_timer('query_as_array');
-            return array();
+        if (!$statement) {
+            return [];
         }
-        while( $xbind = each($bind) ) {
-            $this->debug('::query_as_array(): bindParam '. $xbind[0] .' = ' . $xbind[1]);
-            $statement->bindParam( $xbind[0], $xbind[1]);
+        foreach ($bind as $name => $value) {
+            $statement->bindParam($name, $value);
         }
-        $this->start_timer('sql');
-        if( !$statement->execute() ) {
-            $this->error('::query_as_array(): ERROR EXECUTE: '.print_r($this->db->errorInfo(),1));
-            $this->end_timer('sql');
-            return array();
-        }
-        $this->end_timer('sql');
+        if (!$statement->execute()) {
+            $this->error('::queryAsArray(): ERROR EXECUTE: ' . print_r($this->db->errorInfo(), true));
 
+            return [];
+        }
         $response = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        if( !$response && $this->db->errorCode() != '00000') {
-            $this->error('::query_as_array(): ERROR FETCH: '.print_r($this->db->errorInfo(),1));
-            $response = array();
+        if (!$response && $this->db->errorCode() != '00000') {
+            $this->error('::queryAsArray(): ERROR FETCH: '  .print_r($this->db->errorInfo(), true));
+            $response = [];
         }
 
-        $this->debug('query_as_array: OK:'. count($response). ': ' . htmlentities($sql)
-        . ' | response: <pre>' . htmlentities(print_r($response,1)) . '</pre>' );
-
-        $this->end_timer('query_as_array');
         return $response;
     }
 
-    //////////////////////////////////////////////////////////
-    function query_as_bool( $sql, $bind=array() ) {
-        $this->start_timer('query_as_bool');
-        $this->debug("query_as_bool: <pre>$sql</pre>");
-        if( $bind ) { $this->debug('query_as_bool: BIND: <pre>' . htmlentities(print_r($bind,1)) . '</pre>' ); }
-
-        if( !$this->db ) { $this->init_database(); }
-        if( !$this->db ) { $this->end_timer('query_as_bool'); return FALSE; }
-        $this->last_insert_id = $this->last_error = FALSE;
-        $this->sql_count++;
+    /**
+     * @param $sql
+     * @param array $bind
+     * @return bool
+     */
+    public function queryAsBool($sql, $bind = [])
+    {
+        if (!$this->db) {
+            $this->initDatabase();
+        }
+        if (!$this->db) {
+            return false;
+        }
+        $this->lastInsertId = $this->lastError = false;
+        $this->sqlCount++;
         $statement = $this->db->prepare($sql);
-        if( !$statement ) {
-            $this->last_error = $this->db->errorInfo();
-            $this->debug('query_as_bool: prepare failed. SQL:<br />'
-                . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
-            $this->end_timer('query_as_bool');
-            return FALSE;
-        }
-        while( $xbind = each($bind) ) {
-            $statement->bindParam( $xbind[0], $xbind[1] );
-        }
-        $this->start_timer('sql');
-        if( !$statement->execute() ) {
-            $this->end_timer('sql');
-            $this->last_error = $this->db->errorInfo();
-            $this->debug($this->last_error);
-            if( $this->last_error[0] == '00000' ) {
-                $this->debug('NULL EVENT: ' . trim($sql));
-                $this->end_timer('sql');
-                $this->end_timer('query_as_bool');
-                return TRUE;
-            }
-            $this->debug('query_as_bool: prepare failed. SQL: '
-                . trim($sql) . '<br />error: ' . print_r($this->last_error,1) );
-            $this->end_timer('sql');
-            $this->end_timer('query_as_bool');
-            return FALSE;
-        }
-        $this->end_timer('sql');
-        $this->last_error = $this->db->errorInfo();
-        $this->last_insert_id = $this->db->lastInsertId();
-        $this->debug('OK: ' . trim($sql));
-        $this->end_timer('query_as_bool');
-        return TRUE;
-    } // end function query_as_bool()
+        if (!$statement) {
+            $this->lastError = $this->db->errorInfo();
 
-    //////////////////////////////////////////////////////////
-    function vacuum() {
-        $this->start_timer('vacuum');
-        if( $this->query_as_bool('VACUUM') ) {
-            $this->end_timer('vacuum');
-            return TRUE;
+            return false;
+        }
+        foreach ($bind as $name => $value) {
+            $statement->bindParam($name, $value);
+        }
+        if (!$statement->execute()) {
+            $this->lastError = $this->db->errorInfo();
+            if ($this->lastError[0] == '00000') {
+                return true;
+            }
+
+            return false;
+        }
+        $this->lastError = $this->db->errorInfo();
+        $this->lastInsertId = $this->db->lastInsertId();
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function vacuum()
+    {
+        if ($this->queryAsBool('VACUUM')) {
+            return true;
         }
         $this->error('FAILED to VACUUM');
-        $this->end_timer('vacuum');
-        return FALSE;
+
+        return false;
     }
 
-    //////////////////////////////////////////////////////////
-    function begin_transaction() {
-        if( $this->query_as_bool('BEGIN TRANSACTION') ) {
-            return TRUE;
+    /**
+     * @return bool
+     */
+    public function beginTransaction()
+    {
+        if ($this->queryAsBool('BEGIN TRANSACTION')) {
+            return true;
         }
         $this->error('FAILED to BEGIN TRANSACTION');
-        return FALSE;
+
+        return false;
     }
 
-    //////////////////////////////////////////////////////////
-    function commit() {
-        if( $this->query_as_bool('COMMIT') ) {
-            return TRUE;
+    /**
+     * @return bool
+     */
+    public function commit()
+    {
+        if ($this->queryAsBool('COMMIT')) {
+            return true;
         }
         $this->error('FAILED to COMMIT');
-        return FALSE;
+
+        return false;
     }
 
-
-    //////////////////////////////////////////////////////////
     // SMT - Media
 
-    var $image_count;
-
-    //////////////////////////////////////////////////////////
-    function get_media($pageid) {
-        $this->debug("get_media($pageid)");
-        if( !$pageid || !$this->is_positive_number($pageid) ) {
-            $this->error('get_media: ERROR no id');
-            return FALSE;
+    /**
+     * @param $pageid
+     * @return array|bool
+     */
+    public function getMedia($pageid)
+    {
+        if (!$pageid || !$this->isPositiveNumber($pageid)) {
+            $this->error('getMedia: ERROR no id');
+            return false;
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
 
-        if( $this->site_info['curation'] == 1 && !$this->is_admin() ) {
+        if ($this->siteInfo['curation'] == 1 && !$this->isAdmin()) {
             $sql .= " AND curated = '1'";
         }
-        return $this->query_as_array( $sql, array(':pageid'=>$pageid) );
+        return $this->queryAsArray($sql, [':pageid'=>$pageid]);
     }
 
-    //////////////////////////////////////////////////////////
-    function get_thumbnail( $media='', $thumb_width='' ) {
-
-        if( !$thumb_width || !$this->is_positive_number($thumb_width) ) {
-            $thumb_width = $this->size_thumb;
+    /**
+     * @param string $media
+     * @param string $thumbWidth
+     * @return array
+     */
+    public function getThumbnail($media = '', $thumbWidth = '')
+    {
+        if (!$thumbWidth || !$this->isPositiveNumber($thumbWidth)) {
+            $thumbWidth = $this->sizeThumb;
         }
-
-        $default = array(
+        $default = [
             'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
                     .'7+/Dw8HV1dfLy8ubm5vX19e3t7fr 6+nl5edra2nZ2dnx8fMHBwYODg/b29np6e'
                     . 'ujo6JGRkeHh4eTk5LCwsN3d3dfX 13Jycp2dnevr6////yH5BAEAAB8ALAAAAAA'
                     . 'LAA4AAAVq4NFw1DNAX/o9imAsB tKpxKRd1+YEWUoIiUoiEWEAApIDMLGoRCyWi'
                     . 'KThenkwDgeGMiggDLEXQkDoTh CKNLpQDgjeAsY7MHgECgx8YR8oHwNHfwADBACG'
                     . 'h4EDA4iGAYAEBAcQIg0Dk gcEIQA7',
-            'width' => $thumb_width,
-            'height' => $thumb_width);
-
-
-        if( !$media || !is_array($media) ) {
+            'width' => $thumbWidth,
+            'height' => $thumbWidth
+        ];
+        if (!$media || !is_array($media)) {
             return $default;
         }
-
-        $width = @$media['width'];
-        if( !$width ) { $width = $this->size_thumb; }
-        $height = @$media['height'];
-        if( !$height ) { $height = $this->size_thumb; }
-
-        //$this->notice("::get_thumbnail: new-w:$thumb_width  old-w:$width old-h:$height");
-        if( $thumb_width >= $width ) {
-            //$this->notice('::get_thumbnail: new-w >= old-w');
-            return array('url'=>@$media['thumburl'], 'width'=>@$width, 'height'=>@$height);
+        $width = !empty($media['width']) ? $media['width'] : null;
+        if (!$width) {
+            $width = $this->sizeThumb;
         }
-
-
-        if( $height > $thumb_width ) {
-            //$this->notice("WARNING: TALL THUMB");
+        $height = !empty($media['height']) ? $media['height'] : null;
+        if (!$height) {
+            $height = $this->sizeThumb;
         }
-
-        //$title = $media['title'];
+        if ($thumbWidth >= $width) {
+            return [
+                'url' => !empty($media['thumburl']) ? $media['thumburl'] : null,
+                'width' => !empty($width) ? $width : null,
+                'height' => !empty($height) ? $height : null,
+            ];
+        }
         $mime = $media['mime'];
-
-        $filename = $this->strip_prefix($media['title']);
-        $filename = str_replace(' ','_',$filename);
-
+        $filename = $this->stripPrefix($media['title']);
+        $filename = str_replace(' ', '_', $filename);
         $md5 = md5($filename);
-        $thumb_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
-        . '/' . $md5[0]
-        . '/' . $md5[0] . $md5[1]
-        . '/' . urlencode($filename)
-        . '/' . $thumb_width . 'px-' . urlencode($filename);
-
+        $thumbUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
+            . '/' . $md5[0]
+            . '/' . $md5[0] . $md5[1]
+            . '/' . urlencode($filename)
+            . '/' . $thumbWidth . 'px-' . urlencode($filename);
         $ratio = $width / $height;
-        $thumb_height = round($thumb_width / $ratio);
-
-        switch( $mime ) {
+        $thumbHeight = round($thumbWidth / $ratio);
+        switch ($mime) {
             case 'application/ogg':
-                $thumb_url = str_replace('px-','px--',$thumb_url);
-                $thumb_url .= '.jpg';
+                $thumbUrl = str_replace('px-', 'px--', $thumbUrl);
+                $thumbUrl .= '.jpg';
                 break;
             case 'video/webm':
-                $thumb_url = str_replace('px-','px--',$thumb_url);
-                $thumb_url .= '.jpg';
+                $thumbUrl = str_replace('px-', 'px--', $thumbUrl);
+                $thumbUrl .= '.jpg';
                 break;
             case 'image/svg+xml':
-                $thumb_url .= '.png';
+                $thumbUrl .= '.png';
                 break;
         }
-
-        return array('url'=>$thumb_url, 'width'=>$thumb_width, 'height'=>$thumb_height);
+        return ['url'=>$thumbUrl, 'width'=>$thumbWidth, 'height'=>$thumbHeight];
     }
 
-    //////////////////////////////////////////////////////////
-    function get_random_unreviewed_media($limit=1) {
-
+    /**
+     * @param int $limit
+     * @return array|bool
+     */
+    public function getRandomUnreviewedMedia($limit = 1)
+    {
         $and = '';
-        if( $this->site_info['curation'] == 1 ) {
+        if ($this->siteInfo['curation'] == 1) {
             $and = "AND curated == '1'";
         }
-
-        $sql = '
+        $sql = "
             SELECT m.*
             FROM media AS m
             LEFT JOIN tagging AS t ON t.media_pageid = m.pageid
-            WHERE t.media_pageid IS NULL '.$and.'
+            WHERE t.media_pageid IS NULL $and
             ORDER BY RANDOM()
-            LIMIT :limit';
-        return $this->query_as_array( $sql, array('limit'=>$limit) );
+            LIMIT :limit";
+
+        return $this->queryAsArray($sql, ['limit' => $limit]);
     }
 
-    //////////////////////////////////////////////////////////
-    function get_random_media($limit=1) {
-
-        if( mt_rand(1,7) == 1 ) { // 1 in 7 chance of getting UNREVIEWED media
-            $unreviewed = $this->get_random_unreviewed_media($limit);
-            if( $unreviewed ) {
+    /**
+     * @param int $limit
+     * @return array|bool
+     */
+    public function getRandomMedia($limit = 1)
+    {
+        if (mt_rand(1, 7) == 1) { // 1 in 7 chance of getting UNREVIEWED media
+            $unreviewed = $this->getRandomUnreviewedMedia($limit);
+            if ($unreviewed) {
                 return $unreviewed;
             }
         }
-
         $where = '';
-        if( $this->site_info['curation'] == 1 ) {
+        if ($this->siteInfo['curation'] == 1) {
             $where = "WHERE curated == '1'";
         }
         $sql = 'SELECT *
                 FROM media ' . $where . '
                 ORDER BY RANDOM()
                 LIMIT :limit';
-        return $this->query_as_array($sql, array('limit'=>$limit));
+        return $this->queryAsArray($sql, ['limit' => $limit]);
     }
 
-    //////////////////////////////////////////////////////////
-    function get_image_count( $redo=FALSE ) {
-        if( isset($this->image_count) && !$redo ) {
-            return $this->image_count;
+    /**
+     * @param bool $redo
+     * @return int
+     */
+    public function getImageCount($redo = false)
+    {
+        if (isset($this->imageCount) && !$redo) {
+            return $this->imageCount;
         }
         $sql = 'SELECT count(pageid) AS count FROM media';
-        if( $this->site_info['curation'] == 1 ) {
+        if ($this->siteInfo['curation'] == 1) {
             $sql .= " WHERE curated = '1'";
         }
-        $response = $this->query_as_array($sql);
-        if( !$response ) {
-            $this->debug('::get_image_count() ERROR query failed.');
+        $response = $this->queryAsArray($sql);
+        if (!$response) {
             return 0;
         }
-        return $this->image_count = $response[0]['count'];
+        return $this->imageCount = $response[0]['count'];
     }
 
-
-    //////////////////////////////////////////////////////////
     // SMT - Admin
 
-    //////////////////////////////////////////////////////////
-    function is_admin() {
-        if( isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1 ) {
-            return TRUE;
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1) {
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
-    //////////////////////////////////////////////////////////
-    function admin_logoff() {
-        if( !$this->is_admin() ) {
+    /**
+     *
+     */
+    public function adminLogoff()
+    {
+        if (!$this->isAdmin()) {
             return;
         }
         unset($_COOKIE['admin']);
         setcookie('admin', null, -1, '/');
     }
 
-    //////////////////////////////////////////////////////////
-    function display_admin_media_list_functions() {
+    /**
+     * @return string
+     */
+    public function displayAdminMediaListFunctions()
+    {
         return
         '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
         . '<input type="submit" value="Delete selected media">'
         . '<script type="text/javascript" language="javascript">'
-        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();
-        checkboxes = document[formname].getElementsByTagName('input');
-        for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }
+        . "
+function checkAll(formname, checktoggle) { 
+    var checkboxes = new Array();
+    checkboxes = document[formname].getElementsByTagName('input');
+    for (var i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].type == 'checkbox') { 
+           checkboxes[i].checked = checktoggle; 
+        } 
+    } 
+}
         </script>"
         . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
         . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
         . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function display_admin_media_functions( $media_id ) {
-        if( !$this->is_admin() ) {
-            return;
+    /**
+     * @param $mediaId
+     * @return string
+     */
+    public function displayAdminMediaFunctions($mediaId)
+    {
+        if (!$this->isAdmin()) {
+            return '';
         }
-        if( !$this->is_positive_number($media_id) ) {
-            return;
+        if (!$this->isPositiveNumber($mediaId)) {
+            return '';
         }
         return ''
         . '<div class="attribution left" style="display:inline-block; float:right;">'
-        . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $media_id
+        . '<a style="font-size:140%;" href="' . $this->url('admin') . 'media.php?dm=' . $mediaId
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
-        . $media_id . ' ?\');">❌</a>'
-        . '<input type="checkbox" name="media[]" value="' . $media_id . '" />'
-        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $media_id
+        . $mediaId . ' ?\');">❌</a>'
+        . '<input type="checkbox" name="media[]" value="' . $mediaId . '" />'
+        . '<a style="font-size:170%;" href="' . $this->url('admin') . 'media.php?am=' . $mediaId
         . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
-        . $media_id . ' ?\');">♻</a>'
-        . ' <a style="font-size:140%;" href="' . $this->url('admin') . 'curate.php?i=' . $media_id. '">C</a>'
+        . $mediaId . ' ?\');">♻</a>'
+        . ' <a style="font-size:140%;" href="' . $this->url('admin') . 'curate.php?i=' . $mediaId. '">C</a>'
         . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function display_admin_category_functions( $category_name ) {
-        if( !$this->is_admin() ) { return; }
-        $category = $this->get_category($category_name);
-        if( !$category ) {
+    /**
+     * @param $categoryName
+     * @return string
+     */
+    public function displayAdminCategoryFunctions($categoryName)
+    {
+        if (!$this->isAdmin()) {
+            return '';
+        }
+        $category = $this->getCategory($categoryName);
+        if (!$category) {
             return '<p>ADMIN: category not in database</p>';
         }
         $response = '<br clear="all" />'
         . '<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">'
         . '<input type="submit" value="Delete selected media">'
         . '<script type="text/javascript" language="javascript">'
-        . "function checkAll(formname, checktoggle) { var checkboxes = new Array();"
-        . " checkboxes = document[formname].getElementsByTagName('input');"
-        . " for (var i=0; i<checkboxes.length; i++) { if (checkboxes[i].type == 'checkbox') { checkboxes[i].checked = checktoggle; } } }"
+        . "
+function checkAll(formname, checktoggle) {
+    var checkboxes = new Array();
+    checkboxes = document[formname].getElementsByTagName('input');
+    for (var i=0; i<checkboxes.length; i++) {
+        if (checkboxes[i].type == 'checkbox') { 
+            checkboxes[i].checked = checktoggle; 
+        }
+    } 
+}"
         . '</script>'
         . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
         . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-
         . '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
-        . $this->category_urlencode($category['name']) . '">VIEW ON COMMONS</a>'
-
+        . $this->categoryUrlencode($category['name']) . '">VIEW ON COMMONS</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
-        . $this->category_urlencode($category['name']) . '">Get Category Info</a>'
-
+        . $this->categoryUrlencode($category['name']) . '">Get Category Info</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
-        . $this->category_urlencode($category['name'])
-        . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import ' . @$category['files'] . ' Files into Category</a>'
-
+        . $this->categoryUrlencode($category['name'])
+        . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import '
+            . !empty($category['files']) ? $category['files'] : '?'
+            . ' Files into Category</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?sc='
-        . $this->category_urlencode($category['name'])
-        . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add ' . @$category['subcats'] . ' Sub-Categories</a>'
-
+        . $this->categoryUrlencode($category['name'])
+        . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add '
+            . !empty($category['subcats']) ? $category['subcats'] : '?'
+            . ' Sub-Categories</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
-        . $this->category_urlencode($category['name'])
+        . $this->categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>'
-
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
         . '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>'
-
-        . '<br /><pre>' . print_r($category,1) . '</pre>'
-
+        . '<br /><pre>' . print_r($category, true) . '</pre>'
         . '</form>'
         . '</div><br /><br />';
+
         return $response;
     }
 
-
-    //////////////////////////////////////////////////////////
     // SMT - User
 
-    var $user_id;
-    var $user_count;
+    /**
+     * @return int
+     */
+    public function getUserCount()
+    {
+        if (isset($this->userCount)) {
+            return $this->userCount;
+        }
+        $count = $this->queryAsArray('SELECT count(id) AS count FROM user');
+        if (isset($count[0]['count'])) {
+            return $this->userCount = $count[0]['count'];
+        }
 
-    //////////////////////////////////////////////////////////
-    function get_user_count() {
-        if( isset($this->user_count) ) {
-            return $this->user_count;
-        }
-        $count = $this->query_as_array('SELECT count(id) AS count FROM user');
-        if( isset($count[0]['count']) ) {
-            return $this->user_count = $count[0]['count'];
-        }
-        return $this->user_count = 0;
+        return $this->userCount = 0;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_users( $limit=100, $orderby='last DESC, page_views DESC' ) {
+    /**
+     * @param int $limit
+     * @param string $orderby
+     * @return array|bool
+     */
+    public function getUsers($limit = 100, $orderby = 'last DESC, page_views DESC')
+    {
         $sql = 'SELECT * FROM user';
         $sql .= ' ORDER BY ' . $orderby;
         $sql .= ' LIMIT ' . $limit;
-        $users = $this->query_as_array($sql);
-        if( isset($users[0]) ) {
+        $users = $this->queryAsArray($sql);
+        if (isset($users[0])) {
             return $users;
         }
-        return array();
-    } // end function get_users
 
-    //////////////////////////////////////////////////////////
-    function get_user( $create_new=FALSE ) {
-        $ip_address = @$_SERVER['REMOTE_ADDR'];
-        $host = @$_SERVER['REMOTE_HOST'];
-        if( !$host ) {
-            $host = $ip_address;
+        return [];
+    }
+
+    /**
+     * @param bool $createNew
+     * @return bool
+     */
+    public function getUser($createNew = false)
+    {
+        $ipAddress = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        $host = !empty($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : null;
+        if (!$host) {
+            $host = $ipAddress;
         }
-        $user_agent = @$_SERVER['HTTP_USER_AGENT'];
-
-        $user = $this->query_as_array(
+        $userAgent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+        $user = $this->queryAsArray(
             'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent',
-            array( ':ip_address'=>$ip_address, ':host'=>$host, ':user_agent'=>$user_agent )
+            [':ip_address' => $ipAddress, ':host' => $host, ':user_agent' => $userAgent]
         );
-        if( !isset($user[0]['id']) ) {
-            if( $create_new ) {
-                return $this->new_user($ip_address, $host, $user_agent); // testing
+        if (!isset($user[0]['id'])) {
+            if ($createNew) {
+                return $this->newUser($ipAddress, $host, $userAgent);
             }
-            $this->user_id = 0;
-            return FALSE;
-        }
-        $this->user_id = $user[0]['id'];
-        //$this->save_user_view(); // testing
-        return TRUE;
-    } // end function get_user_info()
+            $this->userId = 0;
 
-    //////////////////////////////////////////////////////////
-    function get_user_tag_count( $user_id=FALSE ) {
-        $sql = 'SELECT sum(count) AS sum FROM user_tagging';
-        $bind = array();
-        if( $user_id > 0 ) {
-            $sql .= ' WHERE user_id = :user_id';
-            $bind[':user_id'] = $user_id;
+            return false;
         }
-        $count = $this->query_as_array($sql, $bind);
-        if( isset($count[0]['sum']) ) {
+        $this->userId = $user[0]['id'];
+
+        return true;
+    }
+
+    /**
+     * @param bool $userId
+     * @return int
+     */
+    public function getUserTagCount($userId = false)
+    {
+        $sql = 'SELECT sum(count) AS sum FROM user_tagging';
+        $bind = [];
+        if ($userId > 0) {
+            $sql .= ' WHERE user_id = :user_id';
+            $bind[':user_id'] = $userId;
+        }
+        $count = $this->queryAsArray($sql, $bind);
+        if (isset($count[0]['sum'])) {
             return $count[0]['sum'];
         }
+
         return 0;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_user_tagging( $user_id ) {
-        $tags = $this->query_as_array(
+    /**
+     * @param $userId
+     * @return array
+     */
+    public function getUserTagging($userId)
+    {
+        $tags = $this->queryAsArray(
             'SELECT m.*, ut.tag_id, ut.count
             FROM user_tagging AS ut, media AS m
             WHERE ut.user_id = :user_id
             AND ut.media_pageid = m.pageid
             ORDER BY ut.media_pageid
-
-            LIMIT 100  -- TMP
-
-            ',
-            array(':user_id'=>$user_id)
+            LIMIT 100  -- TMP',
+            [':user_id' => $userId]
         );
-        if( $tags ) {
+        if ($tags) {
             return $tags;
         }
-        return array();
+
+        return [];
     }
 
-    //////////////////////////////////////////////////////////
-    function save_user_last_tag_time() {
-        return $this->query_as_bool(
+    /**
+     * @return bool
+     */
+    public function saveUserLastTagTime()
+    {
+        return $this->queryAsBool(
             'UPDATE user SET last = :last WHERE id = :user_id',
-            array(':user_id'=>$this->user_id, ':last'=>gmdate('Y-m-d H:i:s'))
+            [':user_id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
         );
     }
 
-    //////////////////////////////////////////////////////////
-    function save_user_view() {
-        if( !$this->user_id ) {
-            return FALSE;
+    /**
+     * @return bool
+     */
+    public function saveUserView()
+    {
+        if (!$this->userId) {
+            return false;
         }
-        $view = $this->query_as_bool(
-                'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
-                array( ':id' => $this->user_id, ':last'=>gmdate('Y-m-d H:i:s') )
+        $view = $this->queryAsBool(
+            'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
+            [':id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
         );
-        if( $view ) {
-            return TRUE;
+        if ($view) {
+            return true;
         }
-        return FALSE;
+
+        return false;
     }
 
-    //////////////////////////////////////////////////////////
-    function new_user( $ip_address, $host, $user_agent ) {
-        if(
-            $this->query_as_bool(
-                'INSERT INTO user (
-                    ip, host, user_agent, page_views, last
-                ) VALUES (
-                    :ip_address, :host, :user_agent, 0, :last
-                )',
-                array(
-                    ':ip_address'=>$ip_address,
-                    ':host'=>$host,
-                    ':user_agent'=>$user_agent,
-                    ':last'=>gmdate('Y-m-d H:i:s')
-                )
-            )
+    /**
+     * @param $ipAddress
+     * @param $host
+     * @param $userAgent
+     * @return bool
+     */
+    public function newUser($ipAddress, $host, $userAgent)
+    {
+        if ($this->queryAsBool(
+            'INSERT INTO user (
+                ip, host, user_agent, page_views, last
+            ) VALUES (
+                :ip_address, :host, :user_agent, 0, :last
+            )',
+            [
+                ':ip_address' => $ipAddress,
+                ':host' => $host,
+                ':user_agent' => $userAgent,
+                ':last' => gmdate('Y-m-d H:i:s')
+            ]
+        )
         ) {
-            $this->user_id = $this->last_insert_id;
-            return TRUE;
+            $this->userId = $this->lastInsertId;
+
+            return true;
         }
-        $this->user_id = 0;
-        //$this->notice('new_user: FAILED to create user');
-        return FALSE;
-    } // end function new_user()
+        $this->userId = 0;
 
+        return false;
+    }
 
-    //////////////////////////////////////////////////////////
     // SMT - Category
 
-    var $category_count;
-
-    //////////////////////////////////////////////////////////
-    function display_categories( $media_id ) {
-
-        if( !$media_id || !$this->is_positive_number($media_id) ) {
-            return FALSE;
+    /**
+     * @param $mediaId
+     * @return bool|string
+     */
+    public function displayCategories($mediaId)
+    {
+        if (!$mediaId || !$this->isPositiveNumber($mediaId)) {
+            return false;
         }
-
-        $cats = $this->get_image_categories($media_id);
-
-        $response = '<div class="categories" style="width:' . $this->size_medium . 'px;">';
-
-        if( !$cats ) { return $response . '<em>Uncategorized</em></div>'; }
-
-        $hidden = array();
-        foreach($cats as $cat ) {
-            if( $this->is_hidden_category($cat) ) {
+        $cats = $this->getImageCategories($mediaId);
+        $response = '<div class="categories" style="width:' . $this->sizeMedium . 'px;">';
+        if (!$cats) {
+            return $response . '<em>Uncategorized</em></div>';
+        }
+        $hidden = [];
+        foreach ($cats as $cat) {
+            if ($this->isHiddenCategory($cat)) {
                 $hidden[] = $cat;
                 continue;
             }
             $response .= ''
             . '+<a href="' . $this->url('category')
-            . '?c=' . $this->category_urlencode( $this->strip_prefix($cat) ) . '">'
-            . $this->strip_prefix($cat) . '</a><br />';
+            . '?c=' . $this->categoryUrlencode($this->stripPrefix($cat)) . '">'
+            . $this->stripPrefix($cat) . '</a><br />';
         }
-
-        if( !$hidden ) {
+        if (!$hidden) {
             return $response . '</div>';
         }
-
         $response .= '<br /><div style="font-size:80%;">';
-
-        foreach( $hidden as $hcat ) {
+        foreach ($hidden as $hcat) {
             $response .= '+<a href="' . $this->url('category')
-            . '?c=' . $this->category_urlencode( $this->strip_prefix($hcat) ) . '">'
-            . $this->strip_prefix($hcat) . '</a><br />';
+            . '?c=' . $this->categoryUrlencode($this->stripPrefix($hcat)) . '">'
+            . $this->stripPrefix($hcat) . '</a><br />';
         }
+
         return $response . '</div></div>';
+    }
 
-    } // end function display_categories()
-
-    //////////////////////////////////////////////////////////
-    function strip_prefix( $string ) {
-        if( !$string || !is_string($string) ) {
+    /**
+     * @param $string
+     * @return null|string|string[]
+     */
+    public function stripPrefix($string)
+    {
+        if (!$string || !is_string($string)) {
             return $string;
         }
-        return preg_replace(
-            array( '/^File:/', '/^Category:/' ),
-            '',
-            $string
-        );
+
+        return preg_replace(['/^File:/', '/^Category:/'], '', $string);
     }
 
-    //////////////////////////////////////////////////////////
-    function category_urldecode($category) {
-        return str_replace(
-            '_',
-            ' ',
-            urldecode($category)
-        );
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public function categoryUrldecode($category)
+    {
+        return str_replace('_', ' ', urldecode($category));
     }
 
-    //////////////////////////////////////////////////////////
-    function category_urlencode($category) {
-        return str_replace(
-            '+',
-            '_',
-            str_replace(
-                '%3A',
-                ':',
-                urlencode($category)
-            )
-        );
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public function categoryUrlencode($category)
+    {
+        return str_replace('+', '_', str_replace('%3A', ':', urlencode($category)));
     }
 
-    //////////////////////////////////////////////////////////
-    function get_category( $name ) {
-
-        $this->debug("get_category( $name )");
-
-        $response = $this->query_as_array(
+    /**
+     * @param $name
+     * @return array|mixed
+     */
+    public function getCategory($name)
+    {
+        $response = $this->queryAsArray(
             'SELECT * FROM category WHERE name = :name',
-            array(':name'=>$name)
+            [':name' => $name]
         );
-        if( !isset($response[0]['id']) ) {
-            $this->debug("get_category( $name ) = ERROR: Category Not Found in Database");
-            return array();
+        if (!isset($response[0]['id'])) {
+            return [];
         }
-        $this->debug("get_category( $name ) = <pre>" . print_r($response[0],1) . '</pre>');
+
         return $response[0];
     }
 
-    //////////////////////////////////////////////////////////
-    function get_category_size( $category_name ) {
-        $this->debug("get_category_size( $category_name )");
-
+    /**
+     * @param $categoryName
+     * @return int
+     */
+    public function getCategorySize($categoryName)
+    {
         $sql = 'SELECT count(c2m.id) AS size
                 FROM category2media AS c2m, category AS c
                 WHERE c.name = :name
                 AND c2m.category_id = c.id';
-        if( $this->site_info['curation'] == 1 ) {
-                $sql = "SELECT count(c2m.id) AS size
+        if ($this->siteInfo['curation'] == 1) {
+            $sql = "SELECT count(c2m.id) AS size
                         FROM category2media AS c2m, category AS c, media as m
                         WHERE c.name = :name
                         AND c2m.category_id = c.id
                         AND m.pageid = c2m.media_pageid
                         AND m.curated = '1'";
         }
-        $response = $this->query_as_array($sql, array(':name'=>$category_name) );
-        if( isset($response[0]['size']) ) {
+        $response = $this->queryAsArray($sql, [':name' => $categoryName]);
+        if (isset($response[0]['size'])) {
             return $response[0]['size'];
         }
-        $this->error("get_category_size( $category_name ) ERROR: 0 size");
+        $this->error("getCategorySize($categoryName) ERROR: 0 size");
+
         return 0;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_categories_count( $redo=FALSE, $hidden=0 ) {
-        if( isset($this->category_count) && !$redo ) {
-            return $this->category_count;
+    /**
+     * @param bool $redo
+     * @param int $hidden
+     * @return int
+     */
+    public function getCategoriesCount($redo = false, $hidden = 0)
+    {
+        if (isset($this->categoryCount) && !$redo) {
+            return $this->categoryCount;
         }
         $sql = 'SELECT count(distinct(c2m.category_id)) AS count
                 FROM category2media AS c2m, category AS c
                 WHERE c.id = c2m.category_id
                 AND c.hidden = ' . ($hidden ? '1' : '0');
-        if( $this->site_info['curation'] == 1 ) {
+        if ($this->siteInfo['curation'] == 1) {
+            $hidden = $hidden ? '1' : '0';
             $sql = "SELECT count(distinct(c2m.category_id)) AS count
                     FROM category2media AS c2m, category AS c, media AS m
                     WHERE c.id = c2m.category_id
-                    AND c.hidden = '" . ($hidden ? '1' : '0') . "'
+                    AND c.hidden = '$hidden'
                     AND c2m.media_pageid = m.pageid
                     AND m.curated = '1'";
         }
-        $response = $this->query_as_array($sql);
-        if( !$response ) {
-            $this->debug('::get_categories_count() ERROR query failed');
+        $response = $this->queryAsArray($sql);
+        if (!$response) {
             return 0;
         }
-        return $this->category_count = $response[0]['count'];
+
+        return $this->categoryCount = $response[0]['count'];
     }
 
-    //////////////////////////////////////////////////////////
-    function get_category_list() {
+    /**
+     * @return array
+     */
+    public function getCategoryList()
+    {
         $sql = 'SELECT name FROM category ORDER BY name';
-        $response = $this->query_as_array( $sql );
-        $return = array();
-        if( !$response || !is_array($response) ) { return $return; }
-        while( $name = each($response) ) {
+        $response = $this->queryAsArray($sql);
+        $return = [];
+        if (!$response || !is_array($response)) {
+            return $return;
+        }
+        foreach ($response as $name) {
             $return[] = $name['value']['name'];
         }
-        return $return;
 
+        return $return;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_image_categories( $pageid ) {
-        //$this->notice('::get_image_categories: pageid=' . $pageid);
-        $error = array('Category database unavailable');
-        if( !$pageid|| !$this->is_positive_number($pageid) ) {
+    /**
+     * @param $pageid
+     * @return array
+     */
+    public function getImageCategories($pageid)
+    {
+        $error = ['Category database unavailable'];
+        if (!$pageid|| !$this->isPositiveNumber($pageid)) {
             return $error;
         }
-        $response = $this->query_as_array(
+        $response = $this->queryAsArray(
             'SELECT category.name
             FROM category, category2media
             WHERE category2media.category_id = category.id
             AND category2media.media_pageid = :pageid
             ORDER BY category.name',
-            array(':pageid'=>$pageid)
+            [':pageid' => $pageid]
         );
-        if( !isset( $response[0]['name'] ) ) {
-            $this->debug('::get_image_categories: ' . print_r($response,1) );
+        if (!isset($response[0]['name'])) {
             return $error;
         }
-        $cats = array();
-        foreach( $response as $cat ) {
+        $cats = [];
+        foreach ($response as $cat) {
             $cats[] = $cat['name'];
         }
+
         return $cats;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_category_id_from_name( $category_name ) {
-
-        $response = $this->query_as_array(
+    /**
+     * @param $categoryName
+     * @return int
+     */
+    public function getCategoryIdFromName($categoryName)
+    {
+        $response = $this->queryAsArray(
             'SELECT id FROM category WHERE name = :name',
-            array(':name'=>$category_name)
+            [':name' => $categoryName]
         );
-
-        if( !isset($response[0]['id']) ) {
-            $this->debug("get_category_id_from_name( $category_name ) ERROR = 0");
+        if (!isset($response[0]['id'])) {
             return 0;
         }
-        $this->debug("get_category_id_from_name( $category_name ) = " . $response[0]['id']);
+
         return $response[0]['id'];
     }
 
-    //////////////////////////////////////////////////////////
-    function get_media_in_category( $category_name ) {
-        $this->debug("get_media_in_category( $category_name )");
-        $category_id = $this->get_category_id_from_name( $category_name );
-        if( !$category_id ) {
-            $this->error('::get_media_in_category: No ID found for: ' . $category_name);
-            return array();
+    /**
+     * @param $categoryName
+     * @return array
+     */
+    public function getMediaInCategory($categoryName)
+    {
+        $categoryId = $this->getCategoryIdFromName($categoryName);
+        if (!$categoryId) {
+            $this->error('::getMediaInCategory: No ID found for: ' . $categoryName);
+
+            return [];
         }
         $sql = 'SELECT media_pageid
                 FROM category2media
                 WHERE category_id = :category_id
                 ORDER BY media_pageid';
-
-        $response = $this->query_as_array($sql, array(':category_id'=>$category_id));
-        if( $response === FALSE ) {
+        $response = $this->queryAsArray($sql, [':category_id' => $categoryId]);
+        if ($response === false) {
             $this->error('ERROR: unable to access categor2media table.');
-            return array();
+
+            return [];
         }
-        if( !$response ) {
-            //$this->notice('get_media_in_category: No Media Found in ' . $category_name);
-            return array();
+        if (!$response) {
+            return [];
         }
-        $return = array();
-        foreach( $response as $media ) {
+        $return = [];
+        foreach ($response as $media) {
             $return[] = $media['media_pageid'];
         }
+
         return $return;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_count_local_files_per_category( $category_id_array ) {
-        if( !is_array($category_id_array) ) {
-            $this->error('get_count_local_files_per_category: invalid category array');
+    /**
+     * @param $categoryIdArray
+     * @return int
+     */
+    public function getCountLocalFilesPerCategory($categoryIdArray)
+    {
+        if (!is_array($categoryIdArray)) {
+            $this->error('getCountLocalFilesPerCategory: invalid category array');
+
             return 0;
         }
-        $locals = $this->query_as_array(
+        $locals = $this->queryAsArray(
             'SELECT count(category_id) AS count
             FROM category2media
             WHERE category_id IN ( :category_id )',
-            array( ':category_id'=> implode($category_id_array, ', ') )
+            [':category_id' => implode($categoryIdArray, ', ')]
         );
-        if( $locals && isset($locals[0]['count']) ) {
+        if ($locals && isset($locals[0]['count'])) {
             return $locals[0]['count'];
         }
+
         return 0;
     }
 
-    //////////////////////////////////////////////////////////
-    function is_hidden_category( $category_name ) {
-        //$this->notice("is_hidden_category( $category_name )");
-        if( !$category_name ) {
-            $this->debug('ERROR: is_hidden_category: category_name NOT FOUND');
-            return FALSE;
+    /**
+     * @param $categoryName
+     * @return bool
+     */
+    public function isHiddenCategory($categoryName)
+    {
+        if (!$categoryName) {
+            return false;
         }
         $sql = 'SELECT id FROM category WHERE hidden = 1 AND name = :category_name';
-        $bind = array(':category_name'=>$category_name);
-        if( $this->query_as_array($sql, $bind) ) {
-            return TRUE;
+        $bind = [':category_name' => $categoryName];
+        if ($this->queryAsArray($sql, $bind)) {
+            return true;
         }
-        return FALSE;
+
+        return false;
     }
 
-
-    //////////////////////////////////////////////////////////
     // SMT - Tag
 
-    //////////////////////////////////////////////////////////
-    function display_tags( $media_id ) {
-        $tags = $this->get_tags();
+    /**
+     * @param $mediaId
+     * @return string
+     */
+    public function displayTags($mediaId)
+    {
+        $tags = $this->getTags();
         $response = '<div class="nobr" style="display:block; margin:auto;">';
-        foreach( $tags as $tag ) {
+        foreach ($tags as $tag) {
             $response .=  ''
             . '<div class="tagbutton tag' . $tag['position'] . '">'
-            . '<a href="' . $this->url('tag') . '?m=' . $media_id
+            . '<a href="' . $this->url('tag') . '?m=' . $mediaId
                 . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">'
             . $tag['display_name']
             . '</a></div>';
         }
+
         return $response . '</div>';
     }
 
-    /////////////////////////////////////////////////////////
-    function display_reviews( $reviews ) {
-        if( !$reviews ) {
-            return; // 'unreviewed';
+    /**
+     * @param $reviews
+     * @return string
+     */
+    public function displayReviews($reviews)
+    {
+        if (!$reviews) {
+            return '';
         }
-        //$review_count = 0;
         $response = '';
-        foreach( $reviews as $review ) {
-            $response .= ''
-            . '+<a href="' . $this->url('reviews')
-            . '?o=reviews.' . urlencode($review['name'])
-            . '">'
-            . $review['count'] . ' ' . $review['name']
-            . '</a><br />';
-            //$review_count += $review['count'];
+        foreach ($reviews as $review) {
+            $response .= '+<a href="' . $this->url('reviews')
+                . '?o=reviews.' . urlencode($review['name']) . '">'
+                . $review['count'] . ' ' . $review['name'] . '</a><br />';
         }
-        //$response = '<div style="display:inline-block; text-align:left;">'
-        //. '<em><b>' . $review_count . '</b> reviews</em>' . $response . '</div>';
+
         return $response;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_tag_id_by_name( $name ) {
-        if( isset( $this->tag_id[$name] ) ) {
-            return $this->tag_id[$name];
+    /**
+     * @param $name
+     * @return int
+     */
+    public function getTagIdByName($name)
+    {
+        if (isset($this->tagId[$name])) {
+            return $this->tagId[$name];
         }
-        $tag = $this->query_as_array(
+        $tag = $this->queryAsArray(
             'SELECT id FROM tag WHERE name = :name LIMIT 1',
-            array(':name'=>$name)
+            [':name' => $name]
         );
-        if( isset( $tag[0]['id'] ) ) {
-            return $this->tag_id[$name] = $tag[0]['id'];
+        if (isset($tag[0]['id'])) {
+            return $this->tagId[$name] = $tag[0]['id'];
         }
-        return $this->tag_id[$name] = 0;
+
+        return $this->tagId[$name] = 0;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_tag_name_by_id( $tag_id ) {
-        if( isset( $this->tag_name[$tag_id] ) ) {
-            return $this->tag_name[$tag_id];
+    /**
+     * @param $tagId
+     * @return mixed
+     */
+    public function getTagNameById($tagId)
+    {
+        if (isset($this->tagName[$tagId])) {
+            return $this->tagName[$tagId];
         }
-        $tag = $this->query_as_array(
+        $tag = $this->queryAsArray(
             'SELECT name FROM tag WHERE id = :id LIMIT 1',
-            array(':id'=>$tag_id)
+            [':id' => $tagId]
         );
-        if( isset( $tag[0]['name'] ) ) {
-            return $this->tag_name[$tag_id] = $tag[0]['name'];
+        if (isset($tag[0]['name'])) {
+            return $this->tagName[$tagId] = $tag[0]['name'];
         }
-        return $this->tag_name[$tag_id] = $tag_id;
+
+        return $this->tagName[$tagId] = $tagId;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_tags() {
-        if( isset($this->tags) ) {
+    /**
+     * @return array|bool
+     */
+    public function getTags()
+    {
+        if (isset($this->tags)) {
             reset($this->tags);
+
             return $this->tags;
         }
-        $tags = $this->query_as_array('
-            SELECT * FROM tag ORDER BY position');
-        if( !$tags ) {
-            $this->debug('Tag database not available');
-            return $this->tags = array();
+        $tags = $this->queryAsArray('SELECT * FROM tag ORDER BY position');
+        if (!$tags) {
+            return $this->tags = [];
         }
+
         return $this->tags = $tags;
     }
 
-    //////////////////////////////////////////////////////////
-    function get_tagging_count( $tag_id=FALSE ) {
+    /**
+     * @param bool $tagId
+     * @return string
+     */
+    public function getTaggingCount($tagId = false)
+    {
         $sql = 'SELECT SUM(count) AS count FROM tagging';
-        $bind = array();
-        if( $tag_id ) {
+        $bind = [];
+        if ($tagId) {
             $sql .= ' WHERE tag_id = :tag_id';
-            $bind[':tag_id'] = $tag_id;
+            $bind[':tag_id'] = $tagId;
         }
-        $count = $this->query_as_array($sql, $bind);
-        if( !isset($count[0]['count']) ) {
+        $count = $this->queryAsArray($sql, $bind);
+        if (!isset($count[0]['count'])) {
             return '0';
         }
+
         return $count[0]['count'];
     }
 
-    /////////////////////////////////////////////////////////
-    function get_total_review_count() {
-        if( isset($this->total_review_count) ) {
-            return $this->total_review_count;
+    /**
+     * @return int
+     */
+    public function getTotalReviewCount()
+    {
+        if (isset($this->totalReviewCount)) {
+            return $this->totalReviewCount;
         }
-        $response = $this->query_as_array('SELECT SUM(count) AS total FROM tagging');
-        if( isset($response[0]['total']) ) {
-            return $this->total_review_count = $response[0]['total'];
+        $response = $this->queryAsArray('SELECT SUM(count) AS total FROM tagging');
+        if (isset($response[0]['total'])) {
+            return $this->totalReviewCount = $response[0]['total'];
         }
-        return $this->total_review_count = 0;
+
+        return $this->totalReviewCount = 0;
     }
 
-    /////////////////////////////////////////////////////////
-    function get_reviews( $pageid ) {
-        $reviews = $this->query_as_array('
-            SELECT t.tag_id, t.count, tag.*
+    /**
+     * @param $pageid
+     * @return string
+     */
+    public function getReviews($pageid)
+    {
+        $reviews = $this->queryAsArray(
+            'SELECT t.tag_id, t.count, tag.*
             FROM tagging AS t, tag
             WHERE t.media_pageid = :media_pageid
             AND tag.id = t.tag_id
             AND t.count > 0
-            ORDER BY tag.position
-            ', array(':media_pageid'=>$pageid) );
-        return $this->display_reviews( $reviews );
+            ORDER BY tag.position',
+            [':media_pageid'=>$pageid]
+        );
+
+        return $this->displayReviews($reviews);
     }
 
-    /////////////////////////////////////////////////////////
-    function get_reviews_per_category( $category_id ) {
-        return $this->display_reviews( $this->get_db_reviews_per_category($category_id) );
+    /**
+     * @param $categoryId
+     * @return string
+     */
+    public function getReviewsPerCategory($categoryId)
+    {
+        return $this->displayReviews($this->getDbReviewsPerCategory($categoryId));
     }
 
-    /////////////////////////////////////////////////////////
-    function get_db_reviews_per_category( $category_id ) {
-        $reviews = $this->query_as_array('
-            SELECT SUM(t.count) AS count, tag.*
+    /**
+     * @param $categoryId
+     * @return array|bool
+     */
+    public function getDbReviewsPerCategory($categoryId)
+    {
+        $reviews = $this->queryAsArray(
+            'SELECT SUM(t.count) AS count, tag.*
             FROM tagging AS t,
                  tag,
                  category2media AS c2m
@@ -1102,363 +1308,380 @@ class SharedMediaTagger {
             AND c2m.category_id = :category_id
             AND t.count > 0
             GROUP BY (tag.id)
-            ORDER BY tag.position
-            ', array(':category_id'=>$category_id) );
+            ORDER BY tag.position',
+            [':category_id' => $categoryId]
+        );
+
         return $reviews;
     }
 
-    /////////////////////////////////////////////////////////
-    function get_total_files_reviewed_count() {
-        if( isset($this->total_files_reviewed_count) ) {
-            return $this->total_files_reviewed_count;
+    /**
+     * @return int
+     */
+    public function getTotalFilesReviewedCount()
+    {
+        if (isset($this->totalFilesReviewedCount)) {
+            return $this->totalFilesReviewedCount;
         }
-        $response = $this->query_as_array('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
-        if( isset($response[0]['total']) ) {
-            return $this->total_files_reviewed_count = $response[0]['total'];
+        $response = $this->queryAsArray('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
+        if (isset($response[0]['total'])) {
+            return $this->totalFilesReviewedCount = $response[0]['total'];
         }
-        return $this->total_files_reviewed_count = 0;
+
+        return $this->totalFilesReviewedCount = 0;
     }
 
-
-    //////////////////////////////////////////////////////////
     // SMT - Menus
 
-    //////////////////////////////////////////////////////////
-    function include_menu() {
+    /**
+     *
+     */
+    public function includeMenu()
+    {
         $space = ' &nbsp; &nbsp; ';
-        $count_files = number_format($this->get_image_count());
-        $count_categories = number_format($this->get_categories_count());
-        $count_reviews = number_format($this->get_total_review_count());
-        $count_users = number_format($this->get_user_count());
+        $countFiles = number_format((float) $this->getImageCount());
+        $countCategories = number_format((float) $this->getCategoriesCount());
+        $countReviews = number_format((float) $this->getTotalReviewCount());
+        $countUsers = number_format((float) $this->getUserCount());
         print '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>' .  $space
-        . '<a href="' . $this->url('browse') . '">🔎' . $count_files . '&nbsp;Files' . '</a>' . $space
-        . '<a href="' . $this->url('categories') . '">📂' . $count_categories . '&nbsp;Categories</a>' . $space
-        . '<a href="' . $this->url('reviews') . '">🗳' . $count_reviews . '&nbsp;Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">'
-            . $count_users .'&nbsp;Users</a>' . $space
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->siteName . '</a></span>' .  $space
+        . '<a href="' . $this->url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
+        . '<a href="' . $this->url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
+        . '<a href="' . $this->url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
+        . '<a href="'. $this->url('users') . ($this->userId ? '?i=' . $this->userId : '') . '">'
+            . $countUsers .'&nbsp;Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
+        . ($this->isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function include_medium_menu() {
+    /**
+     *
+     */
+    public function includeMediumMenu()
+    {
         $space = ' &nbsp; &nbsp; ';
-        print ''
-        . '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->site_name . '</a></span>' .  $space
+        print '<div class="menu" style="font-weight:bold;">'
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->siteName . '</a></span>' .  $space
         . '<a href="' . $this->url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . ($this->user_id ? '?i=' . $this->user_id : '') . '">Users</a>' . $space
+        . '<a href="'. $this->url('users') . ($this->userId ? '?i=' . $this->userId : '') . '">Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-        . ($this->is_admin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
+        . ($this->isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function include_small_menu() {
+    /**
+     *
+     */
+    public function includeSmallMenu()
+    {
         $space = ' ';
         print '<div class="menujcon">'
-        . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . $this->site_name . '</a>'
+        . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . $this->siteName . '</a>'
         . '<span style="float:right;">'
         . '<a class="menuj" title="Browse" href="' . $this->url('browse') . '">🔎</a>' . $space
         . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
         . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
         . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
-        . ($this->is_admin() ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>' : '')
+        . ($this->isAdmin() ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</span>'
         . '</div><div style="clear:both;"></div>';
-        // 🌐 🏷 📂 🔗 🔎 🔖 🖇 ⛓  ❓  ❔  📢
     }
 
-
-    //////////////////////////////////////////////////////////
     // SMT - Shared Media Tagger
 
-    var $install_directory;
-    var $server;
-    var $setup;
-    var $site;
-    var $site_info;
-    var $site_name;
-    var $site_url;
-    var $size_medium;
-    var $size_thumb;
-    var $title; // Page <title>
-    var $use_bootstrap;
-    var $use_jquery;
+    /**
+     * SharedMediaTagger constructor.
+     */
+    public function __construct()
+    {
+        global $router, $setup;
 
-    //////////////////////////////////////////////////////////
-    function __construct() {
-
-        global $router;
-
-        $this->start_timer('page');
-
-        global $setup; // Load the setup array, if present in _setup.php
-        $this->setup = array();
-        if( is_array($setup) ) {
+        $this->setup = [];
+        if (is_array($setup)) {
             $this->setup = $setup;
         }
-
-        $this->install_directory = realpath(__DIR__.'/..');
-
-        $this->database_name = $this->install_directory . '/db/media.sqlite';
-
-        $this->size_medium = 325;
-        $this->size_thumb = 100;
-
+        $this->installDirectory = realpath(__DIR__.'/..');
+        $this->databaseName = $this->installDirectory . '/db/media.sqlite';
+        $this->sizeMedium = 325;
+        $this->sizeThumb = 100;
         $this->server = $_SERVER['SERVER_NAME']; // $_SERVER['HTTP_HOST'];
-
         if (isset($this->setup['site_url'])) {
-            $this->site_url = $setup['site_url'];
-            $this->debug('Site URL: using setup: ' . $this->site_url);
+            $this->siteUrl = $setup['site_url'];
         } else {
-            $this->site_url = $router->getUriBase() . '/';
-            $this->debug('Site URL: using default: ' . $this->site_url);
+            $this->siteUrl = $router->getUriBase() . '/';
         }
-
-        $this->set_site_info();
-
-        $this->links = array(
-            'home'       => $this->site_url . '',
-            'css'        => $this->site_url . 'css.css',
-            'jquery'        => $this->site_url . 'use/jquery.min.js',
-            'bootstrap_js'  => $this->site_url . 'use/bootstrap/js/bootstrap.min.js',
-            'bootstrap_css' => $this->site_url . 'use/bootstrap/css/bootstrap.min.css',
-            'info'       => $this->site_url . 'info.php',
-            'browse'     => $this->site_url . 'browse.php',
-            'categories' => $this->site_url . 'categories.php',
-            'category'   => $this->site_url . 'category.php',
-            'about'      => $this->site_url . 'about.php',
-            'reviews'    => $this->site_url . 'reviews.php',
-            'admin'      => $this->site_url . 'admin/',
-            'contact'    => $this->site_url . 'contact.php',
-            'tag'        => $this->site_url . 'tag.php',
-            'users'      => $this->site_url . 'users.php',
+        $this->setSiteInfo();
+        $this->links = [
+            'home'       => $this->siteUrl . '',
+            'css'        => $this->siteUrl . 'css.css',
+            'jquery'        => $this->siteUrl . 'use/jquery.min.js',
+            'bootstrap_js'  => $this->siteUrl . 'use/bootstrap/js/bootstrap.min.js',
+            'bootstrap_css' => $this->siteUrl . 'use/bootstrap/css/bootstrap.min.css',
+            'info'       => $this->siteUrl . 'info.php',
+            'browse'     => $this->siteUrl . 'browse.php',
+            'categories' => $this->siteUrl . 'categories.php',
+            'category'   => $this->siteUrl . 'category.php',
+            'about'      => $this->siteUrl . 'about.php',
+            'reviews'    => $this->siteUrl . 'reviews.php',
+            'admin'      => $this->siteUrl . 'admin/',
+            'contact'    => $this->siteUrl . 'contact.php',
+            'tag'        => $this->siteUrl . 'tag.php',
+            'users'      => $this->siteUrl . 'users.php',
             'github_smt' => 'https://github.com/attogram/shared-media-tagger',
-        );
-
-        $this->get_user();
-
-        $this->sql_count = 0;
-        if( isset($_GET['logoff']) ) {
-            $this->admin_logoff();
+        ];
+        $this->getUser();
+        $this->sqlCount = 0;
+        if (isset($_GET['logoff'])) {
+            $this->adminLogoff();
         }
-
-    } // end function __construct()
-
-    //////////////////////////////////////////////////////////
-    function set_site_info() {
-        $response = $this->query_as_array('SELECT * FROM site WHERE id = 1');
-        if( !$response || !isset($response[0]['id']) ) {
-            $this->site_name = 'Shared Media Tagger';
-            $this->site_info = array();
-            $this->site_info['curation'] = 0;
-            return FALSE;
-        }
-        $this->site_name = @$response[0]['name'];
-        $this->site_info = $response[0];
-
-        if( !isset($this->site_info['curation']) ) {
-            $this->site_info['curation'] = 0;
-        }
-        $this->debug('site_info = ' . print_r($this->site_info,1));
-        return TRUE;
     }
 
-    //////////////////////////////////////////////////////////
-    function display_thumbnail( $media='' ) {
+    /**
+     * @return bool
+     */
+    public function setSiteInfo()
+    {
+        $response = $this->queryAsArray('SELECT * FROM site WHERE id = 1');
+        if (!$response || !isset($response[0]['id'])) {
+            $this->siteName = 'Shared Media Tagger';
+            $this->siteInfo = [];
+            $this->siteInfo['curation'] = 0;
 
-        $thumb = $this->get_thumbnail($media);
+            return false;
+        }
+        $this->siteName = !empty($response[0]['name']) ? $response[0]['name'] : null;
+        $this->siteInfo = $response[0];
+        if (!isset($this->siteInfo['curation'])) {
+            $this->siteInfo['curation'] = 0;
+        }
 
+        return true;
+    }
+
+    /**
+     * @param array $media
+     * @return string
+     */
+    public function displayThumbnail(array $media)
+    {
+        $thumb = $this->getThumbnail($media);
+        $pageid = !empty($media['pageid']) ? $media['pageid'] : null;
+        $title = !empty($media['title']) ? $media['title'] : null;
         return '<div style="display:inline-block;text-align:center;">'
-            . '<a href="' .  $this->url('info') . '?i=' . $media['pageid'] . '">'
+            . '<a href="' .  $this->url('info') . '?i=' . $pageid . '">'
             . '<img src="' . $thumb['url'] . '"'
             . ' width="' . $thumb['width'] . '"'
             . ' height="' . $thumb['height'] . '"'
-            . ' title="' . htmlentities($media['title']) . '" /></a>'
-            . '</div>'
-            ;
+            . ' title="' . htmlentities($title) . '" /></a>'
+            . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function display_thumbnail_box( $media='' ) {
-        $return = '<div class="thumbnail_box">'
-        . $this->display_thumbnail($media)
-        . str_replace(
-            ' / ',
-            '<br />',
-            $this->display_attribution( $media, /*title truncate*/17, /*artist*/21 )
+    /**
+     * @param array $media
+     * @return string
+     */
+    public function displayThumbnailBox(array $media)
+    {
+        return '<div class="thumbnail_box">'
+            . $this->displayThumbnail($media)
+            . str_replace(
+                ' / ',
+                '<br />',
+                $this->displayAttribution($media, 17, 21)
             )
-        . $this->display_admin_media_functions( $media['pageid'] )
-        //. '<br />'
-        . '<div class="thumbnail_reviews left">'
-        . $this->get_reviews( $media['pageid'] )
-        . '</div>'
-        . '</div>';
-        return $return;
+            . $this->displayAdminMediaFunctions($media['pageid'])
+            . '<div class="thumbnail_reviews left">'
+            . $this->getReviews($media['pageid'])
+            . '</div>'
+            . '</div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function display_video( $media ) {
+    /**
+     * @param array $media
+     * @return string
+     */
+    public function displayVideo(array $media)
+    {
         $mime = $media['mime'];
         $url = $media['url'];
-        $width = $media['thumbwidth'];
+        //$width = $media['thumbwidth'];
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        if( !$width || $width > $this->size_medium) {
-            $height = $this->get_resized_height( $width, $height, $this->size_medium );
-            $width = $this->size_medium;
-        }
-        //$infourl = $this->url('info') . '?i=' . $media['pageid'];
+        //if (!$width || $width > $this->sizeMedium) {
+        //    $height = $this->get_resized_height($width, $height, $this->sizeMedium); // @TODO find
+        //}
         $divwidth = $width = $media['thumbwidth'];
-        if( $divwidth < $this->size_medium )  {
-            $divwidth = $this->size_medium;
+        if ($divwidth < $this->sizeMedium) {
+            $divwidth = $this->sizeMedium;
         }
 
-        $return = '<div style="width:' . $divwidth . 'px; margin:auto;">'
+        return '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<video width="'. $divwidth . '" height="' . $height . '" poster="' . $poster
         . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</video>'
-        . $this->display_attribution( $media )
-        . $this->display_admin_media_functions( $media['pageid'] )
+        . $this->displayAttribution($media)
+        . $this->displayAdminMediaFunctions($media['pageid'])
         . '</div>';
-        return $return;
     }
 
-    //////////////////////////////////////////////////////////
-    function display_audio( $media ) {
+    /**
+     * @param $media
+     * @return string
+     */
+    public function displayAudio($media)
+    {
         $mime = $media['mime'];
         $url = $media['url'];
-        $width = $media['thumbwidth'];
+        //$width = $media['thumbwidth'];
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        if( !$width || $width > $this->size_medium) {
-            $height = $this->get_resized_height( $width, $height, $this->size_medium );
-            $width = $this->size_medium;
-        }
-        //$infourl = $this->url('info') . '?i=' . $media['pageid'];
+        //if (!$width || $width > $this->sizeMedium) {
+        //    $height = $this->get_resized_height($width, $height, $this->sizeMedium );
+        //}
         $divwidth = $width = $media['thumbwidth'];
-        if( $divwidth < $this->size_medium )  {
-            $divwidth = $this->size_medium;
+        if ($divwidth < $this->sizeMedium) {
+            $divwidth = $this->sizeMedium;
         }
 
-        $return = '<div style="width:' . $divwidth . 'px; margin:auto;">'
+        return '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<audio width="'. $width . '" height="' . $height . '" poster="' . $poster
         . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</audio>'
-        . $this->display_attribution( $media )
-        . $this->display_admin_media_functions( $media['pageid'] )
+        . $this->displayAttribution($media)
+        . $this->displayAdminMediaFunctions($media['pageid'])
         . '</div>';
-        return $return;
     }
 
-    //////////////////////////////////////////////////////////
-    function display_image( $media='' ) {
-        if( !$media || !is_array($media) ) {
-            $this->error('display_image: ERROR: no image array');
-            return FALSE;
+    /**
+     * @param string $media
+     * @return bool|string
+     */
+    public function displayImage($media = '')
+    {
+        if (!$media || !is_array($media)) {
+            $this->error('displayImage: ERROR: no image array');
+
+            return false;
+        }
+        $mime = !empty($media['mime']) ? $media['mime'] : null;
+        $video = ['application/ogg','video/webm'];
+        if (in_array($mime, $video)) {
+            return $this->displayVideo($media);
         }
 
-        $mime = @$media['mime'];
-
-        $video = array('application/ogg','video/webm');
-        if( in_array( $mime, $video ) ) {
-            return $this->display_video($media);
-        }
-
-        $audio = array('audio/x-flac');
-        if( in_array( $mime, $audio ) ) {
-            return $this->display_audio($media);
+        $audio = ['audio/x-flac'];
+        if (in_array($mime, $audio)) {
+            return $this->displayAudio($media);
         }
 
         $url = $media['thumburl'];
         $height = $media['thumbheight'];
         $divwidth = $width = $media['thumbwidth'];
-        if( $divwidth < $this->size_medium )  {
-            $divwidth = $this->size_medium;
+        if ($divwidth < $this->sizeMedium) {
+            $divwidth = $this->sizeMedium;
         }
         $infourl =  $this->url('info') . '?i=' . $media['pageid'];
 
         return  '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<a href="' . $infourl . '">'
         . '<img src="'. $url .'" height="'. $height .'" width="'. $width . '" alt=""></a>'
-        . $this->display_attribution( $media )
-        . $this->display_admin_media_functions( $media['pageid'] )
-        . '</div>'
-        ;
+        . $this->displayAttribution($media)
+        . $this->displayAdminMediaFunctions($media['pageid'])
+        . '</div>';
     }
 
-    /////////////////////////////////////////////////////////
-    function display_licensing( $media, $artist_truncate=42 ) {
-        if( !$media || !is_array($media) ) {
-            $this->error('::display_attribution: Media Not Found');
-            return FALSE;
+    /**
+     * @param $media
+     * @param int $artistTruncate
+     * @return bool|string
+     */
+    public function displayLicensing($media, $artistTruncate = 42)
+    {
+        if (!$media || !is_array($media)) {
+            $this->error('::displayLicensing: Media Not Found');
+
+            return false;
         }
-        $artist = @$media['artist'];
-        if( !$artist ) {
+        $artist = !empty($media['artist']) ? $media['artist'] : null;
+        if (!$artist) {
             $artist = 'Unknown';
             $copyright = '';
         } else {
-            $artist = $this->truncate( strip_tags($artist), $artist_truncate );
+            $artist = $this->truncate(strip_tags($artist), $artistTruncate);
             $copyright = '&copy; ';
         }
-        $licenseshortname = @$media['licenseshortname'];
-        switch( $licenseshortname ) {
+        $licenseshortname = !empty($media['licenseshortname']) ? $media['licenseshortname'] : null;
+        switch ($licenseshortname) {
             case 'No restrictions':
             case 'Public domain':
                 $licenseshortname = 'Public Domain';
-                $copyright = ''; break;
+                $copyright = '';
+                break;
         }
+
         return "$copyright $artist / $licenseshortname";
     }
 
-    //////////////////////////////////////////////////////////
-    function display_attribution( $media, $title_truncate=250, $artist_truncate=48 ) {
+    /**
+     * @param $media
+     * @param int $titleTruncate
+     * @param int $artistTruncate
+     * @return string
+     */
+    public function displayAttribution($media, $titleTruncate = 250, $artistTruncate = 48)
+    {
         $infourl = $this->url('info') . '?i=' . $media['pageid'];
-        $title = htmlspecialchars($this->strip_prefix($media['title']));
+        $title = htmlspecialchars($this->stripPrefix($media['title']));
+
         return '<div class="mediatitle left">'
         . '<a href="' . $infourl . '" title="' . htmlentities($title) . '">'
-        . $this->truncate($title, $title_truncate)
+        . $this->truncate($title, $titleTruncate)
         . '</a></div>'
         . '<div class="attribution left">'
         . '<a href="' . $infourl . '">'
-        . $this->display_licensing($media, $artist_truncate)
+        . $this->displayLicensing($media, $artistTruncate)
         . '</a></div>';
     }
 
-    //////////////////////////////////////////////////////////
-    function display_site_header() {
-        print @$this->site_info['header'];
+    /**
+     *
+     */
+    public function displaySiteHeader()
+    {
+        print !empty($this->siteInfo['header']) ? $this->siteInfo['header'] : null;
     }
 
-    //////////////////////////////////////////////////////////
-    function display_site_footer() {
-        print @$this->site_info['footer'];
+    /**
+     *
+     */
+    public function displaySiteFooter()
+    {
+        print !empty($this->siteInfo['footer']) ? $this->siteInfo['footer'] : null;
     }
 
-    //////////////////////////////////////////////////////////
-    function include_header( $show_site_header=TRUE ) {
-
-        if( !$this->title ) {
-            $this->title = $this->site_name;
+    /**
+     * @param bool $showSiteHeader
+     */
+    public function includeHeader($showSiteHeader = true)
+    {
+        if (!$this->title) {
+            $this->title = $this->siteName;
         }
-
         print "<!doctype html>\n"
         . '<html><head><title>' . $this->title . '</title>'
         . '<meta charset="utf-8" />'
         . '<meta name="viewport" content="initial-scale=1" />'
         . '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
-        if( $this->use_bootstrap ) {
+        if ($this->useBootstrap) {
             print '<link rel="stylesheet" href="' . $this->url('bootstrap_css') . '" />'
             . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
             . '<!--[if lt IE 9]>'
@@ -1466,10 +1689,10 @@ class SharedMediaTagger {
             . '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
             . '<![endif]-->';
         }
-        if( $this->use_bootstrap || $this->use_jquery ) {
+        if ($this->useBootstrap || $this->useJquery) {
             print '<script src="' . $this->url('jquery') . '"></script>';
         }
-        if( $this->use_bootstrap ) {
+        if ($this->useBootstrap) {
             print '<script src="' . $this->url('bootstrap_js') . '"></script>';
         }
         print '<link rel="stylesheet" type="text/css" href="' . $this->url('css') . '" />'
@@ -1477,59 +1700,49 @@ class SharedMediaTagger {
         . '</head><body>';
 
         // Site headers
-        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_header ) {
+        if ($this->isAdmin() || get_class($this) == 'SharedMediaTaggerAdmin' || !$showSiteHeader) {
             return;
         }
-        $this->display_site_header();
+        $this->displaySiteHeader();
+    }
 
-    } // end function include_header()
-
-    //////////////////////////////////////////////////////////
-    function include_footer( $show_site_footer=TRUE ) {
-
-        $this->include_menu();
-
-        print '<footer>'
-        . '<div class="menu" style="line-height:2; font-size:80%;">';
-
-
-        if( !@$this->setup['hide_hosted_by'] ) {
-            print '<span class="nobr">Hosted by <b><a href="//' . @$_SERVER['SERVER_NAME'] . '/">'
-            . @$_SERVER['SERVER_NAME'] . '</a></b></span>';
+    /**
+     * @param bool $showSiteFooter
+     */
+    public function includeFooter($showSiteFooter = true)
+    {
+        $this->includeMenu();
+        print '<footer><div class="menu" style="line-height:2; font-size:80%;">';
+        if (empty($this->setup['hide_hosted_by']) || !$this->setup['hide_hosted_by']) {
+            $serverName = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : null;
+            print '<span class="nobr">Hosted by <b><a href="//' . $serverName . '/">' . $serverName . '</a></b></span>';
         }
         print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
-        if( !@$this->setup['hide_powered_by'] ) {
+        if (!empty($this->setup['hide_powered_by']) && $this->setup['hide_powered_by']) {
             print '<span class="nobr">Powered by <b>'
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
             . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
         }
-
-        $this->end_timer('page');
-
-        if( $this->is_admin() ) {
+        if ($this->isAdmin()) {
             print '<br /><br />'
             . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
             . '<a href="' . $this->url('home') . '?logoff">LOGOFF</a>'
-            . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC';
-
-            while( list($timer_name,$result) = each($this->timer_results) ) {
-                print '<br />TIMER: ' . str_pad( round($result,5), 7, '0' ) . ' - ' . $timer_name;
-            }
-            print '<br />MEMORY usage: ' . number_format(memory_get_usage())
-            . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage());
-            print '</div><br /><br /><br />';
+            . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC'
+            . '<br />MEMORY usage: ' . number_format(memory_get_usage())
+            . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage())
+            . '</div><br /><br /><br />';
         }
 
         print '</div></footer>';
 
         // Site footers
-        if( $this->is_admin() || get_class($this) == 'smt_admin' || !$show_site_footer ) {
+        if ($this->isAdmin() || get_class($this) == 'smt_admin' || !$showSiteFooter) {
             print '</body></html>';
+
             return;
         }
-        $this->display_site_footer();
 
+        $this->displaySiteFooter();
         print '</body></html>';
-    } // end include_footer()
-
+    }
 }

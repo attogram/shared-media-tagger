@@ -3,13 +3,15 @@
  * Shared Media Tagger
  * Site Admin
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var SharedMediaTaggerAdmin $smt
  */
 
+use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+
 $smt->title = 'Site Admin';
-$smt->include_header();
-$smt->include_medium_menu();
-$smt->include_admin_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
+$smt->includeAdminMenu();
 print '<div class="box white">';
 
 if (isset($_POST) && $_POST) {
@@ -17,15 +19,14 @@ if (isset($_POST) && $_POST) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-$sites = $smt->query_as_array('SELECT * FROM site ORDER BY id LIMIT 1', array());
+$sites = $smt->queryAsArray('SELECT * FROM site ORDER BY id LIMIT 1', array());
 
 if (!$sites || !is_array($sites[0])) {
     $smt->error('Creating New Site, ID #1');
-    $smt->query_as_bool("INSERT INTO site (id) VALUES ('1')");
+    $smt->queryAsBool("INSERT INTO site (id) VALUES ('1')");
     $sites[0]['id'] = 1;
 }
 $site = $sites[0];
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 print ''
@@ -40,7 +41,7 @@ print ''
 . '<textarea name="about" rows="5" cols="70">' . htmlentities(@$site['about']) . '</textarea>'
 
 . '<br /><br /><input type="checkbox" name="curation"'
-. ( @$site['curation'] ? ' checked="checked"' : '' ) . '/> Show only Curated Media'
+. (@$site['curation'] ? ' checked="checked"' : '') . '/> Show only Curated Media'
 
 . '<br /><br />Header:<br />'
 . '<textarea name="header" rows="5" cols="70">' . htmlentities(@$site['header']) . '</textarea>'
@@ -49,36 +50,31 @@ print ''
 . '<textarea name="footer" rows="5" cols="70">' . htmlentities(@$site['footer']) . '</textarea>'
 
 . '<br /><br /><input type="checkbox" name="use_cdn"'
-. ( @$site['use_cdn'] ? ' checked="checked"' : '' ) . '/> Use CDN for jquery, bootstrap'
+. (@$site['use_cdn'] ? ' checked="checked"' : '') . '/> Use CDN for jquery, bootstrap'
 
 . '<br /><br /><input type="submit" value="           Save Site Setup           ">'
 . '</form>'
 . '<br /><br />'
 . '<br /><small>Site ID: ' . @$site['id'] . '</small>'
-. '<br /><small>Last updated: ' . @$site['updated'] . '</small>';
+. '<br /><small>Last updated: ' . @$site['updated'] . '</small>'
 
-
-print '<br /><br /><br /><br /><br /><hr />Modify Database directly:<ul>'
+. '<br /><br /><br /><br /><br /><hr />Modify Database directly:<ul>'
 . '<li><a target="sqlite" href="./sqladmin.php?table=site&action=row_editordelete&pk=['
 . @$site['id'] . ']&type=edit">EDIT site</a></li>'
 . '<li><a target="sqlite" href="./sqladmin.php?table=site&action=row_create">'
 . 'CREATE NEW site</a></li>'
-. '</ul>';
+. '</ul>'
 
-print '<hr>DEBUG: site: <pre>' . htmlentities(print_r($site, 1)) . '</pre>';
-
-print '</div>';
-$smt->include_footer();
-
+.'<hr>DEBUG: site: <pre>' . htmlentities(print_r($site, 1)) . '</pre>'
+.'</div>';
+$smt->includeFooter();
 
 /**
- * @param \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @param SharedMediaTaggerAdmin $smt
  * @return bool
  */
-function saveSiteInfo(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt)
+function saveSiteInfo(SharedMediaTaggerAdmin $smt)
 {
-    $smt->debug('save_site_info()');
-
     $bind = [];
     while ((list($name, $value) = each($_POST))) {
         switch ($name) {
@@ -108,13 +104,11 @@ function saveSiteInfo(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt)
     }
 
     $sql = 'UPDATE site SET ' . implode($set, ', ') . ' WHERE id = :id';
-    $smt->debug($sql);
-    $smt->debug($bind);
 
-    if ($smt->query_as_bool($sql, $bind)) {
+    if ($smt->queryAsBool($sql, $bind)) {
         $smt->notice('OK: Site Info Saved');
         return true;
     }
-    $smt->error('Unable to update site: ' . print_r($smt->last_error, 1));
+    $smt->error('Unable to update site: ' . print_r($smt->lastError, 1));
     return false;
 }
