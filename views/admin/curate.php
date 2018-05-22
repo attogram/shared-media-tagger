@@ -3,7 +3,7 @@
  * Shared Media Tagger
  * Curation Admin
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
  */
 
 use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
@@ -32,7 +32,6 @@ if ($pageLimit > 1000) {
 if ($pageLimit < 1) {
     $pageLimit = 1;
 }
-
 
 $sql = "SELECT *
         FROM media
@@ -141,8 +140,10 @@ foreach ($medias as $media) {
         . $imgInfo . '" onclick="curation_click(this.id);" class="curation_que">';
     print '</div>';
 
-    print '<input style="display:none;" type="checkbox" name="keep[]" id="keep' . $pageid . '" value="' . $pageid . '">';
-    print '<input style="display:none;" type="checkbox" name="delete[]" id="delete' . $pageid . '" value="' . $pageid . '">';
+    print '<input style="display:none;" type="checkbox" name="keep[]" id="keep' . $pageid
+        . '" value="' . $pageid . '">';
+    print '<input style="display:none;" type="checkbox" name="delete[]" id="delete' . $pageid
+        . '" value="' . $pageid . '">';
 }
 
 print '<br />';
@@ -164,7 +165,8 @@ function curationMenu()
     . ' <a href="javascript:mark_all_keep();">[KEEP]</a>'
     . ' <a href="javascript:mark_all_delete();">[DELETE]</a>'
     . ' <a href="javascript:mark_all_que();">[QUE]</a></span>'
-    . ' - <a href="./curate.php?l='.$pageLimit.'">'.$pageLimit.'</a> of ' . number_format($uncuratedCount) . ' in que'
+    . ' - <a href="./curate.php?l='.$pageLimit.'">'.$pageLimit.'</a> of '
+        . number_format($uncuratedCount) . ' in que'
     . '</div>';
 }
 

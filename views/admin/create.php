@@ -1,62 +1,65 @@
 <?php
-// Shared Media Tagger
-// User Admin
+/**
+ * Shared Media Tagger
+ * Create Admin
+ *
+ * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ */
 
-$number_of_images = 4;
-$thumb_width = 50;
-$montage_width = 100;
-$montage_height = 100;
-$montage_images_per_row = 2;
-$montage_index_step = $thumb_width;
+$numberOfImages = 4;
+$thumbWidth = 50;
+$montageWidth = 100;
+$montageHeight = 100;
+$montageImagesPerRow = 2;
+$montageIndexStep = $thumbWidth;
 
-$show_footer = false;
-$footer_height = 0;
+$showFooter = false;
+$footerHeight = 0;
 
 $mimetypes[] = 'image/jpeg';
 $mimetypes[] = 'image/gif';
 $mimetypes[] = 'image/png';
 
-$tag_id = (!empty($_GET['t']) && $smt->is_positive_number($_GET['t']))
+$tagId = (!empty($_GET['t']) && $smt->isPositiveNumber($_GET['t']))
     ? (int)$_GET['t']
     : 'R';
 
 $smt->title = 'Create';
-$smt->include_header();
-$smt->include_medium_menu();
-$smt->include_admin_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
+$smt->includeAdminMenu();
 print '<div class="box white"><p><a href="create.php">Create</a></p>';
 print '<ul>'
 . '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t=R">Random Images</a></li>';
 
-foreach ($smt->get_tags() as $tag) {
+foreach ($smt->getTags() as $tag) {
     print '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t='
     . $tag['id'] . '">Images tagged: ' . $tag['name'] . '</a></li>';
 }
 print '</ul>';
 
-//print '<p>gd_info: ' . print_r(@gd_info(),1) . '</p>';
 if (empty($_GET['montage'])) {
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
+
     return;
 }
 
 if (!function_exists('imagecreatetruecolor')) {
     $smt->error('PHP GD Library NOT FOUND');
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
+
     return;
 }
-//$smt->notice('PHP GD Library FOUND OK');
 
-if (!class_exists("Imagick")) {
-    //$smt->error('Imagick NOT FOUND');
-} else {
-    //$smt->notice('Imagick FOUND OK');
-}
+//if (!class_exists("Imagick")) {
+//    $smt->error('Imagick NOT FOUND');
+//} else {
+//    $smt->notice('Imagick FOUND OK');
+//}
 
-switch ($tag_id) {
-
+switch ($tagId) {
     default:
         $sql = '
         SELECT m.*, t.count
@@ -67,87 +70,91 @@ switch ($tag_id) {
         AND   m.thumbmime IN ("' . implode($mimetypes, '", "') . '")
         AND   m.thumburl LIKE "%325px%"
         ORDER BY RANDOM()
-        LIMIT ' . $number_of_images;
-        $bind = array(':tag_id'=>$tag_id);
+        LIMIT ' . $numberOfImages;
+        $bind = [':tag_id' => $tagId];
         break;
-
     case 'R':
         $sql = '
         SELECT m.*
         FROM media AS m
         ORDER BY RANDOM()
-        LIMIT ' . $number_of_images;
-        $bind = array();
+        LIMIT ' . $numberOfImages;
+        $bind = [];
         break;
 }
 
-$images = $smt->query_as_array($sql, $bind);
+$images = $smt->queryAsArray($sql, $bind);
 if (!$images) {
     $smt->error('No images found in criteria');
     print '</div>';
-    $smt->include_footer();
+    $smt->includeFooter();
     return;
 }
 
-$montage = imagecreatetruecolor($montage_width, $montage_height + $footer_height);
-$x_index = $y_index = 0;
+$montage = imagecreatetruecolor($montageWidth, $montageHeight + $footerHeight);
+$xIndex = $yIndex = 0;
 foreach ($images as $image) {
-    $url = str_replace('325px', $thumb_width.'px', $image['thumburl']);
+    $url = str_replace('325px', $thumbWidth.'px', $image['thumburl']);
 
     switch ($image['thumbmime']) {
-        case 'image/gif': $current_image = @imagecreatefromgif($url); break;
-        case 'image/jpeg': $current_image = @imagecreatefromjpeg($url); break;
-        case 'image/png': $current_image = @imagecreatefrompng($url);
-        // no break
+        case 'image/gif':
+            $currentImage = @imagecreatefromgif($url);
+            break;
+        case 'image/jpeg':
+            $currentImage = @imagecreatefromjpeg($url);
+            break;
+        case 'image/png':
+            $currentImage = @imagecreatefrompng($url);
+            // no break
         default:
             //print '<P>ERROR: unknown mime type</P>';
             continue;
     }
-    if (!$current_image) {
+    if (!$currentImage) {
         print '<p>ERROR: cannot get image: ' . $url . '</p>';
         continue;
     }
-    if (imagesx($current_image) < $thumb_width) {
-        $current_image = imagescale(
-            $current_image,
-            $thumb_width,
-            imagesy($current_image)
+    if (imagesx($currentImage) < $thumbWidth) {
+        $currentImage = imagescale(
+            $currentImage,
+            $thumbWidth,
+            imagesy($currentImage)
         );
     }
-    if (imagesy($current_image) < $thumb_width) {
-        $current_image = imagescale(
-            $current_image,
-            imagesx($current_image),
-            $thumb_width
+    if (imagesy($currentImage) < $thumbWidth) {
+        $currentImage = imagescale(
+            $currentImage,
+            imagesx($currentImage),
+            $thumbWidth
         );
     }
 
     imagecopy(
         $montage, // Destination image link resource
-        $current_image, // Source image link resource
-        $x_index * $montage_index_step, // x-coordinate of destination point
-        $y_index * $montage_index_step, // y-coordinate of destination point
+        $currentImage, // Source image link resource
+        $xIndex * $montageIndexStep, // x-coordinate of destination point
+        $yIndex * $montageIndexStep, // y-coordinate of destination point
         0, // x-coordinate of source point
         0, // y-coordinate of source point
-        $montage_index_step, // Source width
-        $montage_index_step  // Source height
+        $montageIndexStep, // Source width
+        $montageIndexStep  // Source height
     );
-    imagedestroy($current_image);
-    $x_index++;
-    if ($x_index > ($montage_images_per_row - 1)) {
-        $x_index = 0;
-        $y_index++;
+    imagedestroy($currentImage);
+    $xIndex++;
+    if ($xIndex > ($montageImagesPerRow - 1)) {
+        $xIndex = 0;
+        $yIndex++;
     }
 }
 
-if ($show_footer) {
+if ($showFooter) {
     $yellow = imagecolorallocate($montage, 255, 255, 0);
 
     imagestring(
         $montage,
         4, // font 1-5
         5, // x
-        $montage_height + 6, // y
+        $montageHeight + 6, // y
         $smt->site_name,
         $yellow
     );
@@ -155,7 +162,7 @@ if ($show_footer) {
         $montage,
         2, // font 1-5
         5, // x
-        $montage_height + 24, // y
+        $montageHeight + 24, // y
         str_replace('//', '', $smt->site_url),
         $yellow
     );
@@ -163,17 +170,17 @@ if ($show_footer) {
 
 ob_start();
 imagepng($montage);
-$image_data = ob_get_contents();
+$imageData = ob_get_contents();
 ob_end_clean();
 
 imagedestroy($montage);
 
-$data_url = 'data:image/png;base64,' . base64_encode($image_data);
+$dataUrl = 'data:image/png;base64,' . base64_encode($imageData);
 
 print '<p>'
-. '<img src="' . $data_url . '"'
-. ' width="' . $montage_width . '"'
-. ' height="' . ($montage_height + $footer_height) . '"'
+. '<img src="' . $dataUrl . '"'
+. ' width="' . $montageWidth . '"'
+. ' height="' . ($montageHeight + $footerHeight) . '"'
 . ' usemap="#montage"'
 . '>'
 . '</p>';
@@ -181,37 +188,31 @@ print '<p>'
 print '<p><b>' . sizeof($images) . '</b> images used in this montage:<br />';
 
 $count = 0;
-$areas = array();
-$descs = array();
+$areas = [];
+$descs = [];
 foreach ($images as $image) {
     $count++;
     $areas[$count] = $smt->url('info') . '?i=' . $image['pageid'];
-    $descs[$count] = htmlspecialchars($smt->strip_prefix($image['title']))
-        . "\n" . $smt->display_licensing($image);
+    $descs[$count] = htmlspecialchars($smt->stripPrefix($image['title']))
+        . "\n" . $smt->displayLicensing($image);
     print '<br />#' . $count . ': '
     . '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">'
-    . htmlspecialchars($smt->strip_prefix($image['title'])) . '</a>'
-    . ' - ' . $smt->display_licensing($image)
+    . htmlspecialchars($smt->stripPrefix($image['title'])) . '</a>'
+    . ' - ' . $smt->displayLicensing($image)
     ;
 }
 
 print ''
 . '<map name="montage">'
-. '<area shape="rect" coords="0,0,50,50" href="'
-. $areas[1] . '" title="#1: ' . $descs[1] . '">'
-. '<area shape="rect" coords="50,0,100,50" href="'
-. $areas[2] . '" title="#2: ' . $descs[2] . '">'
-. '<area shape="rect" coords="0,50,50,100" href="'
-. $areas[3] . '" title="#3: ' . $descs[3] . '">'
-. '<area shape="rect" coords="50,50,100,100" href="'
-. $areas[4] . '" title="#4: ' . $descs[4] . '">'
+. '<area shape="rect" coords="0,0,50,50" href="' . $areas[1] . '" title="#1: ' . $descs[1] . '">'
+. '<area shape="rect" coords="50,0,100,50" href="' . $areas[2] . '" title="#2: ' . $descs[2] . '">'
+. '<area shape="rect" coords="0,50,50,100" href="' . $areas[3] . '" title="#3: ' . $descs[3] . '">'
+. '<area shape="rect" coords="50,50,100,100" href="' . $areas[4] . '" title="#4: ' . $descs[4] . '">'
 . '</map>';
 
-
 print '</p>';
-
-print '<p>Data URL: ' . number_format(strlen($data_url))
-. ' characters<br /><textarea cols="60" rows="20">' . $data_url . '</textarea><br /></p>';
-
+print '<p>Data URL: ' . number_format(strlen($dataUrl))
+. ' characters<br /><textarea cols="60" rows="20">' . $dataUrl . '</textarea><br /></p>';
 print '</div>';
-$smt->include_footer();
+
+$smt->includeFooter();

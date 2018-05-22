@@ -1,29 +1,44 @@
 <?php
-// Shared Media Tagger
-// Database Admin
-
+/**
+ * Shared Media Tagger
+ * Database Admin
+ *
+ * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ */
 
 $smt->title = 'Database Admin';
-$smt->include_header();
-$smt->include_medium_menu();
-$smt->include_admin_menu();
+$smt->includeHeader();
+$smt->includeMediumMenu();
+$smt->includeAdminMenu();
 print '<div class="box white">';
 
 if (isset($_GET['a'])) {
     print '<hr /><pre>';
     switch ($_GET['a']) {
         case 'c':
-            print '<p>Creating Database tables:</p>'; print $smt->create_tables(); break;
+            print '<p>Creating Database tables:</p>';
+            print $smt->createTables();
+            break;
         case 'd':
-            print '<p>Dropping Database tables:</p>'; print $smt->drop_tables(); break;
+            print '<p>Dropping Database tables:</p>';
+            print $smt->dropTables();
+            break;
         case 'em':
-            print '<p>Emptying Media tables:</p>'; print_r($smt->empty_media_tables()); break;
+            print '<p>Emptying Media tables:</p>';
+            print_r($smt->emptyMediaTables());
+            break;
         case 'ec':
-            print '<p>Emptying Category tables:</p>'; print_r($smt->empty_category_tables()); break;
+            print '<p>Emptying Category tables:</p>';
+            print_r($smt->emptyCategoryTables());
+            break;
         case 'et':
-            print '<p>Emptying Tagging tables:</p>'; print_r($smt->empty_tagging_tables()); break;
+            print '<p>Emptying Tagging tables:</p>';
+            print_r($smt->emptyTaggingTables());
+            break;
         case 'eu':
-            print '<p>Emptying User tables:</p>'; print_r($smt->empty_user_tables()); break;
+            print '<p>Emptying User tables:</p>';
+            print_r($smt->emptyUserTables());
+            break;
     }
 }
 print '</pre><hr />';
@@ -34,15 +49,16 @@ print '</pre><hr />';
 <p>- <a href="reports.php" >Reports</a></p>
 <?php print '
 <ul>
-<li>File: ' . $smt->database_name . '</li>
+<li>File: ' . $smt->databaseName . '</li>
 <li>Permissions: '
-. (is_writeable($smt->database_name) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY')
+. (is_writeable($smt->databaseName) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY')
 . '</li>
 <li>Size: '
-. (file_exists($smt->database_name) ? number_format(filesize($smt->database_name)) : 'NULL')
+. (file_exists($smt->databaseName) ? number_format(filesize($smt->databaseName)) : 'NULL')
 . ' bytes</li>
 
-<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">' . $smt->url('admin')  . 'db/media.sqlite</a></li>
+<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">'
+    . $smt->url('admin')  . 'db/media.sqlite</a></li>
 </ul>';
 ?>
 <br />
@@ -64,4 +80,5 @@ DANGER ZONE:
 <?php
 
 print '</div>';
-$smt->include_footer();
+
+$smt->includeFooter();

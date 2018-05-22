@@ -198,10 +198,6 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
                 'userid' INTEGER,
                 'duration' REAL,
                 'timestamp' TEXT,
-                'skin' REAL,
-                'ahash' TEXT,
-                'dhash' TEXT,
-                'phash' TEXT,
                 'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
             'contact' =>
                 "CREATE TABLE IF NOT EXISTS 'contact' (
@@ -289,7 +285,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function createTables()
     {
         if (!file_exists($this->databaseName)) {
-            if (!@touch($this->databaseName)) {
+            if (!touch($this->databaseName)) {
                 $this->error('ERROR: can not touch database name: ' . $this->databaseName);
 
                 return false;
@@ -364,8 +360,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     {
         $toUpdate = [];
         foreach (array_keys($this->sqlNew) as $name) {
-            $old = $this->normalizeSql(@$this->sqlCurrent[$name]);
-            $new = $this->normalizeSql(@$this->sqlNew[$name]);
+            $old = $this->normalizeSql(
+                !empty($this->sqlCurrent[$name]) ? $this->sqlCurrent[$name] : ''
+            );
+            $new = $this->normalizeSql(
+                !empty($this->sqlNew[$name]) ? $this->sqlNew[$name] : ''
+            );
             if ($old == $new) {
                 continue;
             }
@@ -454,7 +454,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             return false;
         }
         $this->commit();
-        $this->notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format($newSize) . ' rows');
+        $this->notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
         $this->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
         $this->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
         $this->vacuum();
@@ -629,7 +629,10 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             return false;
         }
 
-        if (!@$this->commonsResponse['query'][$key] || !is_array($this->commonsResponse['query'][$key])) {
+        if (empty($this->commonsResponse['query'][$key])
+            || !$this->commonsResponse['query'][$key]
+            || !is_array($this->commonsResponse['query'][$key])
+        ) {
             $this->error("::call_commons: WARNING: missing key: $key");
         }
 
@@ -695,7 +698,9 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         if (!$media) {
             return $response . '<p>ERROR: failed to get media info from API</p></div>';
         }
-        $response .= '<p>OK: media: <b>' . @$media[$pageid]['title'] . '</b></p>';
+        $response .= '<p>OK: media: <b>'
+            . !empty($media[$pageid]['title']) ? $media[$pageid]['title'] : '?'
+            . '</b></p>';
 
         // Save media
         if (!$this->saveMediaToDatabase($media)) {
@@ -733,12 +738,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
 
         $this->beginTransaction();
 
-        while (list(, $media_file) = each($media)) {
+        foreach ($media as $id => $mediaFile) {
             $new = [];
-            $new[':pageid'] = @$media_file['pageid'];
-            $new[':title'] = @$media_file['title'];
+            $new[':pageid'] = @$mediaFile['pageid'];
+            $new[':title'] = @$mediaFile['title'];
 
-            $new[':url'] = @$media_file['imageinfo'][0]['url'];
+            $new[':url'] = @$mediaFile['imageinfo'][0]['url'];
             if (!isset($new[':url']) || $new[':url'] == '') {
                 $this->error('::save_media_to_database: ERROR: NO URL: SKIPPING: pageid='
                     . @$new[':pageid'] . ' title=' . @$new[':title']);
@@ -746,36 +751,36 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
                 continue;
             }
 
-            $new[':descriptionurl'] = @$media_file['imageinfo'][0]['descriptionurl'];
-            $new[':descriptionshorturl'] = @$media_file['imageinfo'][0]['descriptionshorturl'];
+            $new[':descriptionurl'] = @$mediaFile['imageinfo'][0]['descriptionurl'];
+            $new[':descriptionshorturl'] = @$mediaFile['imageinfo'][0]['descriptionshorturl'];
 
-            $new[':imagedescription'] = @$media_file['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
-            $new[':artist'] = @$media_file['imageinfo'][0]['extmetadata']['Artist']['value'];
-            $new[':datetimeoriginal'] = @$media_file['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
-            $new[':licenseshortname'] = @$media_file['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
-            $new[':usageterms'] = @$media_file['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
-            $new[':attributionrequired'] = @$media_file['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
-            $new[':restrictions'] = @$media_file['imageinfo'][0]['extmetadata']['Restrictions']['value'];
+            $new[':imagedescription'] = @$mediaFile['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
+            $new[':artist'] = @$mediaFile['imageinfo'][0]['extmetadata']['Artist']['value'];
+            $new[':datetimeoriginal'] = @$mediaFile['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
+            $new[':licenseshortname'] = @$mediaFile['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
+            $new[':usageterms'] = @$mediaFile['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
+            $new[':attributionrequired'] = @$mediaFile['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
+            $new[':restrictions'] = @$mediaFile['imageinfo'][0]['extmetadata']['Restrictions']['value'];
 
             $new[':licenseuri'] = @$this->openContentLicenseUri($new[':licenseshortname']);
             $new[':licensename'] = @$this->openContentLicenseName($new[':licenseuri']);
 
-            $new[':size'] = @$media_file['imageinfo'][0]['size'];
-            $new[':width'] = @$media_file['imageinfo'][0]['width'];
-            $new[':height'] = @$media_file['imageinfo'][0]['height'];
-            $new[':sha1'] = @$media_file['imageinfo'][0]['sha1'];
-            $new[':mime'] = @$media_file['imageinfo'][0]['mime'];
+            $new[':size'] = @$mediaFile['imageinfo'][0]['size'];
+            $new[':width'] = @$mediaFile['imageinfo'][0]['width'];
+            $new[':height'] = @$mediaFile['imageinfo'][0]['height'];
+            $new[':sha1'] = @$mediaFile['imageinfo'][0]['sha1'];
+            $new[':mime'] = @$mediaFile['imageinfo'][0]['mime'];
 
-            $new[':thumburl'] = @$media_file['imageinfo'][0]['thumburl'];
-            $new[':thumbwidth'] = @$media_file['imageinfo'][0]['thumbwidth'];
-            $new[':thumbheight'] = @$media_file['imageinfo'][0]['thumbheight'];
-            $new[':thumbmime'] = @$media_file['imageinfo'][0]['thumbmime'];
+            $new[':thumburl'] = @$mediaFile['imageinfo'][0]['thumburl'];
+            $new[':thumbwidth'] = @$mediaFile['imageinfo'][0]['thumbwidth'];
+            $new[':thumbheight'] = @$mediaFile['imageinfo'][0]['thumbheight'];
+            $new[':thumbmime'] = @$mediaFile['imageinfo'][0]['thumbmime'];
 
-            $new[':user'] = @$media_file['imageinfo'][0]['user'];
-            $new[':userid'] = @$media_file['imageinfo'][0]['userid'];
+            $new[':user'] = @$mediaFile['imageinfo'][0]['user'];
+            $new[':userid'] = @$mediaFile['imageinfo'][0]['userid'];
 
-            $new[':duration'] = @$media_file['imageinfo'][0]['duration'];
-            $new[':timestamp'] = @$media_file['imageinfo'][0]['timestamp'];
+            $new[':duration'] = @$mediaFile['imageinfo'][0]['duration'];
+            $new[':timestamp'] = @$mediaFile['imageinfo'][0]['timestamp'];
 
             $sql = "INSERT OR REPLACE INTO media (
                         pageid, title, url,
@@ -990,8 +995,8 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         $sql = 'INSERT INTO block (pageid, title, thumb) VALUES (:pageid, :title, :thumb)';
         $bind = [
             ':pageid' => $pageid,
-            ':title' => @$media[0]['title'],
-            ':thumb' => @$media[0]['thumburl'],
+            ':title' => !empty($media[0]['title']) ? $media[0]['title'] : null,
+            ':thumb' => !empty($media[0]['thumburl']) ? $media[0]['thumburl'] : null,
         ];
         if ($this->queryAsBool($sql, $bind)) {
             //$response .= '<br />OK: ' . $sql;
@@ -1131,7 +1136,9 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             $this->error('::get_categories_from_media: nothing found');
             return false;
         }
-        $this->categories = @$this->commonsResponse['query']['pages'][$pageid]['categories'];
+        $this->categories = !empty($this->commonsResponse['query']['pages'][$pageid]['categories'])
+            ? $this->commonsResponse['query']['pages'][$pageid]['categories']
+            : null;
 
         return true;
     }
@@ -1230,7 +1237,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
 
     /**
      * @param $category
-     * @return bool
+     * @return array|bool
      */
     public function getCategoryInfo($category)
     {
@@ -1260,61 +1267,54 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     {
         $categoryName = $this->categoryUrldecode($categoryName);
 
-        $category_row = $this->getCategory($categoryName);
-        if (!$category_row) {
+        $categoryRow = $this->getCategory($categoryName);
+        if (!$categoryRow) {
             if (!$this->insertCategory($categoryName, /*getinfo*/false, /*local_files*/1)) {
                 $this->error('save_category_info: new category INSERT FAILED: ' . $categoryName);
                 return false;
             }
             $this->notice('save_category_info: NEW CATEGORY: '  . $categoryName);
-            $category_row = $this->getCategory($categoryName);
+            $categoryRow = $this->getCategory($categoryName);
         }
-        //$this->notice($category_row);
 
-        $category_info = $this->getCategoryInfo($categoryName);
-        foreach ($category_info as $onesy) {
-            $category_info = $onesy; // is always just 1 result
+        $categoryInfo = $this->getCategoryInfo($categoryName);
+        foreach ($categoryInfo as $onesy) {
+            $categoryInfo = $onesy; // is always just 1 result
         }
-        //$this->notice($category_info);
 
         $bind = [];
 
-        if (@$category_info['pageid'] != @$category_row['pageid']) {
-            $bind[':pageid'] = $category_info['pageid'];
-            //$this->notice('NEW: pageid: ' . $bind[':pageid']);
+        if (@$categoryInfo['pageid'] != @$categoryRow['pageid']) {
+            $bind[':pageid'] = $categoryInfo['pageid'];
         }
 
-        if ($category_info['categoryinfo']['files'] != $category_row['files']) {
-            $bind[':files'] = $category_info['categoryinfo']['files'];
-            //$this->notice('NEW: files: ' . $bind[':files']);
+        if ($categoryInfo['categoryinfo']['files'] != $categoryRow['files']) {
+            $bind[':files'] = $categoryInfo['categoryinfo']['files'];
         }
 
-        if ($category_info['categoryinfo']['subcats'] != $category_row['subcats']) {
-            $bind[':subcats'] = $category_info['categoryinfo']['subcats'];
-            //$this->notice('NEW: subcats: ' . $bind[':subcats']);
+        if ($categoryInfo['categoryinfo']['subcats'] != $categoryRow['subcats']) {
+            $bind[':subcats'] = $categoryInfo['categoryinfo']['subcats'];
         }
 
         $hidden = 0;
-        if (isset($category_info['categoryinfo']['hidden'])) {
+        if (isset($categoryInfo['categoryinfo']['hidden'])) {
             $hidden = 1;
         }
-        if ($hidden != $category_row['hidden']) {
+        if ($hidden != $categoryRow['hidden']) {
             $bind[':hidden'] = $hidden;
-            //$this->notice('NEW: hidden: ' . $bind[':hidden']);
         }
 
         $missing = 0;
-        if (isset($category_info['categoryinfo']['missing'])) {
+        if (isset($categoryInfo['categoryinfo']['missing'])) {
             $missing = 1;
         }
-        if ($missing != $category_row['missing']) {
+        if ($missing != $categoryRow['missing']) {
             $bind[':missing'] = $missing;
-            //$this->notice('NEW: missing: ' . $bind[':missing']);
         }
 
-        $url = '<a href="' . $this->url('category') . '?c='
-            . $this->categoryUrlencode($this->stripPrefix($categoryName))
-            . '">' . $categoryName . '</a>';
+        //$url = '<a href="' . $this->url('category') . '?c='
+        //    . $this->categoryUrlencode($this->stripPrefix($categoryName))
+        //    . '">' . $categoryName . '</a>';
 
         if (!$bind) {
             return true; // nothing to update
@@ -1327,15 +1327,15 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         $sql .= implode($sets, ', ');
         $sql .= ' WHERE id = :id';
 
-        $bind[':id'] = $category_row['id'];
+        $bind[':id'] = $categoryRow['id'];
 
         $result = $this->queryAsBool($sql, $bind);
 
         if ($result) {
-            //$this->notice('OK: CATEGORY INFO: ' . $url);
             return true;
         }
-        $this->error('get_category_info: UPDATE/INSERT FAILED: ' . print_r($this->lastError, 1));
+        $this->error('get_category_info: UPDATE/INSERT FAILED: ' . print_r($this->lastError, true));
+
         return false;
     }
 
@@ -1349,25 +1349,26 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     {
         if (!$name) {
             $this->error('insert_category: no name found');
+
             return false;
         }
 
         if (!$this->queryAsBool(
-                'INSERT INTO category (
-                    name, local_files, hidden, missing
-                ) VALUES (
-                    :name, :local_files, :hidden, :missing
-                )',
-                [
-                    ':name'=>$name,
-                    ':local_files'=>$localFiles,
-                    ':hidden'=>'0',
-                    ':missing'=>'0'
-                ]
+            'INSERT INTO category (
+                name, local_files, hidden, missing
+            ) VALUES (
+                :name, :local_files, :hidden, :missing
+            )',
+            [
+                ':name' => $name,
+                ':local_files' => $localFiles,
+                ':hidden' => '0',
+                ':missing' => '0'
+            ]
         )
-
         ) {
             $this->error('insert_category: FAILED to insert: ' . $name);
+
             return false;
         }
 
@@ -1383,7 +1384,6 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             . $this->categoryUrlencode($this->stripPrefix($name))
             . '">'
             . htmlentities($this->stripPrefix($name)) . '</a>'
-            //. " (local_files=$local_files)"
         );
         return true;
     }
@@ -1410,11 +1410,14 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             || !is_array($this->commonsResponse['query']['categorymembers'])
         ) {
             $this->error('::get_subcats: Nothing Found');
+
             return false;
         }
         foreach ($this->commonsResponse['query']['categorymembers'] as $subcat) {
             $this->insertCategory($subcat['title']);
         }
+
+        return true;
     }
 
     /**
@@ -1423,11 +1426,10 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function importCategories($categoryNameArray)
     {
         $this->notice("import_categories( category_name_array )");
-
         $this->beginTransaction();
-        foreach ($categoryNameArray as $category_name) {
-            $category_name = $this->categoryUrldecode($category_name);
-            $this->insertCategory($category_name);
+        foreach ($categoryNameArray as $categoryName) {
+            $categoryName = $this->categoryUrldecode($categoryName);
+            $this->insertCategory($categoryName);
         }
         $this->commit();
         $this->vacuum();
@@ -1449,13 +1451,16 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
 
         if (!$bind[':id']) {
             $this->error("update_category_local_files_count( $categoryName ) - Category Not Found in Database");
+
             return false;
         }
         if ($this->queryAsBool($sql, $bind)) {
             $this->notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $categoryName);
+
             return true;
         }
         $this->error("update_category_local_files_count( $categoryName ) - UPDATE ERROR");
+
         return false;
     }
 
@@ -1471,25 +1476,19 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             GROUP BY c.id
             ORDER by c.local_files ASC';
 
-        $category_new_sizes = $this->queryAsArray($sql);
-        if (!$category_new_sizes) {
-            $category_new_sizes = [];
+        $categoryNewSizes = $this->queryAsArray($sql);
+        if (!$categoryNewSizes) {
             $this->error('NOT FOUND: Updated 0 Categories Local Files count');
+
             return;
         }
 
         $updates = 0;
         $this->beginTransaction();
-        foreach ($category_new_sizes as $cat) {
-            if (!$cat['size']) {
-                //$this->delete_category( $cat['id'] );
-                //continue;
-            }
-
+        foreach ($categoryNewSizes as $cat) {
             if ($cat['local_files'] == $cat['size']) {
                 continue;
             }
-
             if ($this->insertCategoryLocalFilesCount($cat['id'], $cat['size'])) {
                 $updates++;
             } else {
@@ -1514,6 +1513,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         if ($this->queryAsBool($sql, $bind)) {
             return true;
         }
+
         return false;
     }
 
@@ -1531,12 +1531,18 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             $this->notice('DELETED Category #'. $categoryId);
         } else {
             $this->error('UNABLE to delete category #' . $categoryId);
+
+            return false;
         }
         if ($this->queryAsBool('DELETE FROM category2media WHERE category_id = :category_id', $bind)) {
             $this->notice('DELETED Links to Category #'. $categoryId);
         } else {
             $this->error('UNABLE to delete links to category #' . $categoryId);
+
+            return false;
         }
+
+        return true;
     }
 
     /**
