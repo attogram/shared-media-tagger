@@ -3,10 +3,10 @@
  * Shared Media Tagger
  * About page
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-$a = $smt->queryAsArray('SELECT name, about FROM site WHERE id = 1');
+$a = $smt->database->queryAsArray('SELECT name, about FROM site WHERE id = 1');
 $about = @$a[0]['about'];
 $name = @$a[0]['name'];
 

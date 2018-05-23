@@ -3,8 +3,10 @@
  * Shared Media Tagger
  * Browse all
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
+
+use Attogram\SharedMedia\Tagger\Tools;
 
 $pageLimit = 20; // # of files per page
 
@@ -26,7 +28,7 @@ switch ($sort) {
     case 'size':
         $orderby = ' ORDER BY size';
         $extra = 'size';
-        $extra_numberformat = 1;
+        $extraNumberformat = 1;
         break;
     case 'title':
         $orderby = ' ORDER BY title';
@@ -38,12 +40,12 @@ switch ($sort) {
     case 'width':
         $orderby = ' ORDER BY width';
         $extra = 'width';
-        $extra_numberformat = 1;
+        $extraNumberformat = 1;
         break;
     case 'height':
         $orderby = ' ORDER BY height';
         $extra = 'height';
-        $extra_numberformat = 1;
+        $extraNumberformat = 1;
         break;
     case 'datetimeoriginal':
         $orderby = ' ORDER BY datetimeoriginal';
@@ -117,69 +119,69 @@ if ($smt->siteInfo['curation'] == 1) {
 }
 
 $dir = 'd';
-$sql_dir = ' DESC';
+$sqlDir = ' DESC';
 if (isset($_GET['d'])) {
     switch ($_GET['d']) {
         case 'a':
             $dir = 'a';
-            $sql_dir = ' ASC';
+            $sqlDir = ' ASC';
             break;
         case 'd':
             $dir = 'd';
-            $sql_dir = ' DESC';
+            $sqlDir = ' DESC';
             break;
     }
 }
 
 switch ($sort) {
     default:
-        $sql_count = 'SELECT count(pageid) AS count FROM media' . $where;
-        $raw_count = $smt->queryAsArray($sql_count);
-        $result_size = 0;
-        if ($raw_count) {
-            $result_size = $raw_count[0]['count'];
+        $sqlCount = 'SELECT count(pageid) AS count FROM media' . $where;
+        $rawCount = $smt->database->queryAsArray($sqlCount);
+        $resultSize = 0;
+        if ($rawCount) {
+            $resultSize = $rawCount[0]['count'];
         }
         break;
 
     case 'random':
-        $result_size = $pageLimit;
+        $resultSize = $pageLimit;
         break;
 }
 
 //////////////////////////////////////////
 $pager = '';
-$sql_offset = '';
+$sqlOffset = '';
 
 $offset = isset($_GET['o']) ? $_GET['o'] : 0;
 
-$current_page = ($offset / $pageLimit) + 1;
-$number_of_pages = ceil($result_size / $pageLimit);
+$currentPage = ($offset / $pageLimit) + 1;
+$numberOfPages = ceil($resultSize / $pageLimit);
 
-if ($sort != 'random' && ($result_size > $pageLimit)) {
-    $sql_offset = " OFFSET $offset";
-    $page_count = 0;
+if ($sort != 'random' && ($resultSize > $pageLimit)) {
+    $sqlOffset = " OFFSET $offset";
+    $pageCount = 0;
     $pager = '<small>page: ';
-    for($x = 0; $x < $result_size; $x+=$pageLimit) {
-        $page_count++;
+    for ($count = 0; $count < $resultSize; $count += $pageLimit) {
+        $pageCount++;
 
-        if ($current_page == $page_count) {
+        if ($currentPage == $pageCount) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
-            . pagerLink($x) . '&nbsp;' . $page_count . '&nbsp;</a> </span>';
+            . pagerLink($count) . '&nbsp;' . $pageCount . '&nbsp;</a> </span>';
             continue;
         }
 
-        $edge_buffer = 3; // always show first and last pages
+        $edgeBuffer = 3; // always show first and last pages
         $buffer = 5; // always show pages before/after current page
-        if ($page_count <= $edge_buffer
-            || $page_count > ($number_of_pages-$edge_buffer)
-            || (($page_count > ($current_page-$buffer)) && ($page_count < ($current_page+$buffer)))
+        if ($pageCount <= $edgeBuffer
+            || $pageCount > ($numberOfPages-$edgeBuffer)
+            || (($pageCount > ($currentPage-$buffer)) && ($pageCount < ($currentPage+$buffer)))
         ) {
-            $pager .= pagerLink($x) . '&nbsp;' . $page_count . ' </a>';
+            $pager .= pagerLink($count) . '&nbsp;' . $pageCount . ' </a>';
             continue;
         }
 
-        if ($page_count % 50 == 0) {
-            $pager .= pagerLink($x) . '. </a>';
+        if ($pageCount % 50 == 0) {
+            $pager .= pagerLink($count) . '. </a>';
         }
     }
     $pager .= '</small>';
@@ -188,13 +190,12 @@ if ($sort != 'random' && ($result_size > $pageLimit)) {
 
 
 $sql = 'SELECT * FROM media';
-$sql .= $where . $orderby . $sql_dir . ' LIMIT ' . $pageLimit . $sql_offset;
+$sql .= $where . $orderby . $sqlDir . ' LIMIT ' . $pageLimit . $sqlOffset;
 
-$medias = $smt->queryAsArray($sql);
+$medias = $smt->database->queryAsArray($sql);
 
-
-$smt->title = 'Browse ' . number_format($result_size) . ' Files, sorted by ' . $sort . ' ' . $sql_dir
-    . ', page #' . $current_page . ' - ' . $smt->siteName;
+$smt->title = 'Browse ' . number_format($resultSize) . ' Files, sorted by ' . $sort . ' ' . $sqlDir
+    . ', page #' . $currentPage . ' - ' . $smt->siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
 ////////////////////////////////////////////////////////////////////////
@@ -202,36 +203,36 @@ $smt->includeMediumMenu();
 print '<div class="box white">';
 print '<form>
 Browse Files, sorty by <select name="s">
-<option value="random"' . $smt->isSelected('random', $sort) . '>Random</option>
-<option value="pageid"' . $smt->isSelected('pageid', $sort) . '>ID</option>
-<option value="size"' . $smt->isSelected('size', $sort) . '>Size</option>
-<option value="title"' . $smt->isSelected('title', $sort) . '>File Name</option>
-<option value="mime"' . $smt->isSelected('mime', $sort) . '>Mime Type</option>
-<option value="width"' . $smt->isSelected('width', $sort) . '>Width</option>
-<option value="height"' . $smt->isSelected('height', $sort) . '>Height</option>
-<option value="datetimeoriginal"' . $smt->isSelected('datetimeoriginal', $sort) . '>Original Datetime</option>
-<option value="timestamp"' . $smt->isSelected('timestamp', $sort) . '>Upload Datetime</option>
-<option value="updated"' . $smt->isSelected('updated', $sort) . '>Last Updated</option>
-<option value="licenseuri"' . $smt->isSelected('licenseuri', $sort) . '>License URI</option>
-<option value="licensename"' . $smt->isSelected('licensename', $sort) . '>License Name</option>
-<option value="licenseshortname"' . $smt->isSelected('licenseshortname', $sort) . '>License Short Name</option>
-<option value="usageterms"' . $smt->isSelected('usageterms', $sort) . '>Usage Terms</option>
-<option value="attributionrequired"' . $smt->isSelected('attributionrequired', $sort) . '>Attribution Required</option>
-<option value="restrictions"' . $smt->isSelected('restrictions', $sort) . '>Restrictions</option>
-<option value="user"' . $smt->isSelected('user', $sort) . '>Uploading User</option>
-<option value="duration"' . $smt->isSelected('duration', $sort) . '>Duration</option>
-<option value="sha1"' . $smt->isSelected('sha1', $sort) . '>Sha1 Hash</option>
-<option value="skin"' . $smt->isSelected('skin', $sort) . '>Skin Percentage</option>
-<option value="dhash"' . $smt->isSelected('dhash', $sort) . '>Difference Hash</option>
-<option value="phash"' . $smt->isSelected('phash', $sort) . '>Perceptual Hash</option>
-<option value="ahash"' . $smt->isSelected('ahash', $sort) . '>Average Hash</option>
+<option value="random"' . Tools::isSelected('random', $sort) . ' >Random</option>
+<option value="pageid"' . Tools::isSelected('pageid', $sort) . '>ID</option>
+<option value="size"' . Tools::isSelected('size', $sort) . '>Size</option>
+<option value="title"' . Tools::isSelected('title', $sort) . '>File Name</option>
+<option value="mime"' . Tools::isSelected('mime', $sort) . '>Mime Type</option>
+<option value="width"' . Tools::isSelected('width', $sort) . '>Width</option>
+<option value="height"' . Tools::isSelected('height', $sort) . '>Height</option>
+<option value="datetimeoriginal"' . Tools::isSelected('datetimeoriginal', $sort) . '>Original Datetime</option>
+<option value="timestamp"' . Tools::isSelected('timestamp', $sort) . '>Upload Datetime</option>
+<option value="updated"' . Tools::isSelected('updated', $sort) . '>Last Updated</option>
+<option value="licenseuri"' . Tools::isSelected('licenseuri', $sort) . '>License URI</option>
+<option value="licensename"' . Tools::isSelected('licensename', $sort) . '>License Name</option>
+<option value="licenseshortname"' . Tools::isSelected('licenseshortname', $sort) . '>License Short Name</option>
+<option value="usageterms"' . Tools::isSelected('usageterms', $sort) . '>Usage Terms</option>
+<option value="attributionrequired"' . Tools::isSelected('attributionrequired', $sort) . '>Attribution Required</option>
+<option value="restrictions"' . Tools::isSelected('restrictions', $sort) . '>Restrictions</option>
+<option value="user"' . Tools::isSelected('user', $sort) . '>Uploading User</option>
+<option value="duration"' . Tools::isSelected('duration', $sort) . '>Duration</option>
+<option value="sha1"' . Tools::isSelected('sha1', $sort) . '>Sha1 Hash</option>
+<option value="skin"' . Tools::isSelected('skin', $sort) . '>Skin Percentage</option>
+<option value="dhash"' . Tools::isSelected('dhash', $sort) . '>Difference Hash</option>
+<option value="phash"' . Tools::isSelected('phash', $sort) . '>Perceptual Hash</option>
+<option value="ahash"' . Tools::isSelected('ahash', $sort) . '>Average Hash</option>
 </select>
 <select name="d">
-<option value="d"' . $smt->isSelected('d', $dir) . '>Descending</option>
-<option value="a"' . $smt->isSelected('a', $dir) . '>Ascending</option>
+<option value="d"' . Tools::isSelected('d', $dir) . '>Descending</option>
+<option value="a"' . Tools::isSelected('a', $dir) . '>Ascending</option>
 </select>
 <input type="submit" value="Browse" />
-</form><br />' . number_format($result_size) . ' Files' . ($pager ? ', '.$pager : '');
+</form><br />' . number_format($resultSize) . ' Files' . ($pager ? ', '.$pager : '');
 
 if ($smt->isAdmin()) {
     print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
@@ -240,12 +241,12 @@ if ($smt->isAdmin()) {
 
 print '<br clear="all" />';
 
-foreach($medias as $media) {
+foreach ($medias as $media) {
     if (isset($extra)) {
         print '<div style="display:inline-block;">'
         . '<span style="background-color:#eee; border:1px solid #f99; font-size:80%;">';
 
-        if (isset($extra_numberformat)) {
+        if (isset($extraNumberformat)) {
             print number_format($media[$extra]);
         } else {
             print $media[$extra];
@@ -275,15 +276,17 @@ $smt->includeFooter();
  * @param $offset
  * @return string
  */
-function pagerLink($offset) {
+function pagerLink($offset)
+{
     global $sort, $dir;
     $link = '<a href="?o=' . $offset;
-    if( $sort ) {
+    if ($sort) {
         $link .= '&amp;s=' . $sort;
     }
-    if( $dir ) {
+    if ($dir) {
         $link .= '&amp;d=' . $dir;
     }
     $link .= '">';
+
     return $link;
 }

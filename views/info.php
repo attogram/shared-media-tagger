@@ -3,10 +3,12 @@
  * Shared Media Tagger
  * Media Info
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-if (!isset($_GET['i']) || !$_GET['i'] || !$smt->isPositiveNumber($_GET['i'])) {
+use Attogram\SharedMedia\Tagger\Tools;
+
+if (!isset($_GET['i']) || !$_GET['i'] || !Tools::isPositiveNumber($_GET['i'])) {
     $smt->fail404('404 Media Not Found');
 }
 
@@ -16,7 +18,7 @@ $media = $smt->getMedia($pageid);
 if (!$media || !isset($media[0]) || !is_array($media[0])) {
     $smt->fail404('404 Media Not Found');
 }
-$media = @$media[0];
+$media = $media[0];
 
 
 /////////////////////////////////////////////////////////////////////
@@ -60,7 +62,8 @@ $fix = [
     'Public domain'=>'Public Domain',
     'CC-BY-SA-3.0'=>'CC BY-SA 3.0'
 ];
-while ((list($bad,$good) = each($fix))) {
+
+foreach ($fix as $bad => $good) {
     if ($media['usageterms'] == $bad) {
         $media['usageterms'] = $good;
     }
@@ -114,7 +117,7 @@ li { margin-bottom:6px; }
 <?php
 if ($media['duration'] > 0) {
     //print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
-    print '<li>duration: <b>' . $smt->secondsToTime($media['duration']) . '</b></li>';
+    print '<li>duration: <b>' . Tools::secondsToTime($media['duration']) . '</b></li>';
 }
 ?>
 <li>timestamp: <b><?php print $media['timestamp']; ?></b></li>

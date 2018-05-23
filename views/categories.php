@@ -3,7 +3,7 @@
  * Shared Media Tagger
  * Categories
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
 $pageLimit = 1000;
@@ -18,7 +18,7 @@ if (isset($_GET['h']) && $_GET['h']) {
     $hidden = 1;
 }
 
-$categorySize = $smt->getCategoriesCount(false, $hidden); // @TODO get real selection size, not full category count
+$categorySize = $smt->database->getCategoriesCount(false, $hidden); // @TODO get real selection size, not full category count
 
 $pager = '';
 $sqlLimit = '';
@@ -27,14 +27,14 @@ if ($categorySize > $pageLimit) {
     $sqlLimit = " LIMIT $pageLimit OFFSET $offset";
     $pageCount = 0;
     $pager = ': ';
-    for ($x = 0; $x < $categorySize; $x += $pageLimit) {
-        if ($x == $offset) {
+    for ($count = 0; $count < $categorySize; $count += $pageLimit) {
+        if ($count == $offset) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
             . '&nbsp;' . ++$pageCount . '&nbsp;</span> ';
             $pagerCount = $pageCount;
             continue;
         }
-        $pager .= '<a href="?o=' . $x
+        $pager .= '<a href="?o=' . $count
         . ($hidden ? '&amp;h=1' : '')
         . '">&nbsp;' . ++$pageCount . '&nbsp;</a> ';
     }
@@ -58,7 +58,7 @@ if ($search) {
 $sql .= ' ORDER BY local_files DESC, name ';
 $sql .= $sqlLimit;
 
-$categories = $smt->queryAsArray($sql, $bind);
+$categories = $smt->database->queryAsArray($sql, $bind);
 
 $pageName = number_format($categorySize);
 if ($hidden) {
@@ -76,7 +76,7 @@ $smt->includeHeader();
 $smt->includeMediumMenu();
 
 ?><div class="box white">
-<div style="padding:10px 0px 10px 0px; float:right;"><form method="GET">
+<div style="padding:10px 0px 10px 0px;float:right;"><form method="GET">
 <a href="<?php print $smt->url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;
 <a href="<?php print $smt->url('categories'); ?>?h=1"  style="font-size:80%;">Tech</a> &nbsp;
 <?php

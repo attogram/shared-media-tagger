@@ -3,10 +3,11 @@
  * Shared Media Tagger
  * Export Admin
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+use Attogram\SharedMedia\Tagger\TaggerAdmin;
+use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Export Admin';
 $smt->includeHeader();
@@ -24,7 +25,13 @@ foreach ($smt->getTags() as $tag) {
 print '<li><a href="?r=skin">MediaWiki Format: Skin Percentage Report</a></li>';
 print '</ul><hr />';
 
-switch (@$_GET['r']) {
+if (!isset($_GET['r'])) {
+    print '</div>';
+    $smt->includeFooter();
+    exit;
+}
+
+switch ($_GET['r']) {
     default:
         break;
     case 'network':
@@ -44,19 +51,19 @@ print '</div>';
 $smt->includeFooter();
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  */
-function networkExport(SharedMediaTaggerAdmin $smt)
+function networkExport(TaggerAdmin $smt)
 {
     $cr = "\n";
     $tab = "\t";
     $site = $smt->getProtocol() . $smt->siteUrl;
 
     $export = 'SMT_NETWORK_SITE: ' . $site . $cr
-    . 'SMT_DATETIME: ' . $smt->timeNow() . $cr
+    . 'SMT_DATETIME: ' . Tools::timeNow() . $cr
     . 'SMT_VERSION: ' . __SMT__ . $cr;
 
-    $cats = $smt->queryAsArray('
+    $cats = $smt->database->queryAsArray('
         SELECT pageid, name
         FROM category
         WHERE local_files > 0
@@ -72,7 +79,7 @@ function networkExport(SharedMediaTaggerAdmin $smt)
     }
     unset($cats);
 
-    $medias = $smt->queryAsArray('
+    $medias = $smt->database->queryAsArray('
         SELECT pageid, title
         FROM media
         ORDER BY title');
@@ -91,14 +98,14 @@ function networkExport(SharedMediaTaggerAdmin $smt)
 }
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  * @param string $tagId
  * @return bool
  */
-function tagReport(SharedMediaTaggerAdmin $smt, $tagId = '')
+function tagReport(TaggerAdmin $smt, $tagId = '')
 {
-    if (!$tagId || !$smt->isPositiveNumber($tagId)) {
-        $smt->error('Tag Report: Tag ID NOT FOUND');
+    if (!$tagId || !Tools::isPositiveNumber($tagId)) {
+        Tools::error('Tag Report: Tag ID NOT FOUND');
         return false;
     }
 
@@ -110,7 +117,7 @@ function tagReport(SharedMediaTaggerAdmin $smt, $tagId = '')
     WHERE m.pageid = t.media_pageid
     AND t.tagId = :tagId
     LIMIT 200';
-    $medias = $smt->queryAsArray($sql, [':tagId' => $tagId]);
+    $medias = $smt->database->queryAsArray($sql, [':tagId' => $tagId]);
     $cr = "\n";
     $reportName = 'Tag Report: ' . $tagName . ' - Top ' . sizeof($medias) . ' Files';
 
@@ -118,7 +125,7 @@ function tagReport(SharedMediaTaggerAdmin $smt, $tagId = '')
     . '== ' . $reportName . ' ==' . $cr
     . '* Collection ID: <code>' . md5($smt->siteName) . '</code>' . $cr
     . '* Collection Size: ' . number_format($smt->getImageCount()) . $cr
-    . '* Created on: ' . $smt->timeNow() . ' UTC' . $cr
+    . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
     . '* Created with: Shared Media Tagger v' . __SMT__ . $cr
     . '<gallery caption="' . $reportName . '" widths="100px" heights="100px" perrow="6">' . $cr;
 
@@ -130,19 +137,19 @@ function tagReport(SharedMediaTaggerAdmin $smt, $tagId = '')
 }
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  */
-function skinReport(SharedMediaTaggerAdmin $smt)
+function skinReport(TaggerAdmin $smt)
 {
     $sql = 'SELECT title, skin FROM media ORDER BY skin DESC LIMIT 200';
-    $medias = $smt->queryAsArray($sql);
+    $medias = $smt->database->queryAsArray($sql);
     $cr = "\n";
     print '<textarea cols="90" rows="20">'
     . '== Skin Percentage Report ==' . $cr
     . '* Collection ID: <code>' . md5($smt->siteName) . '</code>' . $cr
     . '* Collection Size: ' . number_format($smt->getImageCount()) . $cr
     . '* Algorithm: Image_FleshSkinQuantifier / YCbCr Space Color Model / J. Marcial-Basilio et al. (2011) ' . $cr
-    . '* Created on: ' . $smt->timeNow() . ' UTC' . $cr
+    . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
     . '* Created with: Shared Media Tagger v' . __SMT__ . $cr
     . '<gallery caption="Skin Percentage Report - Top ' . sizeof($medias)
         . ' Files" widths="100px" heights="100px" perrow="6">' . $cr;

@@ -3,7 +3,7 @@
  * Shared Media Tagger
  * Media Admin
  *
- * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
 $smt->title = 'Media Admin';
@@ -65,14 +65,14 @@ $smt->includeFooter();
 
 
 /**
- * @param \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @param \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  * @param $list
  * @return bool|string
  */
-function multiDeleteMedia(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt, $list)
+function multiDeleteMedia(\Attogram\SharedMedia\Tagger\TaggerAdmin $smt, $list)
 {
     if (!is_array($list)) {
-        $smt->error('multi_delete_media: No list array found');
+        Tools::error('multi_delete_media: No list array found');
         return false;
     }
     $response = '<p>Deleting &amp; Blocking ' . sizeof($list) . ' Media files:';
@@ -84,14 +84,14 @@ function multiDeleteMedia(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $s
 }
 
 /**
- * @param \Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @param \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  * @param $category_name
  * @return bool|string
  */
-function deleteMediaInCategory(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt, $category_name)
+function deleteMediaInCategory(\Attogram\SharedMedia\Tagger\TaggerAdmin $smt, $category_name)
 {
     if (!$category_name || !is_string($category_name)) {
-        $smt->error('::delete_media_in_category: Invalid Category Name: ' . $category_name);
+        Tools::error('::delete_media_in_category: Invalid Category Name: ' . $category_name);
         return false;
     }
     $return = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
@@ -100,7 +100,7 @@ function deleteMediaInCategory(\Attogram\SharedMedia\Tagger\SharedMediaTaggerAdm
     $return .= '<br /><b>' . count($media) . '</b> Media files found in Category';
     foreach ($media as $pageid) {
         $return .= '<br />Deleting #' . $pageid;
-        $return .= $smt->deleteMedia($pageid, /*no-block*/true);
+        $return .= $smt->deleteMedia($pageid, true);
     }
     $return .= '</div><br />';
 

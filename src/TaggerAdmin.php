@@ -5,24 +5,31 @@ declare(strict_types = 1);
 namespace Attogram\SharedMedia\Tagger;
 
 /**
- * Class sharedMediaTaggerAdmin
+ * Class TaggerAdmin
  */
-class SharedMediaTaggerAdmin extends SharedMediaTagger
+class TaggerAdmin extends Tagger
 {
+    /** @var Commons */
+    private $commons;
+
     protected $tablesCurrent;
     protected $sqlCurrent;
     protected $sqlNew;
-    public $commonsApiUrl;
-    public $apiCount;
-    public $propImageinfo;
-    public $totalHits;
-    public $continue;
-    public $sroffset;
-    public $batchComplete;
-    public $commonsResponse;
+
     public $categories;
     public $categoryId;
     public $databaseFile;
+
+    /**
+     * SharedMediaTaggerAdmin constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        ini_set('user_agent', 'Shared Media Tagger v' . __SMT__);
+        $this->setAdminCookie();
+        $this->commons = new Commons();
+    }
 
     // SMT Admin - Utils
 
@@ -284,14 +291,14 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function createTables()
     {
-        if (!file_exists($this->databaseName)) {
-            if (!touch($this->databaseName)) {
-                $this->error('ERROR: can not touch database name: ' . $this->databaseName);
+        if (!file_exists($this->database->databaseName)) {
+            if (!touch($this->database->databaseName)) {
+                Tools::error('ERROR: can not touch database name: ' . $this->database->databaseName);
 
                 return false;
             }
         }
-        $this->setDatabaseFile($this->databaseName);
+        $this->setDatabaseFile($this->database->databaseName);
         $this->setNewStructures($this->getDatabaseTables());
         $this->update();
 
@@ -309,7 +316,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         $this->sqlCurrent = [];
         $this->setTableInfo();
 
-        return $this->databaseLoaded();
+        return $this->database->databaseLoaded();
     }
 
     /**
@@ -319,7 +326,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function setNewStructures(array $tables = [])
     {
         if (!$tables || !is_array($tables)) {
-            $this->error('$tables array is invalid');
+            Tools::error('$tables array is invalid');
 
             return false;
         }
@@ -328,12 +335,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         foreach ($tables as $tableName => $tableSql) {
             $count++;
             if (!$tableName || !is_string($tableName)) {
-                $this->error("#$count - Invalid table name");
+                Tools::error("#$count - Invalid table name");
                 $errors++;
                 continue;
             }
             if (!$tableSql || !is_string($tableSql)) {
-                $this->error("#$count - Invalid table sql");
+                Tools::error("#$count - Invalid table sql");
                 $errors++;
                 continue;
             }
@@ -372,28 +379,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             $toUpdate[] = $name;
         }
         if (!$toUpdate) {
-            $this->notice('OK: ' . sizeof($this->sqlNew) . ' tables up-to-date');
+            Tools::notice('OK: ' . sizeof($this->sqlNew) . ' tables up-to-date');
 
             return true;
         }
-        $this->notice(sizeof($toUpdate) . ' tables to update: ' . implode($toUpdate, ', '));
+        Tools::notice(sizeof($toUpdate) . ' tables to update: ' . implode($toUpdate, ', '));
         foreach ($toUpdate as $tableName) {
             $this->updateTable($tableName);
-        }
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function databaseLoaded()
-    {
-        //if (!$this->db) {
-        //    $this->open_database(); // @TODO find
-        //}
-        if (!$this->db) {
-            return false;
         }
 
         return true;
@@ -407,13 +399,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     {
         $tmpName = '_STSU_TMP_' . $tableName;
         $backupName = '_STSU_BACKUP_' . $tableName;
-        $this->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
-        $this->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
-        $this->beginTransaction();
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
+        $this->database->beginTransaction();
         $sql = $this->sqlNew[$tableName];
         $sql = str_ireplace("CREATE TABLE '$tableName'", "CREATE TABLE '$tmpName'", $sql);
-        if (!$this->queryAsBool($sql)) {
-            $this->error('ERROR: can not create tmp table:<br />' . $sql);
+        if (!$this->database->queryAsBool($sql)) {
+            Tools::error('ERROR: can not create tmp table:<br />' . $sql);
             return false;
         }
         // Get Columns of new table
@@ -432,32 +424,32 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             $oldSize = $this->getTableSize($tableName);
             $cols = implode($cols, ', ');
             $sql = "INSERT INTO '$tmpName' ( $cols ) SELECT $cols FROM $tableName";
-            if (!$this->queryAsBool($sql)) {
-                $this->error('ERROR: can not insert into tmp table: ' . $tmpName
+            if (!$this->database->queryAsBool($sql)) {
+                Tools::error('ERROR: can not insert into tmp table: ' . $tmpName
                 . '<br />' . $sql);
                 return false;
             }
             $newSize = $this->getTableSize($tmpName);
             if ($newSize == $oldSize) {
             } else {
-                $this->error("ERROR: Inserted new $newSize rows, from $oldSize old rows");
+                Tools::error("ERROR: Inserted new $newSize rows, from $oldSize old rows");
             }
-            if (!$this->queryAsBool("ALTER TABLE $tableName RENAME TO $backupName")) {
-                $this->error('ERROR: can not rename '.$tableName.' to '.$backupName);
+            if (!$this->database->queryAsBool("ALTER TABLE $tableName RENAME TO $backupName")) {
+                Tools::error('ERROR: can not rename '.$tableName.' to '.$backupName);
 
                 return false;
             }
         }
-        if (!$this->queryAsBool("ALTER TABLE $tmpName RENAME TO $tableName")) {
-            $this->error('ERROR: can not rename ' . $tmpName . ' to ' . $backupName);
+        if (!$this->database->queryAsBool("ALTER TABLE $tmpName RENAME TO $tableName")) {
+            Tools::error('ERROR: can not rename ' . $tmpName . ' to ' . $backupName);
 
             return false;
         }
-        $this->commit();
-        $this->notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
-        $this->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
-        $this->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
-        $this->vacuum();
+        $this->database->commit();
+        Tools::notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
+        $this->database->vacuum();
 
         return true;
     }
@@ -467,7 +459,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     protected function setTableInfo()
     {
-        $tables = $this->queryAsArray("SELECT name, sql FROM sqlite_master WHERE type = 'table'");
+        $tables = $this->database->queryAsArray("SELECT name, sql FROM sqlite_master WHERE type = 'table'");
         foreach ($tables as $table) {
             if (preg_match('/^_STSU_/', $table['name'])) {
                 continue; // tmp and backup tables
@@ -482,7 +474,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     protected function setTableColumnInfo($tableName)
     {
-        $columns = $this->queryAsArray("PRAGMA table_info($tableName)");
+        $columns = $this->database->queryAsArray("PRAGMA table_info($tableName)");
         foreach ($columns as $column) {
             $this->tablesCurrent[$tableName][$column['name']] = $column;
         }
@@ -507,11 +499,11 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     protected function getTableSize($tableName)
     {
-        $size = $this->queryAsArray('SELECT count(rowid) AS count FROM ' . $tableName);
+        $size = $this->database->queryAsArray('SELECT count(rowid) AS count FROM ' . $tableName);
         if (isset($size[0]['count'])) {
             return $size[0]['count'];
         }
-        $this->error('Can not get table size: ' . $tableName);
+        Tools::error('Can not get table size: ' . $tableName);
 
         return 0;
     }
@@ -529,13 +521,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         ];
         $response = [];
         foreach ($sqls as $sql) {
-            if ($this->queryAsBool($sql)) {
+            if ($this->database->queryAsBool($sql)) {
                 $response[] = 'OK: ' . $sql;
             } else {
                 $response[] = 'FAIL: ' . $sql;
             }
         }
-        $this->vacuum();
+        $this->database->vacuum();
 
         return $response;
     }
@@ -552,13 +544,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         ];
         $response = [];
         foreach ($sqls as $sql) {
-            if ($this->queryAsBool($sql)) {
+            if ($this->database->queryAsBool($sql)) {
                 $response[] = 'OK: ' . $sql;
             } else {
                 $response[] = 'FAIL: ' . $sql;
             }
         }
-        $this->vacuum();
+        $this->database->vacuum();
 
         return $response;
     }
@@ -584,96 +576,15 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         ];
         $response = false;
         foreach ($sqls as $id => $sql) {
-            if ($this->queryAsBool($sql)) {
+            if ($this->database->queryAsBool($sql)) {
                 $response .= "<b>OK:</b> $sql<br />";
             } else {
                 $response .= "<b>FAIL:<b/> $sql<br />";
             }
         }
-        $this->vacuum();
+        $this->database->vacuum();
 
         return $response;
-    }
-
-    // SMT Admin - Commons API
-
-    /**
-     * @param $url
-     * @param string $key
-     * @return bool
-     */
-    public function callCommons($url, $key = '')
-    {
-        if (!$url) {
-            $this->error('::call_commons: ERROR: no url');
-
-            return false;
-        }
-        $getResponse = @file_get_contents($url);
-
-        if ($getResponse === false) {
-            $this->error('Cannnot reach API endpoint'
-                . '<br />URL: <a target="commons" href="' . $url . '">' . $url  .'</a>'
-                . '<br />Exiting.');
-            print '</div>';
-            $this->includeFooter();
-
-            exit;
-        }
-        $this->apiCount++;
-        $this->commonsResponse = json_decode($getResponse, true);
-        if (!$this->commonsResponse) {
-            $this->error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error());
-            $this->error('::call_commons: ERROR: ' . $this->smtJsonLastErrorMsg());
-
-            return false;
-        }
-
-        if (empty($this->commonsResponse['query'][$key])
-            || !$this->commonsResponse['query'][$key]
-            || !is_array($this->commonsResponse['query'][$key])
-        ) {
-            $this->error("::call_commons: WARNING: missing key: $key");
-        }
-
-        $this->totalHits = $this->continue = $this->batchComplete = false;
-
-        if (isset($this->commonsResponse['batchcomplete'])) {
-            $this->batchComplete = true;
-        }
-
-        if (isset($this->commonsResponse['query']['searchinfo']['totalhits'])) {
-            $this->totalHits = $this->commonsResponse['query']['searchinfo']['totalhits'];
-            $this->notice('::call_commmons: totalhits=' . $this->totalHits);
-        }
-        if (isset($this->commonsResponse['continue'])) {
-            $this->continue = $this->commonsResponse['continue']['continue'];
-        }
-        if (isset($this->commonsResponse['sroffset'])) {
-            $this->sroffset = $this->commonsResponse['continue']['sroffset'];
-        }
-        if (isset($this->commonsResponse['warnings'])) {
-            $this->error('::call_commons: ' . print_r($this->commonsResponse['warnings'], true));
-            $this->error('::call_commons: url: ' . $url);
-        }
-        return true;
-    }
-
-    /**
-     * @return mixed|string
-     */
-    public function smtJsonLastErrorMsg()
-    {
-        static $errors = [
-            JSON_ERROR_NONE             => null,
-            JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
-            JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
-            JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
-            JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
-            JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
-        ];
-        $error = json_last_error();
-        return array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
     }
 
     // SMT Admin - Media
@@ -684,8 +595,8 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function addMedia($pageid)
     {
-        if (!$pageid || !$this->isPositiveNumber($pageid)) {
-            $this->error('add_media: Invalid PageID');
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('add_media: Invalid PageID');
 
             return false;
         }
@@ -694,7 +605,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         . '<p>Add Media: pageid: <b>' . $pageid . '</b></p>';
 
         // Get media info from API
-        $media = $this->getApiImageinfo([$pageid], 0);
+        $media = $this->commons->getApiImageinfo([$pageid], 0);
         if (!$media) {
             return $response . '<p>ERROR: failed to get media info from API</p></div>';
         }
@@ -730,13 +641,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function saveMediaToDatabase($media = [])
     {
         if (!$media || !is_array($media)) {
-            $this->error('::save_media_to_database: no media array');
+            Tools::error('::save_media_to_database: no media array');
             return false;
         }
 
         $errors = [];
 
-        $this->beginTransaction();
+        $this->database->beginTransaction();
 
         foreach ($media as $id => $mediaFile) {
             $new = [];
@@ -745,7 +656,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
 
             $new[':url'] = @$mediaFile['imageinfo'][0]['url'];
             if (!isset($new[':url']) || $new[':url'] == '') {
-                $this->error('::save_media_to_database: ERROR: NO URL: SKIPPING: pageid='
+                Tools::error('::save_media_to_database: ERROR: NO URL: SKIPPING: pageid='
                     . @$new[':pageid'] . ' title=' . @$new[':title']);
                 $errors[ $new[':pageid'] ] = $new[':title'];
                 continue;
@@ -800,29 +711,29 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
                         :user, :userid, :duration, :timestamp
                     )";
 
-            $response = $this->queryAsBool($sql, $new);
+            $response = $this->database->queryAsBool($sql, $new);
 
             if ($response === false) {
-                $this->error('::save_media_to_database: STOPPING IMPORT');
-                $this->error('::save_media_to_database: FAILED insert into media table');
+                Tools::error('::save_media_to_database: STOPPING IMPORT');
+                Tools::error('::save_media_to_database: FAILED insert into media table');
                 return false;
             }
 
-            $this->notice('SAVED MEDIA: ' . $new[':pageid'] . ' = <a href="' . $this->url('info')
+            Tools::notice('SAVED MEDIA: ' . $new[':pageid'] . ' = <a href="' . $this->url('info')
             . '?i=' . $new[':pageid'] . '">' . $this->stripPrefix($new[':title']) . '</a>');
 
             if (!$this->linkMediaCategories($new[':pageid'])) {
-                $this->error('::: FAILED to link media categories - p:' . $new[':pageid']);
+                Tools::error('::: FAILED to link media categories - p:' . $new[':pageid']);
             }
-            //$this->notice('::: LINKED ' . sizeof($this->categories) . ' categories');
+            //Tools::notice('::: LINKED ' . sizeof($this->categories) . ' categories');
         } // end while each media
 
-        $this->commit();
-        $this->vacuum();
+        $this->database->commit();
+        $this->database->vacuum();
 
-        //$this->notice('END of save_media_to_database: ' . sizeof($media) . ' files');
+        //Tools::notice('END of save_media_to_database: ' . sizeof($media) . ' files');
         if ($errors) {
-            $this->error($errors);
+            Tools::error($errors);
         }
         return true;
     }
@@ -842,20 +753,20 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             $category = 'Category:' . $category;
         }
 
-        $categorymembers = $this->getApiCategorymembers($category);
+        $categorymembers = $this->commons->getApiCategorymembers($category);
         if (!$categorymembers) {
-            $this->error('::getMediaFromCategory: No Media Found');
+            Tools::error('::getMediaFromCategory: No Media Found');
 
             return false;
         }
 
-        $blocked = $this->queryAsArray(
+        $blocked = $this->database->queryAsArray(
             'SELECT pageid FROM block WHERE pageid IN ('
                 . implode($categorymembers, ',')
             . ')'
         );
         if ($blocked) {
-            $this->error('ERROR: ' . sizeof($blocked) . ' BLOCKED MEDIA FILES');
+            Tools::error('ERROR: ' . sizeof($blocked) . ' BLOCKED MEDIA FILES');
             foreach ($blocked as $bpageid) {
                 if (($key = array_search($bpageid['pageid'], $categorymembers)) !== false) {
                     unset($categorymembers[$key]);
@@ -865,93 +776,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
 
         $chunks = array_chunk($categorymembers, 50);
         foreach ($chunks as $chunk) {
-            $this->saveMediaToDatabase($this->getApiImageinfo($chunk));
+            $this->saveMediaToDatabase($this->commons->getApiImageinfo($chunk));
         }
         $this->updateCategoryLocalFilesCount($category);
         $this->saveCategoryInfo($category);
 
         return true;
-    }
-
-    /**
-     * @see https://www.mediawiki.org/wiki/API:Categorymembers
-     * @param $category
-     * @return array
-     */
-    public function getApiCategorymembers($category)
-    {
-        $url = $this->commonsApiUrl . '?action=query&format=json'
-        . '&list=categorymembers'
-        . '&cmtype=file'
-        . '&cmprop=ids'
-        . '&cmlimit=500'
-        . '&cmtitle=' . urlencode($category);
-        if (!$this->callCommons($url, 'categorymembers')
-            || !isset($this->commonsResponse['query']['categorymembers'])
-        ) {
-            $this->error('::get_api_categorymembers: ERROR: call');
-            return [];
-        }
-        $pageids = [];
-        foreach ($this->commonsResponse['query']['categorymembers'] as $cat) {
-            $pageids[] = $cat['pageid'];
-        }
-        if (!$pageids) {
-            return [];
-        }
-        return $pageids;
-    }
-
-    /**
-     * @param $pageids
-     * @param int $recurseCount
-     * @return array
-     */
-    public function getApiImageinfo($pageids, $recurseCount = 0)
-    {
-        $call = $this->commonsApiUrl . '?action=query&format=json'
-        . $this->propImageinfo
-        . '&iiurlwidth=' . $this->sizeMedium
-        . '&iilimit=50'
-        . '&pageids=' . implode('|', $pageids);
-        if (!$this->callCommons($call, 'pages')
-            || !isset($this->commonsResponse['query']['pages'])
-        ) {
-            $this->error('::get_api_imageinfo: ERROR: call');
-
-            return [];
-        }
-
-        $pages = $this->commonsResponse['query']['pages'];
-
-        $errors = [];
-        foreach ($pages as $media) {
-            if (!isset($media['imageinfo'][0]['url'])) {
-                $errors[] = $media['pageid'];
-                unset($pages[ $media['pageid'] ]);
-            }
-        }
-
-        if (!$recurseCount) {
-            return $pages;
-        }
-
-        if ($recurseCount > 5) {
-            $this->error('::get_api_imageinfo: TOO MUCH RECURSION: ' . $recurseCount);
-
-            return $pages;
-        }
-        $recurseCount++;
-        if ($errors) {
-            $this->error('::get_api_imageinfo: CALL #' . $recurseCount . ': ' . sizeof($errors) . ' EMPTY files');
-            $second = $this->getApiImageinfo($errors, $recurseCount);
-            $this->notice('::get_api_imageinfo: CALL #' . $recurseCount . ': GOT: ' . sizeof($second) . ' files');
-            $pages = array_merge($pages, $second);
-            $this->notice('::get_api_imageinfo: CALL #' . $recurseCount . ': total pages: '
-                . sizeof($pages) . ' files');
-        }
-
-        return $pages;
     }
 
     /**
@@ -961,8 +791,8 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function deleteMedia($pageid, $noBlock = false)
     {
-        if (!$pageid || !$this->isPositiveNumber($pageid)) {
-            $this->error('delete_media: Invalid PageID');
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('delete_media: Invalid PageID');
             return false;
         }
         $response = '<div style="white-space:nowrap;font-family:monospace;color:black;background-color:lightsalmon;">'
@@ -981,7 +811,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         $sqls[] = 'DELETE FROM user_tagging WHERE media_pageid = :pageid';
         $bind = [':pageid' => $pageid];
         foreach ($sqls as $sql) {
-            if ($this->queryAsBool($sql, $bind)) {
+            if ($this->database->queryAsBool($sql, $bind)) {
                 //$response .= '<br />OK: ' . $sql;
             } else {
                 $response .= '<br />ERROR: ' . $sql;
@@ -998,7 +828,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             ':title' => !empty($media[0]['title']) ? $media[0]['title'] : null,
             ':thumb' => !empty($media[0]['thumburl']) ? $media[0]['thumburl'] : null,
         ];
-        if ($this->queryAsBool($sql, $bind)) {
+        if ($this->database->queryAsBool($sql, $bind)) {
             //$response .= '<br />OK: ' . $sql;
         } else {
             $response .= '<br />ERROR: ' . $sql;
@@ -1021,13 +851,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         ];
         $response = [];
         foreach ($sqls as $sql) {
-            if ($this->queryAsBool($sql)) {
+            if ($this->database->queryAsBool($sql)) {
                 $response[] = 'OK: ' . $sql;
             } else {
                 $response[] = 'FAIL: ' . $sql;
             }
         }
-        $this->vacuum();
+        $this->database->vacuum();
         return $response;
     }
 
@@ -1124,8 +954,8 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function getCategoriesFromMedia($pageid)
     {
-        if (!$pageid || !$this->isPositiveNumber($pageid)) {
-            $this->error('::get_categories_from_media: invalid pageid');
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('::get_categories_from_media: invalid pageid');
             return false;
         }
         $call = $this->commonsApiUrl . '?action=query&format=json'
@@ -1133,7 +963,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         . '&pageids=' . $pageid
         ;
         if (!$this->callCommons($call, 'pages')) {
-            $this->error('::get_categories_from_media: nothing found');
+            Tools::error('::get_categories_from_media: nothing found');
             return false;
         }
         $this->categories = !empty($this->commonsResponse['query']['pages'][$pageid]['categories'])
@@ -1149,45 +979,45 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function linkMediaCategories($pageid)
     {
-        if (!$pageid || !$this->isPositiveNumber($pageid)) {
-            $this->error('link_media_categories: invalid pageid');
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('link_media_categories: invalid pageid');
 
             return false;
         }
 
         if (!$this->getCategoriesFromMedia($pageid)) {
-            $this->error('link_media_categories: unable to get categories from API');
+            Tools::error('link_media_categories: unable to get categories from API');
 
             return false;
         }
 
         // Remove any old category links for this media
-        $this->queryAsBool(
+        $this->database->queryAsBool(
             'DELETE FROM category2media WHERE media_pageid = :pageid',
             [':pageid' => $pageid]
         );
 
         foreach ($this->categories as $category) {
             if (!isset($category['title']) || !$category['title']) {
-                $this->error('link_media_categories: ERROR: missing category title');
+                Tools::error('link_media_categories: ERROR: missing category title');
                 continue;
             }
             if (!isset($category['ns']) || $category['ns'] != '14') {
-                $this->error('link_media_categories: ERROR: invalid category namespace');
+                Tools::error('link_media_categories: ERROR: invalid category namespace');
                 continue;
             }
 
             $categoryId = $this->getCategoryIdFromName($category['title']);
             if (!$categoryId) {
                 if (!$this->insertCategory($category['title'], true, 1)) {
-                    $this->error('link_media_categories: FAILED to insert ' . $category['title']);
+                    Tools::error('link_media_categories: FAILED to insert ' . $category['title']);
                     continue;
                 }
                 $categoryId = $this->categoryId;
             }
 
             if (!$this->linkMediaToCategory($pageid, $categoryId)) {
-                $this->error('link_media_categories: FAILED to link category');
+                Tools::error('link_media_categories: FAILED to link category');
                 continue;
             }
         }
@@ -1202,7 +1032,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function linkMediaToCategory($pageid, $categoryId)
     {
-        $response = $this->queryAsBool(
+        $response = $this->database->queryAsBool(
             'INSERT INTO category2media ( category_id, media_pageid ) VALUES ( :category_id, :pageid )',
             ['category_id' => $categoryId, 'pageid' => $pageid]
         );
@@ -1219,7 +1049,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function findCategories($search = '')
     {
         if (!$search || $search == '' || !is_string($search)) {
-            $this->error('::find_categories: invalid search string: ' . $search);
+            Tools::error('::find_categories: invalid search string: ' . $search);
             return false;
         }
         $call = $this->commonsApiUrl . '?action=query&format=json'
@@ -1229,7 +1059,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         . '&srlimit=500'
         . '&srsearch=' . urlencode($search);
         if (!$this->callCommons($call, 'search')) {
-            $this->error('::find_categories: nothing found');
+            Tools::error('::find_categories: nothing found');
             return false;
         }
         return true;
@@ -1242,20 +1072,20 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function getCategoryInfo($category)
     {
         if (!$category || $category=='' || !is_string($category)) {
-            $this->error('::get_category_info: no category');
+            Tools::error('::get_category_info: no category');
             return false;
         }
         $call = $this->commonsApiUrl . '?action=query&format=json'
         . '&prop=categoryinfo'
         . '&titles=' . urlencode($category);    // cicontinue
         if (!$this->callCommons($call, 'pages')) {
-            $this->error('::get_category_info: API: nothing found');
+            Tools::error('::get_category_info: API: nothing found');
             return false;
         }
         if (isset($this->commonsResponse['query']['pages'])) {
             return $this->commonsResponse['query']['pages'];
         }
-        $this->error('::get_category_info: API: no pages');
+        Tools::error('::get_category_info: API: no pages');
         return false;
     }
 
@@ -1266,33 +1096,45 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function saveCategoryInfo($categoryName)
     {
         $categoryName = $this->categoryUrldecode($categoryName);
-
         $categoryRow = $this->getCategory($categoryName);
         if (!$categoryRow) {
-            if (!$this->insertCategory($categoryName, /*getinfo*/false, /*local_files*/1)) {
-                $this->error('save_category_info: new category INSERT FAILED: ' . $categoryName);
+            if (!$this->insertCategory($categoryName, false, 1)) {
+                Tools::error('saveCategoryInfo: new category INSERT FAILED: ' . $categoryName);
+
                 return false;
             }
-            $this->notice('save_category_info: NEW CATEGORY: '  . $categoryName);
+            Tools::notice('saveCategoryInfo: NEW CATEGORY: '  . $categoryName);
             $categoryRow = $this->getCategory($categoryName);
+            if (!$categoryRow) {
+                Tools::error('saveCategoryInfo: Category save Failed: ' . $categoryName);
+
+                return false;
+            }
         }
 
         $categoryInfo = $this->getCategoryInfo($categoryName);
-        foreach ($categoryInfo as $onesy) {
-            $categoryInfo = $onesy; // is always just 1 result
-        }
+        $categoryInfo= $categoryInfo[0];
 
         $bind = [];
 
-        if (@$categoryInfo['pageid'] != @$categoryRow['pageid']) {
+        if (isset($categoryInfo['pageid'])
+            && isset($categoryRow['pageid'])
+            && $categoryInfo['pageid'] != $categoryRow['pageid']
+        ) {
             $bind[':pageid'] = $categoryInfo['pageid'];
         }
 
-        if ($categoryInfo['categoryinfo']['files'] != $categoryRow['files']) {
+        if (isset($categoryInfo['categoryinfo']['files'])
+            && isset($categoryRow['files'])
+            && $categoryInfo['categoryinfo']['files'] != $categoryRow['files']
+        ) {
             $bind[':files'] = $categoryInfo['categoryinfo']['files'];
         }
 
-        if ($categoryInfo['categoryinfo']['subcats'] != $categoryRow['subcats']) {
+        if (isset($categoryInfo['categoryinfo']['subcats'])
+            && isset($categoryRow['subcats'])
+            && $categoryInfo['categoryinfo']['subcats'] != $categoryRow['subcats']
+        ) {
             $bind[':subcats'] = $categoryInfo['categoryinfo']['subcats'];
         }
 
@@ -1300,7 +1142,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         if (isset($categoryInfo['categoryinfo']['hidden'])) {
             $hidden = 1;
         }
-        if ($hidden != $categoryRow['hidden']) {
+        if (isset($categoryRow['hidden']) && $hidden != $categoryRow['hidden']) {
             $bind[':hidden'] = $hidden;
         }
 
@@ -1308,7 +1150,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         if (isset($categoryInfo['categoryinfo']['missing'])) {
             $missing = 1;
         }
-        if ($missing != $categoryRow['missing']) {
+        if (isset($categoryRow['missing']) && $missing != $categoryRow['missing']) {
             $bind[':missing'] = $missing;
         }
 
@@ -1329,12 +1171,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
 
         $bind[':id'] = $categoryRow['id'];
 
-        $result = $this->queryAsBool($sql, $bind);
+        $result = $this->database->queryAsBool($sql, $bind);
 
         if ($result) {
             return true;
         }
-        $this->error('get_category_info: UPDATE/INSERT FAILED: ' . print_r($this->lastError, true));
+        Tools::error('get_category_info: UPDATE/INSERT FAILED: ' . print_r($this->database->lastError, true));
 
         return false;
     }
@@ -1348,12 +1190,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function insertCategory($name = '', $fillInfo = true, $localFiles = 0)
     {
         if (!$name) {
-            $this->error('insert_category: no name found');
+            Tools::error('insert_category: no name found');
 
             return false;
         }
 
-        if (!$this->queryAsBool(
+        if (!$this->database->queryAsBool(
             'INSERT INTO category (
                 name, local_files, hidden, missing
             ) VALUES (
@@ -1367,24 +1209,25 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             ]
         )
         ) {
-            $this->error('insert_category: FAILED to insert: ' . $name);
+            Tools::error('insert_category: FAILED to insert: ' . $name);
 
             return false;
         }
 
-        $this->categoryId = $this->lastInsertId;
+        $this->categoryId = $this->database->lastInsertId;
 
         if ($fillInfo) {
             $this->saveCategoryInfo($name);
         }
 
-        $this->notice(
+        Tools::notice(
             'SAVED CATEGORY: ' . $this->categoryId . ' = +<a href="'
             . $this->url('category') . '?c='
             . $this->categoryUrlencode($this->stripPrefix($name))
             . '">'
             . htmlentities($this->stripPrefix($name)) . '</a>'
         );
+
         return true;
     }
 
@@ -1395,10 +1238,10 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     public function getSubcats($category)
     {
         if (!$category || $category=='' || !is_string($category)) {
-            $this->error('::get_subcats: ERROR - no category');
+            Tools::error('::get_subcats: ERROR - no category');
             return false;
         }
-        $this->notice('::get_subcats: ' . $category);
+        Tools::notice('::get_subcats: ' . $category);
         $call = $this->commonsApiUrl . '?action=query&format=json&cmlimit=50'
         . '&list=categorymembers'
         . '&cmtype=subcat'
@@ -1409,7 +1252,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             || !isset($this->commonsResponse['query']['categorymembers'])
             || !is_array($this->commonsResponse['query']['categorymembers'])
         ) {
-            $this->error('::get_subcats: Nothing Found');
+            Tools::error('::get_subcats: Nothing Found');
 
             return false;
         }
@@ -1425,14 +1268,14 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function importCategories($categoryNameArray)
     {
-        $this->notice("import_categories( category_name_array )");
-        $this->beginTransaction();
+        Tools::notice("import_categories( category_name_array )");
+        $this->database->beginTransaction();
         foreach ($categoryNameArray as $categoryName) {
             $categoryName = $this->categoryUrldecode($categoryName);
             $this->insertCategory($categoryName);
         }
-        $this->commit();
-        $this->vacuum();
+        $this->database->commit();
+        $this->database->vacuum();
     }
 
     /**
@@ -1450,16 +1293,16 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         }
 
         if (!$bind[':id']) {
-            $this->error("update_category_local_files_count( $categoryName ) - Category Not Found in Database");
+            Tools::error("update_category_local_files_count( $categoryName ) - Category Not Found in Database");
 
             return false;
         }
-        if ($this->queryAsBool($sql, $bind)) {
-            $this->notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $categoryName);
+        if ($this->database->queryAsBool($sql, $bind)) {
+            Tools::notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $categoryName);
 
             return true;
         }
-        $this->error("update_category_local_files_count( $categoryName ) - UPDATE ERROR");
+        Tools::error("update_category_local_files_count( $categoryName ) - UPDATE ERROR");
 
         return false;
     }
@@ -1476,15 +1319,15 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             GROUP BY c.id
             ORDER by c.local_files ASC';
 
-        $categoryNewSizes = $this->queryAsArray($sql);
+        $categoryNewSizes = $this->database->queryAsArray($sql);
         if (!$categoryNewSizes) {
-            $this->error('NOT FOUND: Updated 0 Categories Local Files count');
+            Tools::error('NOT FOUND: Updated 0 Categories Local Files count');
 
             return;
         }
 
         $updates = 0;
-        $this->beginTransaction();
+        $this->database->beginTransaction();
         foreach ($categoryNewSizes as $cat) {
             if ($cat['local_files'] == $cat['size']) {
                 continue;
@@ -1492,12 +1335,12 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
             if ($this->insertCategoryLocalFilesCount($cat['id'], $cat['size'])) {
                 $updates++;
             } else {
-                $this->error('ERROR: UPDATE FAILED: Category ID:' . $cat['id'] . ' local_files=' . $cat['size']);
+                Tools::error('ERROR: UPDATE FAILED: Category ID:' . $cat['id'] . ' local_files=' . $cat['size']);
             }
         }
-        $this->commit();
-        $this->notice('Updated ' . $updates . ' Categories Local Files count');
-        $this->vacuum();
+        $this->database->commit();
+        Tools::notice('Updated ' . $updates . ' Categories Local Files count');
+        $this->database->vacuum();
     }
 
     /**
@@ -1510,7 +1353,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         $sql = 'UPDATE category SET local_files = :category_size WHERE id = :category_id';
         $bind[':category_size'] = $categorySize;
         $bind[':category_id'] = $categoryId;
-        if ($this->queryAsBool($sql, $bind)) {
+        if ($this->database->queryAsBool($sql, $bind)) {
             return true;
         }
 
@@ -1523,21 +1366,21 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function deleteCategory($categoryId)
     {
-        if (!$this->isPositiveNumber($categoryId)) {
+        if (!Tools::isPositiveNumber($categoryId)) {
             return false;
         }
         $bind = [':category_id' => $categoryId];
-        if ($this->queryAsBool('DELETE FROM category WHERE id = :category_id', $bind)) {
-            $this->notice('DELETED Category #'. $categoryId);
+        if ($this->database->queryAsBool('DELETE FROM category WHERE id = :category_id', $bind)) {
+            Tools::notice('DELETED Category #'. $categoryId);
         } else {
-            $this->error('UNABLE to delete category #' . $categoryId);
+            Tools::error('UNABLE to delete category #' . $categoryId);
 
             return false;
         }
-        if ($this->queryAsBool('DELETE FROM category2media WHERE category_id = :category_id', $bind)) {
-            $this->notice('DELETED Links to Category #'. $categoryId);
+        if ($this->database->queryAsBool('DELETE FROM category2media WHERE category_id = :category_id', $bind)) {
+            Tools::notice('DELETED Links to Category #'. $categoryId);
         } else {
-            $this->error('UNABLE to delete links to category #' . $categoryId);
+            Tools::error('UNABLE to delete links to category #' . $categoryId);
 
             return false;
         }
@@ -1556,13 +1399,13 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
         ];
         $response = [];
         foreach ($sqls as $sql) {
-            if ($this->queryAsBool($sql)) {
+            if ($this->database->queryAsBool($sql)) {
                 $response[] = 'OK: ' . $sql;
             } else {
                 $response[] = 'FAIL: ' . $sql;
             }
         }
-        $this->vacuum();
+        $this->database->vacuum();
         return $response;
     }
 
@@ -1573,7 +1416,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function getBlockCount()
     {
-        $count = $this->queryAsArray('SELECT count(block.pageid) AS count FROM block');
+        $count = $this->database->queryAsArray('SELECT count(block.pageid) AS count FROM block');
         if (isset($count[0]['count'])) {
             return $count[0]['count'];
         }
@@ -1586,7 +1429,7 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
      */
     public function isBlocked($pageid)
     {
-        $block = $this->queryAsArray(
+        $block = $this->database->queryAsArray(
             'SELECT pageid FROM block WHERE pageid = :pageid',
             [':pageid' => $pageid]
         );
@@ -1597,23 +1440,6 @@ class SharedMediaTaggerAdmin extends SharedMediaTagger
     }
 
     // SMT Admin
-
-    /**
-     * SharedMediaTaggerAdmin constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->debug = false;
-        $this->commonsApiUrl = 'https://commons.wikimedia.org/w/api.php';
-        ini_set('user_agent', 'Shared Media Tagger v' . __SMT__);
-        $this->apiCount = 0;
-        $this->propImageinfo = '&prop=imageinfo'
-            . '&iiprop=url|size|mime|thumbmime|user|userid|sha1|timestamp|extmetadata'
-            . '&iiextmetadatafilter=LicenseShortName|UsageTerms|AttributionRequired|'
-            . 'Restrictions|Artist|ImageDescription|DateTimeOriginal';
-        $this->setAdminCookie();
-    }
 
     /**
      *

@@ -3,10 +3,11 @@
  * Shared Media Tagger
  * Tag Admin
  *
- * @var SharedMediaTaggerAdmin $smt
+ * @var TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+use Attogram\SharedMedia\Tagger\TaggerAdmin;
+use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Tag Admin';
 $smt->includeHeader();
@@ -15,7 +16,7 @@ $smt->includeAdminMenu();
 print '<div class="box white">';
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['tagid']) && $smt->isPositiveNumber($_GET['tagid'])) {
+if (isset($_GET['tagid']) && Tools::isPositiveNumber($_GET['tagid'])) {
     saveTag($smt);
 }
 
@@ -50,10 +51,10 @@ print '</div>';
 $smt->includeFooter();
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  * @return bool
  */
-function saveTag(SharedMediaTaggerAdmin $smt)
+function saveTag(TaggerAdmin $smt)
 {
     $sql = '
     UPDATE tag
@@ -68,11 +69,11 @@ function saveTag(SharedMediaTaggerAdmin $smt)
         ':display_name' => @$_GET['display_name']
     ];
 
-    if ($smt->queryAsBool($sql, $bind)) {
-        $smt->notice('OK: Saved Tag ID#'.$_GET['tagid']);
+    if ($smt->database->queryAsBool($sql, $bind)) {
+        Tools::notice('OK: Saved Tag ID#'.$_GET['tagid']);
         return true;
     }
-    $smt->notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>'
+    Tools::notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>'
         . print_r($bind, 1) . ' </pre>');
     return false;
 }

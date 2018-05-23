@@ -3,10 +3,10 @@
  * Shared Media Tagger
  * Site Admin
  *
- * @var SharedMediaTaggerAdmin $smt
+ * @var TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+use Attogram\SharedMedia\Tagger\TaggerAdmin;
 
 $smt->title = 'Site Admin';
 $smt->includeHeader();
@@ -19,11 +19,11 @@ if (isset($_POST) && $_POST) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-$sites = $smt->queryAsArray('SELECT * FROM site ORDER BY id LIMIT 1', array());
+$sites = $smt->database->queryAsArray('SELECT * FROM site ORDER BY id LIMIT 1', []);
 
 if (!$sites || !is_array($sites[0])) {
-    $smt->error('Creating New Site, ID #1');
-    $smt->queryAsBool("INSERT INTO site (id) VALUES ('1')");
+    Tools::error('Creating New Site, ID #1');
+    $smt->database->queryAsBool("INSERT INTO site (id) VALUES ('1')");
     $sites[0]['id'] = 1;
 }
 $site = $sites[0];
@@ -70,13 +70,13 @@ print ''
 $smt->includeFooter();
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  * @return bool
  */
-function saveSiteInfo(SharedMediaTaggerAdmin $smt)
+function saveSiteInfo(TaggerAdmin $smt)
 {
     $bind = [];
-    while ((list($name, $value) = each($_POST))) {
+    foreach ($_POST as $name => $value) {
         switch ($name) {
             case 'id':
                 $bind[":$name"] = $value;
@@ -105,10 +105,10 @@ function saveSiteInfo(SharedMediaTaggerAdmin $smt)
 
     $sql = 'UPDATE site SET ' . implode($set, ', ') . ' WHERE id = :id';
 
-    if ($smt->queryAsBool($sql, $bind)) {
-        $smt->notice('OK: Site Info Saved');
+    if ($smt->database->queryAsBool($sql, $bind)) {
+        Tools::notice('OK: Site Info Saved');
         return true;
     }
-    $smt->error('Unable to update site: ' . print_r($smt->lastError, 1));
+    Tools::error('Unable to update site: ' . print_r($smt->database->lastError, 1));
     return false;
 }

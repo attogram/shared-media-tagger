@@ -3,7 +3,7 @@
  * Shared Media Tagger
  * Reviews
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
 $me = $smt->url('reviews');
@@ -18,13 +18,13 @@ $order = isset($_GET['o']) ? $smt->categoryUrldecode($_GET['o']) : '';
 print '<div class="box white">Reviews:<br />';
 
 foreach ($tags as $tag) {
-    $tagCount = $smt->getTaggingCount($tag['id']);
+    $tagCount = $smt->database->getTaggingCount($tag['id']);
     print '<span class="reviewbutton tag' . $tag['position'] . '">'
     . '<a href="' . $me . '?o=reviews.' . $smt->categoryUrlencode($tag['name']) . '">'
     . '+' . $tagCount . ' ' . $tag['name'] . '</a></span>';
 }
 print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+'
-    . $smt->getTaggingCount() . ' Total</a></span><hr />';
+    . $smt->database->getTaggingCount() . ' Total</a></span><hr />';
 
 // Reviews per tag
 $tagName = null;
@@ -32,7 +32,7 @@ if ((preg_match('/^reviews\.(.*)/', $order, $matches)) === 1) {
     $tagName = $matches[1];
     $tagId = $smt->getTagIdByName($tagName);
     if (!$tagId) {
-        $smt->notice('Invalid Review Name');
+        Tools::notice('Invalid Review Name');
         $order = '';
     } else {
         $order = 'PER.TAG';
@@ -71,7 +71,7 @@ switch ($order) {
         break;
 }
 
-$rates = $smt->queryAsArray($sql, $bind);
+$rates = $smt->database->queryAsArray($sql, $bind);
 if (!is_array($rates)) {
     $rates = [];
 }

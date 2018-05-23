@@ -3,14 +3,14 @@
  * Shared Media Tagger
  * Users
  *
- * @var Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
 $allUsers = $smt->getUsers();
 $users = [];
 
 foreach ($allUsers as $user) {
-    $user['tag_count'] = $smt->getUserTagCount($user['id']);
+    $user['tag_count'] = $smt->database->getUserTagCount($user['id']);
     $user['user_tagging'] = $smt->getUserTagging($user['id']);
     $users[$user['id']] = $user;
 }
@@ -51,7 +51,7 @@ foreach ($users as $user) {
 print '<hr />';
 
 if ($userId) {
-    print '<p>+' . $smt->getUserTagCount($userId) . ' reviews by User:' . $userId . '</p>';
+    print '<p>+' . $smt->database->getUserTagCount($userId) . ' reviews by User:' . $userId . '</p>';
     foreach ($smt->getUserTagging($userId) as $media) {
         print '<div style="display:inline-block;">'
             . '+' . $media['count'] . ' ' . $smt->getTagNameById($media['tag_id'])

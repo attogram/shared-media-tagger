@@ -3,8 +3,10 @@
  * Shared Media Tagger
  * Create Admin
  *
- * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
+
+use Attogram\SharedMedia\Tagger\Tools;
 
 $numberOfImages = 4;
 $thumbWidth = 50;
@@ -20,7 +22,7 @@ $mimetypes[] = 'image/jpeg';
 $mimetypes[] = 'image/gif';
 $mimetypes[] = 'image/png';
 
-$tagId = (!empty($_GET['t']) && $smt->isPositiveNumber($_GET['t']))
+$tagId = (!empty($_GET['t']) && Tools::isPositiveNumber($_GET['t']))
     ? (int)$_GET['t']
     : 'R';
 
@@ -46,7 +48,7 @@ if (empty($_GET['montage'])) {
 }
 
 if (!function_exists('imagecreatetruecolor')) {
-    $smt->error('PHP GD Library NOT FOUND');
+    Tools::error('PHP GD Library NOT FOUND');
     print '</div>';
     $smt->includeFooter();
 
@@ -54,9 +56,9 @@ if (!function_exists('imagecreatetruecolor')) {
 }
 
 //if (!class_exists("Imagick")) {
-//    $smt->error('Imagick NOT FOUND');
+//    Tools::error('Imagick NOT FOUND');
 //} else {
-//    $smt->notice('Imagick FOUND OK');
+//    Tools::notice('Imagick FOUND OK');
 //}
 
 switch ($tagId) {
@@ -83,9 +85,9 @@ switch ($tagId) {
         break;
 }
 
-$images = $smt->queryAsArray($sql, $bind);
+$images = $smt->database->queryAsArray($sql, $bind);
 if (!$images) {
-    $smt->error('No images found in criteria');
+    Tools::error('No images found in criteria');
     print '</div>';
     $smt->includeFooter();
     return;

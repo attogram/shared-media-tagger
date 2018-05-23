@@ -8,8 +8,8 @@
 declare(strict_types = 1);
 
 use Attogram\Router\Router;
-use Attogram\SharedMedia\Tagger\SharedMediaTagger;
-use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+use Attogram\SharedMedia\Tagger\Tagger;
+use Attogram\SharedMedia\Tagger\TaggerAdmin;
 
 define('__SMT__', '0.8.0');
 
@@ -55,9 +55,9 @@ function showView(Router $router, bool $isAdmin)
     }
 
     if ($isAdmin) {
-        $smt = new SharedMediaTaggerAdmin();
+        $smt = new TaggerAdmin();
     } else {
-        $smt = new SharedMediaTagger();
+        $smt = new Tagger();
     }
 
     include $viewFile;

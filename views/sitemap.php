@@ -3,12 +3,12 @@
  * Shared Media Tagger
  * Sitemap
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
 $cr = "\n";
 
-$protocol = @$smt->getProtocol();
+$protocol = $smt->getProtocol();
 if (!$protocol) {
     $protocol = 'http:';
 }
@@ -33,7 +33,7 @@ printUrl($smt->url('contact'));
 print $cr;
 
 // all categories
-$cats = $smt->queryAsArray('
+$cats = $smt->database->queryAsArray('
     SELECT DISTINCT(c2m.category_id), c.name
     FROM category2media AS c2m, category AS c
     WHERE c2m.category_id = c.id');
@@ -44,7 +44,7 @@ foreach ($cats as $cat) {
 print $cr;
 
 // all media files
-$media = $smt->queryAsArray('SELECT pageid FROM media');
+$media = $smt->database->queryAsArray('SELECT pageid FROM media');
 foreach ($media as $pageid) {
     printUrl($smt->url('info') . '?i=' . $pageid['pageid']);
 }

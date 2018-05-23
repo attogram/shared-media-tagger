@@ -3,8 +3,10 @@
  * Shared Media Tagger
  * Contact
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
+
+use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Contact - ' . $smt->siteName;
 $smt->includeHeader();
@@ -14,10 +16,10 @@ print '<div class="box white">';
 
 if (isset($_POST['c'])) {
     $comment = urldecode($_POST['c']);
-    $remoteAddr = @$_SERVER['REMOTE_ADDR'];
-    $insert = $smt->queryAsBool(
+    $remoteAddr = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+    $insert = $smt->database->queryAsBool(
         'INSERT INTO contact (comment, datetime, ip) VALUES (:comment, CURRENT_TIMESTAMP, :ip)',
-        [':comment'=>$comment, ':ip'=>$remoteAddr]
+        [':comment' => $comment, ':ip' => $remoteAddr]
     );
     if ($insert) {
         print '<p>Thank you for your message.</p>';
@@ -42,11 +44,11 @@ $footer = '
 
 ';
 
-if (isset($_GET['r']) && $smt->isPositiveNumber($_GET['r'])) {
+if (isset($_GET['r']) && Tools::isPositiveNumber($_GET['r'])) {
     $pageid = (int)$_GET['r'];
     $media = $smt->getMedia($pageid);
     if (!$media || !isset($media[0])) {
-        $smt->notice('ERROR: no media ID #' . $pageid . ' found.');
+        Tools::notice('ERROR: no media ID #' . $pageid . ' found.');
         goto form;
     }
     $media = $media[0];

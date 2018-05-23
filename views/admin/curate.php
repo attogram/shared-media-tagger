@@ -3,10 +3,11 @@
  * Shared Media Tagger
  * Curation Admin
  *
- * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+use Attogram\SharedMedia\Tagger\TaggerAdmin;
+use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Curation Admin';
 $smt->useJquery = true;
@@ -23,7 +24,7 @@ $uncuratedCount = getUncuratedCount($smt);
 
 $pageLimit = 20; // # of files per page
 
-if (isset($_GET['l']) && $smt->isPositiveNumber($_GET['l'])) {
+if (isset($_GET['l']) && Tools::isPositiveNumber($_GET['l'])) {
     $pageLimit = (int) $_GET['l'];
 }
 if ($pageLimit > 1000) {
@@ -39,10 +40,10 @@ $sql = "SELECT *
         ORDER BY updated ASC
         LIMIT " . $pageLimit;
 
-if (isset($_GET['i']) && $smt->isPositiveNumber($_GET['i'])) {
+if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
     $medias = $smt->getMedia($_GET['i']);
 } else {
-    $medias = $smt->queryAsArray($sql);
+    $medias = $smt->database->queryAsArray($sql);
 }
 
 print '<form name="media" action="" method="GET">';
@@ -171,9 +172,9 @@ function curationMenu()
 }
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  */
-function curateBatch(SharedMediaTaggerAdmin $smt)
+function curateBatch(TaggerAdmin $smt)
 {
     if (!empty($_GET['keep'])) {
         curateKeep($_GET['keep'], $smt);
@@ -185,30 +186,30 @@ function curateBatch(SharedMediaTaggerAdmin $smt)
 
 /**
  * @param array $id_array
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  * @return bool
  */
-function curateKeep(array $id_array, SharedMediaTaggerAdmin $smt)
+function curateKeep(array $id_array, TaggerAdmin $smt)
 {
     if (!is_array($id_array) || !$id_array) {
         return false;
     }
     $ids = implode($id_array, ', ');
     $sql = "UPDATE media SET curated = '1', updated = CURRENT_TIMESTAMP WHERE pageid IN ($ids)";
-    if ($smt->queryAsBool($sql)) {
-        $smt->notice('Curate: KEEP ' . sizeof($id_array));
+    if ($smt->database->queryAsBool($sql)) {
+        Tools::notice('Curate: KEEP ' . sizeof($id_array));
         return true;
     }
-    $smt->error('ERROR setting media curated to KEEP: ' . $smt->lastError);
+    Tools::error('ERROR setting media curated to KEEP: ' . $smt->database->lastError);
     return false;
 }
 
 /**
  * @param array $id_array
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  * @return bool
  */
-function curateDelete(array $id_array, SharedMediaTaggerAdmin $smt)
+function curateDelete(array $id_array, TaggerAdmin $smt)
 {
     if (!is_array($id_array) || !$id_array) {
         return false;
@@ -216,18 +217,18 @@ function curateDelete(array $id_array, SharedMediaTaggerAdmin $smt)
     foreach ($id_array as $pageid) {
         $smt->deleteMedia($pageid);
     }
-    $smt->notice('Curate: DELETE ' . sizeof($id_array));
+    Tools::notice('Curate: DELETE ' . sizeof($id_array));
     $smt->updateCategoriesLocalFilesCount();
     return true;
 }
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  * @return string
  */
-function getUncuratedCount(SharedMediaTaggerAdmin $smt)
+function getUncuratedCount(TaggerAdmin $smt)
 {
-    $count = $smt->queryAsArray("
+    $count = $smt->database->queryAsArray("
         SELECT count(pageid) AS count
         FROM media
         WHERE curated != '1'
@@ -235,6 +236,6 @@ function getUncuratedCount(SharedMediaTaggerAdmin $smt)
     if (isset($count[0]['count'])) {
         return $count[0]['count'];
     }
-    $smt->error($smt->lastError);
+    Tools::error($smt->database->lastError);
     return 'ERR';
 }

@@ -3,10 +3,11 @@
  * Shared Media Tagger
  * Category Admin
  *
- * @var SharedMediaTaggerAdmin $smt
+ * @var TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin;
+use Attogram\SharedMedia\Tagger\TaggerAdmin;
+use Attogram\SharedMedia\Tagger\Tools;
 
 if (function_exists('set_time_limit')) {
     set_time_limit(1000);
@@ -45,13 +46,12 @@ if (isset($_POST['cats']) && $_POST['cats']) {
 
 if (isset($_GET['c']) && $_GET['c']) {
     if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
-        $smt->notice(
+        Tools::notice(
             'OK: Refreshed Category Info: <b><a href="' . $smt->url('category')
             . '?c=' . $smt->stripPrefix($smt->categoryUrlencode($_GET['c'])) . '">'
-            . htmlentities($smt->categoryUrldecode($_GET['c']))
-        ) . '</a></b>';
+            . htmlentities($smt->categoryUrldecode($_GET['c'])) . '</a></b>'
+        );
     }
-    //$smt->update_categories_local_files_count();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -84,7 +84,7 @@ $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
 
 if (isset($_GET['g']) && $_GET['g']=='all') {
     $toget = [];
-    $cats = $smt->queryAsArray('SELECT * FROM category ' . $orderBy);
+    $cats = $smt->database->queryAsArray('SELECT * FROM category ' . $orderBy);
     foreach ($cats as $cat) {
         if ($cat['subcats'] != '' && $cat['files'] != '' && $cat['pageid'] != '') {
             continue;
@@ -105,21 +105,21 @@ if (isset($_GET['g']) && $_GET['g']=='all') {
 
 if (isset($_GET['sca']) && $_GET['sca']=='all') {
     $sql = 'SELECT * FROM category WHERE subcats > 0 ' . $orderBy;
-    $smt->notice('SHOWING only categories with subcategories');
+    Tools::notice('SHOWING only categories with subcategories');
 } elseif (isset($_GET['wf'])) {
     $sql = 'SELECT * FROM category WHERE files > 0 ' . $orderBy;
-    $smt->notice('SHOWING only categories with files');
+    Tools::notice('SHOWING only categories with files');
 } elseif (isset($_GET['s'])) {
     $sql = 'SELECT * FROM category WHERE name LIKE :search ' . $orderBy;
     $bind = [':search'=>'%' . $_GET['s']. '%'];
-    $smt->notice('SHOWING only categories with search text: ' . $_GET['s']);
+    Tools::notice('SHOWING only categories with search text: ' . $_GET['s']);
 } else {
     $sql = 'SELECT * FROM category ' . $orderBy;
 }
 if (!isset($bind)) {
     $bind = [];
 }
-$cats = $smt->queryAsArray($sql, $bind);
+$cats = $smt->database->queryAsArray($sql, $bind);
 
 if (!is_array($cats)) {
     $cats = [];
@@ -129,7 +129,7 @@ $spacer = ' &nbsp; &nbsp; &nbsp; ';
 
 print ''
 . '<ul>'
-. '<li><b>' . number_format($smt->getCategoriesCount()) . '</b> Active Categories</li>'
+. '<li><b>' . number_format($smt->database->getCategoriesCount()) . '</b> Active Categories</li>'
 . '<li><b>?</b> Technical Categories</li>'
 . '<li><b>?</b> Empty Categories</li>'
 . '</ul>'
@@ -151,7 +151,7 @@ print ''
 . '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
-if (($smt->getCategoriesCount() > 1000) && (@$_GET['v'] != 1)) {
+if (($smt->database->getCategoriesCount() > 1000) && isset($_GET['v']) && ($_GET['v'] != 1)) {
     print '</div>';
     $smt->includeFooter();
     return;
@@ -238,19 +238,22 @@ $smt->includeFooter();
 
 
 /**
- * @param SharedMediaTaggerAdmin $smt
+ * @param TaggerAdmin $smt
  */
-function getSearchResults(SharedMediaTaggerAdmin $smt)
+function getSearchResults(TaggerAdmin $smt)
 {
     $search = urldecode($_GET['scommons']);
 
     if (!$smt->findCategories($search)) {
-        $smt->notice('Error: no categories found');
+        Tools::notice('Error: no categories found');
         return;
     }
-    $cats = @$smt->commonsResponse['query']['search'];
+    $cats = isset($smt->commonsResponse['query']['search'])
+        ? $smt->commonsResponse['query']['search']
+        : null;
     if (!$cats || !is_array($cats)) {
-        $smt->notice('Error: no categories returned');
+        Tools::notice('Error: no categories returned');
+
         return;
     }
     print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>'
@@ -275,7 +278,7 @@ function getSearchResults(SharedMediaTaggerAdmin $smt)
     print '<form action="" name="cats" method="POST">'
     . '<input type="submit" value="  save to database  "><br /><br />';
 
-    while ((list(, $cat) = each($cats))) {
+    foreach ($cats as $id => $cat) {
         print '<input type="checkbox" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
         . $cat['title']
         . '</strong><small> '

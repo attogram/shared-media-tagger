@@ -5,30 +5,15 @@ declare(strict_types = 1);
 namespace Attogram\SharedMedia\Tagger;
 
 /**
- * Class SharedMediaTagger
+ * Class Tagger
  */
-class SharedMediaTagger
+class Tagger
 {
-
-    /** @var bool debug mode */
-    public $debug;
     /** @var string http: or https: */
     public $protocol;
-    public $timer;
-    public $timerResults;
     /** @var array array of [page_name] = page_url */
     public $links;
-    /** @var string */
-    public $databaseName;
-    /** @var \PDO */
-    public $db;
-    public $sqlCount;
-    public $lastInsertId;
-    public $lastError;
-    public $imageCount;
     public $userId;
-    public $userCount;
-    public $categoryCount;
     public $installDirectory;
     public $server;
     public $setup;
@@ -40,90 +25,61 @@ class SharedMediaTagger
     public $sizeThumb;
     public $tagId;
     public $tagName;
-    public $totalReviewCount;
     public $totalFilesReviewedCount;
     /** @var string Page <title> */
     public $title;
     public $useBootstrap;
     public $useJquery;
+    /** @var Database */
+    public $database;
+
+    /**
+     * SharedMediaTagger constructor.
+     */
+    public function __construct()
+    {
+        global $router, $setup;
+
+        $this->database = new Database();
+        $this->setup = [];
+        if (is_array($setup)) {
+            $this->setup = $setup;
+        }
+        $this->installDirectory = realpath(__DIR__ . '/..');
+        $this->sizeMedium = 325;
+        $this->sizeThumb = 100;
+        $this->server = $_SERVER['SERVER_NAME'];
+        if (isset($this->setup['site_url'])) {
+            $this->siteUrl = $setup['site_url'];
+        } else {
+            $this->siteUrl = $router->getUriBase() . '/';
+        }
+        $this->setSiteInfo();
+        $this->links = [
+            'home'       => $this->siteUrl . '',
+            'css'        => $this->siteUrl . 'css.css',
+            'jquery'        => $this->siteUrl . 'use/jquery.min.js',
+            'bootstrap_js'  => $this->siteUrl . 'use/bootstrap/js/bootstrap.min.js',
+            'bootstrap_css' => $this->siteUrl . 'use/bootstrap/css/bootstrap.min.css',
+            'info'       => $this->siteUrl . 'info.php',
+            'browse'     => $this->siteUrl . 'browse.php',
+            'categories' => $this->siteUrl . 'categories.php',
+            'category'   => $this->siteUrl . 'category.php',
+            'about'      => $this->siteUrl . 'about.php',
+            'reviews'    => $this->siteUrl . 'reviews.php',
+            'admin'      => $this->siteUrl . 'admin/',
+            'contact'    => $this->siteUrl . 'contact.php',
+            'tag'        => $this->siteUrl . 'tag.php',
+            'users'      => $this->siteUrl . 'users.php',
+            'github_smt' => 'https://github.com/attogram/shared-media-tagger',
+        ];
+        $this->getUser();
+        if (isset($_GET['logoff'])) {
+            $this->adminLogoff();
+        }
+    }
 
     // SMT - Utils
-
-    /**
-     * @return false|string
-     */
-    public function timeNow()
-    {
-        return gmdate('Y-m-d H:i:s');
-    }
-
-    /**
-     * @param $message
-     * @param $type
-     */
-    public function logMessage($message, $type)
-    {
-        switch ($type) {
-            case 'debug':
-                $class = 'debug';
-                $head = '';
-                break;
-            case 'notice':
-                $class = 'notice';
-                $head = '';
-                break;
-            case 'error':
-                $class = 'error';
-                $head = 'ERROR:';
-                break;
-            case 'fail':
-                $class = 'fail';
-                $head = 'GURU MEDITATION FAILURE:';
-                break;
-            default:
-                return;
-        }
-        if (is_array($message)) {
-            $message = '<pre>' . htmlentities(print_r($message, true)) . '</pre>';
-        }
-        print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
-    }
-
-    /**
-     * @param string $message
-     */
-    public function debug($message = '')
-    {
-        if (!$this->debug) {
-            return;
-        }
-        $this->logMessage($message, 'debug');
-    }
-
-    /**
-     * @param string $message
-     */
-    public function notice($message = '')
-    {
-        $this->logMessage($message, 'notice');
-    }
-
-    /**
-     * @param string $message
-     */
-    public function error($message = '')
-    {
-        $this->logMessage($message, 'error');
-    }
-
-    /**
-     * @param string $message
-     */
-    public function fail($message = '')
-    {
-        $this->logMessage($message, 'fail');
-        exit;
-    }
 
     /**
      * @param string $message
@@ -148,50 +104,6 @@ class SharedMediaTagger
     }
 
     /**
-     * @param string $number
-     * @return bool
-     */
-    public function isPositiveNumber($number = '')
-    {
-        if (preg_match('/^[0-9]*$/', (string) $number)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $string
-     * @param int $length
-     * @return string
-     */
-    public function truncate($string, $length = 50)
-    {
-        if (strlen($string) <= $length) {
-            return $string;
-        }
-
-        return substr($string, 0, $length-2) . '..';
-    }
-
-    /**
-     * @param $string
-     * @param $length
-     * @return string
-     */
-    public function centerpad($string, $length)
-    {
-        if (!$length) {
-            return $string;
-        }
-        if (strlen($string) >= $length) {
-            return $string;
-        }
-
-        return str_pad($string, $length, ' ', STR_PAD_BOTH);
-    }
-
-    /**
      * @return string
      */
     public function getProtocol()
@@ -209,191 +121,18 @@ class SharedMediaTagger
     }
 
     /**
-     * @param $rawSeconds
-     * @return string
-     */
-    public function secondsToTime($rawSeconds)
-    {
-        if (!$rawSeconds) {
-            return '0 seconds';
-        }
-        $hours = floor($rawSeconds / 3600);
-        $minutes = floor(($rawSeconds / 60) % 60);
-        $seconds = $rawSeconds % 60;
-        $seconds += round($rawSeconds - floor($rawSeconds), 2);
-        $response = [];
-        if ($hours) {
-            $response[] = $hours . ' hours';
-        }
-        if ($minutes) {
-            $response[] = $minutes . ' minutes';
-        }
-        if ($seconds) {
-            $response[] = $seconds . ' seconds';
-        }
-        return implode($response, ', ');
-    }
-
-    /**
-     * @param $one
-     * @param $two
-     * @return string
-     */
-    public function isSelected($one, $two)
-    {
-        if ($one == $two) {
-            return ' selected="selected"';
-        }
-
-        return '';
-    }
-
-    /**
      * @param string $link
      * @return bool|mixed
      */
     public function url($link = '')
     {
         if (!$link || !isset($this->links[$link])) {
-            $this->error("::url: Link Not Found: $link");
+            Tools::error("::url: Link Not Found: $link");
 
             return false;
         }
 
         return $this->links[$link];
-    }
-
-    // SMT - Database Utils
-
-    /**
-     * @return bool|\PDO
-     */
-    public function initDatabase()
-    {
-        if (!in_array('sqlite', \PDO::getAvailableDrivers())) {
-            $this->error('::initDatabase: ERROR: no sqlite Driver');
-
-            return $this->db = false;
-        }
-        try {
-            return $this->db = new \PDO('sqlite:' . $this->databaseName);
-        } catch (\PDOException $error) {
-            $this->error('::initDatabase: ' . $this->databaseName . '  ERROR: ' . $error->getMessage());
-
-            return $this->db = false;
-        }
-    }
-
-    /**
-     * @param $sql
-     * @param array $bind
-     * @return array|bool
-     */
-    public function queryAsArray($sql, array $bind = [])
-    {
-        if (!$this->db) {
-            $this->initDatabase();
-        }
-        if (!$this->db) {
-            return false;
-        }
-
-        $statement = $this->db->prepare($sql);
-        if (!$statement) {
-            return [];
-        }
-        foreach ($bind as $name => $value) {
-            $statement->bindParam($name, $value);
-        }
-        if (!$statement->execute()) {
-            $this->error('::queryAsArray(): ERROR EXECUTE: ' . print_r($this->db->errorInfo(), true));
-
-            return [];
-        }
-        $response = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        if (!$response && $this->db->errorCode() != '00000') {
-            $this->error('::queryAsArray(): ERROR FETCH: '  .print_r($this->db->errorInfo(), true));
-            $response = [];
-        }
-
-        return $response;
-    }
-
-    /**
-     * @param $sql
-     * @param array $bind
-     * @return bool
-     */
-    public function queryAsBool($sql, $bind = [])
-    {
-        if (!$this->db) {
-            $this->initDatabase();
-        }
-        if (!$this->db) {
-            return false;
-        }
-        $this->lastInsertId = $this->lastError = false;
-        $this->sqlCount++;
-        $statement = $this->db->prepare($sql);
-        if (!$statement) {
-            $this->lastError = $this->db->errorInfo();
-
-            return false;
-        }
-        foreach ($bind as $name => $value) {
-            $statement->bindParam($name, $value);
-        }
-        if (!$statement->execute()) {
-            $this->lastError = $this->db->errorInfo();
-            if ($this->lastError[0] == '00000') {
-                return true;
-            }
-
-            return false;
-        }
-        $this->lastError = $this->db->errorInfo();
-        $this->lastInsertId = $this->db->lastInsertId();
-
-        return true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function vacuum()
-    {
-        if ($this->queryAsBool('VACUUM')) {
-            return true;
-        }
-        $this->error('FAILED to VACUUM');
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function beginTransaction()
-    {
-        if ($this->queryAsBool('BEGIN TRANSACTION')) {
-            return true;
-        }
-        $this->error('FAILED to BEGIN TRANSACTION');
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function commit()
-    {
-        if ($this->queryAsBool('COMMIT')) {
-            return true;
-        }
-        $this->error('FAILED to COMMIT');
-
-        return false;
     }
 
     // SMT - Media
@@ -404,8 +143,8 @@ class SharedMediaTagger
      */
     public function getMedia($pageid)
     {
-        if (!$pageid || !$this->isPositiveNumber($pageid)) {
-            $this->error('getMedia: ERROR no id');
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('getMedia: ERROR no id');
             return false;
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
@@ -413,7 +152,7 @@ class SharedMediaTagger
         if ($this->siteInfo['curation'] == 1 && !$this->isAdmin()) {
             $sql .= " AND curated = '1'";
         }
-        return $this->queryAsArray($sql, [':pageid'=>$pageid]);
+        return $this->database->queryAsArray($sql, [':pageid'=>$pageid]);
     }
 
     /**
@@ -423,7 +162,7 @@ class SharedMediaTagger
      */
     public function getThumbnail($media = '', $thumbWidth = '')
     {
-        if (!$thumbWidth || !$this->isPositiveNumber($thumbWidth)) {
+        if (!$thumbWidth || !Tools::isPositiveNumber($thumbWidth)) {
             $thumbWidth = $this->sizeThumb;
         }
         $default = [
@@ -479,70 +218,6 @@ class SharedMediaTagger
                 break;
         }
         return ['url'=>$thumbUrl, 'width'=>$thumbWidth, 'height'=>$thumbHeight];
-    }
-
-    /**
-     * @param int $limit
-     * @return array|bool
-     */
-    public function getRandomUnreviewedMedia($limit = 1)
-    {
-        $and = '';
-        if ($this->siteInfo['curation'] == 1) {
-            $and = "AND curated == '1'";
-        }
-        $sql = "
-            SELECT m.*
-            FROM media AS m
-            LEFT JOIN tagging AS t ON t.media_pageid = m.pageid
-            WHERE t.media_pageid IS NULL $and
-            ORDER BY RANDOM()
-            LIMIT :limit";
-
-        return $this->queryAsArray($sql, ['limit' => $limit]);
-    }
-
-    /**
-     * @param int $limit
-     * @return array|bool
-     */
-    public function getRandomMedia($limit = 1)
-    {
-        if (mt_rand(1, 7) == 1) { // 1 in 7 chance of getting UNREVIEWED media
-            $unreviewed = $this->getRandomUnreviewedMedia($limit);
-            if ($unreviewed) {
-                return $unreviewed;
-            }
-        }
-        $where = '';
-        if ($this->siteInfo['curation'] == 1) {
-            $where = "WHERE curated == '1'";
-        }
-        $sql = 'SELECT *
-                FROM media ' . $where . '
-                ORDER BY RANDOM()
-                LIMIT :limit';
-        return $this->queryAsArray($sql, ['limit' => $limit]);
-    }
-
-    /**
-     * @param bool $redo
-     * @return int
-     */
-    public function getImageCount($redo = false)
-    {
-        if (isset($this->imageCount) && !$redo) {
-            return $this->imageCount;
-        }
-        $sql = 'SELECT count(pageid) AS count FROM media';
-        if ($this->siteInfo['curation'] == 1) {
-            $sql .= " WHERE curated = '1'";
-        }
-        $response = $this->queryAsArray($sql);
-        if (!$response) {
-            return 0;
-        }
-        return $this->imageCount = $response[0]['count'];
     }
 
     // SMT - Admin
@@ -604,7 +279,7 @@ function checkAll(formname, checktoggle) {
         if (!$this->isAdmin()) {
             return '';
         }
-        if (!$this->isPositiveNumber($mediaId)) {
+        if (!Tools::isPositiveNumber($mediaId)) {
             return '';
         }
         return ''
@@ -679,22 +354,6 @@ function checkAll(formname, checktoggle) {
     // SMT - User
 
     /**
-     * @return int
-     */
-    public function getUserCount()
-    {
-        if (isset($this->userCount)) {
-            return $this->userCount;
-        }
-        $count = $this->queryAsArray('SELECT count(id) AS count FROM user');
-        if (isset($count[0]['count'])) {
-            return $this->userCount = $count[0]['count'];
-        }
-
-        return $this->userCount = 0;
-    }
-
-    /**
      * @param int $limit
      * @param string $orderby
      * @return array|bool
@@ -704,7 +363,7 @@ function checkAll(formname, checktoggle) {
         $sql = 'SELECT * FROM user';
         $sql .= ' ORDER BY ' . $orderby;
         $sql .= ' LIMIT ' . $limit;
-        $users = $this->queryAsArray($sql);
+        $users = $this->database->queryAsArray($sql);
         if (isset($users[0])) {
             return $users;
         }
@@ -724,7 +383,7 @@ function checkAll(formname, checktoggle) {
             $host = $ipAddress;
         }
         $userAgent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
-        $user = $this->queryAsArray(
+        $user = $this->database->queryAsArray(
             'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent',
             [':ip_address' => $ipAddress, ':host' => $host, ':user_agent' => $userAgent]
         );
@@ -742,32 +401,12 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * @param bool $userId
-     * @return int
-     */
-    public function getUserTagCount($userId = false)
-    {
-        $sql = 'SELECT sum(count) AS sum FROM user_tagging';
-        $bind = [];
-        if ($userId > 0) {
-            $sql .= ' WHERE user_id = :user_id';
-            $bind[':user_id'] = $userId;
-        }
-        $count = $this->queryAsArray($sql, $bind);
-        if (isset($count[0]['sum'])) {
-            return $count[0]['sum'];
-        }
-
-        return 0;
-    }
-
-    /**
      * @param $userId
      * @return array
      */
     public function getUserTagging($userId)
     {
-        $tags = $this->queryAsArray(
+        $tags = $this->database->queryAsArray(
             'SELECT m.*, ut.tag_id, ut.count
             FROM user_tagging AS ut, media AS m
             WHERE ut.user_id = :user_id
@@ -788,7 +427,7 @@ function checkAll(formname, checktoggle) {
      */
     public function saveUserLastTagTime()
     {
-        return $this->queryAsBool(
+        return $this->database->queryAsBool(
             'UPDATE user SET last = :last WHERE id = :user_id',
             [':user_id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
         );
@@ -802,7 +441,7 @@ function checkAll(formname, checktoggle) {
         if (!$this->userId) {
             return false;
         }
-        $view = $this->queryAsBool(
+        $view = $this->database->queryAsBool(
             'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
             [':id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
         );
@@ -821,7 +460,7 @@ function checkAll(formname, checktoggle) {
      */
     public function newUser($ipAddress, $host, $userAgent)
     {
-        if ($this->queryAsBool(
+        if ($this->database->queryAsBool(
             'INSERT INTO user (
                 ip, host, user_agent, page_views, last
             ) VALUES (
@@ -835,7 +474,7 @@ function checkAll(formname, checktoggle) {
             ]
         )
         ) {
-            $this->userId = $this->lastInsertId;
+            $this->userId = $this->database->lastInsertId;
 
             return true;
         }
@@ -852,7 +491,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displayCategories($mediaId)
     {
-        if (!$mediaId || !$this->isPositiveNumber($mediaId)) {
+        if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
             return false;
         }
         $cats = $this->getImageCategories($mediaId);
@@ -921,7 +560,7 @@ function checkAll(formname, checktoggle) {
      */
     public function getCategory($name)
     {
-        $response = $this->queryAsArray(
+        $response = $this->database->queryAsArray(
             'SELECT * FROM category WHERE name = :name',
             [':name' => $name]
         );
@@ -950,44 +589,13 @@ function checkAll(formname, checktoggle) {
                         AND m.pageid = c2m.media_pageid
                         AND m.curated = '1'";
         }
-        $response = $this->queryAsArray($sql, [':name' => $categoryName]);
+        $response = $this->database->queryAsArray($sql, [':name' => $categoryName]);
         if (isset($response[0]['size'])) {
             return $response[0]['size'];
         }
-        $this->error("getCategorySize($categoryName) ERROR: 0 size");
+        Tools::error("getCategorySize($categoryName) ERROR: 0 size");
 
         return 0;
-    }
-
-    /**
-     * @param bool $redo
-     * @param int $hidden
-     * @return int
-     */
-    public function getCategoriesCount($redo = false, $hidden = 0)
-    {
-        if (isset($this->categoryCount) && !$redo) {
-            return $this->categoryCount;
-        }
-        $sql = 'SELECT count(distinct(c2m.category_id)) AS count
-                FROM category2media AS c2m, category AS c
-                WHERE c.id = c2m.category_id
-                AND c.hidden = ' . ($hidden ? '1' : '0');
-        if ($this->siteInfo['curation'] == 1) {
-            $hidden = $hidden ? '1' : '0';
-            $sql = "SELECT count(distinct(c2m.category_id)) AS count
-                    FROM category2media AS c2m, category AS c, media AS m
-                    WHERE c.id = c2m.category_id
-                    AND c.hidden = '$hidden'
-                    AND c2m.media_pageid = m.pageid
-                    AND m.curated = '1'";
-        }
-        $response = $this->queryAsArray($sql);
-        if (!$response) {
-            return 0;
-        }
-
-        return $this->categoryCount = $response[0]['count'];
     }
 
     /**
@@ -996,7 +604,7 @@ function checkAll(formname, checktoggle) {
     public function getCategoryList()
     {
         $sql = 'SELECT name FROM category ORDER BY name';
-        $response = $this->queryAsArray($sql);
+        $response = $this->database->queryAsArray($sql);
         $return = [];
         if (!$response || !is_array($response)) {
             return $return;
@@ -1015,10 +623,10 @@ function checkAll(formname, checktoggle) {
     public function getImageCategories($pageid)
     {
         $error = ['Category database unavailable'];
-        if (!$pageid|| !$this->isPositiveNumber($pageid)) {
+        if (!$pageid|| !Tools::isPositiveNumber($pageid)) {
             return $error;
         }
-        $response = $this->queryAsArray(
+        $response = $this->database->queryAsArray(
             'SELECT category.name
             FROM category, category2media
             WHERE category2media.category_id = category.id
@@ -1043,7 +651,7 @@ function checkAll(formname, checktoggle) {
      */
     public function getCategoryIdFromName($categoryName)
     {
-        $response = $this->queryAsArray(
+        $response = $this->database->queryAsArray(
             'SELECT id FROM category WHERE name = :name',
             [':name' => $categoryName]
         );
@@ -1062,7 +670,7 @@ function checkAll(formname, checktoggle) {
     {
         $categoryId = $this->getCategoryIdFromName($categoryName);
         if (!$categoryId) {
-            $this->error('::getMediaInCategory: No ID found for: ' . $categoryName);
+            Tools::error('::getMediaInCategory: No ID found for: ' . $categoryName);
 
             return [];
         }
@@ -1070,9 +678,9 @@ function checkAll(formname, checktoggle) {
                 FROM category2media
                 WHERE category_id = :category_id
                 ORDER BY media_pageid';
-        $response = $this->queryAsArray($sql, [':category_id' => $categoryId]);
+        $response = $this->database->queryAsArray($sql, [':category_id' => $categoryId]);
         if ($response === false) {
-            $this->error('ERROR: unable to access categor2media table.');
+            Tools::error('ERROR: unable to access categor2media table.');
 
             return [];
         }
@@ -1094,11 +702,11 @@ function checkAll(formname, checktoggle) {
     public function getCountLocalFilesPerCategory($categoryIdArray)
     {
         if (!is_array($categoryIdArray)) {
-            $this->error('getCountLocalFilesPerCategory: invalid category array');
+            Tools::error('getCountLocalFilesPerCategory: invalid category array');
 
             return 0;
         }
-        $locals = $this->queryAsArray(
+        $locals = $this->database->queryAsArray(
             'SELECT count(category_id) AS count
             FROM category2media
             WHERE category_id IN ( :category_id )',
@@ -1122,7 +730,7 @@ function checkAll(formname, checktoggle) {
         }
         $sql = 'SELECT id FROM category WHERE hidden = 1 AND name = :category_name';
         $bind = [':category_name' => $categoryName];
-        if ($this->queryAsArray($sql, $bind)) {
+        if ($this->database->queryAsArray($sql, $bind)) {
             return true;
         }
 
@@ -1179,7 +787,7 @@ function checkAll(formname, checktoggle) {
         if (isset($this->tagId[$name])) {
             return $this->tagId[$name];
         }
-        $tag = $this->queryAsArray(
+        $tag = $this->database->queryAsArray(
             'SELECT id FROM tag WHERE name = :name LIMIT 1',
             [':name' => $name]
         );
@@ -1199,7 +807,7 @@ function checkAll(formname, checktoggle) {
         if (isset($this->tagName[$tagId])) {
             return $this->tagName[$tagId];
         }
-        $tag = $this->queryAsArray(
+        $tag = $this->database->queryAsArray(
             'SELECT name FROM tag WHERE id = :id LIMIT 1',
             [':id' => $tagId]
         );
@@ -1220,7 +828,7 @@ function checkAll(formname, checktoggle) {
 
             return $this->tags;
         }
-        $tags = $this->queryAsArray('SELECT * FROM tag ORDER BY position');
+        $tags = $this->database->queryAsArray('SELECT * FROM tag ORDER BY position');
         if (!$tags) {
             return $this->tags = [];
         }
@@ -1229,48 +837,12 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * @param bool $tagId
-     * @return string
-     */
-    public function getTaggingCount($tagId = false)
-    {
-        $sql = 'SELECT SUM(count) AS count FROM tagging';
-        $bind = [];
-        if ($tagId) {
-            $sql .= ' WHERE tag_id = :tag_id';
-            $bind[':tag_id'] = $tagId;
-        }
-        $count = $this->queryAsArray($sql, $bind);
-        if (!isset($count[0]['count'])) {
-            return '0';
-        }
-
-        return $count[0]['count'];
-    }
-
-    /**
-     * @return int
-     */
-    public function getTotalReviewCount()
-    {
-        if (isset($this->totalReviewCount)) {
-            return $this->totalReviewCount;
-        }
-        $response = $this->queryAsArray('SELECT SUM(count) AS total FROM tagging');
-        if (isset($response[0]['total'])) {
-            return $this->totalReviewCount = $response[0]['total'];
-        }
-
-        return $this->totalReviewCount = 0;
-    }
-
-    /**
      * @param $pageid
      * @return string
      */
     public function getReviews($pageid)
     {
-        $reviews = $this->queryAsArray(
+        $reviews = $this->database->queryAsArray(
             'SELECT t.tag_id, t.count, tag.*
             FROM tagging AS t, tag
             WHERE t.media_pageid = :media_pageid
@@ -1298,7 +870,7 @@ function checkAll(formname, checktoggle) {
      */
     public function getDbReviewsPerCategory($categoryId)
     {
-        $reviews = $this->queryAsArray(
+        $reviews = $this->database->queryAsArray(
             'SELECT SUM(t.count) AS count, tag.*
             FROM tagging AS t,
                  tag,
@@ -1323,7 +895,7 @@ function checkAll(formname, checktoggle) {
         if (isset($this->totalFilesReviewedCount)) {
             return $this->totalFilesReviewedCount;
         }
-        $response = $this->queryAsArray('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
+        $response = $this->database->queryAsArray('SELECT COUNT( DISTINCT(media_pageid) ) AS total FROM tagging');
         if (isset($response[0]['total'])) {
             return $this->totalFilesReviewedCount = $response[0]['total'];
         }
@@ -1339,10 +911,10 @@ function checkAll(formname, checktoggle) {
     public function includeMenu()
     {
         $space = ' &nbsp; &nbsp; ';
-        $countFiles = number_format((float) $this->getImageCount());
-        $countCategories = number_format((float) $this->getCategoriesCount());
-        $countReviews = number_format((float) $this->getTotalReviewCount());
-        $countUsers = number_format((float) $this->getUserCount());
+        $countFiles = number_format((float) $this->database->getImageCount());
+        $countCategories = number_format((float) $this->database->getCategoriesCount());
+        $countReviews = number_format((float) $this->database->getTotalReviewCount());
+        $countUsers = number_format((float) $this->database->getUserCount());
         print '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->siteName . '</a></span>' .  $space
         . '<a href="' . $this->url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
@@ -1395,62 +967,15 @@ function checkAll(formname, checktoggle) {
     // SMT - Shared Media Tagger
 
     /**
-     * SharedMediaTagger constructor.
-     */
-    public function __construct()
-    {
-        global $router, $setup;
-
-        $this->setup = [];
-        if (is_array($setup)) {
-            $this->setup = $setup;
-        }
-        $this->installDirectory = realpath(__DIR__.'/..');
-        $this->databaseName = $this->installDirectory . '/db/media.sqlite';
-        $this->sizeMedium = 325;
-        $this->sizeThumb = 100;
-        $this->server = $_SERVER['SERVER_NAME']; // $_SERVER['HTTP_HOST'];
-        if (isset($this->setup['site_url'])) {
-            $this->siteUrl = $setup['site_url'];
-        } else {
-            $this->siteUrl = $router->getUriBase() . '/';
-        }
-        $this->setSiteInfo();
-        $this->links = [
-            'home'       => $this->siteUrl . '',
-            'css'        => $this->siteUrl . 'css.css',
-            'jquery'        => $this->siteUrl . 'use/jquery.min.js',
-            'bootstrap_js'  => $this->siteUrl . 'use/bootstrap/js/bootstrap.min.js',
-            'bootstrap_css' => $this->siteUrl . 'use/bootstrap/css/bootstrap.min.css',
-            'info'       => $this->siteUrl . 'info.php',
-            'browse'     => $this->siteUrl . 'browse.php',
-            'categories' => $this->siteUrl . 'categories.php',
-            'category'   => $this->siteUrl . 'category.php',
-            'about'      => $this->siteUrl . 'about.php',
-            'reviews'    => $this->siteUrl . 'reviews.php',
-            'admin'      => $this->siteUrl . 'admin/',
-            'contact'    => $this->siteUrl . 'contact.php',
-            'tag'        => $this->siteUrl . 'tag.php',
-            'users'      => $this->siteUrl . 'users.php',
-            'github_smt' => 'https://github.com/attogram/shared-media-tagger',
-        ];
-        $this->getUser();
-        $this->sqlCount = 0;
-        if (isset($_GET['logoff'])) {
-            $this->adminLogoff();
-        }
-    }
-
-    /**
      * @return bool
      */
     public function setSiteInfo()
     {
-        $response = $this->queryAsArray('SELECT * FROM site WHERE id = 1');
+        $response = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
         if (!$response || !isset($response[0]['id'])) {
             $this->siteName = 'Shared Media Tagger';
             $this->siteInfo = [];
-            $this->siteInfo['curation'] = 0;
+            $this->siteInfo['curation'] = $this->database->curation = 0;
 
             return false;
         }
@@ -1460,6 +985,7 @@ function checkAll(formname, checktoggle) {
             $this->siteInfo['curation'] = 0;
         }
 
+        $this->database->curation = $this->siteInfo['curation'];
         return true;
     }
 
@@ -1568,7 +1094,7 @@ function checkAll(formname, checktoggle) {
     public function displayImage($media = '')
     {
         if (!$media || !is_array($media)) {
-            $this->error('displayImage: ERROR: no image array');
+            Tools::error('displayImage: ERROR: no image array');
 
             return false;
         }
@@ -1607,7 +1133,7 @@ function checkAll(formname, checktoggle) {
     public function displayLicensing($media, $artistTruncate = 42)
     {
         if (!$media || !is_array($media)) {
-            $this->error('::displayLicensing: Media Not Found');
+            Tools::error('::displayLicensing: Media Not Found');
 
             return false;
         }
@@ -1616,7 +1142,7 @@ function checkAll(formname, checktoggle) {
             $artist = 'Unknown';
             $copyright = '';
         } else {
-            $artist = $this->truncate(strip_tags($artist), $artistTruncate);
+            $artist = Tools::truncate(strip_tags($artist), $artistTruncate);
             $copyright = '&copy; ';
         }
         $licenseshortname = !empty($media['licenseshortname']) ? $media['licenseshortname'] : null;
@@ -1644,7 +1170,7 @@ function checkAll(formname, checktoggle) {
 
         return '<div class="mediatitle left">'
         . '<a href="' . $infourl . '" title="' . htmlentities($title) . '">'
-        . $this->truncate($title, $titleTruncate)
+        . Tools::truncate($title, $titleTruncate)
         . '</a></div>'
         . '<div class="attribution left">'
         . '<a href="' . $infourl . '">'

@@ -3,13 +3,15 @@
  * Shared Media Tagger
  * HOME PAGE
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
 */
 
-if (isset($_GET['i']) && $smt->isPositiveNumber($_GET['i'])) {
+use Attogram\SharedMedia\Tagger\Tools;
+
+if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
     $media = $smt->getMedia($_GET['i']);
 } else {
-    $media = $smt->getRandomMedia(1);
+    $media = $smt->database->getRandomMedia(1);
 }
 if (!$media || !isset($media[0])) {
     $smt->fail404('404 Media Not Found');
@@ -18,7 +20,7 @@ if (!$media || !isset($media[0])) {
 $media = $media[0];
 
 $smt->title = $smt->siteName;
-$smt->includeHeader(/*show_site_header*/false);
+$smt->includeHeader(false);
 $smt->includeSmallMenu();
 
 print '<div class="box grey center">'

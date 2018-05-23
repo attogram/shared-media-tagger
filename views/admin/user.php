@@ -3,7 +3,7 @@
  * Shared Media Tagger
  * User Admin
  *
- * @var Attogram\SharedMedia\Tagger\SharedMediaTaggerAdmin $smt
+ * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
 $smt->title = 'User Admin';
@@ -30,7 +30,7 @@ foreach ($users as $user) {
     print '<tr>'
     . '<td>' . $user['id'] . '</td>'
     . '<td><a href="' . $smt->url('users') . '?i=' . $user['id'] . '">+'
-    . $smt->getUserTagCount($user['id']) . '</a></td>'
+    . $smt->database->getUserTagCount($user['id']) . '</a></td>'
     . '<td class="nobr"><small>' . $user['last'] . '</small></td>'
     . '<td><small>' . $iphost . '</small></td>'
     . '<td><small>' . $user['user_agent'] . '</small></td>'

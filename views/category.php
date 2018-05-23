@@ -3,7 +3,7 @@
  * Shared Media Tagger
  * Category
  *
- * @var \Attogram\SharedMedia\Tagger\SharedMediaTagger $smt
+ * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
 $pageLimit = 20; // # of files per page
@@ -36,13 +36,13 @@ if ($categorySize > $pageLimit) {
     $sqlLimit = " LIMIT $pageLimit OFFSET $offset";
     $pageCount = 0;
     $pager = 'pages: ';
-    for ($x = 0; $x < $categorySize; $x+=$pageLimit) {
-        if ($x == $offset) {
+    for ($count = 0; $count < $categorySize; $count+=$pageLimit) {
+        if ($count == $offset) {
             $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
             . '&nbsp;' . ++$pageCount . '&nbsp;</span> ';
             continue;
         }
-        $pager .= '<a href="?o=' . $x . '&amp;c='
+        $pager .= '<a href="?o=' . $count . '&amp;c='
             . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
                 . '&nbsp;' . ++$pageCount . '&nbsp;</a> ';
     }
@@ -62,7 +62,7 @@ $sql .= " ORDER BY m.pageid ASC $sqlLimit";
 
 $bind = [':category_name'=>$categoryName];
 
-$category = $smt->queryAsArray($sql, $bind);
+$category = $smt->database->queryAsArray($sql, $bind);
 
 if (!$category || !is_array($category)) {
     $smt->fail404(
