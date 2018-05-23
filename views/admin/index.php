@@ -30,7 +30,7 @@ if (isset($result[0]['count'])) {
 print '<p>Site: <b><a href="./site.php">' . Config::$siteName . '</a></b>
 <ul>
 <li><b>' . $msgCount . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
-<li><b>' . sizeof($smt->getTags()) . '</b> <a href="./site.php">Tags</a></li>
+<li><b>' . sizeof($smt->getTags()) . '</b> <a href="./tag.php">Tags</a></li>
 <li><b>' . number_format($smt->database->getImageCount()) . '</b> Files</li>
 <li><b>' . number_format($smt->getBlockCount()) . '</b> Blocked Files</li>
 <li><b>' . number_format($smt->getTotalFilesReviewedCount()) . '</b> Files reviewed</li>

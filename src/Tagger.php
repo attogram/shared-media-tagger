@@ -9,10 +9,6 @@ namespace Attogram\SharedMedia\Tagger;
  */
 class Tagger
 {
-    private $userId;
-
-    public $protocol;
-    public $site;
     public $tagId;
     public $tagName;
     public $totalFilesReviewedCount;
@@ -207,7 +203,7 @@ function checkAll(formname, checktoggle) {
         if (!Tools::isAdmin()) {
             return '';
         }
-        $category = $this->getCategory($categoryName);
+        $category = $this->database->getCategory($categoryName);
         if (!$category) {
             return '<p>ADMIN: category not in database</p>';
         }
@@ -265,14 +261,14 @@ function checkAll(formname, checktoggle) {
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
             return false;
         }
-        $cats = $this->getImageCategories($mediaId);
+        $cats = $this->database->getImageCategories($mediaId);
         $response = '<div class="categories" style="width:' . Config::$sizeMedium . 'px;">';
         if (!$cats) {
             return $response . '<em>Uncategorized</em></div>';
         }
         $hidden = [];
         foreach ($cats as $cat) {
-            if ($this->isHiddenCategory($cat)) {
+            if ($this->database->isHiddenCategory($cat)) {
                 $hidden[] = $cat;
                 continue;
             }
@@ -292,189 +288,6 @@ function checkAll(formname, checktoggle) {
         }
 
         return $response . '</div></div>';
-    }
-
-    /**
-     * @param $name
-     * @return array|mixed
-     */
-    public function getCategory($name)
-    {
-        $response = $this->database->queryAsArray(
-            'SELECT * FROM category WHERE name = :name',
-            [':name' => $name]
-        );
-        if (!isset($response[0]['id'])) {
-            return [];
-        }
-
-        return $response[0];
-    }
-
-    /**
-     * @param $categoryName
-     * @return int
-     */
-    public function getCategorySize($categoryName)
-    {
-        $sql = 'SELECT count(c2m.id) AS size
-                FROM category2media AS c2m, category AS c
-                WHERE c.name = :name
-                AND c2m.category_id = c.id';
-        if (Config::$siteInfo['curation'] == 1) {
-            $sql = "SELECT count(c2m.id) AS size
-                        FROM category2media AS c2m, category AS c, media as m
-                        WHERE c.name = :name
-                        AND c2m.category_id = c.id
-                        AND m.pageid = c2m.media_pageid
-                        AND m.curated = '1'";
-        }
-        $response = $this->database->queryAsArray($sql, [':name' => $categoryName]);
-        if (isset($response[0]['size'])) {
-            return $response[0]['size'];
-        }
-        Tools::error("getCategorySize($categoryName) ERROR: 0 size");
-
-        return 0;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCategoryList()
-    {
-        $sql = 'SELECT name FROM category ORDER BY name';
-        $response = $this->database->queryAsArray($sql);
-        $return = [];
-        if (!$response || !is_array($response)) {
-            return $return;
-        }
-        foreach ($response as $name) {
-            $return[] = $name['value']['name'];
-        }
-
-        return $return;
-    }
-
-    /**
-     * @param $pageid
-     * @return array
-     */
-    public function getImageCategories($pageid)
-    {
-        $error = ['Category database unavailable'];
-        if (!$pageid|| !Tools::isPositiveNumber($pageid)) {
-            return $error;
-        }
-        $response = $this->database->queryAsArray(
-            'SELECT category.name
-            FROM category, category2media
-            WHERE category2media.category_id = category.id
-            AND category2media.media_pageid = :pageid
-            ORDER BY category.name',
-            [':pageid' => $pageid]
-        );
-        if (!isset($response[0]['name'])) {
-            return $error;
-        }
-        $cats = [];
-        foreach ($response as $cat) {
-            $cats[] = $cat['name'];
-        }
-
-        return $cats;
-    }
-
-    /**
-     * @param $categoryName
-     * @return int
-     */
-    public function getCategoryIdFromName($categoryName)
-    {
-        $response = $this->database->queryAsArray(
-            'SELECT id FROM category WHERE name = :name',
-            [':name' => $categoryName]
-        );
-        if (!isset($response[0]['id'])) {
-            return 0;
-        }
-
-        return $response[0]['id'];
-    }
-
-    /**
-     * @param $categoryName
-     * @return array
-     */
-    public function getMediaInCategory($categoryName)
-    {
-        $categoryId = $this->getCategoryIdFromName($categoryName);
-        if (!$categoryId) {
-            Tools::error('::getMediaInCategory: No ID found for: ' . $categoryName);
-
-            return [];
-        }
-        $sql = 'SELECT media_pageid
-                FROM category2media
-                WHERE category_id = :category_id
-                ORDER BY media_pageid';
-        $response = $this->database->queryAsArray($sql, [':category_id' => $categoryId]);
-        if ($response === false) {
-            Tools::error('ERROR: unable to access categor2media table.');
-
-            return [];
-        }
-        if (!$response) {
-            return [];
-        }
-        $return = [];
-        foreach ($response as $media) {
-            $return[] = $media['media_pageid'];
-        }
-
-        return $return;
-    }
-
-    /**
-     * @param $categoryIdArray
-     * @return int
-     */
-    public function getCountLocalFilesPerCategory($categoryIdArray)
-    {
-        if (!is_array($categoryIdArray)) {
-            Tools::error('getCountLocalFilesPerCategory: invalid category array');
-
-            return 0;
-        }
-        $locals = $this->database->queryAsArray(
-            'SELECT count(category_id) AS count
-            FROM category2media
-            WHERE category_id IN ( :category_id )',
-            [':category_id' => implode($categoryIdArray, ', ')]
-        );
-        if ($locals && isset($locals[0]['count'])) {
-            return $locals[0]['count'];
-        }
-
-        return 0;
-    }
-
-    /**
-     * @param $categoryName
-     * @return bool
-     */
-    public function isHiddenCategory($categoryName)
-    {
-        if (!$categoryName) {
-            return false;
-        }
-        $sql = 'SELECT id FROM category WHERE hidden = 1 AND name = :category_name';
-        $bind = [':category_name' => $categoryName];
-        if ($this->database->queryAsArray($sql, $bind)) {
-            return true;
-        }
-
-        return false;
     }
 
     // SMT - Tag

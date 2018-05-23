@@ -537,7 +537,7 @@ class TaggerAdmin extends Tagger
                 continue;
             }
 
-            $categoryId = $this->getCategoryIdFromName($category['title']);
+            $categoryId = $this->database->getCategoryIdFromName($category['title']);
             if (!$categoryId) {
                 if (!$this->insertCategory($category['title'], true, 1)) {
                     Tools::error('link_media_categories: FAILED to insert ' . $category['title']);
@@ -626,7 +626,7 @@ class TaggerAdmin extends Tagger
     public function saveCategoryInfo($categoryName)
     {
         $categoryName = Tools::categoryUrldecode($categoryName);
-        $categoryRow = $this->getCategory($categoryName);
+        $categoryRow = $this->database->getCategory($categoryName);
         if (!$categoryRow) {
             if (!$this->insertCategory($categoryName, false, 1)) {
                 Tools::error('saveCategoryInfo: new category INSERT FAILED: ' . $categoryName);
@@ -634,7 +634,7 @@ class TaggerAdmin extends Tagger
                 return false;
             }
             Tools::notice('saveCategoryInfo: NEW CATEGORY: '  . $categoryName);
-            $categoryRow = $this->getCategory($categoryName);
+            $categoryRow = $this->database->getCategory($categoryName);
             if (!$categoryRow) {
                 Tools::error('saveCategoryInfo: Category save Failed: ' . $categoryName);
 
@@ -815,11 +815,11 @@ class TaggerAdmin extends Tagger
     public function updateCategoryLocalFilesCount($categoryName)
     {
         $sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
-        $bind[':local_files'] = $this->getCategorySize($categoryName);
+        $bind[':local_files'] = $this->database->getCategorySize($categoryName);
         if (is_int($categoryName)) {
             $bind['id'] = $categoryName;
         } else {
-            $bind[':id'] = $this->getCategoryIdFromName($categoryName);
+            $bind[':id'] = $this->database->getCategoryIdFromName($categoryName);
         }
 
         if (!$bind[':id']) {
