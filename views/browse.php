@@ -6,6 +6,7 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 $pageLimit = 20; // # of files per page
@@ -110,7 +111,7 @@ switch ($sort) {
         break;
 }
 
-if ($smt->siteInfo['curation'] == 1) {
+if (Config::$siteInfo['curation'] == 1) {
     if ($where) {
         $where .= " AND curated = '1'";
     } else {
@@ -195,7 +196,7 @@ $sql .= $where . $orderby . $sqlDir . ' LIMIT ' . $pageLimit . $sqlOffset;
 $medias = $smt->database->queryAsArray($sql);
 
 $smt->title = 'Browse ' . number_format($resultSize) . ' Files, sorted by ' . $sort . ' ' . $sqlDir
-    . ', page #' . $currentPage . ' - ' . $smt->siteName;
+    . ', page #' . $currentPage . ' - ' . Config::$siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
 ////////////////////////////////////////////////////////////////////////
