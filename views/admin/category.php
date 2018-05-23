@@ -22,12 +22,12 @@ print '<div class="box white">';
 ///////////////////////////////////////////////////////////////////////////////
 // Import images from a category
 if (isset($_GET['i']) && $_GET['i']) {
-    $categoryName = $smt->categoryUrldecode($_GET['i']);
+    $categoryName = Tools::categoryUrldecode($_GET['i']);
     $catUrl = '<a href="' . $smt->url('category')
-    . '?c=' . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
-    . htmlentities($smt->stripPrefix($categoryName)) . '</a>';
+    . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
+    . htmlentities(Tools::stripPrefix($categoryName)) . '</a>';
     print '<p>Importing media from <b>' . $catUrl . '</b></p>';
-    $smt->getMediaFromCategory($categoryName);
+    $smt->database->getMediaFromCategory($categoryName);
     $smt->updateCategoriesLocalFilesCount();
     print '<p>Imported media from <b>' . $catUrl . '</b></p>';
     print '</div>';
@@ -48,8 +48,8 @@ if (isset($_GET['c']) && $_GET['c']) {
     if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
         Tools::notice(
             'OK: Refreshed Category Info: <b><a href="' . $smt->url('category')
-            . '?c=' . $smt->stripPrefix($smt->categoryUrlencode($_GET['c'])) . '">'
-            . htmlentities($smt->categoryUrldecode($_GET['c'])) . '</a></b>'
+            . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
+            . htmlentities(Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
         );
     }
     print '</div>';
@@ -73,7 +73,7 @@ if (isset($_GET['scommons']) && $_GET['scommons']) {
 }
 
 if (isset($_GET['sc']) && $_GET['sc']) {
-    $smt->getSubcats($smt->categoryUrldecode($_GET['sc']));
+    $smt->getSubcats(Tools::categoryUrldecode($_GET['sc']));
     $smt->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
@@ -180,8 +180,8 @@ foreach ($cats as $cat) {
 
     print '<tr>'
     . '<td><b><a href="' . $smt->url('category') . '?c='
-    . $smt->categoryUrlencode($smt->stripPrefix($cat['name']))
-    . '">' . $smt->stripPrefix($cat['name']) . '</a></b></td>';
+    . Tools::categoryUrlencode(Tools::stripPrefix($cat['name']))
+    . '">' . Tools::stripPrefix($cat['name']) . '</a></b></td>';
 
     $localFiles = '';
 
@@ -204,7 +204,7 @@ foreach ($cats as $cat) {
         . ($cat['files'] ? number_format($cat['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
     ;
     if ($cat['subcats'] > 0) {
-        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->categoryUrlencode($cat['name']) . '"">+'
+        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . Tools::categoryUrlencode($cat['name']) . '"">+'
         . $cat['subcats'] . '</a>';
     } else {
         $subcatslink = '';
@@ -216,13 +216,13 @@ foreach ($cats as $cat) {
 
     print ''
     . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/'
-        . $smt->categoryUrlencode($cat['name']) . '">View</a></td>'
+        . Tools::categoryUrlencode($cat['name']) . '">View</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
-        . '?c=' . $smt->categoryUrlencode($cat['name']) . '">Info</a></td>'
+        . '?c=' . Tools::categoryUrlencode($cat['name']) . '">Info</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
-        . '?i=' . $smt->categoryUrlencode($cat['name']) . '">Import</a></td>'
+        . '?i=' . Tools::categoryUrlencode($cat['name']) . '">Import</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./media.php?dc='
-        . $smt->categoryUrlencode($cat['name']) . '">Clear</a></td>'
+        . Tools::categoryUrlencode($cat['name']) . '">Clear</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
         . '?d=' . urlencode($cat['id']) . '">Delete</a></td>'
     . '</tr>'
@@ -283,7 +283,7 @@ function getSearchResults(TaggerAdmin $smt)
         . $cat['title']
         . '</strong><small> '
         . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
-            . $smt->categoryUrlencode($cat['title']) . '">(view)</a> '
+            . Tools::categoryUrlencode($cat['title']) . '">(view)</a> '
         . ' (' . $cat['snippet'] . ')'
         . ' (size:' . $cat['size'] . ')</small><br />';
     }

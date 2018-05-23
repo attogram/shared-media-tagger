@@ -11,7 +11,7 @@ $smt->includeHeader();
 $smt->includeMediumMenu();
 $smt->includeAdminMenu();
 
-$users = $smt->getUsers();
+$users = $smt->database->getUsers();
 
 print '<div class="box white"><p>User Admin</p>
 <table border="1">

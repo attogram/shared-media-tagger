@@ -165,4 +165,61 @@ class Tools
 
         return str_pad($string, $length, ' ', STR_PAD_BOTH);
     }
+
+    /**
+     * @param $string
+     * @return null|string|string[]
+     */
+    public static function stripPrefix($string)
+    {
+        if (!$string || !is_string($string)) {
+            return $string;
+        }
+
+        return preg_replace(['/^File:/', '/^Category:/'], '', $string);
+    }
+
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public static function categoryUrldecode($category)
+    {
+        return str_replace('_', ' ', urldecode($category));
+    }
+
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public static function categoryUrlencode($category)
+    {
+        return str_replace('+', '_', str_replace('%3A', ':', urlencode($category)));
+    }
+
+    // Admin
+
+    /**
+     * @return bool
+     */
+    public static function isAdmin()
+    {
+        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     */
+    public static function adminLogoff()
+    {
+        if (!self::isAdmin()) {
+            return;
+        }
+        unset($_COOKIE['admin']);
+        setcookie('admin', null, -1, '/');
+    }
 }

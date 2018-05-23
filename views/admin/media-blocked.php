@@ -43,7 +43,7 @@ foreach ($blocks as $block) {
     . $block['pageid']
     . ': '
     . '<a target="commmons" href="https://commons.wikimedia.org/w/index.php?curid=' . $block['pageid'] . '">'
-    . $smt->stripPrefix($block['title'])
+    . Tools::stripPrefix($block['title'])
     . '<br />'
     . '<br />'
     . '<a target="sqlite" href="./sqladmin.php?table=block&action=row_editordelete&pk=%5B'

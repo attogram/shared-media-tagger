@@ -41,7 +41,7 @@ $sql = "SELECT *
         LIMIT " . $pageLimit;
 
 if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
-    $medias = $smt->getMedia($_GET['i']);
+    $medias = $smt->database->getMedia($_GET['i']);
 } else {
     $medias = $smt->database->queryAsArray($sql);
 }

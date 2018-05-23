@@ -23,7 +23,6 @@ print '<ul>'
 foreach ($smt->getTags() as $tag) {
     print '<li>MediaWiki Format: Tag Report: <a href="?r=tag&amp;i=' . $tag['id'] . '">' . $tag['name'] . '</a></li>';
 }
-print '<li><a href="?r=skin">MediaWiki Format: Skin Percentage Report</a></li>';
 print '</ul><hr />';
 
 if (!isset($_GET['r'])) {
@@ -37,9 +36,6 @@ switch ($_GET['r']) {
         break;
     case 'network':
         networkExport($smt);
-        break;
-    case 'skin':
-        skinReport($smt);
         break;
     case 'tag':
         if (!empty($_GET['i'])) {
@@ -76,7 +72,7 @@ function networkExport(TaggerAdmin $smt)
         if (!$cat['name']) {
             $cat['name'] = 'NULL';
         }
-        $export .= $cat['pageid'] . $tab . '14' . $tab . $smt->stripPrefix($cat['name']) . $cr;
+        $export .= $cat['pageid'] . $tab . '14' . $tab . Tools::stripPrefix($cat['name']) . $cr;
     }
     unset($cats);
 
@@ -91,7 +87,7 @@ function networkExport(TaggerAdmin $smt)
         if (!$media['title']) {
             $media['title'] = 'NULL';
         }
-        $export .= $media['pageid'] . $tab . '6' . $tab . $smt->stripPrefix($media['title']) . $cr;
+        $export .= $media['pageid'] . $tab . '6' . $tab . Tools::stripPrefix($media['title']) . $cr;
     }
     unset($medias);
 
@@ -137,26 +133,3 @@ function tagReport(TaggerAdmin $smt, $tagId = '')
     return true;
 }
 
-/**
- * @param TaggerAdmin $smt
- */
-function skinReport(TaggerAdmin $smt)
-{
-    $sql = 'SELECT title, skin FROM media ORDER BY skin DESC LIMIT 200';
-    $medias = $smt->database->queryAsArray($sql);
-    $cr = "\n";
-    print '<textarea cols="90" rows="20">'
-    . '== Skin Percentage Report ==' . $cr
-    . '* Collection ID: <code>' . md5(Config::$siteName) . '</code>' . $cr
-    . '* Collection Size: ' . number_format($smt->database->getImageCount()) . $cr
-    . '* Algorithm: Image_FleshSkinQuantifier / YCbCr Space Color Model / J. Marcial-Basilio et al. (2011) ' . $cr
-    . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
-    . '* Created with: Shared Media Tagger v' . __SMT__ . $cr
-    . '<gallery caption="Skin Percentage Report - Top ' . sizeof($medias)
-        . ' Files" widths="100px" heights="100px" perrow="6">' . $cr;
-
-    foreach ($medias as $media) {
-        print $media['title'] . '|' . $media['skin'] . ' %' . $cr;
-    }
-    print '</gallery></textarea>';
-}

@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+use Attogram\SharedMedia\Tagger\Config;
+
 $cr = "\n";
 
 $protocol = Config::$protocol;
@@ -38,7 +40,7 @@ $cats = $smt->database->queryAsArray('
     FROM category2media AS c2m, category AS c
     WHERE c2m.category_id = c.id');
 foreach ($cats as $cat) {
-    printUrl($smt->url('category') . '?c=' . $smt->categoryUrlencode($smt->stripPrefix($cat['name'])));
+    printUrl($smt->url('category') . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($cat['name'])));
 }
 
 print $cr;

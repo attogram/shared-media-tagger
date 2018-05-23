@@ -19,6 +19,7 @@ class Config
     public static $siteUrl;
     public static $sizeMedium;
     public static $sizeThumb;
+    public static $userId;
 
     /**
      *
@@ -41,6 +42,8 @@ class Config
         } else {
             self::$siteUrl = $router->getUriBase() . '/';
         }
+
+        self::$userId = 0;
 
         self::setLinks();
         self::setProtocol();
@@ -242,6 +245,7 @@ class Config
 
     /**
      * @return array
+     * @TODO unused
      */
     public static function getDefaultDatabaseSetup()
     {

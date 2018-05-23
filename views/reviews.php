@@ -16,14 +16,14 @@ $smt->title = 'Reviews - ' . Config::$siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
 
-$order = isset($_GET['o']) ? $smt->categoryUrldecode($_GET['o']) : '';
+$order = isset($_GET['o']) ? Tools::categoryUrldecode($_GET['o']) : '';
 
 print '<div class="box white">Reviews:<br />';
 
 foreach ($tags as $tag) {
     $tagCount = $smt->database->getTaggingCount($tag['id']);
     print '<span class="reviewbutton tag' . $tag['position'] . '">'
-    . '<a href="' . $me . '?o=reviews.' . $smt->categoryUrlencode($tag['name']) . '">'
+    . '<a href="' . $me . '?o=reviews.' . Tools::categoryUrlencode($tag['name']) . '">'
     . '+' . $tagCount . ' ' . $tag['name'] . '</a></span>';
 }
 print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+'

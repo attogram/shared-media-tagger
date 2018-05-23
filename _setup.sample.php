@@ -13,7 +13,7 @@ $setup = [];
 //$setup['site_url'] = 'https://example.com/mysite/';
 
 // Hide 'Powered by Shared Media Tagger' on footer
-//$setup['hide_powered_by'] = TRUE;
+//$setup['hide_powered_by'] = tru;
 
 // Hide 'Hosted by' on footer
-//$setup['hide_hosted_by'] = TRUE;
+//$setup['hide_hosted_by'] = true;
