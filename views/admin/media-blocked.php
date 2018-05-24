@@ -13,7 +13,7 @@ $smt->includeAdminMenu();
 print '<div class="box white"><p>Blocked Media Admin:</p>';
 ?>
 * <a target="sqlite"
-     href="<?= $smt->url('admin'); ?>sqladmin.php?table=block&action=row_view">Database: View/Edit Blocked Media</a>
+     href="<?= Tools::url('admin'); ?>sqladmin.php?table=block&action=row_view">Database: View/Edit Blocked Media</a>
 <hr />
 
 <?php

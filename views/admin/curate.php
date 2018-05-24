@@ -134,7 +134,7 @@ foreach ($medias as $media) {
 
     print '<div>';
     print '<a target="site" style="font-size:10pt; text-align:center;" href="'
-        . $smt->url('info') . '?i=' . $pageid . '">' . $pageid . '</a><br />';
+        . Tools::url('info') . '?i=' . $pageid . '">' . $pageid . '</a><br />';
 
     print '<img name="' . $pageid . '" id="' . $pageid.'"  src="' . $url . '"'
         . ' width="' . $width . '" height="' . $height . '" title="'

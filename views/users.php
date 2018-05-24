@@ -44,7 +44,7 @@ foreach ($users as $user) {
         continue;
     }
     print '<div style="display:inline-block; border:1px solid grey; padding:4px; margin:2px; ">'
-    . '<h2><a href="' . $smt->url('users') . '?i=' . $user['id'] . '">'
+    . '<h2><a href="' . Tools::url('users') . '?i=' . $user['id'] . '">'
     . '+' . $user['tag_count'] . '</h2>'
     . ' <small>user:' . $user['id'] . '</small>'
     . '</a>'

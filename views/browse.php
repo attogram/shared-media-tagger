@@ -215,7 +215,7 @@ Browse Files, sorty by <select name="s">
 </form><br />' . number_format($resultSize) . ' Files' . ($pager ? ', '.$pager : '');
 
 if (Tools::isAdmin()) {
-    print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
+    print '<form action="' . Tools::url('admin') .'media.php" method="GET" name="media">';
     print $smt->displayAdminMediaListFunctions();
 }
 

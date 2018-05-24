@@ -23,7 +23,7 @@ print '<div class="box white">';
 // Import images from a category
 if (isset($_GET['i']) && $_GET['i']) {
     $categoryName = Tools::categoryUrldecode($_GET['i']);
-    $catUrl = '<a href="' . $smt->url('category')
+    $catUrl = '<a href="' . Tools::url('category')
     . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
     . htmlentities(Tools::stripPrefix($categoryName)) . '</a>';
     print '<p>Importing media from <b>' . $catUrl . '</b></p>';
@@ -47,7 +47,7 @@ if (isset($_POST['cats']) && $_POST['cats']) {
 if (isset($_GET['c']) && $_GET['c']) {
     if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
         Tools::notice(
-            'OK: Refreshed Category Info: <b><a href="' . $smt->url('category')
+            'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
             . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
             . htmlentities(Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
         );
@@ -143,12 +143,12 @@ print ''
 . '<input type="submit" value="   Search LOCAL Categories   "></form>'
 . '<br /><br />'
 
-. '<a href="' . $smt->url('admin') . 'category.php?v=1">[View&nbsp;Category&nbsp;List]</a>'
+. '<a href="' . Tools::url('admin') . 'category.php?v=1">[View&nbsp;Category&nbsp;List]</a>'
 . $spacer
 . ' <a href="./sqladmin.php?table=category&action=row_create" target="sqlite">'
 . ' [Manually&nbsp;add&nbsp;category]</a>'
 . $spacer
-. '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
+. '<a href="' . Tools::url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
 if (($smt->database->getCategoriesCount() > 1000) && isset($_GET['v']) && ($_GET['v'] != 1)) {
@@ -179,7 +179,7 @@ foreach ($cats as $cat) {
     $commonFilesCount += $cat['files'];
 
     print '<tr>'
-    . '<td><b><a href="' . $smt->url('category') . '?c='
+    . '<td><b><a href="' . Tools::url('category') . '?c='
     . Tools::categoryUrlencode(Tools::stripPrefix($cat['name']))
     . '">' . Tools::stripPrefix($cat['name']) . '</a></b></td>';
 

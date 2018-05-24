@@ -270,5 +270,4 @@ class Config
                 "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
         ];
     }
-
 }

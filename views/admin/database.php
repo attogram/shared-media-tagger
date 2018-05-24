@@ -6,6 +6,8 @@
  * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+use Attogram\SharedMedia\Tagger\Tools;
+
 $smt->title = 'Database Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();
@@ -57,8 +59,8 @@ print '</pre><hr />';
 . (file_exists($smt->database->databaseName) ? number_format(filesize($smt->database->databaseName)) : 'NULL')
 . ' bytes</li>
 
-<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">'
-    . $smt->url('admin')  . 'db/media.sqlite</a></li>
+<li>Download URL: <a href="' . Tools::url('admin')  . 'db/media.sqlite">'
+    . Tools::url('admin')  . 'db/media.sqlite</a></li>
 </ul>';
 ?>
 <br />

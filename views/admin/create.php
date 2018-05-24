@@ -194,11 +194,11 @@ $areas = [];
 $descs = [];
 foreach ($images as $image) {
     $count++;
-    $areas[$count] = $smt->url('info') . '?i=' . $image['pageid'];
+    $areas[$count] = Tools::url('info') . '?i=' . $image['pageid'];
     $descs[$count] = htmlspecialchars(Tools::stripPrefix($image['title']))
         . "\n" . $smt->displayLicensing($image);
     print '<br />#' . $count . ': '
-    . '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">'
+    . '<a href="' . Tools::url('info') . '?i=' . $image['pageid'] . '">'
     . htmlspecialchars(Tools::stripPrefix($image['title'])) . '</a>'
     . ' - ' . $smt->displayLicensing($image)
     ;
