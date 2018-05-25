@@ -91,9 +91,13 @@ class Database
         if (!$statement) {
             return [];
         }
-        foreach ($bind as $name => $value) {
-            $statement->bindParam($name, $value);
+        while (($xbind = each($bind))) {
+            $statement->bindParam($xbind[0], $xbind[1]);
         }
+        //foreach ($bind as $name => $value) {
+        //    $statement->bindParam($name, $value);
+        //}
+
         if (!$statement->execute()) {
             Tools::error('::queryAsArray(): ERROR EXECUTE: ' . print_r($this->db->errorInfo(), true));
 
@@ -128,9 +132,12 @@ class Database
 
             return false;
         }
-        foreach ($bind as $name => $value) {
-            $statement->bindParam($name, $value);
+        while (($xbind = each($bind))) {
+            $statement->bindParam($xbind[0], $xbind[1]);
         }
+        //foreach ($bind as $name => $value) {
+        //    $statement->bindParam($name, $value);
+        //}
         if (!$statement->execute()) {
             $this->lastError = $this->db->errorInfo();
             if ($this->lastError[0] == '00000') {

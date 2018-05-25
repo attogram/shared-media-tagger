@@ -6,6 +6,7 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 if (!isset($_GET['i']) || !$_GET['i'] || !Tools::isPositiveNumber($_GET['i'])) {

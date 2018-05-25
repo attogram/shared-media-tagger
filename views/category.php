@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+use Attogram\SharedMedia\Tagger\Config;
+
 $pageLimit = 20; // # of files per page
 
 $categoryName = isset($_GET['c']) ? $smt->categoryUrldecode($_GET['c']) : false;

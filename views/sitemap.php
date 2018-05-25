@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+use Attogram\SharedMedia\Tagger\Config;
+
 $cr = "\n";
 
 $protocol = Config::$protocol;

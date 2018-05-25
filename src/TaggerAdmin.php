@@ -950,7 +950,7 @@ class TaggerAdmin extends Tagger
         }
 
         $categoryInfo = $this->getCategoryInfo($categoryName);
-        $categoryInfo= $categoryInfo[0];
+        $categoryInfo= @$categoryInfo[0];
 
         $bind = [];
 
