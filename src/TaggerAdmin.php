@@ -10,7 +10,7 @@ namespace Attogram\SharedMedia\Tagger;
 class TaggerAdmin extends Tagger
 {
     /** @var Commons */
-    private $commons;
+    public $commons;
 
     protected $tablesCurrent;
     protected $sqlCurrent;
@@ -49,10 +49,10 @@ class TaggerAdmin extends Tagger
      */
     public function checkRobotstxt()
     {
-        $robotstxt = $this->installDirectory . '/robots.txt';
-        $tagUrl = str_replace('//'.$this->server, '', $this->url('tag'));
-        $sitemapUrl = $this->getProtocol() . $this->url('home') . 'sitemap.php';
-        $reportUrl = str_replace('//'.$this->server, '', $this->url('contact')) . '?r=*';
+        $robotstxt = Config::$installDirectory . '/robots.txt';
+        $tagUrl = str_replace('//'.Config::$server, '', $this->url('tag'));
+        $sitemapUrl = Config::$protocol . $this->url('home') . 'sitemap.php';
+        $reportUrl = str_replace('//'.Config::$server, '', $this->url('contact')) . '?r=*';
         $response = $robotstxt;
         if (!file_exists($robotstxt)) {
             return '<br />❌file not found: ' . $robotstxt
@@ -121,169 +121,6 @@ class TaggerAdmin extends Tagger
 
     // SMT Admin - Database Tables
 
-    /**
-     * @return array
-     */
-    public function getDatabaseTables()
-    {
-        return [
-            'site' =>
-                "CREATE TABLE IF NOT EXISTS 'site' (
-                'id' INTEGER PRIMARY KEY,
-                'name' TEXT,
-                'about' TEXT,
-                'header' TEXT,
-                'footer' TEXT,
-                'use_cdn' BOOLEAN NOT NULL DEFAULT '0',
-                'curation' BOOLEAN NOT NULL DEFAULT '0',
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT su UNIQUE (name) )",
-            'tag' =>
-                "CREATE TABLE IF NOT EXISTS 'tag' (
-                'id' INTEGER PRIMARY KEY,
-                'position' INTEGER,
-                'name' TEXT,
-                'display_name' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
-            'tagging' =>
-                "CREATE TABLE IF NOT EXISTS 'tagging' (
-                'id' INTEGER PRIMARY KEY,
-                'tag_id' INTEGER,
-                'media_pageid' INTEGER,
-                'count' INTEGER,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT tmu UNIQUE (tag_id, media_pageid) )",
-            'category' =>
-                "CREATE TABLE IF NOT EXISTS 'category' (
-                'id' INTEGER PRIMARY KEY,
-                'name' TEXT,
-                'curated' BOOLEAN NOT NULL DEFAULT '0',
-                'pageid' INTEGER,
-                'files' INTEGER,
-                'subcats' INTEGER,
-                'local_files' INTEGER DEFAULT '0',
-                'curated_files' INTEGER DEFAULT '0',
-                'missing' INTEGER DEFAULT '0',
-                'hidden' INTEGER DEFAULT '0',
-                'force' INTEGER,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT cu UNIQUE (name) )",
-            'category2media' =>
-                "CREATE TABLE IF NOT EXISTS 'category2media' (
-                'id' INTEGER PRIMARY KEY,
-                'category_id' INTEGER,
-                'media_pageid' INTEGER,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT tmu UNIQUE (category_id, media_pageid) )",
-            'media' =>
-                "CREATE TABLE IF NOT EXISTS 'media' (
-                'pageid' INTEGER PRIMARY KEY,
-                'curated' BOOLEAN NOT NULL DEFAULT '0',
-                'title' TEXT,
-                'url' TEXT,
-                'descriptionurl' TEXT,
-                'descriptionshorturl' TEXT,
-                'imagedescription' TEXT,
-                'artist' TEXT,
-                'datetimeoriginal' TEXT,
-                'licenseuri' TEXT,
-                'licensename' TEXT,
-                'licenseshortname' TEXT,
-                'usageterms' TEXT,
-                'attributionrequired' TEXT,
-                'restrictions' TEXT,
-                'size' INTEGER,
-                'width' INTEGER,
-                'height' INTEGER,
-                'sha1' TEXT,
-                'mime' TEXT,
-                'thumburl' TEXT,
-                'thumbwidth' INTEGER,
-                'thumbheight' INTEGER,
-                'thumbmime' TEXT,
-                'user' TEXT,
-                'userid' INTEGER,
-                'duration' REAL,
-                'timestamp' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
-            'contact' =>
-                "CREATE TABLE IF NOT EXISTS 'contact' (
-                'id' INTEGER PRIMARY KEY,
-                'comment' TEXT,
-                'datetime' TEXT,
-                'ip' TEXT )",
-            'block' =>
-                "CREATE TABLE IF NOT EXISTS 'block' (
-                'pageid' INTEGER PRIMARY KEY,
-                'title' TEXT,
-                'thumb' TEXT,
-                'ns' INTEGER,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
-            'user' =>
-                "CREATE TABLE IF NOT EXISTS 'user' (
-                'id' INTEGER PRIMARY KEY,
-                'ip' TEXT,
-                'host' TEXT,
-                'user_agent' TEXT,
-                'page_views' INTEGER,
-                'last' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT uc UNIQUE (ip, host, user_agent) )",
-            'user_tagging' =>
-                "CREATE TABLE IF NOT EXISTS 'user_tagging' (
-                'id' INTEGER PRIMARY KEY,
-                'user_id' INTEGER,
-                'tag_id' INTEGER,
-                'media_pageid' INTEGER,
-                'count' INTEGER,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
-            'network' =>
-                "CREATE TABLE IF NOT EXISTS 'network' (
-                'id' INTEGER PRIMARY KEY,
-                'site_id' INTEGER NOT NULL,
-                'ns' INTEGER NOT NULL,
-                'pageid' INTEGER,
-                'name' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT nu UNIQUE (ns, pageid) )",
-            'network_site' =>
-                "CREATE TABLE IF NOT EXISTS 'network_site' (
-                'id' INTEGER PRIMARY KEY,
-                'url' TEXT,
-                'name' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT nsu UNIQUE (url) )",
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultDatabaseSetup()
-    {
-        return [
-            'default_site' =>
-                "INSERT INTO site (
-                    id, name, about
-                ) VALUES (
-                    1,
-                    'Shared Media Tagger Demo',
-                    'This is a demonstration of the Shared Media Tagger software.'
-                )",
-            'default_tag1' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
-            'default_tag2' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (2, 2, '🙁 Bad',    '🙁')",
-            'default_tag3' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (3, 3, '😐 Unsure', '😐')",
-            'default_tag4' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙂 Good',   '🙂')",
-            'default_tag5' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
-        ];
-    }
-
     // SQLiteTableStructureUpdater
 
     /**
@@ -299,7 +136,7 @@ class TaggerAdmin extends Tagger
             }
         }
         $this->setDatabaseFile($this->database->databaseName);
-        $this->setNewStructures($this->getDatabaseTables());
+        $this->setNewStructures(Config::getDatabaseTables());
         $this->update();
 
         return true;
@@ -958,16 +795,16 @@ class TaggerAdmin extends Tagger
             Tools::error('::get_categories_from_media: invalid pageid');
             return false;
         }
-        $call = $this->commonsApiUrl . '?action=query&format=json'
+        $call = $this->commons->commonsApiUrl . '?action=query&format=json'
         . '&prop=categories'
         . '&pageids=' . $pageid
         ;
-        if (!$this->callCommons($call, 'pages')) {
+        if (!$this->commons->callCommons($call, 'pages')) {
             Tools::error('::get_categories_from_media: nothing found');
             return false;
         }
-        $this->categories = !empty($this->commonsResponse['query']['pages'][$pageid]['categories'])
-            ? $this->commonsResponse['query']['pages'][$pageid]['categories']
+        $this->categories = !empty($this->commons->response['query']['pages'][$pageid]['categories'])
+            ? $this->commons->response['query']['pages'][$pageid]['categories']
             : null;
 
         return true;
@@ -1052,13 +889,13 @@ class TaggerAdmin extends Tagger
             Tools::error('::find_categories: invalid search string: ' . $search);
             return false;
         }
-        $call = $this->commonsApiUrl . '?action=query&format=json'
+        $call = $this->commons->commonsApiUrl . '?action=query&format=json'
         . '&list=search'
         . '&srnamespace=14' // 6 = File   14 = Category
         . '&srprop=size|snippet' // titlesnippet|timestamp|title
         . '&srlimit=500'
         . '&srsearch=' . urlencode($search);
-        if (!$this->callCommons($call, 'search')) {
+        if (!$this->commons->callCommons($call, 'search')) {
             Tools::error('::find_categories: nothing found');
             return false;
         }
@@ -1075,15 +912,15 @@ class TaggerAdmin extends Tagger
             Tools::error('::get_category_info: no category');
             return false;
         }
-        $call = $this->commonsApiUrl . '?action=query&format=json'
+        $call = $this->commons->commonsApiUrl . '?action=query&format=json'
         . '&prop=categoryinfo'
         . '&titles=' . urlencode($category);    // cicontinue
-        if (!$this->callCommons($call, 'pages')) {
+        if (!$this->commons->callCommons($call, 'pages')) {
             Tools::error('::get_category_info: API: nothing found');
             return false;
         }
-        if (isset($this->commonsResponse['query']['pages'])) {
-            return $this->commonsResponse['query']['pages'];
+        if (isset($this->commons->response['query']['pages'])) {
+            return $this->commons->response['query']['pages'];
         }
         Tools::error('::get_category_info: API: no pages');
         return false;
@@ -1242,21 +1079,21 @@ class TaggerAdmin extends Tagger
             return false;
         }
         Tools::notice('::get_subcats: ' . $category);
-        $call = $this->commonsApiUrl . '?action=query&format=json&cmlimit=50'
+        $call = $this->commons->commonsApiUrl . '?action=query&format=json&cmlimit=50'
         . '&list=categorymembers'
         . '&cmtype=subcat'
         . '&cmprop=title'
         . '&cmlimit=500'
         . '&cmtitle=' . urlencode($category) ;
-        if (!$this->callCommons($call, 'categorymembers')
-            || !isset($this->commonsResponse['query']['categorymembers'])
-            || !is_array($this->commonsResponse['query']['categorymembers'])
+        if (!$this->commons->callCommons($call, 'categorymembers')
+            || !isset($this->commons->response['query']['categorymembers'])
+            || !is_array($this->commons->response['query']['categorymembers'])
         ) {
             Tools::error('::get_subcats: Nothing Found');
 
             return false;
         }
-        foreach ($this->commonsResponse['query']['categorymembers'] as $subcat) {
+        foreach ($this->commons->response['query']['categorymembers'] as $subcat) {
             $this->insertCategory($subcat['title']);
         }
 

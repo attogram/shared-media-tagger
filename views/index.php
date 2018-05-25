@@ -19,14 +19,14 @@ if (!$media || !isset($media[0])) {
 
 $media = $media[0];
 
-$smt->title = $smt->siteName;
+$smt->title = Config::$siteName;
 $smt->includeHeader(false);
 $smt->includeSmallMenu();
 
 print '<div class="box grey center">'
 . $smt->displayTags($media['pageid'])
 . $smt->displayImage($media)
-. '<div class="left" style="margin:auto; width:' . $smt->sizeMedium . 'px;">'
+. '<div class="left" style="margin:auto; width:' . Config::$sizeMedium . 'px;">'
 . '<br />'
 . $smt->getReviews($media['pageid'])
 . $smt->displayCategories($media['pageid'])

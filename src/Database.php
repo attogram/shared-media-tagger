@@ -20,8 +20,6 @@ class Database
     public $lastInsertId;
     /** @var string */
     public $lastError;
-    /** @var bool */
-    public $curation;
 
     /** @var int */
     private $userCount;
@@ -202,7 +200,7 @@ class Database
                 FROM category2media AS c2m, category AS c
                 WHERE c.id = c2m.category_id
                 AND c.hidden = ' . ($hidden ? '1' : '0');
-        if ($this->curation == 1) {
+        if (Config::$siteInfo['curation'] == 1) {
             $hidden = $hidden ? '1' : '0';
             $sql = "SELECT count(distinct(c2m.category_id)) AS count
                     FROM category2media AS c2m, category AS c, media AS m
@@ -229,7 +227,7 @@ class Database
             return $this->imageCount;
         }
         $sql = 'SELECT count(pageid) AS count FROM media';
-        if ($this->curation == 1) {
+        if (Config::$siteInfo['curation'] == 1) {
             $sql .= " WHERE curated = '1'";
         }
         $response = $this->queryAsArray($sql);
@@ -327,7 +325,7 @@ class Database
             }
         }
         $where = '';
-        if ($this->curation == 1) {
+        if (Config::$siteInfo['curation'] == 1) {
             $where = "WHERE curated == '1'";
         }
         $sql = 'SELECT *
@@ -344,7 +342,7 @@ class Database
     public function getRandomUnreviewedMedia($limit = 1)
     {
         $and = '';
-        if ($this->curation == 1) {
+        if (Config::$siteInfo['curation'] == 1) {
             $and = "AND curated == '1'";
         }
         $sql = "

@@ -14,7 +14,7 @@ if (!$categoryName) {
     $smt->fail404('404 Category Name Not Found');
 }
 
-$smt->title = $categoryName . ' - ' . $smt->siteName;
+$smt->title = $categoryName . ' - ' . Config::$siteName;
 
 $categoryName = 'Category:' . $categoryName;
 
@@ -55,7 +55,7 @@ $sql = '
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name';
 
-if ($smt->siteInfo['curation'] == 1 && !$smt->isAdmin()) {
+if (Config::$siteInfo['curation'] == 1 && !$smt->isAdmin()) {
     $sql .= " AND m.curated ='1'";
 }
 $sql .= " ORDER BY m.pageid ASC $sqlLimit";

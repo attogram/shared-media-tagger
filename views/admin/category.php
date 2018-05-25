@@ -248,8 +248,8 @@ function getSearchResults(TaggerAdmin $smt)
         Tools::notice('Error: no categories found');
         return;
     }
-    $cats = isset($smt->commonsResponse['query']['search'])
-        ? $smt->commonsResponse['query']['search']
+    $cats = isset($smt->commons->response['query']['search'])
+        ? $smt->commons->response['query']['search']
         : null;
     if (!$cats || !is_array($cats)) {
         Tools::notice('Error: no categories returned');
@@ -257,7 +257,7 @@ function getSearchResults(TaggerAdmin $smt)
         return;
     }
     print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>'
-        . $smt->totalHits . '</b> categories</p>';
+        . $smt->commons->totalHits . '</b> categories</p>';
     print '
     <script type="text/javascript" language="javascript">// <![CDATA[
     function checkAll(formname, checktoggle)
