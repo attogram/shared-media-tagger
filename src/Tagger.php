@@ -9,8 +9,6 @@ namespace Attogram\SharedMedia\Tagger;
  */
 class Tagger
 {
-    private $userId;
-
     public $protocol;
     public $site;
     public $tagId;
@@ -32,7 +30,7 @@ class Tagger
         $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
         Config::setSiteInfo($siteInfo);
 
-        $this->getUser();
+        $this->database->getUser();
 
         if (isset($_GET['logoff'])) {
             $this->adminLogoff();
@@ -292,138 +290,6 @@ function checkAll(formname, checktoggle) {
         . '</div><br /><br />';
 
         return $response;
-    }
-
-    // SMT - User
-
-    /**
-     * @param int $limit
-     * @param string $orderby
-     * @return array|bool
-     */
-    public function getUsers($limit = 100, $orderby = 'last DESC, page_views DESC')
-    {
-        $sql = 'SELECT * FROM user';
-        $sql .= ' ORDER BY ' . $orderby;
-        $sql .= ' LIMIT ' . $limit;
-        $users = $this->database->queryAsArray($sql);
-        if (isset($users[0])) {
-            return $users;
-        }
-
-        return [];
-    }
-
-    /**
-     * @param bool $createNew
-     * @return bool
-     */
-    public function getUser($createNew = false)
-    {
-        $ipAddress = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
-        $host = !empty($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : null;
-        if (!$host) {
-            $host = $ipAddress;
-        }
-        $userAgent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
-        $user = $this->database->queryAsArray(
-            'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent',
-            [':ip_address' => $ipAddress, ':host' => $host, ':user_agent' => $userAgent]
-        );
-        if (!isset($user[0]['id'])) {
-            if ($createNew) {
-                return $this->newUser($ipAddress, $host, $userAgent);
-            }
-            $this->userId = 0;
-
-            return false;
-        }
-        $this->userId = $user[0]['id'];
-
-        return true;
-    }
-
-    /**
-     * @param $userId
-     * @return array
-     */
-    public function getUserTagging($userId)
-    {
-        $tags = $this->database->queryAsArray(
-            'SELECT m.*, ut.tag_id, ut.count
-            FROM user_tagging AS ut, media AS m
-            WHERE ut.user_id = :user_id
-            AND ut.media_pageid = m.pageid
-            ORDER BY ut.media_pageid
-            LIMIT 100  -- TMP',
-            [':user_id' => $userId]
-        );
-        if ($tags) {
-            return $tags;
-        }
-
-        return [];
-    }
-
-    /**
-     * @return bool
-     */
-    public function saveUserLastTagTime()
-    {
-        return $this->database->queryAsBool(
-            'UPDATE user SET last = :last WHERE id = :user_id',
-            [':user_id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    public function saveUserView()
-    {
-        if (!$this->userId) {
-            return false;
-        }
-        $view = $this->database->queryAsBool(
-            'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
-            [':id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
-        );
-        if ($view) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $ipAddress
-     * @param $host
-     * @param $userAgent
-     * @return bool
-     */
-    public function newUser($ipAddress, $host, $userAgent)
-    {
-        if ($this->database->queryAsBool(
-            'INSERT INTO user (
-                ip, host, user_agent, page_views, last
-            ) VALUES (
-                :ip_address, :host, :user_agent, 0, :last
-            )',
-            [
-                ':ip_address' => $ipAddress,
-                ':host' => $host,
-                ':user_agent' => $userAgent,
-                ':last' => gmdate('Y-m-d H:i:s')
-            ]
-        )
-        ) {
-            $this->userId = $this->database->lastInsertId;
-
-            return true;
-        }
-        $this->userId = 0;
-
-        return false;
     }
 
     // SMT - Category
@@ -863,7 +729,7 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . $this->url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . ($this->userId ? '?i=' . $this->userId : '') . '">'
+        . '<a href="'. $this->url('users') . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">'
             . $countUsers .'&nbsp;Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
@@ -882,7 +748,7 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . $this->url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . ($this->userId ? '?i=' . $this->userId : '') . '">Users</a>' . $space
+        . '<a href="'. $this->url('users') . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
         . ($this->isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')

@@ -34,7 +34,7 @@ if (!$smt->database->queryAsBool(
 }
 
 // Get user, or create new user
-if (!$smt->getUser(1)) {
+if (!$smt->database->getUser(1)) {
     $smt->fail404('404 User Not Found');
 }
 
@@ -53,7 +53,7 @@ if ($rating) {  // existing user rating for this media file
     if ($oldTag == $tagId) { // user NOT changing tag, do nothing
         goto redirect;
     }
-    $smt->saveUserLastTagTime();
+    $smt->database->saveUserLastTagTime();
     $addUserTag = false;
 
     // user_tagging: Switch old tag to new tag
@@ -86,7 +86,7 @@ if ($addUserTag) {
         $res = $smt->database->queryAsBool('INSERT INTO user_tagging ( count, tag_id, media_pageid, user_id) '
         . ' VALUES (1, :tag_id, :media_id, :user_id)', $bind);
     }
-    $smt->saveUserLastTagTime();
+    $smt->database->saveUserLastTagTime();
 }
 
 // global tagging: +1 new tag
