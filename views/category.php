@@ -6,11 +6,9 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
-
 $pageLimit = 20; // # of files per page
 
-$categoryName = isset($_GET['c']) ? Tools::categoryUrldecode($_GET['c']) : false;
+$categoryName = isset($_GET['c']) ? $smt->categoryUrldecode($_GET['c']) : false;
 
 if (!$categoryName) {
     $smt->fail404('404 Category Name Not Found');
@@ -45,7 +43,7 @@ if ($categorySize > $pageLimit) {
             continue;
         }
         $pager .= '<a href="?o=' . $count . '&amp;c='
-            . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
+            . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
                 . '&nbsp;' . ++$pageCount . '&nbsp;</a> ';
     }
 }
@@ -57,7 +55,7 @@ $sql = '
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name';
 
-if (Config::$siteInfo['curation'] == 1 && !Tools::isAdmin()) {
+if (Config::$siteInfo['curation'] == 1 && !$smt->isAdmin()) {
     $sql .= " AND m.curated ='1'";
 }
 $sql .= " ORDER BY m.pageid ASC $sqlLimit";
@@ -80,13 +78,13 @@ print '<div class="box white">'
     . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">'
         . $smt->getReviewsPerCategory($categoryInfo['id'])
     . '</div>'
-    . '<h1>' . Tools::stripPrefix($categoryName) . '</h1>'
+    . '<h1>' . $smt->stripPrefix($categoryName) . '</h1>'
     . '<br /><b>' . $categorySize . '</b> files'
     . ($pager ? ', '.$pager : '')
     . '<br clear="all" />'
     ;
 
-if (Tools::isAdmin()) {
+if ($smt->isAdmin()) {
     print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
 }
 
@@ -98,7 +96,7 @@ if ($pager) {
     print '<p>' . $pager . '</p>';
 }
 
-if (Tools::isAdmin()) {
+if ($smt->isAdmin()) {
     print $smt->displayAdminCategoryFunctions($categoryName);
 }
 

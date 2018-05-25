@@ -6,9 +6,9 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-$site = $smt->database->queryAsArray('SELECT name, about FROM site WHERE id = 1');
-$about = !empty($site[0]['about']) ? $site[0]['about'] : '';
-$name = !empty($site[0]['name']) ? $site[0]['name'] : '';
+$a = $smt->database->queryAsArray('SELECT name, about FROM site WHERE id = 1');
+$about = @$a[0]['about'];
+$name = @$a[0]['name'];
 
 if ($about == '') {
     $about = 'Welcome!';

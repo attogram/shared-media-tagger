@@ -33,7 +33,7 @@ if (isset($_GET['dm'])) {
 }
 
 if (isset($_GET['dc'])) {
-    print deleteMediaInCategory($smt, Tools::categoryUrldecode($_GET['dc']));
+    print deleteMediaInCategory($smt, $smt->categoryUrldecode($_GET['dc']));
     $smt->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
@@ -98,7 +98,7 @@ function deleteMediaInCategory(\Attogram\SharedMedia\Tagger\TaggerAdmin $smt, $c
     }
     $return = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
         . 'Deleting Media in <b>' . $category_name . '</b>';
-    $media = $smt->database->getMediaInCategory($category_name);
+    $media = $smt->getMediaInCategory($category_name);
     $return .= '<br /><b>' . count($media) . '</b> Media files found in Category';
     foreach ($media as $pageid) {
         $return .= '<br />Deleting #' . $pageid;

@@ -32,10 +32,10 @@ class Tagger
         $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
         Config::setSiteInfo($siteInfo);
 
-        $this->database->getUser();
+        $this->getUser();
 
         if (isset($_GET['logoff'])) {
-            Tools::adminLogoff();
+            $this->adminLogoff();
         }
     }
 
@@ -81,11 +81,29 @@ class Tagger
     // SMT - Media
 
     /**
-     * @param array $media
+     * @param $pageid
+     * @return array|bool
+     */
+    public function getMedia($pageid)
+    {
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('getMedia: ERROR no id');
+            return false;
+        }
+        $sql = 'SELECT * FROM media WHERE pageid = :pageid';
+
+        if (Config::$siteInfo['curation'] == 1 && !$this->isAdmin()) {
+            $sql .= " AND curated = '1'";
+        }
+        return $this->database->queryAsArray($sql, [':pageid'=>$pageid]);
+    }
+
+    /**
+     * @param string $media
      * @param string $thumbWidth
      * @return array
      */
-    public function getThumbnail(array $media, $thumbWidth = '')
+    public function getThumbnail($media = '', $thumbWidth = '')
     {
         if (!$thumbWidth || !Tools::isPositiveNumber($thumbWidth)) {
             $thumbWidth = Config::$sizeThumb;
@@ -97,8 +115,8 @@ class Tagger
                     . 'LAA4AAAVq4NFw1DNAX/o9imAsB tKpxKRd1+YEWUoIiUoiEWEAApIDMLGoRCyWi'
                     . 'KThenkwDgeGMiggDLEXQkDoTh CKNLpQDgjeAsY7MHgECgx8YR8oHwNHfwADBACG'
                     . 'h4EDA4iGAYAEBAcQIg0Dk gcEIQA7',
-            'width' => Config::$sizeThumb,
-            'height' => Config::$sizeThumb,
+            'width' => $thumbWidth,
+            'height' => $thumbWidth
         ];
         if (!$media || !is_array($media)) {
             return $default;
@@ -119,7 +137,7 @@ class Tagger
             ];
         }
         $mime = $media['mime'];
-        $filename = Tools::stripPrefix($media['title']);
+        $filename = $this->stripPrefix($media['title']);
         $filename = str_replace(' ', '_', $filename);
         $md5 = md5($filename);
         $thumbUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb'
@@ -142,11 +160,33 @@ class Tagger
                 $thumbUrl .= '.png';
                 break;
         }
-
         return ['url'=>$thumbUrl, 'width'=>$thumbWidth, 'height'=>$thumbHeight];
     }
 
     // SMT - Admin
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     */
+    public function adminLogoff()
+    {
+        if (!$this->isAdmin()) {
+            return;
+        }
+        unset($_COOKIE['admin']);
+        setcookie('admin', null, -1, '/');
+    }
 
     /**
      * @return string
@@ -179,7 +219,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displayAdminMediaFunctions($mediaId)
     {
-        if (!Tools::isAdmin()) {
+        if (!$this->isAdmin()) {
             return '';
         }
         if (!Tools::isPositiveNumber($mediaId)) {
@@ -204,7 +244,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displayAdminCategoryFunctions($categoryName)
     {
-        if (!Tools::isAdmin()) {
+        if (!$this->isAdmin()) {
             return '';
         }
         $category = $this->getCategory($categoryName);
@@ -229,21 +269,21 @@ function checkAll(formname, checktoggle) {
         . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
         . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
         . '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
-        . Tools::categoryUrlencode($category['name']) . '">VIEW ON COMMONS</a>'
+        . $this->categoryUrlencode($category['name']) . '">VIEW ON COMMONS</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?c='
-        . Tools::categoryUrlencode($category['name']) . '">Get Category Info</a>'
+        . $this->categoryUrlencode($category['name']) . '">Get Category Info</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?i='
-        . Tools::categoryUrlencode($category['name'])
+        . $this->categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import '
             . !empty($category['files']) ? $category['files'] : '?'
             . ' Files into Category</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?sc='
-        . Tools::categoryUrlencode($category['name'])
+        . $this->categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add '
             . !empty($category['subcats']) ? $category['subcats'] : '?'
             . ' Sub-Categories</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'media.php?dc='
-        . Tools::categoryUrlencode($category['name'])
+        . $this->categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>'
         . '<br /><br /><a href="' . $this->url('admin') . 'category.php/?d=' . urlencode($category['id'])
         . '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>'
@@ -252,6 +292,138 @@ function checkAll(formname, checktoggle) {
         . '</div><br /><br />';
 
         return $response;
+    }
+
+    // SMT - User
+
+    /**
+     * @param int $limit
+     * @param string $orderby
+     * @return array|bool
+     */
+    public function getUsers($limit = 100, $orderby = 'last DESC, page_views DESC')
+    {
+        $sql = 'SELECT * FROM user';
+        $sql .= ' ORDER BY ' . $orderby;
+        $sql .= ' LIMIT ' . $limit;
+        $users = $this->database->queryAsArray($sql);
+        if (isset($users[0])) {
+            return $users;
+        }
+
+        return [];
+    }
+
+    /**
+     * @param bool $createNew
+     * @return bool
+     */
+    public function getUser($createNew = false)
+    {
+        $ipAddress = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        $host = !empty($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : null;
+        if (!$host) {
+            $host = $ipAddress;
+        }
+        $userAgent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+        $user = $this->database->queryAsArray(
+            'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent',
+            [':ip_address' => $ipAddress, ':host' => $host, ':user_agent' => $userAgent]
+        );
+        if (!isset($user[0]['id'])) {
+            if ($createNew) {
+                return $this->newUser($ipAddress, $host, $userAgent);
+            }
+            $this->userId = 0;
+
+            return false;
+        }
+        $this->userId = $user[0]['id'];
+
+        return true;
+    }
+
+    /**
+     * @param $userId
+     * @return array
+     */
+    public function getUserTagging($userId)
+    {
+        $tags = $this->database->queryAsArray(
+            'SELECT m.*, ut.tag_id, ut.count
+            FROM user_tagging AS ut, media AS m
+            WHERE ut.user_id = :user_id
+            AND ut.media_pageid = m.pageid
+            ORDER BY ut.media_pageid
+            LIMIT 100  -- TMP',
+            [':user_id' => $userId]
+        );
+        if ($tags) {
+            return $tags;
+        }
+
+        return [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveUserLastTagTime()
+    {
+        return $this->database->queryAsBool(
+            'UPDATE user SET last = :last WHERE id = :user_id',
+            [':user_id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveUserView()
+    {
+        if (!$this->userId) {
+            return false;
+        }
+        $view = $this->database->queryAsBool(
+            'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
+            [':id' => $this->userId, ':last' => gmdate('Y-m-d H:i:s')]
+        );
+        if ($view) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $ipAddress
+     * @param $host
+     * @param $userAgent
+     * @return bool
+     */
+    public function newUser($ipAddress, $host, $userAgent)
+    {
+        if ($this->database->queryAsBool(
+            'INSERT INTO user (
+                ip, host, user_agent, page_views, last
+            ) VALUES (
+                :ip_address, :host, :user_agent, 0, :last
+            )',
+            [
+                ':ip_address' => $ipAddress,
+                ':host' => $host,
+                ':user_agent' => $userAgent,
+                ':last' => gmdate('Y-m-d H:i:s')
+            ]
+        )
+        ) {
+            $this->userId = $this->database->lastInsertId;
+
+            return true;
+        }
+        $this->userId = 0;
+
+        return false;
     }
 
     // SMT - Category
@@ -278,8 +450,8 @@ function checkAll(formname, checktoggle) {
             }
             $response .= ''
             . '+<a href="' . $this->url('category')
-            . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($cat)) . '">'
-            . Tools::stripPrefix($cat) . '</a><br />';
+            . '?c=' . $this->categoryUrlencode($this->stripPrefix($cat)) . '">'
+            . $this->stripPrefix($cat) . '</a><br />';
         }
         if (!$hidden) {
             return $response . '</div>';
@@ -287,11 +459,42 @@ function checkAll(formname, checktoggle) {
         $response .= '<br /><div style="font-size:80%;">';
         foreach ($hidden as $hcat) {
             $response .= '+<a href="' . $this->url('category')
-            . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($hcat)) . '">'
-            . Tools::stripPrefix($hcat) . '</a><br />';
+            . '?c=' . $this->categoryUrlencode($this->stripPrefix($hcat)) . '">'
+            . $this->stripPrefix($hcat) . '</a><br />';
         }
 
         return $response . '</div></div>';
+    }
+
+    /**
+     * @param $string
+     * @return null|string|string[]
+     */
+    public function stripPrefix($string)
+    {
+        if (!$string || !is_string($string)) {
+            return $string;
+        }
+
+        return preg_replace(['/^File:/', '/^Category:/'], '', $string);
+    }
+
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public function categoryUrldecode($category)
+    {
+        return str_replace('_', ' ', urldecode($category));
+    }
+
+    /**
+     * @param $category
+     * @return mixed
+     */
+    public function categoryUrlencode($category)
+    {
+        return str_replace('+', '_', str_replace('%3A', ':', urlencode($category)));
     }
 
     /**
@@ -660,11 +863,11 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . $this->url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . (Config::$userId ? '?i=' . Config::$userId : '') . '">'
+        . '<a href="'. $this->url('users') . ($this->userId ? '?i=' . $this->userId : '') . '">'
             . $countUsers .'&nbsp;Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-        . (Tools::isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
+        . ($this->isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -679,10 +882,10 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . $this->url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . (Config::$userId ? '?i=' . Config::$userId : '') . '">Users</a>' . $space
+        . '<a href="'. $this->url('users') . ($this->userId ? '?i=' . $this->userId : '') . '">Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
-        . (Tools::isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
+        . ($this->isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -699,7 +902,7 @@ function checkAll(formname, checktoggle) {
         . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
         . '<a class="menuj" title="Reviews" href="' . $this->url('reviews') . '">🗳</a>' . $space
         . '<a class="menuj" title="About" href="' . $this->url('about') . '">❔</a>' . $space
-        . (Tools::isAdmin() ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>' : '')
+        . ($this->isAdmin() ? '<a class="menuj" title="ADMIN" href="' . $this->url('admin') . '">🔧</a>' : '')
         . '</span>'
         . '</div><div style="clear:both;"></div>';
     }
@@ -883,7 +1086,7 @@ function checkAll(formname, checktoggle) {
     public function displayAttribution($media, $titleTruncate = 250, $artistTruncate = 48)
     {
         $infourl = $this->url('info') . '?i=' . $media['pageid'];
-        $title = htmlspecialchars(Tools::stripPrefix($media['title']));
+        $title = htmlspecialchars($this->stripPrefix($media['title']));
 
         return '<div class="mediatitle left">'
         . '<a href="' . $infourl . '" title="' . htmlentities($title) . '">'
@@ -943,7 +1146,7 @@ function checkAll(formname, checktoggle) {
         . '</head><body>';
 
         // Site headers
-        if (Tools::isAdmin() || get_class($this) == 'SharedMediaTaggerAdmin' || !$showSiteHeader) {
+        if ($this->isAdmin() || get_class($this) == 'SharedMediaTaggerAdmin' || !$showSiteHeader) {
             return;
         }
         $this->displaySiteHeader();
@@ -966,7 +1169,7 @@ function checkAll(formname, checktoggle) {
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
             . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
         }
-        if (Tools::isAdmin()) {
+        if ($this->isAdmin()) {
             print '<br /><br />'
             . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
             . '<a href="' . $this->url('home') . '?logoff">LOGOFF</a>'
@@ -979,7 +1182,7 @@ function checkAll(formname, checktoggle) {
         print '</div></footer>';
 
         // Site footers
-        if (Tools::isAdmin() || get_class($this) == 'smt_admin' || !$showSiteFooter) {
+        if ($this->isAdmin() || get_class($this) == 'smt_admin' || !$showSiteFooter) {
             print '</body></html>';
 
             return;

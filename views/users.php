@@ -8,12 +8,12 @@
 
 use Attogram\SharedMedia\Tagger\Config;
 
-$allUsers = $smt->database->getUsers();
+$allUsers = $smt->getUsers();
 $users = [];
 
 foreach ($allUsers as $user) {
     $user['tag_count'] = $smt->database->getUserTagCount($user['id']);
-    $user['user_tagging'] = $smt->database->getUserTagging($user['id']);
+    $user['user_tagging'] = $smt->getUserTagging($user['id']);
     $users[$user['id']] = $user;
 }
 
@@ -54,7 +54,7 @@ print '<hr />';
 
 if ($userId) {
     print '<p>+' . $smt->database->getUserTagCount($userId) . ' reviews by User:' . $userId . '</p>';
-    foreach ($smt->database->getUserTagging($userId) as $media) {
+    foreach ($smt->getUserTagging($userId) as $media) {
         print '<div style="display:inline-block;">'
             . '+' . $media['count'] . ' ' . $smt->getTagNameById($media['tag_id'])
             . '<br />' . $smt->displayThumbnailBox($media)

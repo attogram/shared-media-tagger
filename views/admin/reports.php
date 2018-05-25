@@ -189,7 +189,7 @@ function catClean(TaggerAdmin $smt)
         . $category['id'] . $tab
         . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00') . $tab
         . '<a target="site" href="' . $smt->url('category') . '?c='
-        . Tools::categoryUrlencode(Tools::stripPrefix($category['name']))
+        . $smt->categoryUrlencode($smt->stripPrefix($category['name']))
         . '">' . $category['name'] . '</a>'
         . '<br />';
     }

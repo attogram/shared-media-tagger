@@ -195,11 +195,11 @@ $descs = [];
 foreach ($images as $image) {
     $count++;
     $areas[$count] = $smt->url('info') . '?i=' . $image['pageid'];
-    $descs[$count] = htmlspecialchars(Tools::stripPrefix($image['title']))
+    $descs[$count] = htmlspecialchars($smt->stripPrefix($image['title']))
         . "\n" . $smt->displayLicensing($image);
     print '<br />#' . $count . ': '
     . '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">'
-    . htmlspecialchars(Tools::stripPrefix($image['title'])) . '</a>'
+    . htmlspecialchars($smt->stripPrefix($image['title'])) . '</a>'
     . ' - ' . $smt->displayLicensing($image)
     ;
 }

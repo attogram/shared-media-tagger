@@ -6,11 +6,10 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
 */
 
-use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
-    $media = $smt->database->getMedia($_GET['i']);
+    $media = $smt->getMedia($_GET['i']);
 } else {
     $media = $smt->database->getRandomMedia(1);
 }

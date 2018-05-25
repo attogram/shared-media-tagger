@@ -106,11 +106,11 @@ flush();
 
 foreach ($categories as $category) {
     $localUrl = $smt->url('category') . '?c='
-        . Tools::categoryUrlencode(Tools::stripPrefix(@$category['name']));
+        . $smt->categoryUrlencode($smt->stripPrefix(@$category['name']));
     print '<div class="catcon">'
     . '<div class="catfiles">' . number_format(@$category['local_files']) . '</div>'
     . '<div class="catname" onclick="window.location=\'' . $localUrl . '\'">'
-    . '<a href="' . $localUrl . '">' . Tools::stripPrefix(@$category['name']) . '</a>'
+    . '<a href="' . $localUrl . '">' . $smt->stripPrefix(@$category['name']) . '</a>'
     . '</div>'
     . '</div>';
     ob_flush();

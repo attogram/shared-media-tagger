@@ -12,10 +12,13 @@ class TaggerAdmin extends Tagger
     /** @var Commons */
     public $commons;
 
-
+    protected $tablesCurrent;
+    protected $sqlCurrent;
+    protected $sqlNew;
 
     public $categories;
     public $categoryId;
+    public $databaseFile;
 
     /**
      * SharedMediaTaggerAdmin constructor.
@@ -116,6 +119,310 @@ class TaggerAdmin extends Tagger
         return $response;
     }
 
+    // SMT Admin - Database Tables
+
+    // SQLiteTableStructureUpdater
+
+    /**
+     * @return bool
+     */
+    public function createTables()
+    {
+        if (!file_exists($this->database->databaseName)) {
+            if (!touch($this->database->databaseName)) {
+                Tools::error('ERROR: can not touch database name: ' . $this->database->databaseName);
+
+                return false;
+            }
+        }
+        $this->setDatabaseFile($this->database->databaseName);
+        $this->setNewStructures(Config::getDatabaseTables());
+        $this->update();
+
+        return true;
+    }
+
+    /**
+     * @param $file
+     * @return bool
+     */
+    public function setDatabaseFile($file)
+    {
+        $this->databaseFile = $file;
+        $this->tablesCurrent = [];
+        $this->sqlCurrent = [];
+        $this->setTableInfo();
+
+        return $this->database->databaseLoaded();
+    }
+
+    /**
+     * @param array $tables
+     * @return bool
+     */
+    public function setNewStructures(array $tables = [])
+    {
+        if (!$tables || !is_array($tables)) {
+            Tools::error('$tables array is invalid');
+
+            return false;
+        }
+        $errors = 0;
+        $count = 0;
+        foreach ($tables as $tableName => $tableSql) {
+            $count++;
+            if (!$tableName || !is_string($tableName)) {
+                Tools::error("#$count - Invalid table name");
+                $errors++;
+                continue;
+            }
+            if (!$tableSql || !is_string($tableSql)) {
+                Tools::error("#$count - Invalid table sql");
+                $errors++;
+                continue;
+            }
+            $this->setNewStructure($tableName, $tableSql);
+        }
+
+        return $errors ? false : true;
+    }
+
+    /**
+     * @param $tableName
+     * @param $sql
+     */
+    public function setNewStructure($tableName, $sql)
+    {
+        $sql = $this->normalizeSql($sql);
+        $this->sqlNew[$tableName] = $sql;
+    }
+
+    /**
+     * @return bool
+     */
+    public function update()
+    {
+        $toUpdate = [];
+        foreach (array_keys($this->sqlNew) as $name) {
+            $old = $this->normalizeSql(
+                !empty($this->sqlCurrent[$name]) ? $this->sqlCurrent[$name] : ''
+            );
+            $new = $this->normalizeSql(
+                !empty($this->sqlNew[$name]) ? $this->sqlNew[$name] : ''
+            );
+            if ($old == $new) {
+                continue;
+            }
+            $toUpdate[] = $name;
+        }
+        if (!$toUpdate) {
+            Tools::notice('OK: ' . sizeof($this->sqlNew) . ' tables up-to-date');
+
+            return true;
+        }
+        Tools::notice(sizeof($toUpdate) . ' tables to update: ' . implode($toUpdate, ', '));
+        foreach ($toUpdate as $tableName) {
+            $this->updateTable($tableName);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $tableName
+     * @return bool
+     */
+    protected function updateTable($tableName)
+    {
+        $tmpName = '_STSU_TMP_' . $tableName;
+        $backupName = '_STSU_BACKUP_' . $tableName;
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
+        $this->database->beginTransaction();
+        $sql = $this->sqlNew[$tableName];
+        $sql = str_ireplace("CREATE TABLE '$tableName'", "CREATE TABLE '$tmpName'", $sql);
+        if (!$this->database->queryAsBool($sql)) {
+            Tools::error('ERROR: can not create tmp table:<br />' . $sql);
+            return false;
+        }
+        // Get Columns of new table
+        $this->setTableColumnInfo($tmpName);
+        $newCols = $this->tablesCurrent[$tmpName];
+        // Only use Columns both in new and old tables
+        $cols =[];
+        foreach ($newCols as $newCol) {
+            if (isset($this->tablesCurrent[$tableName][$newCol['name']])) {
+                $cols[] = $newCol['name'];
+            }
+        }
+        if (!$cols) {
+            $newSize = 0;
+        } else {
+            $oldSize = $this->getTableSize($tableName);
+            $cols = implode($cols, ', ');
+            $sql = "INSERT INTO '$tmpName' ( $cols ) SELECT $cols FROM $tableName";
+            if (!$this->database->queryAsBool($sql)) {
+                Tools::error('ERROR: can not insert into tmp table: ' . $tmpName
+                . '<br />' . $sql);
+                return false;
+            }
+            $newSize = $this->getTableSize($tmpName);
+            if ($newSize == $oldSize) {
+            } else {
+                Tools::error("ERROR: Inserted new $newSize rows, from $oldSize old rows");
+            }
+            if (!$this->database->queryAsBool("ALTER TABLE $tableName RENAME TO $backupName")) {
+                Tools::error('ERROR: can not rename '.$tableName.' to '.$backupName);
+
+                return false;
+            }
+        }
+        if (!$this->database->queryAsBool("ALTER TABLE $tmpName RENAME TO $tableName")) {
+            Tools::error('ERROR: can not rename ' . $tmpName . ' to ' . $backupName);
+
+            return false;
+        }
+        $this->database->commit();
+        Tools::notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
+        $this->database->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
+        $this->database->vacuum();
+
+        return true;
+    }
+
+    /**
+     *
+     */
+    protected function setTableInfo()
+    {
+        $tables = $this->database->queryAsArray("SELECT name, sql FROM sqlite_master WHERE type = 'table'");
+        foreach ($tables as $table) {
+            if (preg_match('/^_STSU_/', $table['name'])) {
+                continue; // tmp and backup tables
+            }
+            $this->sqlCurrent[$table['name']] = $this->normalizeSql($table['sql']);
+            $this->setTableColumnInfo($table['name']);
+        }
+    }
+
+    /**
+     * @param $tableName
+     */
+    protected function setTableColumnInfo($tableName)
+    {
+        $columns = $this->database->queryAsArray("PRAGMA table_info($tableName)");
+        foreach ($columns as $column) {
+            $this->tablesCurrent[$tableName][$column['name']] = $column;
+        }
+    }
+
+    /**
+     * @param $sql
+     * @return string
+     */
+    protected function normalizeSql($sql)
+    {
+        $sql = preg_replace('/\s+/', ' ', $sql); // remove all excessive spaces and control chars
+        $sql = str_replace('"', "'", $sql); // use only single quote '
+        $sql = str_ireplace('CREATE TABLE IF NOT EXISTS', 'CREATE TABLE', $sql); // standard create syntax
+
+        return trim($sql);
+    }
+
+    /**
+     * @param $tableName
+     * @return int
+     */
+    protected function getTableSize($tableName)
+    {
+        $size = $this->database->queryAsArray('SELECT count(rowid) AS count FROM ' . $tableName);
+        if (isset($size[0]['count'])) {
+            return $size[0]['count'];
+        }
+        Tools::error('Can not get table size: ' . $tableName);
+
+        return 0;
+    }
+
+    // SMT Admin - Database Utils
+
+    /**
+     * @return array
+     */
+    public function emptyTaggingTables()
+    {
+        $sqls = [
+            'DELETE FROM tagging',
+            'DELETE FROM user_tagging',
+        ];
+        $response = [];
+        foreach ($sqls as $sql) {
+            if ($this->database->queryAsBool($sql)) {
+                $response[] = 'OK: ' . $sql;
+            } else {
+                $response[] = 'FAIL: ' . $sql;
+            }
+        }
+        $this->database->vacuum();
+
+        return $response;
+    }
+
+    /**
+     * @return array
+     */
+    public function emptyUserTables()
+    {
+        $sqls = [
+            'DELETE FROM user',
+            'DELETE FROM tagging',
+            'DELETE FROM user_tagging',
+        ];
+        $response = [];
+        foreach ($sqls as $sql) {
+            if ($this->database->queryAsBool($sql)) {
+                $response[] = 'OK: ' . $sql;
+            } else {
+                $response[] = 'FAIL: ' . $sql;
+            }
+        }
+        $this->database->vacuum();
+
+        return $response;
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function dropTables()
+    {
+        $sqls = [
+            'DROP TABLE IF EXISTS block',
+            'DROP TABLE IF EXISTS category',
+            'DROP TABLE IF EXISTS category2media',
+            'DROP TABLE IF EXISTS contact',
+            'DROP TABLE IF EXISTS media',
+            'DROP TABLE IF EXISTS site',
+            'DROP TABLE IF EXISTS tag',
+            'DROP TABLE IF EXISTS tagging',
+            'DROP TABLE IF EXISTS user',
+            'DROP TABLE IF EXISTS user_tagging',
+            'DROP TABLE IF EXISTS network',
+            'DROP TABLE IF EXISTS network_site',
+        ];
+        $response = false;
+        foreach ($sqls as $id => $sql) {
+            if ($this->database->queryAsBool($sql)) {
+                $response .= "<b>OK:</b> $sql<br />";
+            } else {
+                $response .= "<b>FAIL:<b/> $sql<br />";
+            }
+        }
+        $this->database->vacuum();
+
+        return $response;
+    }
 
     // SMT Admin - Media
 
@@ -156,8 +463,8 @@ class TaggerAdmin extends Tagger
         foreach ($this->categories as $category) {
             $response .= '+'
             . '<a href="' . $this->url('category')
-            . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($category['title']))
-            . '">' . Tools::stripPrefix($category['title']) . '</a><br />';
+            . '?c=' . $this->categoryUrlencode($this->stripPrefix($category['title']))
+            . '">' . $this->stripPrefix($category['title']) . '</a><br />';
         }
         $response .= '</div>';
 
@@ -250,7 +557,7 @@ class TaggerAdmin extends Tagger
             }
 
             Tools::notice('SAVED MEDIA: ' . $new[':pageid'] . ' = <a href="' . $this->url('info')
-            . '?i=' . $new[':pageid'] . '">' . Tools::stripPrefix($new[':title']) . '</a>');
+            . '?i=' . $new[':pageid'] . '">' . $this->stripPrefix($new[':title']) . '</a>');
 
             if (!$this->linkMediaCategories($new[':pageid'])) {
                 Tools::error('::: FAILED to link media categories - p:' . $new[':pageid']);
@@ -328,7 +635,7 @@ class TaggerAdmin extends Tagger
         $response = '<div style="white-space:nowrap;font-family:monospace;color:black;background-color:lightsalmon;">'
         . 'Deleting Media :pageid = ' . $pageid;
 
-        $media = $this->database->getMedia($pageid);
+        $media = $this->getMedia($pageid);
         if (!$media) {
             $response .= '<p>Media Not Found</p></div>';
             return $response;
@@ -625,7 +932,7 @@ class TaggerAdmin extends Tagger
      */
     public function saveCategoryInfo($categoryName)
     {
-        $categoryName = Tools::categoryUrldecode($categoryName);
+        $categoryName = $this->categoryUrldecode($categoryName);
         $categoryRow = $this->getCategory($categoryName);
         if (!$categoryRow) {
             if (!$this->insertCategory($categoryName, false, 1)) {
@@ -685,7 +992,7 @@ class TaggerAdmin extends Tagger
         }
 
         //$url = '<a href="' . $this->url('category') . '?c='
-        //    . Tools::categoryUrlencode(Tools::stripPrefix($categoryName))
+        //    . $this->categoryUrlencode($this->stripPrefix($categoryName))
         //    . '">' . $categoryName . '</a>';
 
         if (!$bind) {
@@ -753,9 +1060,9 @@ class TaggerAdmin extends Tagger
         Tools::notice(
             'SAVED CATEGORY: ' . $this->categoryId . ' = +<a href="'
             . $this->url('category') . '?c='
-            . Tools::categoryUrlencode(Tools::stripPrefix($name))
+            . $this->categoryUrlencode($this->stripPrefix($name))
             . '">'
-            . htmlentities(Tools::stripPrefix($name)) . '</a>'
+            . htmlentities($this->stripPrefix($name)) . '</a>'
         );
 
         return true;
@@ -801,7 +1108,7 @@ class TaggerAdmin extends Tagger
         Tools::notice("import_categories( category_name_array )");
         $this->database->beginTransaction();
         foreach ($categoryNameArray as $categoryName) {
-            $categoryName = Tools::categoryUrldecode($categoryName);
+            $categoryName = $this->categoryUrldecode($categoryName);
             $this->insertCategory($categoryName);
         }
         $this->database->commit();

@@ -25,16 +25,12 @@ if (!$smt->database->queryAsBool('SELECT id FROM tag WHERE id = :tag_id LIMIT 1'
 }
 
 // Media exists?
-if (!$smt->database->queryAsBool(
-    'SELECT pageid FROM media WHERE pageid = :media_id LIMIT 1',
-    [':media_id' => $mediaId]
-)
-) {
+if (!$smt->database->queryAsBool('SELECT pageid FROM media WHERE pageid = :media_id LIMIT 1', [':media_id' => $mediaId])) {
     $smt->fail404('404 Media Not Found');
 }
 
 // Get user, or create new user
-if (!$smt->database->getUser(1)) {
+if (!$smt->getUser(1)) {
     $smt->fail404('404 User Not Found');
 }
 
@@ -53,7 +49,7 @@ if ($rating) {  // existing user rating for this media file
     if ($oldTag == $tagId) { // user NOT changing tag, do nothing
         goto redirect;
     }
-    $smt->database->saveUserLastTagTime();
+    $smt->saveUserLastTagTime();
     $addUserTag = false;
 
     // user_tagging: Switch old tag to new tag
@@ -77,42 +73,33 @@ if ($rating) {  // existing user rating for this media file
 
 if ($addUserTag) {
     // user tagging: +1 new tag
-    $where = ' WHERE user_id=:user_id AND tag_id=:tag_id AND media_pageid=:media_id';
-    $sql = 'SELECT count FROM user_tagging' . $where;
+    $where = 'WHERE user_id=:user_id AND tag_id=:tag_id AND media_pageid=:media_id';
+    $sql = 'SELECT count FROM user_tagging ' . $where;
     $bind = [':user_id' => $smt->user_id, ':tag_id' => $tagId, ':media_id' => $mediaId];
     if ($smt->database->queryAsArray($sql, $bind)) {
-        $res = $smt->database->queryAsBool(
-            'UPDATE user_tagging SET count = count + 1'  . $where,
-            $bind
-        );
+        $res = $smt->database->queryAsBool('UPDATE user_tagging SET count = count + 1 ' . $where, $bind);
     } else {
-        $res = $smt->database->queryAsBool(
-            'INSERT INTO user_tagging (count, tag_id, media_pageid, user_id) '
-            . ' VALUES (1, :tag_id, :media_id, :user_id)',
-            $bind
-        );
+        $res = $smt->database->queryAsBool('INSERT INTO user_tagging ( count, tag_id, media_pageid, user_id) '
+        . ' VALUES (1, :tag_id, :media_id, :user_id)', $bind);
     }
-    $smt->database->saveUserLastTagTime();
+    $smt->saveUserLastTagTime();
 }
 
 // global tagging: +1 new tag
-$where = ' WHERE tag_id=:tag_id AND media_pageid=:media_id';
-$sql = 'SELECT count FROM tagging' . $where;
+$where = 'WHERE tag_id=:tag_id AND media_pageid=:media_id';
+$sql = 'SELECT count FROM tagging ' . $where;
 $bind = [':tag_id' => $tagId, ':media_id' => $mediaId];
 $gtag = $smt->database->queryAsArray($sql, $bind);
 if (!$gtag) {
-    $res = $smt->database->queryAsBool(
-        'INSERT INTO tagging (count, tag_id, media_pageid) VALUES (1, :tag_id, :media_id)',
-        $bind
-    );
+    $res = $smt->database->queryAsBool('INSERT INTO tagging (count, tag_id, media_pageid) VALUES (1, :tag_id, :media_id)', $bind);
 } else {
-    $res = $smt->database->queryAsBool('UPDATE tagging SET count = count + 1' . $where, $bind);
+    $res = $smt->database->queryAsBool('UPDATE tagging SET count = count + 1 ' . $where, $bind);
 }
 
 // get next random image
 redirect:
 
-$next = $smt->database->getRandomMedia();
+$next = $smt->getRandomMedia();
 if (isset($next[0]['pageid'])) {
     header('Location: ./?i=' . $next[0]['pageid']);
 

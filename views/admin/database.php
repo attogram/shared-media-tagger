@@ -17,11 +17,11 @@ if (isset($_GET['a'])) {
     switch ($_GET['a']) {
         case 'c':
             print '<p>Creating Database tables:</p>';
-            print $smt->database->createTables();
+            print $smt->createTables();
             break;
         case 'd':
             print '<p>Dropping Database tables:</p>';
-            print $smt->database->dropTables();
+            print $smt->dropTables();
             break;
         case 'em':
             print '<p>Emptying Media tables:</p>';
@@ -33,11 +33,11 @@ if (isset($_GET['a'])) {
             break;
         case 'et':
             print '<p>Emptying Tagging tables:</p>';
-            print_r($smt->database->emptyTaggingTables());
+            print_r($smt->emptyTaggingTables());
             break;
         case 'eu':
             print '<p>Emptying User tables:</p>';
-            print_r($smt->database->emptyUserTables());
+            print_r($smt->emptyUserTables());
             break;
     }
 }
@@ -73,8 +73,8 @@ DANGER ZONE:
 <br />
 <br />- <a onclick="return confirm('Confirm: EMPTY Media tables?');" href="database.php?a=em">EMPTY Media tables</a>
 <br />
-<br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');"
-           href="database.php?a=ec">EMPTY Category tables</a>
+<br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');" href="database.php?a=ec">'
+        . 'EMPTY Category tables</a>
 <br />
 <br />- <a onclick="return confirm('Confirm: DROP tables?');" href="database.php?a=d">DROP ALL tables</a>
 </div>
