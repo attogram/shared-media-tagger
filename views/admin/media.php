@@ -16,25 +16,25 @@ print '<div class="box white"><p>Media Admin:</p>';
 
 if (isset($_GET['am'])) {
     print $smt->addMedia($_GET['am']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
 if (isset($_GET['media'])) {
     print multiDeleteMedia($smt, $_GET['media']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
 if (isset($_GET['dm'])) {
-    print $smt->deleteMedia($_GET['dm']);
-    $smt->updateCategoriesLocalFilesCount();
+    print $smt->database->deleteMedia($_GET['dm']);
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
 if (isset($_GET['dc'])) {
     print deleteMediaInCategory($smt, Tools::categoryUrldecode($_GET['dc']));
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
@@ -79,7 +79,7 @@ function multiDeleteMedia(\Attogram\SharedMedia\Tagger\TaggerAdmin $smt, $list)
     }
     $response = '<p>Deleting &amp; Blocking ' . sizeof($list) . ' Media files:';
     foreach ($list as $mediaId) {
-        $response .= $smt->deleteMedia($mediaId);
+        $response .= $smt->database->deleteMedia($mediaId);
     }
 
     return $response;

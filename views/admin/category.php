@@ -28,7 +28,7 @@ if (isset($_GET['i']) && $_GET['i']) {
     . htmlentities(Tools::stripPrefix($categoryName)) . '</a>';
     print '<p>Importing media from <b>' . $catUrl . '</b></p>';
     $smt->database->getMediaFromCategory($categoryName);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<p>Imported media from <b>' . $catUrl . '</b></p>';
     print '</div>';
     $smt->includeFooter();
@@ -38,14 +38,14 @@ if (isset($_GET['i']) && $_GET['i']) {
 ///////////////////////////////////////////////////////////////////////////////
 if (isset($_POST['cats']) && $_POST['cats']) {
     $smt->importCategories($_POST['cats']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
     return;
 }
 
 if (isset($_GET['c']) && $_GET['c']) {
-    if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
+    if ($smt->database->saveCategoryInfo(urldecode($_GET['c']))) {
         Tools::notice(
             'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
             . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
@@ -58,8 +58,8 @@ if (isset($_GET['c']) && $_GET['c']) {
 }
 
 if (isset($_GET['d']) && $_GET['d']) {
-    $smt->deleteCategory($_GET['d']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->deleteCategory($_GET['d']);
+    $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -73,8 +73,8 @@ if (isset($_GET['scommons']) && $_GET['scommons']) {
 }
 
 if (isset($_GET['sc']) && $_GET['sc']) {
-    $smt->getSubcats(Tools::categoryUrldecode($_GET['sc']));
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->commons->getSubcats(Tools::categoryUrldecode($_GET['sc']));
+    $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -95,7 +95,7 @@ if (isset($_GET['g']) && $_GET['g']=='all') {
         $toget[] = $cat['name'];
     }
     $_GET['c'] = implode('|', $toget);
-    $smt->getCategoryInfo($_GET['c']);
+    $smt->commons->getCategoryInfo($_GET['c']);
     print '</div>';
     $smt->includeFooter();
     return;
@@ -244,8 +244,9 @@ function getSearchResults(TaggerAdmin $smt)
 {
     $search = urldecode($_GET['scommons']);
 
-    if (!$smt->findCategories($search)) {
+    if (!$smt->commons->findCategories($search)) {
         Tools::notice('Error: no categories found');
+
         return;
     }
     $cats = isset($smt->commons->response['query']['search'])

@@ -215,10 +215,10 @@ function curateDelete(array $id_array, TaggerAdmin $smt)
         return false;
     }
     foreach ($id_array as $pageid) {
-        $smt->deleteMedia($pageid);
+        $smt->database->deleteMedia($pageid);
     }
     Tools::notice('Curate: DELETE ' . sizeof($id_array));
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     return true;
 }
 
