@@ -7,7 +7,6 @@
  */
 
 use Attogram\SharedMedia\Tagger\Config;
-use Attogram\SharedMedia\Tagger\Tools;
 
 $pageLimit = 20; // # of files per page
 
