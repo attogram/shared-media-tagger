@@ -25,7 +25,8 @@ class Tagger
         Config::setup();
         $this->database = new Database();
 
-        Config::setSiteInfo($this->database->queryAsArray('SELECT * FROM site WHERE id = 1'));
+        $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
+        Config::setSiteInfo($siteInfo);
 
         $this->database->getUser();
 

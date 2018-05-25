@@ -38,7 +38,7 @@ switch ($_GET['r']) {
         print '<p>Please choose a report above</p>';
         break;
     case 'localfiles':
-        $smt->database->updateCategoriesLocalFilesCount();
+        $smt->updateCategoriesLocalFilesCount();
         break;
     case 'catclean':
         catClean($smt);
@@ -160,7 +160,7 @@ function catClean(TaggerAdmin $smt)
         $result = '';
         foreach ($categories as $category) {
             $result .= ' ' . $category['id'];
-            if ($smt->database->saveCategoryInfo($category['name'])) {
+            if ($smt->saveCategoryInfo($category['name'])) {
                 continue;
             }
             $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';

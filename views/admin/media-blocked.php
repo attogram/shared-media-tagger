@@ -6,8 +6,6 @@
  * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\Tools;
-
 $smt->title = 'Blocked Media Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();

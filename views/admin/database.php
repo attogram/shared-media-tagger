@@ -27,11 +27,11 @@ if (isset($_GET['a'])) {
             break;
         case 'em':
             print '<p>Emptying Media tables:</p>';
-            print_r($smt->database->emptyMediaTables());
+            print_r($smt->emptyMediaTables());
             break;
         case 'ec':
             print '<p>Emptying Category tables:</p>';
-            print_r($smt->database->emptyCategoryTables());
+            print_r($smt->emptyCategoryTables());
             break;
         case 'et':
             print '<p>Emptying Tagging tables:</p>';
