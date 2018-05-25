@@ -75,21 +75,6 @@ class Tools
     }
 
     /**
-     * @param string $link
-     * @return string
-     */
-    public static function url($link = '')
-    {
-        if (!$link || empty(Config::$links[$link])) {
-            Tools::error("::url: Link Not Found: $link");
-
-            return '';
-        }
-
-        return Config::$links[$link];
-    }
-
-    /**
      * @param string $number
      * @return bool
      */
@@ -212,6 +197,8 @@ class Tools
         return str_replace('+', '_', str_replace('%3A', ':', urlencode($category)));
     }
 
+    // Admin
+
     /**
      * @return bool
      */
@@ -234,90 +221,5 @@ class Tools
         }
         unset($_COOKIE['admin']);
         setcookie('admin', null, -1, '/');
-    }
-
-    /**
-     * @param $uri
-     * @return string
-     */
-    public static function openContentLicenseName($uri)
-    {
-        // modified from: https://github.com/gbv/image-attribution - MIT License
-        if ($uri == 'http://creativecommons.org/publicdomain/zero/1.0/') {
-            return "CC0";
-        } elseif ($uri == 'https://creativecommons.org/publicdomain/mark/1.0/') {
-            return "Public Domain";
-        } elseif (preg_match(
-            '/^http:\/\/creativecommons.org\/licenses\/(((by|sa)-?)+)\/([0-9.]+)\/(([a-z]+)\/)?/',
-            $uri,
-            $match
-        )
-        ) {
-            $license = "CC ".strtoupper($match[1])." ".$match[4];
-            if (isset($match[6])) {
-                $license .= " ".$match[6];
-            }
-            return $license;
-        } else {
-            return '';
-        }
-    }
-
-    /**
-     * @param $license
-     * @return string
-     */
-    public static function openContentLicenseUri($license)
-    {
-        // modified from: https://github.com/gbv/image-attribution - MIT License
-        $license = strtolower(trim($license));
-
-        if (preg_match('/^(cc0|cc[ -]zero)$/', $license)) {
-            return 'http://creativecommons.org/publicdomain/zero/1.0/'; // CC Zero
-        } elseif (preg_match('/^(cc )?(pd|pdm|public[ -]domain)( mark( 1\.0)?)?$/', $license)) {
-            return 'https://creativecommons.org/publicdomain/mark/1.0/'; // Public Domain
-        } elseif ($license == "no restrictions") {
-            // No restrictions (for instance images imported from Flickr Commons)
-            return 'https://creativecommons.org/publicdomain/mark/1.0/';
-        } elseif (preg_match('/^cc([ -]by)?([ -]sa)?([ -]([1-4]\.0|2\.5))([ -]([a-z][a-z]))?$/', $license, $match)) {
-            // CC licenses.
-            // see <https://wiki.creativecommons.org/wiki/License_Versions>
-            // See <https://wiki.creativecommons.org/wiki/Jurisdiction_Database>
-            $byline = $match[1] ? 'by' : '';
-            $sharealike = $match[2] ? 'sa' : '';
-            $port = isset($match[6]) ? $match[6] : '';
-            $version = $match[4];
-
-            // just "CC" is not enough
-            if (!($byline or $sharealike) or !$version) {
-                return '';
-            }
-
-            // only 1.0 had pure SA-license without BY
-            if ($version == "1.0" && !$byline) {
-                $condition = "sa";
-            } else {
-                $condition = $sharealike ? "by-sa" : "by";
-            }
-
-            // ported versions only existed in 2.0, 2.5, and 3.0
-            if ($port) {
-                if ($version == "1.0" or $version == "4.0") {
-                    return '';
-                }
-                # TODO: check whether port actually exists at given version, for instance 2.5 had less ports!
-            }
-
-            // build URI
-            $uri = "http://creativecommons.org/licenses/$condition/$version/";
-            if ($port) {
-                $uri .= "$port/";
-            }
-
-            return $uri;
-        } else {
-            // TODO: GFLD and other licenses
-            return '';
-        }
     }
 }

@@ -138,7 +138,7 @@ if (isset($media['sha1']) && $media['sha1'] != null) {
 
 <br />
 <p><a href="<?php
-print Tools::url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
+print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
 <?php
 
 if (Tools::isAdmin()) {

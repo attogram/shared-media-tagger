@@ -132,3 +132,4 @@ function tagReport(TaggerAdmin $smt, $tagId = '')
     print '</textarea>';
     return true;
 }
+

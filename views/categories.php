@@ -7,7 +7,6 @@
  */
 
 use Attogram\SharedMedia\Tagger\Config;
-use Attogram\SharedMedia\Tagger\Tools;
 
 $pageLimit = 1000;
 
@@ -81,8 +80,8 @@ $smt->includeMediumMenu();
 
 ?><div class="box white">
 <div style="padding:10px 0px 10px 0px;float:right;"><form method="GET">
-<a href="<?php print Tools::url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;
-<a href="<?php print Tools::url('categories'); ?>?h=1"  style="font-size:80%;">Tech</a> &nbsp;
+<a href="<?php print $smt->url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;
+<a href="<?php print $smt->url('categories'); ?>?h=1"  style="font-size:80%;">Tech</a> &nbsp;
 <?php
 if ($hidden) {
     print '<input type="hidden" name="h" value="1">';
@@ -106,7 +105,7 @@ ob_flush();
 flush();
 
 foreach ($categories as $category) {
-    $localUrl = Tools::url('category') . '?c='
+    $localUrl = $smt->url('category') . '?c='
         . Tools::categoryUrlencode(Tools::stripPrefix(@$category['name']));
     print '<div class="catcon">'
     . '<div class="catfiles">' . number_format(@$category['local_files']) . '</div>'
@@ -121,8 +120,8 @@ print '</div>';
 print '<br />' . $pager;
 print '<br /><br />'
 . '<p class="center" style="padding:10px;">'
-. '<a href="' . Tools::url('categories') . '">Active Categories</a>'
-. '  -  <a href="' . Tools::url('categories') . '?h=1">Technical Categories</a>'
+. '<a href="' . $smt->url('categories') . '">Active Categories</a>'
+. '  -  <a href="' . $smt->url('categories') . '?h=1">Technical Categories</a>'
 . '</p><br /><br />'
 . '</div>';
 

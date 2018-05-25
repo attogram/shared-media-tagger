@@ -17,13 +17,13 @@ $smt->title = 'Admin Reports';
 $smt->includeHeader();
 $smt->includeMediumMenu();
 $smt->includeAdminMenu();
-print '<div class="box white"><p><a href="' . Tools::url('admin') .'reports.php">' . $smt->title . '</a></p>
+print '<div class="box white"><p><a href="' . $smt->url('admin') .'reports.php">' . $smt->title . '</a></p>
 <ul>
-<li><a href="' . Tools::url('admin') . 'reports.php?r=localfiles">update_categories_local_files_count()</a>
+<li><a href="' . $smt->url('admin') . 'reports.php?r=localfiles">update_categories_local_files_count()</a>
 <br /><br />
-<li><a href="' . Tools::url('admin') . 'reports.php?r=category2media">Check: category2media</a>
+<li><a href="' . $smt->url('admin') . 'reports.php?r=category2media">Check: category2media</a>
 <br /><br />
-<li><a href="' . Tools::url('admin') . 'reports.php?r=catclean">Check/Clean: category</a></li>
+<li><a href="' . $smt->url('admin') . 'reports.php?r=catclean">Check/Clean: category</a></li>
 </ul>
 <hr />';
 
@@ -189,7 +189,7 @@ function catClean(TaggerAdmin $smt)
         . $category['missing'] . ' '
         . $category['id'] . $tab
         . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00') . $tab
-        . '<a target="site" href="' . Tools::url('category') . '?c='
+        . '<a target="site" href="' . $smt->url('category') . '?c='
         . Tools::categoryUrlencode(Tools::stripPrefix($category['name']))
         . '">' . $category['name'] . '</a>'
         . '<br />';

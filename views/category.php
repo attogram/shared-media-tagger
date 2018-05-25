@@ -87,7 +87,7 @@ print '<div class="box white">'
     ;
 
 if (Tools::isAdmin()) {
-    print '<form action="' . Tools::url('admin') .'media.php" method="GET" name="media">';
+    print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
 }
 
 foreach ($category as $media) {

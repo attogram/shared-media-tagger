@@ -32,7 +32,7 @@ print '<div class="box grey center">'
 . $smt->getReviews($media['pageid'])
 . $smt->displayCategories($media['pageid'])
 . '<br />'
-. '<a href="' . Tools::url('contact') . '?r='
+. '<a href="' . $smt->url('contact') . '?r='
 . $media['pageid'] . '" style="color:#666; font-size:85%;">REPORT this file</a>'
 . '</div></div>';
 

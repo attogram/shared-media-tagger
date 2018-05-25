@@ -9,7 +9,7 @@
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
-$me = Tools::url('reviews');
+$me = $smt->url('reviews');
 $tags = $smt->getTags();
 
 $smt->title = 'Reviews - ' . Config::$siteName;
