@@ -12,16 +12,19 @@ $smt->includeMediumMenu();
 $smt->includeAdminMenu();
 print '<div class="box white"><p>Blocked Media Admin:</p>';
 ?>
-* <a target="sqlite"
-     href="<?= $smt->url('admin'); ?>sqladmin.php?table=block&action=row_view">Database: View/Edit Blocked Media</a>
+* <a target="sqlite" href="<?php print $smt->url('admin'); ?>sqladmin.php?table=block&action=row_view">'
+    . 'Database: View/Edit Blocked Media</a>
 <hr />
 
 <?php
 
+// TODO - pager
+
 $sql = "SELECT * 
 		FROM block 
 		ORDER BY pageid ASC
-		LIMIT 200"; // TODO - pager
+		LIMIT 200
+		";
 
 $blocks = $smt->database->queryAsArray($sql);
 if (!$blocks || !is_array($blocks)) {

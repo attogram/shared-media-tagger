@@ -20,7 +20,7 @@ $smt->title = $categoryName . ' - ' . Config::$siteName;
 
 $categoryName = 'Category:' . $categoryName;
 
-$categoryInfo = $smt->database->getCategory($categoryName);
+$categoryInfo = $smt->getCategory($categoryName);
 
 if (!$categoryInfo) {
     $smt->fail404(
@@ -29,7 +29,7 @@ if (!$categoryInfo) {
     );
 }
 
-$categorySize = $smt->database->getCategorySize($categoryName);
+$categorySize = $smt->getCategorySize($categoryName);
 
 $pager = '';
 $sqlLimit = '';

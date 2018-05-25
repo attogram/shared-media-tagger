@@ -7,7 +7,6 @@
  */
 
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
-use Attogram\SharedMedia\Tagger\Tools;
 
 if (function_exists('set_time_limit')) {
     set_time_limit(1000);
@@ -126,7 +125,7 @@ function catClean(TaggerAdmin $smt)
         foreach ($categories as $category) {
             //$result .= ' ' . $category['id'];
             $bind = [];
-            $bind[':local_files'] = $smt->database->getCategorySize($category['name']);
+            $bind[':local_files'] = $smt->getCategorySize($category['name']);
             $bind[':hidden'] = 0;
             if ($category['hidden'] == 1) {
                 $bind[':hidden'] = 1;
