@@ -6,7 +6,6 @@
  * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -58,7 +57,7 @@ function networkExport(TaggerAdmin $smt)
 {
     $cr = "\n";
     $tab = "\t";
-    $site = Config::$protocol . Config::$siteUrl;
+    $site = $smt->getProtocol() . $smt->siteUrl;
 
     $export = 'SMT_NETWORK_SITE: ' . $site . $cr
     . 'SMT_DATETIME: ' . Tools::timeNow() . $cr
@@ -124,8 +123,8 @@ function tagReport(TaggerAdmin $smt, $tagId = '')
 
     print '<textarea cols="90" rows="20">'
     . '== ' . $reportName . ' ==' . $cr
-    . '* Collection ID: <code>' . md5(Config::$siteName) . '</code>' . $cr
-    . '* Collection Size: ' . number_format($smt->database->getImageCount()) . $cr
+    . '* Collection ID: <code>' . md5($smt->siteName) . '</code>' . $cr
+    . '* Collection Size: ' . number_format($smt->getImageCount()) . $cr
     . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
     . '* Created with: Shared Media Tagger v' . __SMT__ . $cr
     . '<gallery caption="' . $reportName . '" widths="100px" heights="100px" perrow="6">' . $cr;
@@ -147,8 +146,8 @@ function skinReport(TaggerAdmin $smt)
     $cr = "\n";
     print '<textarea cols="90" rows="20">'
     . '== Skin Percentage Report ==' . $cr
-    . '* Collection ID: <code>' . md5(Config::$siteName) . '</code>' . $cr
-    . '* Collection Size: ' . number_format($smt->database->getImageCount()) . $cr
+    . '* Collection ID: <code>' . md5($smt->siteName) . '</code>' . $cr
+    . '* Collection Size: ' . number_format($smt->getImageCount()) . $cr
     . '* Algorithm: Image_FleshSkinQuantifier / YCbCr Space Color Model / J. Marcial-Basilio et al. (2011) ' . $cr
     . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
     . '* Created with: Shared Media Tagger v' . __SMT__ . $cr

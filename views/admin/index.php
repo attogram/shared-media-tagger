@@ -6,8 +6,6 @@
  * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
-
 $smt->title = 'Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();
@@ -26,7 +24,7 @@ if (isset($result[0]['count'])) {
     $msgCount = $result[0]['count'];
 }
 
-print '<p>Site: <b><a href="./site.php">' . Config::$siteName . '</a></b>
+print '<p>Site: <b><a href="./site.php">' . $smt->siteName . '</a></b>
 <ul>
 <li><b>' . $msgCount . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
 <li><b>' . sizeof($smt->getTags()) . '</b> <a href="./site.php">Tags</a></li>
@@ -42,11 +40,11 @@ print '<p>Site: <b><a href="./site.php">' . Config::$siteName . '</a></b>
 
 print '<p>Installation:
 <ul>
-<li>Server: ' . Config::$server . '</li>
+<li>Server: ' . $smt->server . '</li>
 <li>URL: <a href="' . $smt->url('home') . '">' . $smt->url('home') . '</a></li>
-<li>Protocol: ' . Config::$protocol . '</li>
-<li>Directory: ' . Config::$installDirectory . '</li>
-<li>Setup: ' . (Config::$setup ? print_r(Config::$setup, true) : 'none') . '</li>
+<li>Protocol: ' . $smt->getProtocol() . '</li>
+<li>Directory: ' . $smt->installDirectory . '</li>
+<li>Setup: ' . ($smt->setup ? print_r($smt->setup, true) : 'none') . '</li>
 </ul>
 </p>';
 
@@ -54,10 +52,10 @@ print '<p>Installation:
 print '<p>Discovery / Restrictions:
 <ul>
 <li>./admin/.htaccess: '
-. (is_readable(Config::$installDirectory.'/admin/.htaccess') ? '✔ACTIVE: ' : '❌MISSING')
+. (is_readable($smt->installDirectory.'/admin/.htaccess') ? '✔ACTIVE: ' : '❌MISSING')
 . '</li>
 <li>./admin/.htpasswd: '
-. (is_readable(Config::$installDirectory.'/admin/.htpasswd') ? '✔ACTIVE: ' : '❌MISSING')
+. (is_readable($smt->installDirectory.'/admin/.htpasswd') ? '✔ACTIVE: ' : '❌MISSING')
 . '</li>
 <li><a href="' . $smt->url('home') . 'sitemap.php">sitemap.php</a></li>
 <li><a href="' . $smt->url('home') . 'robots.txt">robots.txt</a>:

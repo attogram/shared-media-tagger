@@ -6,8 +6,6 @@
  * @var Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
-
 $allUsers = $smt->getUsers();
 $users = [];
 
@@ -26,9 +24,9 @@ if (isset($_GET['i'])) {
     }
 }
 
-$smt->title = 'Users - ' . Config::$siteName;
+$smt->title = 'Users - ' . $smt->siteName;
 if ($userId) {
-    $smt->title = 'User:' . $userId . ' - ' . Config::$siteName;
+    $smt->title = 'User:' . $userId . ' - ' . $smt->siteName;
 }
 $smt->includeHeader();
 $smt->includeMediumMenu();

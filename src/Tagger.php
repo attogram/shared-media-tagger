@@ -9,16 +9,28 @@ namespace Attogram\SharedMedia\Tagger;
  */
 class Tagger
 {
-    private $userId;
-
+    /** @var string http: or https: */
     public $protocol;
+    /** @var array array of [page_name] = page_url */
+    public $links;
+    public $userId;
+    public $installDirectory;
+    public $server;
+    public $setup;
     public $site;
+    public $siteInfo;
+    public $siteName;
+    public $siteUrl;
+    public $sizeMedium;
+    public $sizeThumb;
     public $tagId;
     public $tagName;
     public $totalFilesReviewedCount;
+    /** @var string Page <title> */
     public $title;
     public $useBootstrap;
     public $useJquery;
+    /** @var Database */
     public $database;
 
     /**
@@ -26,14 +38,42 @@ class Tagger
      */
     public function __construct()
     {
-        Config::setup();
+        global $router, $setup;
+
         $this->database = new Database();
-
-        $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
-        Config::setSiteInfo($siteInfo);
-
+        $this->setup = [];
+        if (is_array($setup)) {
+            $this->setup = $setup;
+        }
+        $this->installDirectory = realpath(__DIR__ . '/..');
+        $this->sizeMedium = 325;
+        $this->sizeThumb = 100;
+        $this->server = $_SERVER['SERVER_NAME'];
+        if (isset($this->setup['site_url'])) {
+            $this->siteUrl = $setup['site_url'];
+        } else {
+            $this->siteUrl = $router->getUriBase() . '/';
+        }
+        $this->setSiteInfo();
+        $this->links = [
+            'home'       => $this->siteUrl . '',
+            'css'        => $this->siteUrl . 'css.css',
+            'jquery'        => $this->siteUrl . 'use/jquery.min.js',
+            'bootstrap_js'  => $this->siteUrl . 'use/bootstrap/js/bootstrap.min.js',
+            'bootstrap_css' => $this->siteUrl . 'use/bootstrap/css/bootstrap.min.css',
+            'info'       => $this->siteUrl . 'info.php',
+            'browse'     => $this->siteUrl . 'browse.php',
+            'categories' => $this->siteUrl . 'categories.php',
+            'category'   => $this->siteUrl . 'category.php',
+            'about'      => $this->siteUrl . 'about.php',
+            'reviews'    => $this->siteUrl . 'reviews.php',
+            'admin'      => $this->siteUrl . 'admin/',
+            'contact'    => $this->siteUrl . 'contact.php',
+            'tag'        => $this->siteUrl . 'tag.php',
+            'users'      => $this->siteUrl . 'users.php',
+            'github_smt' => 'https://github.com/attogram/shared-media-tagger',
+        ];
         $this->getUser();
-
         if (isset($_GET['logoff'])) {
             $this->adminLogoff();
         }
@@ -64,18 +104,35 @@ class Tagger
     }
 
     /**
+     * @return string
+     */
+    public function getProtocol()
+    {
+        if (isset($this->protocol)) {
+            return $this->protocol;
+        }
+        if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+        ) {
+            return $this->protocol = 'https:';
+        }
+
+        return $this->protocol = 'http:';
+    }
+
+    /**
      * @param string $link
      * @return bool|mixed
      */
     public function url($link = '')
     {
-        if (!$link || !isset(Config::$links[$link])) {
+        if (!$link || !isset($this->links[$link])) {
             Tools::error("::url: Link Not Found: $link");
 
             return false;
         }
 
-        return Config::$links[$link];
+        return $this->links[$link];
     }
 
     // SMT - Media
@@ -92,7 +149,7 @@ class Tagger
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
 
-        if (Config::$siteInfo['curation'] == 1 && !$this->isAdmin()) {
+        if ($this->siteInfo['curation'] == 1 && !$this->isAdmin()) {
             $sql .= " AND curated = '1'";
         }
         return $this->database->queryAsArray($sql, [':pageid'=>$pageid]);
@@ -106,7 +163,7 @@ class Tagger
     public function getThumbnail($media = '', $thumbWidth = '')
     {
         if (!$thumbWidth || !Tools::isPositiveNumber($thumbWidth)) {
-            $thumbWidth = Config::$sizeThumb;
+            $thumbWidth = $this->sizeThumb;
         }
         $default = [
             'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
@@ -123,11 +180,11 @@ class Tagger
         }
         $width = !empty($media['width']) ? $media['width'] : null;
         if (!$width) {
-            $width = Config::$sizeThumb;
+            $width = $this->sizeThumb;
         }
         $height = !empty($media['height']) ? $media['height'] : null;
         if (!$height) {
-            $height = Config::$sizeThumb;
+            $height = $this->sizeThumb;
         }
         if ($thumbWidth >= $width) {
             return [
@@ -438,7 +495,7 @@ function checkAll(formname, checktoggle) {
             return false;
         }
         $cats = $this->getImageCategories($mediaId);
-        $response = '<div class="categories" style="width:' . Config::$sizeMedium . 'px;">';
+        $response = '<div class="categories" style="width:' . $this->sizeMedium . 'px;">';
         if (!$cats) {
             return $response . '<em>Uncategorized</em></div>';
         }
@@ -524,7 +581,7 @@ function checkAll(formname, checktoggle) {
                 FROM category2media AS c2m, category AS c
                 WHERE c.name = :name
                 AND c2m.category_id = c.id';
-        if (Config::$siteInfo['curation'] == 1) {
+        if ($this->siteInfo['curation'] == 1) {
             $sql = "SELECT count(c2m.id) AS size
                         FROM category2media AS c2m, category AS c, media as m
                         WHERE c.name = :name
@@ -859,7 +916,7 @@ function checkAll(formname, checktoggle) {
         $countReviews = number_format((float) $this->database->getTotalReviewCount());
         $countUsers = number_format((float) $this->database->getUserCount());
         print '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . $this->url('home') . '">' . Config::$siteName . '</a></span>' .  $space
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->siteName . '</a></span>' .  $space
         . '<a href="' . $this->url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
@@ -878,7 +935,7 @@ function checkAll(formname, checktoggle) {
     {
         $space = ' &nbsp; &nbsp; ';
         print '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . $this->url('home') . '">' . Config::$siteName . '</a></span>' .  $space
+        . '<span class="nobr"><a href="' . $this->url('home') . '">' . $this->siteName . '</a></span>' .  $space
         . '<a href="' . $this->url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳Reviews</a>' . $space
@@ -896,7 +953,7 @@ function checkAll(formname, checktoggle) {
     {
         $space = ' ';
         print '<div class="menujcon">'
-        . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . Config::$siteName . '</a>'
+        . '<a style="font-weight:bold; font-size:85%;" href="' . $this->url('home') . '">' . $this->siteName . '</a>'
         . '<span style="float:right;">'
         . '<a class="menuj" title="Browse" href="' . $this->url('browse') . '">🔎</a>' . $space
         . '<a class="menuj" title="Categories" href="' . $this->url('categories') . '">📂</a>' . $space
@@ -908,6 +965,29 @@ function checkAll(formname, checktoggle) {
     }
 
     // SMT - Shared Media Tagger
+
+    /**
+     * @return bool
+     */
+    public function setSiteInfo()
+    {
+        $response = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
+        if (!$response || !isset($response[0]['id'])) {
+            $this->siteName = 'Shared Media Tagger';
+            $this->siteInfo = [];
+            $this->siteInfo['curation'] = $this->database->curation = 0;
+
+            return false;
+        }
+        $this->siteName = !empty($response[0]['name']) ? $response[0]['name'] : null;
+        $this->siteInfo = $response[0];
+        if (!isset($this->siteInfo['curation'])) {
+            $this->siteInfo['curation'] = 0;
+        }
+
+        $this->database->curation = $this->siteInfo['curation'];
+        return true;
+    }
 
     /**
      * @param array $media
@@ -959,12 +1039,12 @@ function checkAll(formname, checktoggle) {
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        //if (!$width || $width > Config::$sizeMedium) {
-        //    $height = $this->get_resized_height($width, $height, Config::$sizeMedium); // @TODO find
+        //if (!$width || $width > $this->sizeMedium) {
+        //    $height = $this->get_resized_height($width, $height, $this->sizeMedium); // @TODO find
         //}
         $divwidth = $width = $media['thumbwidth'];
-        if ($divwidth < Config::$sizeMedium) {
-            $divwidth = Config::$sizeMedium;
+        if ($divwidth < $this->sizeMedium) {
+            $divwidth = $this->sizeMedium;
         }
 
         return '<div style="width:' . $divwidth . 'px; margin:auto;">'
@@ -989,12 +1069,12 @@ function checkAll(formname, checktoggle) {
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        //if (!$width || $width > Config::$sizeMedium) {
-        //    $height = $this->get_resized_height($width, $height, Config::$sizeMedium );
+        //if (!$width || $width > $this->sizeMedium) {
+        //    $height = $this->get_resized_height($width, $height, $this->sizeMedium );
         //}
         $divwidth = $width = $media['thumbwidth'];
-        if ($divwidth < Config::$sizeMedium) {
-            $divwidth = Config::$sizeMedium;
+        if ($divwidth < $this->sizeMedium) {
+            $divwidth = $this->sizeMedium;
         }
 
         return '<div style="width:' . $divwidth . 'px; margin:auto;">'
@@ -1032,8 +1112,8 @@ function checkAll(formname, checktoggle) {
         $url = $media['thumburl'];
         $height = $media['thumbheight'];
         $divwidth = $width = $media['thumbwidth'];
-        if ($divwidth < Config::$sizeMedium) {
-            $divwidth = Config::$sizeMedium;
+        if ($divwidth < $this->sizeMedium) {
+            $divwidth = $this->sizeMedium;
         }
         $infourl =  $this->url('info') . '?i=' . $media['pageid'];
 
@@ -1103,7 +1183,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displaySiteHeader()
     {
-        print !empty(Config::$siteInfo['header']) ? Config::$siteInfo['header'] : null;
+        print !empty($this->siteInfo['header']) ? $this->siteInfo['header'] : null;
     }
 
     /**
@@ -1111,7 +1191,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displaySiteFooter()
     {
-        print !empty(Config::$siteInfo['footer']) ? Config::$siteInfo['footer'] : null;
+        print !empty($this->siteInfo['footer']) ? $this->siteInfo['footer'] : null;
     }
 
     /**
@@ -1120,7 +1200,7 @@ function checkAll(formname, checktoggle) {
     public function includeHeader($showSiteHeader = true)
     {
         if (!$this->title) {
-            $this->title = Config::$siteName;
+            $this->title = $this->siteName;
         }
         print "<!doctype html>\n"
         . '<html><head><title>' . $this->title . '</title>'
@@ -1159,12 +1239,12 @@ function checkAll(formname, checktoggle) {
     {
         $this->includeMenu();
         print '<footer><div class="menu" style="line-height:2; font-size:80%;">';
-        if (empty(Config::$setup['hide_hosted_by']) || !Config::$setup['hide_hosted_by']) {
+        if (empty($this->setup['hide_hosted_by']) || !$this->setup['hide_hosted_by']) {
             $serverName = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : null;
             print '<span class="nobr">Hosted by <b><a href="//' . $serverName . '/">' . $serverName . '</a></b></span>';
         }
         print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
-        if (!empty(Config::$setup['hide_powered_by']) && Config::$setup['hide_powered_by']) {
+        if (!empty($this->setup['hide_powered_by']) && $this->setup['hide_powered_by']) {
             print '<span class="nobr">Powered by <b>'
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
             . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';

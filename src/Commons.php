@@ -9,14 +9,13 @@ namespace Attogram\SharedMedia\Tagger;
  */
 class Commons
 {
+    private $commonsApiUrl;
     private $propImageinfo;
-
-    public $commonsApiUrl;
     public $totalHits;
     public $continue;
     public $sroffset;
     public $batchComplete;
-    public $response;
+    public $commonsResponse;
 
     /**
      * Commons constructor.
@@ -52,38 +51,38 @@ class Commons
 
             exit;
         }
-        $this->response = json_decode($getResponse, true);
-        if (!$this->response) {
+        $this->commonsResponse = json_decode($getResponse, true);
+        if (!$this->commonsResponse) {
             Tools::error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error());
             Tools::error('::call_commons: ERROR: ' . $this->smtJsonLastErrorMsg());
 
             return false;
         }
 
-        if (empty($this->response['query'][$key])
-            || !$this->response['query'][$key]
-            || !is_array($this->response['query'][$key])
+        if (empty($this->commonsResponse['query'][$key])
+            || !$this->commonsResponse['query'][$key]
+            || !is_array($this->commonsResponse['query'][$key])
         ) {
             Tools::error("::call_commons: WARNING: missing key: $key");
         }
 
         $this->totalHits = $this->continue = $this->batchComplete = false;
 
-        if (isset($this->response['batchcomplete'])) {
+        if (isset($this->commonsResponse['batchcomplete'])) {
             $this->batchComplete = true;
         }
-        if (isset($this->response['query']['searchinfo']['totalhits'])) {
-            $this->totalHits = $this->response['query']['searchinfo']['totalhits'];
+        if (isset($this->commonsResponse['query']['searchinfo']['totalhits'])) {
+            $this->totalHits = $this->commonsResponse['query']['searchinfo']['totalhits'];
             Tools::notice('::call_commmons: totalhits=' . $this->totalHits);
         }
-        if (isset($this->response['continue'])) {
-            $this->continue = $this->response['continue']['continue'];
+        if (isset($this->commonsResponse['continue'])) {
+            $this->continue = $this->commonsResponse['continue']['continue'];
         }
-        if (isset($this->response['sroffset'])) {
-            $this->sroffset = $this->response['continue']['sroffset'];
+        if (isset($this->commonsResponse['sroffset'])) {
+            $this->sroffset = $this->commonsResponse['continue']['sroffset'];
         }
-        if (isset($this->response['warnings'])) {
-            Tools::error('::call_commons: ' . print_r($this->response['warnings'], true));
+        if (isset($this->commonsResponse['warnings'])) {
+            Tools::error('::call_commons: ' . print_r($this->commonsResponse['warnings'], true));
             Tools::error('::call_commons: url: ' . $url);
         }
 
@@ -122,14 +121,14 @@ class Commons
             . '&cmlimit=500'
             . '&cmtitle=' . urlencode($category);
         if (!$this->callCommons($url, 'categorymembers')
-            || !isset($this->response['query']['categorymembers'])
+            || !isset($this->commonsResponse['query']['categorymembers'])
         ) {
             Tools::error('::get_api_categorymembers: ERROR: call');
 
             return [];
         }
         $pageids = [];
-        foreach ($this->response['query']['categorymembers'] as $cat) {
+        foreach ($this->commonsResponse['query']['categorymembers'] as $cat) {
             $pageids[] = $cat['pageid'];
         }
         if (!$pageids) {
@@ -148,18 +147,18 @@ class Commons
     {
         $call = $this->commonsApiUrl . '?action=query&format=json'
             . $this->propImageinfo
-            . '&iiurlwidth=' . Config::$sizeMedium // @TODO get size
+            . '&iiurlwidth=' . $this->sizeMedium // @TODO get size
             . '&iilimit=50'
             . '&pageids=' . implode('|', $pageids);
         if (!$this->callCommons($call, 'pages')
-            || !isset($this->response['query']['pages'])
+            || !isset($this->commonsResponse['query']['pages'])
         ) {
             Tools::error('::get_api_imageinfo: ERROR: call');
 
             return [];
         }
 
-        $pages = $this->response['query']['pages'];
+        $pages = $this->commonsResponse['query']['pages'];
 
         $errors = [];
         foreach ($pages as $media) {

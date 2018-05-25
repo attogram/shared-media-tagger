@@ -7,7 +7,6 @@
  */
 
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
-use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Site Admin';
 $smt->includeHeader();

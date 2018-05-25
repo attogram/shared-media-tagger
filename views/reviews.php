@@ -6,13 +6,10 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
-use Attogram\SharedMedia\Tagger\Tools;
-
 $me = $smt->url('reviews');
 $tags = $smt->getTags();
 
-$smt->title = 'Reviews - ' . Config::$siteName;
+$smt->title = 'Reviews - ' . $smt->siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
 

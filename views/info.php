@@ -36,7 +36,7 @@ $smt->includeMediumMenu();
 print ''
 . $smt->displayTags($pageid)
 . $smt->displayImage($media)
-. '<div class="left" style="margin:auto; width:' . Config::$sizeMedium . 'px;">'
+. '<div class="left" style="margin:auto; width:' . $smt->sizeMedium . 'px;">'
 . '<br />'
 . $smt->getReviews($pageid)
 . $smt->displayCategories($pageid)

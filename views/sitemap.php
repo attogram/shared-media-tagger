@@ -8,7 +8,7 @@
 
 $cr = "\n";
 
-$protocol = Config::$protocol;
+$protocol = $smt->getProtocol();
 if (!$protocol) {
     $protocol = 'http:';
 }

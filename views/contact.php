@@ -6,10 +6,9 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
-$smt->title = 'Contact - ' . Config::$siteName;
+$smt->title = 'Contact - ' . $smt->siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
 

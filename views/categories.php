@@ -6,8 +6,6 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-use Attogram\SharedMedia\Tagger\Config;
-
 $pageLimit = 1000;
 
 $search = false;
@@ -20,8 +18,7 @@ if (isset($_GET['h']) && $_GET['h']) {
     $hidden = 1;
 }
 
-$categorySize = $smt->database->getCategoriesCount(false, $hidden);
-// @TODO get real selection size, not full category count
+$categorySize = $smt->database->getCategoriesCount(false, $hidden); // @TODO get real selection size, not full category count
 
 $pager = '';
 $sqlLimit = '';
@@ -73,7 +70,7 @@ $pageName .= ' Categories';
 if (isset($pagerCount)) {
     $pageName .= ', page #' . $pagerCount;
 }
-$smt->title = $pageName . ' - ' . Config::$siteName;
+$smt->title = $pageName . ' - ' . $smt->siteName;
 
 $smt->includeHeader();
 $smt->includeMediumMenu();
