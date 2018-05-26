@@ -1031,7 +1031,7 @@ function checkAll(formname, checktoggle) {
         if (!empty(Config::$setup['hide_powered_by']) && Config::$setup['hide_powered_by']) {
             print '<span class="nobr">Powered by <b>'
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
-            . 'Shared Media Tagger v' . __SMT__ . '</a></b></span>';
+            . 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER . '</a></b></span>';
         }
         if ($this->isAdmin()) {
             print '<br /><br />'

@@ -26,7 +26,7 @@ class TaggerAdmin extends Tagger
     public function __construct()
     {
         parent::__construct();
-        ini_set('user_agent', 'Shared Media Tagger v' . __SMT__);
+        ini_set('user_agent', 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER);
         $this->setAdminCookie();
         $this->commons = new Commons();
     }
@@ -932,7 +932,7 @@ class TaggerAdmin extends Tagger
      */
     public function saveCategoryInfo($categoryName)
     {
-        Tools::debug("saveCategoryInfo($categoryName)");
+        //Tools::debug("saveCategoryInfo($categoryName)");
 
         $categoryName = $this->categoryUrldecode($categoryName);
 

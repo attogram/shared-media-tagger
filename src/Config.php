@@ -24,7 +24,7 @@ class Config
     public static $sizeThumb;
 
     /**
-     *
+     * setup
      */
     public static function setup()
     {
@@ -51,7 +51,7 @@ class Config
     }
 
     /**
-     *
+     * setLinks
      */
     public static function setLinks()
     {
@@ -76,7 +76,7 @@ class Config
     }
 
     /**
-     *
+     * setMimeTypes
      */
     private static function setMimeTypes()
     {
@@ -125,7 +125,7 @@ class Config
     }
 
     /**
-     *
+     * setProtocol
      */
     private static function setProtocol()
     {

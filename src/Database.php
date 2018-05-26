@@ -92,13 +92,9 @@ class Database
         if (!$statement) {
             return [];
         }
-        while (($xbind = each($bind))) {
+        while (($xbind = each($bind))) { // @TODO each deprecated - to foreach
             $statement->bindParam($xbind[0], $xbind[1]);
         }
-        // @TODO each deprecated
-        //foreach ($bind as $name => $value) {
-        //    $statement->bindParam($name, $value);
-        //}
 
         if (!$statement->execute()) {
             Tools::error('::queryAsArray(): ERROR EXECUTE: ' . print_r($this->db->errorInfo(), true));
@@ -134,13 +130,10 @@ class Database
 
             return false;
         }
-        while (($xbind = each($bind))) {
+        while (($xbind = each($bind))) { // @TODO each deprecated
             $statement->bindParam($xbind[0], $xbind[1]);
         }
-        // @TODO each deprecated
-        //foreach ($bind as $name => $value) {
-        //    $statement->bindParam($name, $value);
-        //}
+
         if (!$statement->execute()) {
             $this->lastError = $this->db->errorInfo();
             if ($this->lastError[0] == '00000') {

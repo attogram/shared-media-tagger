@@ -42,6 +42,7 @@ class Commons
 
             return false;
         }
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $getResponse = @file_get_contents($url);
 
         if ($getResponse === false) {

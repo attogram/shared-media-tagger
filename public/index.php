@@ -11,7 +11,7 @@ use Attogram\Router\Router;
 use Attogram\SharedMedia\Tagger\Tagger;
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 
-define('__SMT__', '0.8.0');
+define('SHARED_MEDIA_TAGGER', '0.8.0');
 
 ob_start('ob_gzhandler');
 
@@ -19,6 +19,7 @@ $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_readable($autoload)) {
     error('404 Vendor Autoloader Not Found');
 }
+/** @noinspection PhpIncludeInspection */
 require_once $autoload;
 
 $router = new Router();
@@ -30,7 +31,6 @@ $router = setAdminRoutes($router);
 showView($router, true);
 
 error('404 Route Not Found');
-
 
 /**
  * @param Router $router
@@ -45,21 +45,25 @@ function showView(Router $router, bool $isAdmin)
 
     $viewFile = '../views/' . $view . '.php';
 
-    if (!file_exists($viewFile)) {
+    if (!is_readable($viewFile)) {
         error('404 control not found');
     }
 
     $setup = __DIR__ . '/../_setup.php'; // optional Site Setup
     if (is_readable($setup)) {
+        /** @noinspection PhpIncludeInspection */
         include $setup;
     }
 
     if ($isAdmin) {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $smt = new TaggerAdmin();
     } else {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $smt = new Tagger();
     }
 
+    /** @noinspection PhpIncludeInspection */
     include $viewFile;
 
     shutdown();

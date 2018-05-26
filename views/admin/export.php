@@ -58,7 +58,7 @@ function networkExport(TaggerAdmin $smt)
 
     $export = 'SMT_NETWORK_SITE: ' . $site . $cr
     . 'SMT_DATETIME: ' . Tools::timeNow() . $cr
-    . 'SMT_VERSION: ' . __SMT__ . $cr;
+    . 'SMT_VERSION: ' . SHARED_MEDIA_TAGGER . $cr;
 
     $cats = $smt->database->queryAsArray('
         SELECT pageid, name
@@ -123,7 +123,7 @@ function tagReport(TaggerAdmin $smt, $tagId = '')
     . '* Collection ID: <code>' . md5(Config::$siteName) . '</code>' . $cr
     . '* Collection Size: ' . number_format($smt->database->getImageCount()) . $cr
     . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
-    . '* Created with: Shared Media Tagger v' . __SMT__ . $cr
+    . '* Created with: Shared Media Tagger v' . SHARED_MEDIA_TAGGER . $cr
     . '<gallery caption="' . $reportName . '" widths="100px" heights="100px" perrow="6">' . $cr;
 
     foreach ($medias as $media) {
