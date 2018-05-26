@@ -26,7 +26,7 @@ $smt->includeSmallMenu();
 
 print '<div class="box grey center">'
 . $smt->displayTags($media['pageid'])
-. $smt->displayImage($media)
+. $smt->displayMedia($media)
 . '<div class="left" style="margin:auto; width:' . Config::$sizeMedium . 'px;">'
 . '<br />'
 . $smt->getReviews($media['pageid'])

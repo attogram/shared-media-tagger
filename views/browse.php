@@ -92,23 +92,6 @@ switch ($sort) {
     case 'sha1':
         $orderby = ' ORDER BY sha1';
         break;
-    case 'skin':
-        $orderby = ' ORDER BY skin';
-        $where = ' WHERE skin IS NOT NULL';
-        $extra = 'skin';
-        break;
-    case 'ahash':
-        $orderby = ' ORDER BY ahash';
-        $where = ' WHERE ahash IS NOT NULL';
-        break;
-    case 'dhash':
-        $orderby = ' ORDER BY dhash';
-        $where = ' WHERE dhash IS NOT NULL';
-        break;
-    case 'phash':
-        $orderby = ' ORDER BY phash';
-        $where = ' WHERE phash IS NOT NULL';
-        break;
 }
 
 if (Config::$siteInfo['curation'] == 1) {
@@ -223,10 +206,6 @@ Browse Files, sorty by <select name="s">
 <option value="user"' . Tools::isSelected('user', $sort) . '>Uploading User</option>
 <option value="duration"' . Tools::isSelected('duration', $sort) . '>Duration</option>
 <option value="sha1"' . Tools::isSelected('sha1', $sort) . '>Sha1 Hash</option>
-<option value="skin"' . Tools::isSelected('skin', $sort) . '>Skin Percentage</option>
-<option value="dhash"' . Tools::isSelected('dhash', $sort) . '>Difference Hash</option>
-<option value="phash"' . Tools::isSelected('phash', $sort) . '>Perceptual Hash</option>
-<option value="ahash"' . Tools::isSelected('ahash', $sort) . '>Average Hash</option>
 </select>
 <select name="d">
 <option value="d"' . Tools::isSelected('d', $dir) . '>Descending</option>

@@ -21,6 +21,7 @@ if (!$media || !isset($media[0]) || !is_array($media[0])) {
 }
 $media = $media[0];
 
+$smt->useBootstrap = true;
 
 /////////////////////////////////////////////////////////////////////
 $smt->title = 'Info: ' . $smt->stripPrefix($media['title']);
@@ -36,7 +37,7 @@ $smt->includeMediumMenu();
 <?php
 print ''
 . $smt->displayTags($pageid)
-. $smt->displayImage($media)
+. $smt->displayMedia($media)
 . '<div class="left" style="margin:auto; width:' . Config::$sizeMedium . 'px;">'
 . '<br />'
 . $smt->getReviews($pageid)

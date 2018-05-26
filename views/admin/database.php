@@ -73,8 +73,8 @@ DANGER ZONE:
 <br />
 <br />- <a onclick="return confirm('Confirm: EMPTY Media tables?');" href="database.php?a=em">EMPTY Media tables</a>
 <br />
-<br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');" href="database.php?a=ec">'
-        . 'EMPTY Category tables</a>
+<br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');"
+           href="database.php?a=ec">EMPTY Category tables</a>
 <br />
 <br />- <a onclick="return confirm('Confirm: DROP tables?');" href="database.php?a=d">DROP ALL tables</a>
 </div>

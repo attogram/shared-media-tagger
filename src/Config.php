@@ -12,6 +12,9 @@ class Config
     public static $installDirectory;
     public static $links;
     public static $protocol;
+    public static $mimeTypesAudio;
+    public static $mimeTypesImage;
+    public static $mimeTypesVideo;
     public static $server;
     public static $setup = [];
     public static $siteInfo;
@@ -44,6 +47,7 @@ class Config
 
         self::setLinks();
         self::setProtocol();
+        self::setMimeTypes();
     }
 
     /**
@@ -72,6 +76,35 @@ class Config
     }
 
     /**
+     *
+     */
+    private static function setMimeTypes()
+    {
+        self::$mimeTypesAudio = [
+            'audio/mpeg',
+            'audio/x-flac',
+            'audio/midi',
+            'audio/wav',
+            'audio/webm',
+        ];
+        self::$mimeTypesImage = [
+            'image/jpeg',
+            'image/png',
+            'image/svg+xml',
+            'image/tiff',
+            'image/gif',
+            'image/vnd.djvu',
+            'image/x-xcf',
+            'image/webp',
+            'application/pdf',
+        ];
+        self::$mimeTypesVideo = [
+            'application/ogg',
+            'video/webm',
+        ];
+    }
+
+    /**
      * @param array $siteInfo
      * @return void
      */
@@ -94,7 +127,7 @@ class Config
     /**
      *
      */
-    public static function setProtocol()
+    private static function setProtocol()
     {
         self::$protocol = 'http:';
         if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')

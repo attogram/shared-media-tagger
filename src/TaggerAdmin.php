@@ -932,71 +932,71 @@ class TaggerAdmin extends Tagger
      */
     public function saveCategoryInfo($categoryName)
     {
+        Tools::debug("saveCategoryInfo($categoryName)");
+
         $categoryName = $this->categoryUrldecode($categoryName);
+
         $categoryRow = $this->getCategory($categoryName);
         if (!$categoryRow) {
-            if (!$this->insertCategory($categoryName, false, 1)) {
+            if (!$this->insertCategory($categoryName, /*getinfo*/false, /*local_files*/1)) {
                 Tools::error('saveCategoryInfo: new category INSERT FAILED: ' . $categoryName);
 
                 return false;
             }
             Tools::notice('saveCategoryInfo: NEW CATEGORY: '  . $categoryName);
             $categoryRow = $this->getCategory($categoryName);
-            if (!$categoryRow) {
-                Tools::error('saveCategoryInfo: Category save Failed: ' . $categoryName);
-
-                return false;
-            }
         }
+        //$this->notice($category_row);
 
         $categoryInfo = $this->getCategoryInfo($categoryName);
-        $categoryInfo= @$categoryInfo[0];
+        foreach ($categoryInfo as $onesy) {
+            $categoryInfo = $onesy; // is always just 1 result
+        }
+        //$this->notice($category_info);
 
         $bind = [];
 
-        if (isset($categoryInfo['pageid'])
-            && isset($categoryRow['pageid'])
-            && $categoryInfo['pageid'] != $categoryRow['pageid']
-        ) {
+        if (@$categoryInfo['pageid'] != @$categoryRow['pageid']) {
             $bind[':pageid'] = $categoryInfo['pageid'];
+            //$this->notice('NEW: pageid: ' . $bind[':pageid']);
         }
 
-        if (isset($categoryInfo['categoryinfo']['files'])
-            && isset($categoryRow['files'])
-            && $categoryInfo['categoryinfo']['files'] != $categoryRow['files']
-        ) {
+        if ($categoryInfo['categoryinfo']['files'] != $categoryRow['files']) {
             $bind[':files'] = $categoryInfo['categoryinfo']['files'];
+            //$this->notice('NEW: files: ' . $bind[':files']);
         }
 
-        if (isset($categoryInfo['categoryinfo']['subcats'])
-            && isset($categoryRow['subcats'])
-            && $categoryInfo['categoryinfo']['subcats'] != $categoryRow['subcats']
-        ) {
+        if ($categoryInfo['categoryinfo']['subcats'] != $categoryRow['subcats']) {
             $bind[':subcats'] = $categoryInfo['categoryinfo']['subcats'];
+            //$this->notice('NEW: subcats: ' . $bind[':subcats']);
         }
 
         $hidden = 0;
         if (isset($categoryInfo['categoryinfo']['hidden'])) {
             $hidden = 1;
         }
-        if (isset($categoryRow['hidden']) && $hidden != $categoryRow['hidden']) {
+        if ($hidden != $categoryRow['hidden']) {
             $bind[':hidden'] = $hidden;
+            //$this->notice('NEW: hidden: ' . $bind[':hidden']);
         }
 
         $missing = 0;
         if (isset($categoryInfo['categoryinfo']['missing'])) {
             $missing = 1;
         }
-        if (isset($categoryRow['missing']) && $missing != $categoryRow['missing']) {
+        if ($missing != $categoryRow['missing']) {
             $bind[':missing'] = $missing;
+            //$this->notice('NEW: missing: ' . $bind[':missing']);
         }
 
-        //$url = '<a href="' . $this->url('category') . '?c='
-        //    . $this->categoryUrlencode($this->stripPrefix($categoryName))
-        //    . '">' . $categoryName . '</a>';
+//        $url = '<a href="' . $this->url('category') . '?c='
+//            . $this->categoryUrlencode($this->stripPrefix($categoryName))
+//            . '">' . $categoryName . '</a>';
 
         if (!$bind) {
-            return true; // nothing to update
+            Tools::debug('saveCategoryInfo: nothing to update');
+
+            return true;
         }
         $sql = 'UPDATE category SET ';
         $sets = [];
@@ -1011,9 +1011,12 @@ class TaggerAdmin extends Tagger
         $result = $this->database->queryAsBool($sql, $bind);
 
         if ($result) {
+            //$this->notice('OK: CATEGORY INFO: ' . $url);
             return true;
         }
-        Tools::error('get_category_info: UPDATE/INSERT FAILED: ' . print_r($this->database->lastError, true));
+        Tools::error(
+            'saveCategoryInfo: UPDATE/INSERT FAILED: ' . print_r($this->database->lastError, true)
+        );
 
         return false;
     }

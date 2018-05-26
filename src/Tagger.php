@@ -183,7 +183,7 @@ class Tagger
             return;
         }
         unset($_COOKIE['admin']);
-        setcookie('admin', null, -1, '/');
+        setcookie('admin', '', -1, '/');
     }
 
     /**
@@ -748,7 +748,8 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . $this->url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . $this->url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . $this->url('reviews') . '">🗳Reviews</a>' . $space
-        . '<a href="'. $this->url('users') . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">Users</a>' . $space
+        . '<a href="'. $this->url('users')
+            . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">Users</a>' . $space
         . '<a href="' . $this->url('contact') . '">Contact</a>' . $space
         . '<a href="'. $this->url('about') . '">❔About</a>'
         . ($this->isAdmin() ? $space . '<a href="' . $this->url('admin') . '">🔧</a>' : '')
@@ -877,7 +878,7 @@ function checkAll(formname, checktoggle) {
      * @param string $media
      * @return bool|string
      */
-    public function displayImage($media = '')
+    public function displayMedia($media = '')
     {
         if (!$media || !is_array($media)) {
             Tools::error('displayImage: ERROR: no image array');
@@ -885,13 +886,10 @@ function checkAll(formname, checktoggle) {
             return false;
         }
         $mime = !empty($media['mime']) ? $media['mime'] : null;
-        $video = ['application/ogg','video/webm'];
-        if (in_array($mime, $video)) {
+        if (in_array($mime, Config::$mimeTypesVideo)) {
             return $this->displayVideo($media);
         }
-
-        $audio = ['audio/x-flac'];
-        if (in_array($mime, $audio)) {
+        if (in_array($mime, Config::$mimeTypesAudio)) {
             return $this->displayAudio($media);
         }
 

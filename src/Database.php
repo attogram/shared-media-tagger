@@ -14,25 +14,23 @@ class Database
 {
     /** @var string */
     public $databaseName;
-    /** @var PDO */
-    public $db;
+    /** @var array */
+    public $lastError;
     /** @var int */
     public $lastInsertId;
-    /** @var string */
-    public $lastError;
     /** @var int */
     public $userId;
 
     /** @var int */
+    private $categoryCount;
+    /** @var PDO */
+    private $db;
+    /** @var int */
+    private $imageCount;
+    /** @var int */
     private $userCount;
     /** @var int */
     private $totalReviewCount;
-    /** @var int */
-    private $categoryCount;
-    /** @var int */
-    private $imageCount;
-
-
 
     /**
      * Database constructor.
@@ -97,6 +95,7 @@ class Database
         while (($xbind = each($bind))) {
             $statement->bindParam($xbind[0], $xbind[1]);
         }
+        // @TODO each deprecated
         //foreach ($bind as $name => $value) {
         //    $statement->bindParam($name, $value);
         //}
@@ -138,6 +137,7 @@ class Database
         while (($xbind = each($bind))) {
             $statement->bindParam($xbind[0], $xbind[1]);
         }
+        // @TODO each deprecated
         //foreach ($bind as $name => $value) {
         //    $statement->bindParam($name, $value);
         //}
@@ -496,5 +496,4 @@ class Database
 
         return false;
     }
-
 }
