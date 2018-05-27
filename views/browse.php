@@ -214,7 +214,7 @@ Browse Files, sorty by <select name="s">
 <input type="submit" value="Browse" />
 </form><br />' . number_format($resultSize) . ' Files' . ($pager ? ', '.$pager : '');
 
-if ($smt->isAdmin()) {
+if (Tools::isAdmin()) {
     print '<form action="' . Tools::url('admin') .'media.php" method="GET" name="media">';
     print $smt->displayAdminMediaListFunctions();
 }
@@ -241,8 +241,8 @@ foreach ($medias as $media) {
 
 print '<br clear="all" />';
 
-if ($smt->isAdmin()) {
-     print $smt->displayAdminMediaListFunctions() . '</form>';
+if (Tools::isAdmin()) {
+    print $smt->displayAdminMediaListFunctions() . '</form>';
 }
 
 if ($pager) {

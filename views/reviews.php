@@ -33,7 +33,7 @@ print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+'
 $tagName = null;
 if ((preg_match('/^reviews\.(.*)/', $order, $matches)) === 1) {
     $tagName = $matches[1];
-    $tagId = $smt->getTagIdByName($tagName);
+    $tagId = $smt->database->getTagIdByName($tagName);
     if (!$tagId) {
         Tools::notice('Invalid Review Name');
         $order = '';

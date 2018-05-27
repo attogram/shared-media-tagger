@@ -45,7 +45,7 @@ if (isset($_POST['cats']) && $_POST['cats']) {
 }
 
 if (isset($_GET['c']) && $_GET['c']) {
-    if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
+    if ($smt->admin->saveCategoryInfo(urldecode($_GET['c']))) {
         Tools::notice(
             'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
             . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
@@ -73,7 +73,7 @@ if (isset($_GET['scommons']) && $_GET['scommons']) {
 }
 
 if (isset($_GET['sc']) && $_GET['sc']) {
-    $smt->getSubcats(Tools::categoryUrldecode($_GET['sc']));
+    $smt->commons->getSubcats(Tools::categoryUrldecode($_GET['sc']));
     $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();

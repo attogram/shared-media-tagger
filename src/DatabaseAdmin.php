@@ -21,6 +21,9 @@ class DatabaseAdmin extends Database
         parent::__construct();
     }
 
+    /**
+     * @param Commons $commons
+     */
     public function setCommons($commons)
     {
         $this->commons = $commons;

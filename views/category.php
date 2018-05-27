@@ -58,7 +58,7 @@ $sql = '
     AND m.pageid = c2m.media_pageid
     AND c.name = :category_name';
 
-if (Config::$siteInfo['curation'] == 1 && !$smt->isAdmin()) {
+if (Config::$siteInfo['curation'] == 1 && !Tools::isAdmin()) {
     $sql .= " AND m.curated ='1'";
 }
 $sql .= " ORDER BY m.pageid ASC $sqlLimit";
@@ -87,7 +87,7 @@ print '<div class="box white">'
     . '<br clear="all" />'
     ;
 
-if ($smt->isAdmin()) {
+if (Tools::isAdmin()) {
     print '<form action="' . Tools::url('admin') .'media.php" method="GET" name="media">';
 }
 
@@ -99,7 +99,7 @@ if ($pager) {
     print '<p>' . $pager . '</p>';
 }
 
-if ($smt->isAdmin()) {
+if (Tools::isAdmin()) {
     print $smt->displayAdminCategoryFunctions($categoryName);
 }
 

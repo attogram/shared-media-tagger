@@ -7,6 +7,7 @@
  */
 
 use Attogram\SharedMedia\Tagger\Config;
+use Attogram\SharedMedia\Tagger\Tools;
 
 $allUsers = $smt->database->getUsers();
 $users = [];

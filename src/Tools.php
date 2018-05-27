@@ -24,68 +24,27 @@ class Tools
     }
 
     /**
-     * @param string $message
+     * @return bool
      */
-    public static function debug($message = '')
+    public static function isAdmin()
     {
-        self::logMessage($message, 'debug');
-    }
-
-    /**
-     * @param string $message
-     */
-    public static function notice($message = '')
-    {
-        self::logMessage($message, 'notice');
-    }
-
-    /**
-     * @param string $message
-     */
-    public static function error($message = '')
-    {
-        self::logMessage($message, 'error');
-    }
-
-    /**
-     * @param string $message
-     */
-    public static function fail($message = '')
-    {
-        self::logMessage($message, 'fail');
-        exit;
-    }
-
-    /**
-     * @param $message
-     * @param $type
-     */
-    public static function logMessage($message, $type)
-    {
-        switch ($type) {
-            case 'debug':
-                $class = 'debug';
-                $head = '';
-                break;
-            case 'notice':
-                $class = 'notice';
-                $head = '';
-                break;
-            case 'error':
-                $class = 'error';
-                $head = 'ERROR:';
-                break;
-            case 'fail':
-                $class = 'fail';
-                $head = 'GURU MEDITATION FAILURE:';
-                break;
-            default:
-                return;
+        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1) {
+            return true;
         }
-        if (is_array($message)) {
-            $message = '<pre>' . htmlentities(print_r($message, true)) . '</pre>';
+
+        return false;
+    }
+
+    /**
+     * adminLogoff
+     */
+    public static function adminLogoff()
+    {
+        if (!self::isAdmin()) {
+            return;
         }
-        print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
+        unset($_COOKIE['admin']);
+        setcookie('admin', '', -1, '/');
     }
 
     /**
@@ -277,5 +236,72 @@ class Tools
             // TODO: GFLD and other licenses
             return '';
         }
+    }
+
+    // Logging
+
+    /**
+     * @param string $message
+     */
+    public static function debug($message = '')
+    {
+        self::logMessage($message, 'debug');
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function notice($message = '')
+    {
+        self::logMessage($message, 'notice');
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function error($message = '')
+    {
+        self::logMessage($message, 'error');
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function fail($message = '')
+    {
+        self::logMessage($message, 'fail');
+        exit;
+    }
+
+    /**
+     * @param $message
+     * @param $type
+     */
+    public static function logMessage($message, $type)
+    {
+        switch ($type) {
+            case 'debug':
+                $class = 'debug';
+                $head = '';
+                break;
+            case 'notice':
+                $class = 'notice';
+                $head = '';
+                break;
+            case 'error':
+                $class = 'error';
+                $head = 'ERROR:';
+                break;
+            case 'fail':
+                $class = 'fail';
+                $head = 'GURU MEDITATION FAILURE:';
+                break;
+            default:
+                return;
+        }
+        if (is_array($message)) {
+            $message = '<pre>' . htmlentities(print_r($message, true)) . '</pre>';
+        }
+        print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
     }
 }

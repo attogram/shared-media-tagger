@@ -6,6 +6,9 @@
  * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
+use Attogram\SharedMedia\Tagger\DatabaseUpdater;
 use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Database Admin';
@@ -19,7 +22,9 @@ if (isset($_GET['a'])) {
     switch ($_GET['a']) {
         case 'c':
             print '<p>Creating Database tables:</p>';
-            print $smt->createTables();
+            $databaseUpdater = new DatabaseUpdater();
+            $databaseUpdater->setDatabase($smt->database);
+            print $databaseUpdater->createTables();
             break;
         case 'd':
             print '<p>Dropping Database tables:</p>';

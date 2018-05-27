@@ -23,14 +23,11 @@ class Tagger
     {
         Config::setup();
         $this->database = new Database();
-
         $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
         Config::setSiteInfo($siteInfo);
-
         $this->database->getUser();
-
         if (isset($_GET['logoff'])) {
-            $this->adminLogoff();
+            Tools::adminLogoff();
         }
     }
 
@@ -122,29 +119,6 @@ class Tagger
     }
 
     /**
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     *
-     */
-    public function adminLogoff()
-    {
-        if (!$this->isAdmin()) {
-            return;
-        }
-        unset($_COOKIE['admin']);
-        setcookie('admin', '', -1, '/');
-    }
-
-    /**
      * @return string
      */
     public function displayAdminMediaListFunctions()
@@ -175,14 +149,10 @@ function checkAll(formname, checktoggle) {
      */
     public function displayAdminMediaFunctions($mediaId)
     {
-        if (!$this->isAdmin()) {
+        if (!Tools::isAdmin() || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        if (!Tools::isPositiveNumber($mediaId)) {
-            return '';
-        }
-        return ''
-        . '<div class="attribution left" style="display:inline-block; float:right;">'
+        return '<div class="attribution left" style="display:inline-block; float:right;">'
         . '<a style="font-size:140%;" href="' . Tools::url('admin') . 'media.php?dm=' . $mediaId
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
         . $mediaId . ' ?\');">❌</a>'
@@ -195,19 +165,19 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * @param $categoryName
+     * @param string $categoryName
      * @return string
      */
     public function displayAdminCategoryFunctions($categoryName)
     {
-        if (!$this->isAdmin()) {
+        if (!Tools::isAdmin()) {
             return '';
         }
         $category = $this->database->getCategory($categoryName);
         if (!$category) {
             return '<p>ADMIN: category not in database</p>';
         }
-        $response = '<br clear="all" />'
+        return '<br clear="all" />'
         . '<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">'
         . '<input type="submit" value="Delete selected media">'
         . '<script type="text/javascript" language="javascript">'
@@ -246,18 +216,16 @@ function checkAll(formname, checktoggle) {
         . '<br /><pre>' . print_r($category, true) . '</pre>'
         . '</form>'
         . '</div><br /><br />';
-
-        return $response;
     }
 
     /**
-     * @param $mediaId
-     * @return bool|string
+     * @param int|string $mediaId
+     * @return string
      */
     public function displayCategories($mediaId)
     {
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
-            return false;
+            return '';
         }
         $cats = $this->database->getImageCategories($mediaId);
         $response = '<div class="categories" style="width:' . Config::$sizeMedium . 'px;">';
@@ -289,7 +257,7 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * @param $mediaId
+     * @param int|string $mediaId
      * @return string
      */
     public function displayTags($mediaId)
@@ -328,7 +296,7 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * @param $categoryId
+     * @param int|string $categoryId
      * @return string
      */
     public function getReviewsPerCategory($categoryId)
@@ -355,7 +323,7 @@ function checkAll(formname, checktoggle) {
             . $countUsers .'&nbsp;Users</a>' . $space
         . '<a href="' . Tools::url('contact') . '">Contact</a>' . $space
         . '<a href="'. Tools::url('about') . '">❔About</a>'
-        . ($this->isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
+        . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -374,7 +342,7 @@ function checkAll(formname, checktoggle) {
             . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">Users</a>' . $space
         . '<a href="' . Tools::url('contact') . '">Contact</a>' . $space
         . '<a href="'. Tools::url('about') . '">❔About</a>'
-        . ($this->isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
+        . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -391,7 +359,7 @@ function checkAll(formname, checktoggle) {
         . '<a class="menuj" title="Categories" href="' . Tools::url('categories') . '">📂</a>' . $space
         . '<a class="menuj" title="Reviews" href="' . Tools::url('reviews') . '">🗳</a>' . $space
         . '<a class="menuj" title="About" href="' . Tools::url('about') . '">❔</a>' . $space
-        . ($this->isAdmin() ? '<a class="menuj" title="ADMIN" href="' . Tools::url('admin') . '">🔧</a>' : '')
+        . (Tools::isAdmin() ? '<a class="menuj" title="ADMIN" href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</span>'
         . '</div><div style="clear:both;"></div>';
     }
@@ -630,7 +598,7 @@ function checkAll(formname, checktoggle) {
         . '</head><body>';
 
         // Site headers
-        if ($this->isAdmin() || get_class($this) == 'TaggerAdmin' || !$showSiteHeader) {
+        if (Tools::isAdmin() || get_class($this) == 'TaggerAdmin' || !$showSiteHeader) {
             return;
         }
         $this->displaySiteHeader();
@@ -653,7 +621,7 @@ function checkAll(formname, checktoggle) {
             . '<a target="commons" href="https://github.com/attogram/shared-media-tagger">'
             . 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER . '</a></b></span>';
         }
-        if ($this->isAdmin()) {
+        if (Tools::isAdmin()) {
             print '<br /><br />'
             . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
             . '<a href="' . Tools::url('home') . '?logoff">LOGOFF</a>'
@@ -666,7 +634,7 @@ function checkAll(formname, checktoggle) {
         print '</div></footer>';
 
         // Site footers
-        if ($this->isAdmin() || get_class($this) == 'TaggerAdmin' || !$showSiteFooter) {
+        if (Tools::isAdmin() || get_class($this) == 'TaggerAdmin' || !$showSiteFooter) {
             print '</body></html>';
 
             return;

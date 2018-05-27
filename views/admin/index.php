@@ -6,7 +6,10 @@
  * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
+use Attogram\SharedMedia\Tagger\DatabaseUpdater;
 use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Admin';
@@ -17,8 +20,10 @@ print '<div class="box white">';
 
 $siteCount = $smt->database->queryAsArray('SELECT count(id) AS count FROM site');
 if (!$siteCount) {
+    $databaseUpdater = new DatabaseUpdater();
+    $databaseUpdater->setDatabase($smt->database);
     print '<p>Welome!  Creating new Shared Media Tagger Database:</p><pre>'
-    . $smt->createTables() . '</pre>';
+    . $databaseUpdater->createTables() . '</pre>';
 }
 
 $msgCount = 0;
@@ -31,13 +36,13 @@ print '<p>Site: <b><a href="./site.php">' . Config::$siteName . '</a></b>
 <ul>
 <li><b>' . $msgCount . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
 <li><b>' . sizeof($smt->database->getTags()) . '</b> <a href="./site.php">Tags</a></li>
-<li><b>' . number_format($smt->database->getImageCount()) . '</b> Files</li>
-<li><b>' . number_format($smt->database->getBlockCount()) . '</b> Blocked Files</li>
-<li><b>' . number_format($smt->database->getTotalFilesReviewedCount()) . '</b> Files reviewed</li>
-<li><b>' . number_format($smt->database->getTaggingCount()) . '</b> Tagging Count</li>
-<li><b>' . number_format($smt->database->getTotalReviewCount()) . '</b> Total Review Count</li>
-<li><b>' . number_format($smt->database->getUserTagCount()) . '</b> User Tag Count</li>
-<li><b>' . number_format($smt->database->getUserCount()) . '</b> Users</li>
+<li><b>' . number_format((float) $smt->database->getImageCount()) . '</b> Files</li>
+<li><b>' . number_format((float) $smt->database->getBlockCount()) . '</b> Blocked Files</li>
+<li><b>' . number_format((float) $smt->database->getTotalFilesReviewedCount()) . '</b> Files reviewed</li>
+<li><b>' . number_format((float) $smt->database->getTaggingCount()) . '</b> Tagging Count</li>
+<li><b>' . number_format((float) $smt->database->getTotalReviewCount()) . '</b> Total Review Count</li>
+<li><b>' . number_format((float) $smt->database->getUserTagCount()) . '</b> User Tag Count</li>
+<li><b>' . number_format((float) $smt->database->getUserCount()) . '</b> Users</li>
 </ul>
 </p>';
 

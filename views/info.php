@@ -52,11 +52,11 @@ print ''
     print Tools::stripPrefix($media['title']); ?></a></h1>
 <br />
 <br />
-<p><?php print ($media['imagedescription']); ?></p>
-<p><em>by:</em> <b><?php print ($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
+<p><?php print($media['imagedescription']); ?></p>
+<p><em>by:</em> <b><?php print($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
 <?php if ($media['datetimeoriginal']) {
-    print ' / ' . $media['datetimeoriginal'];
-} ?></p>
+        print ' / ' . $media['datetimeoriginal'];
+    } ?></p>
 <div style="border:1px solid #ccc; display:inline-block; padding:10px; background-color:#eee;">
 <em>License:</em>
 <?php
@@ -131,8 +131,8 @@ if ($media['duration'] > 0) {
 <ul>
 <?php
 if (isset($media['sha1']) && $media['sha1'] != null) {
-    print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
-}
+        print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
+    }
 ?>
 </ul>
 </p>
@@ -142,7 +142,7 @@ if (isset($media['sha1']) && $media['sha1'] != null) {
 print Tools::url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
 <?php
 
-if ($smt->isAdmin()) {
+if (Tools::isAdmin()) {
     print '<pre>ADMIN: media: ' . print_r($media, 1) . '</pre>';
 }
 

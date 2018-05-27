@@ -6,22 +6,15 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
-$a = $smt->database->queryAsArray('SELECT name, about FROM site WHERE id = 1');
-$about = @$a[0]['about'];
-$name = @$a[0]['name'];
+use Attogram\SharedMedia\Tagger\Tools;
 
-if ($about == '') {
-    $about = 'Welcome!';
-}
-if ($name == '') {
-    $name = 'Shared Media Tagger';
-}
+$site = $smt->database->queryAsArray('SELECT name, about FROM site WHERE id = 1');
+$about = !empty($site[0]['about']) ? $site[0]['about'] : 'Welcome';
+$name = !empty($site[0]['name']) ? $site[0]['name'] : 'Shared Media Tagger';
 
 $smt->title = 'About ' . $name;
-
 $smt->includeHeader();
 $smt->includeMediumMenu();
-
 print '
 <div class="box white" style="padding:30px;">
 <h1>' . $name. '</h1>
@@ -56,7 +49,6 @@ print '
 <p>You may copy, use and modify these media files for commercial or non-commercial purposes, 
 as long as you properly follow the licensing.<p>
 <p>See each media files info page for complete licensing information.<p>
-';
+</div>';
 
-print '</div>';
 $smt->includeFooter();

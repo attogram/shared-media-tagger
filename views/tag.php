@@ -6,12 +6,14 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Tools;
 
 $mediaId = isset($_GET['m']) ? $_GET['m'] : false;
 $tagId = isset($_GET['t']) ? $_GET['t'] : false;
 
-if ($tagId || !Tools::isPositiveNumber($tagId)) {
+if (!$tagId || !Tools::isPositiveNumber($tagId)) {
     $smt->fail404('404 Tag ID Not Found');
 }
 
@@ -20,7 +22,11 @@ if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
 }
 
 // Tag exists?
-if (!$smt->database->queryAsBool('SELECT id FROM tag WHERE id = :tag_id LIMIT 1', [':tag_id' => $tagId])) {
+if (!$smt->database->queryAsBool(
+    'SELECT id FROM tag WHERE id = :tag_id LIMIT 1',
+    [':tag_id' => $tagId]
+)
+) {
     $smt->fail404('404 Tag Not Found');
 }
 

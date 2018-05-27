@@ -13,7 +13,6 @@ class Commons
     private $database;
     private $propImageinfo;
 
-
     public $categories;
     public $commonsApiUrl;
     public $totalHits;
@@ -41,6 +40,7 @@ class Commons
     {
         $this->database = $database;
     }
+
     /**
      * @param $url
      * @param string $key
@@ -49,13 +49,12 @@ class Commons
     public function callCommons($url, $key = '')
     {
         if (!$url) {
-            Tools::error('::call_commons: ERROR: no url');
+            Tools::error('callCommons: ERROR: no url');
 
             return false;
         }
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $getResponse = @file_get_contents($url);
-
         if ($getResponse === false) {
             Tools::error('Cannnot reach API endpoint'
                 . '<br />URL: <a target="commons" href="' . $url . '">' . $url  .'</a>'
@@ -66,27 +65,24 @@ class Commons
         }
         $this->response = json_decode($getResponse, true);
         if (!$this->response) {
-            Tools::error('::call_commons: ERROR: json_decode failed. Error: ' . json_last_error());
-            Tools::error('::call_commons: ERROR: ' . $this->smtJsonLastErrorMsg());
+            Tools::error('callCommons: ERROR: json_decode failed. Error: ' . json_last_error());
+            Tools::error('callCommons: ERROR: ' . $this->smtJsonLastErrorMsg());
 
             return false;
         }
-
         if (empty($this->response['query'][$key])
             || !$this->response['query'][$key]
             || !is_array($this->response['query'][$key])
         ) {
-            Tools::error("::call_commons: WARNING: missing key: $key");
+            Tools::error("callCommons: WARNING: missing key: $key");
         }
-
         $this->totalHits = $this->continue = $this->batchComplete = false;
-
         if (isset($this->response['batchcomplete'])) {
             $this->batchComplete = true;
         }
         if (isset($this->response['query']['searchinfo']['totalhits'])) {
             $this->totalHits = $this->response['query']['searchinfo']['totalhits'];
-            Tools::notice('::call_commmons: totalhits=' . $this->totalHits);
+            Tools::notice('callCommons: totalhits=' . $this->totalHits);
         }
         if (isset($this->response['continue'])) {
             $this->continue = $this->response['continue']['continue'];
@@ -95,8 +91,8 @@ class Commons
             $this->sroffset = $this->response['continue']['sroffset'];
         }
         if (isset($this->response['warnings'])) {
-            Tools::error('::call_commons: ' . print_r($this->response['warnings'], true));
-            Tools::error('::call_commons: url: ' . $url);
+            Tools::error('callCommons: ' . print_r($this->response['warnings'], true));
+            Tools::error('callCommons: url: ' . $url);
         }
 
         return true;
@@ -136,7 +132,7 @@ class Commons
         if (!$this->callCommons($url, 'categorymembers')
             || !isset($this->response['query']['categorymembers'])
         ) {
-            Tools::error('::get_api_categorymembers: ERROR: call');
+            Tools::error('getApiCategorymembers: ERROR: call');
 
             return [];
         }
@@ -163,16 +159,12 @@ class Commons
             . '&iiurlwidth=' . Config::$sizeMedium // @TODO get size
             . '&iilimit=50'
             . '&pageids=' . implode('|', $pageids);
-        if (!$this->callCommons($call, 'pages')
-            || !isset($this->response['query']['pages'])
-        ) {
-            Tools::error('::get_api_imageinfo: ERROR: call');
+        if (!$this->callCommons($call, 'pages') || !isset($this->response['query']['pages'])) {
+            Tools::error('getApiImageinfo: ERROR: call');
 
             return [];
         }
-
         $pages = $this->response['query']['pages'];
-
         $errors = [];
         foreach ($pages as $media) {
             if (!isset($media['imageinfo'][0]['url'])) {
@@ -180,23 +172,21 @@ class Commons
                 unset($pages[ $media['pageid'] ]);
             }
         }
-
         if (!$recurseCount) {
             return $pages;
         }
-
         if ($recurseCount > 5) {
-            Tools::error('::get_api_imageinfo: TOO MUCH RECURSION: ' . $recurseCount);
+            Tools::error('getApiImageinfo: TOO MUCH RECURSION: ' . $recurseCount);
 
             return $pages;
         }
         $recurseCount++;
         if ($errors) {
-            Tools::error('::get_api_imageinfo: CALL #' . $recurseCount . ': ' . sizeof($errors) . ' EMPTY files');
+            Tools::error('getApiImageinfo: CALL #' . $recurseCount . ': ' . sizeof($errors) . ' EMPTY files');
             $second = $this->getApiImageinfo($errors, $recurseCount);
-            Tools::notice('::get_api_imageinfo: CALL #' . $recurseCount . ': GOT: ' . sizeof($second) . ' files');
+            Tools::notice('getApiImageinfo: CALL #' . $recurseCount . ': GOT: ' . sizeof($second) . ' files');
             $pages = array_merge($pages, $second);
-            Tools::notice('::get_api_imageinfo: CALL #' . $recurseCount . ': total pages: '
+            Tools::notice('getApiImageinfo: CALL #' . $recurseCount . ': total pages: '
                 . sizeof($pages) . ' files');
         }
 
@@ -265,11 +255,11 @@ class Commons
     public function getSubcats($category)
     {
         if (!$category || $category=='' || !is_string($category)) {
-            Tools::error('::get_subcats: ERROR - no category');
+            Tools::error('getSubcats: ERROR - no category');
 
             return false;
         }
-        Tools::notice('::get_subcats: ' . $category);
+        Tools::notice('getSubcats: ' . $category);
         $call = $this->commonsApiUrl . '?action=query&format=json&cmlimit=50'
             . '&list=categorymembers'
             . '&cmtype=subcat'
@@ -280,7 +270,7 @@ class Commons
             || !isset($this->response['query']['categorymembers'])
             || !is_array($this->response['query']['categorymembers'])
         ) {
-            Tools::error('::get_subcats: Nothing Found');
+            Tools::error('getSubcats: Nothing Found');
 
             return false;
         }
@@ -298,7 +288,7 @@ class Commons
     public function findCategories($search = '')
     {
         if (!$search || $search == '' || !is_string($search)) {
-            Tools::error('::find_categories: invalid search string: ' . $search);
+            Tools::error('findCategories: invalid search string: ' . $search);
 
             return false;
         }
@@ -309,7 +299,7 @@ class Commons
             . '&srlimit=500'
             . '&srsearch=' . urlencode($search);
         if (!$this->callCommons($call, 'search')) {
-            Tools::error('::find_categories: nothing found');
+            Tools::error('findCategories: nothing found');
 
             return false;
         }

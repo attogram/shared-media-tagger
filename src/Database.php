@@ -782,7 +782,7 @@ class Database
         }
         $sql = 'SELECT * FROM media WHERE pageid = :pageid';
 
-        if (Config::$siteInfo['curation'] == 1 && !$this->isAdmin()) {
+        if (Config::$siteInfo['curation'] == 1 && !Tools::isAdmin()) {
             $sql .= " AND curated = '1'";
         }
 

@@ -160,7 +160,7 @@ function catClean(TaggerAdmin $smt)
         $result = '';
         foreach ($categories as $category) {
             $result .= ' ' . $category['id'];
-            if ($smt->saveCategoryInfo($category['name'])) {
+            if ($smt->database->saveCategoryInfo($category['name'])) {
                 continue;
             }
             $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
