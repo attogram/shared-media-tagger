@@ -34,7 +34,7 @@ print '<div class="box white"><p><a href="create.php">Create</a></p>';
 print '<ul>'
 . '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t=R">Random Images</a></li>';
 
-foreach ($smt->getTags() as $tag) {
+foreach ($smt->database->getTags() as $tag) {
     print '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t='
     . $tag['id'] . '">Images tagged: ' . $tag['name'] . '</a></li>';
 }
@@ -194,12 +194,12 @@ $areas = [];
 $descs = [];
 foreach ($images as $image) {
     $count++;
-    $areas[$count] = $smt->url('info') . '?i=' . $image['pageid'];
-    $descs[$count] = htmlspecialchars($smt->stripPrefix($image['title']))
+    $areas[$count] = Tools::url('info') . '?i=' . $image['pageid'];
+    $descs[$count] = htmlspecialchars(Tools::stripPrefix($image['title']))
         . "\n" . $smt->displayLicensing($image);
     print '<br />#' . $count . ': '
-    . '<a href="' . $smt->url('info') . '?i=' . $image['pageid'] . '">'
-    . htmlspecialchars($smt->stripPrefix($image['title'])) . '</a>'
+    . '<a href="' . Tools::url('info') . '?i=' . $image['pageid'] . '">'
+    . htmlspecialchars(Tools::stripPrefix($image['title'])) . '</a>'
     . ' - ' . $smt->displayLicensing($image)
     ;
 }

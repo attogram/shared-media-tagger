@@ -20,7 +20,7 @@ print '<div class="box white"><p>' . $smt->title . '</p>';
 print '<ul>'
 . '<li><a href="?r=network">Network Export</a></li>';
 
-foreach ($smt->getTags() as $tag) {
+foreach ($smt->database->getTags() as $tag) {
     print '<li>MediaWiki Format: Tag Report: <a href="?r=tag&amp;i=' . $tag['id'] . '">' . $tag['name'] . '</a></li>';
 }
 print '</ul><hr />';
@@ -72,7 +72,7 @@ function networkExport(TaggerAdmin $smt)
         if (!$cat['name']) {
             $cat['name'] = 'NULL';
         }
-        $export .= $cat['pageid'] . $tab . '14' . $tab . $smt->stripPrefix($cat['name']) . $cr;
+        $export .= $cat['pageid'] . $tab . '14' . $tab . Tools::stripPrefix($cat['name']) . $cr;
     }
     unset($cats);
 
@@ -87,7 +87,7 @@ function networkExport(TaggerAdmin $smt)
         if (!$media['title']) {
             $media['title'] = 'NULL';
         }
-        $export .= $media['pageid'] . $tab . '6' . $tab . $smt->stripPrefix($media['title']) . $cr;
+        $export .= $media['pageid'] . $tab . '6' . $tab . Tools::stripPrefix($media['title']) . $cr;
     }
     unset($medias);
 
@@ -106,7 +106,7 @@ function tagReport(TaggerAdmin $smt, $tagId = '')
         return false;
     }
 
-    $tagName = $smt->getTagNameById($tagId);
+    $tagName = $smt->database->getTagNameById($tagId);
 
     $sql = '
     SELECT m.title, t.count

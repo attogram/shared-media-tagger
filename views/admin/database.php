@@ -6,6 +6,8 @@
  * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+use Attogram\SharedMedia\Tagger\Tools;
+
 $smt->title = 'Database Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();
@@ -21,23 +23,23 @@ if (isset($_GET['a'])) {
             break;
         case 'd':
             print '<p>Dropping Database tables:</p>';
-            print $smt->dropTables();
+            print_r($smt->database->dropTables());
             break;
         case 'em':
             print '<p>Emptying Media tables:</p>';
-            print_r($smt->emptyMediaTables());
+            print_r($smt->database->emptyMediaTables());
             break;
         case 'ec':
             print '<p>Emptying Category tables:</p>';
-            print_r($smt->emptyCategoryTables());
+            print_r($smt->database->emptyCategoryTables());
             break;
         case 'et':
             print '<p>Emptying Tagging tables:</p>';
-            print_r($smt->emptyTaggingTables());
+            print_r($smt->database->emptyTaggingTables());
             break;
         case 'eu':
             print '<p>Emptying User tables:</p>';
-            print_r($smt->emptyUserTables());
+            print_r($smt->database->emptyUserTables());
             break;
     }
 }
@@ -57,8 +59,8 @@ print '</pre><hr />';
 . (file_exists($smt->database->databaseName) ? number_format(filesize($smt->database->databaseName)) : 'NULL')
 . ' bytes</li>
 
-<li>Download URL: <a href="' . $smt->url('admin')  . 'db/media.sqlite">'
-    . $smt->url('admin')  . 'db/media.sqlite</a></li>
+<li>Download URL: <a href="' . Tools::url('admin')  . 'db/media.sqlite">'
+    . Tools::url('admin')  . 'db/media.sqlite</a></li>
 </ul>';
 ?>
 <br />

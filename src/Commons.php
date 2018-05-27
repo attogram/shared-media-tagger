@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger;
@@ -9,8 +8,13 @@ namespace Attogram\SharedMedia\Tagger;
  */
 class Commons
 {
+
+    /** @var Database|DatabaseAdmin */
+    private $database;
     private $propImageinfo;
 
+
+    public $categories;
     public $commonsApiUrl;
     public $totalHits;
     public $continue;
@@ -30,6 +34,13 @@ class Commons
             . 'Restrictions|Artist|ImageDescription|DateTimeOriginal';
     }
 
+    /**
+     * @param Database|DatabaseAdmin $database
+     */
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+    }
     /**
      * @param $url
      * @param string $key
@@ -190,5 +201,119 @@ class Commons
         }
 
         return $pages;
+    }
+
+    // Admin
+
+    /**
+     * @param int|string $pageid
+     * @return bool
+     */
+    public function getCategoriesFromMedia($pageid)
+    {
+        if (!$pageid || !Tools::isPositiveNumber($pageid)) {
+            Tools::error('getCategoriesFromMedia: invalid pageid');
+
+            return false;
+        }
+        $call = $this->commonsApiUrl . '?action=query&format=json'
+            . '&prop=categories'
+            . '&pageids=' . $pageid
+        ;
+        if (!$this->callCommons($call, 'pages')) {
+            Tools::error('getCategoriesFromMedia: nothing found');
+
+            return false;
+        }
+        $this->categories = !empty($this->response['query']['pages'][$pageid]['categories'])
+            ? $this->response['query']['pages'][$pageid]['categories']
+            : null;
+
+        return true;
+    }
+
+    /**
+     * @param string $category
+     * @return array
+     */
+    public function getCategoryInfo($category)
+    {
+        if (!$category || $category=='' || !is_string($category)) {
+            Tools::error('getCategoryInfo: no category');
+
+            return [];
+        }
+        $call = $this->commonsApiUrl
+            . '?action=query&format=json&prop=categoryinfo&titles=' . urlencode($category); // @TODO cicontinue
+        if (!$this->callCommons($call, 'pages')) {
+            Tools::error('getCategoryInfo: API: nothing found');
+
+            return [];
+        }
+        if (isset($this->response['query']['pages'])) {
+            return $this->response['query']['pages'];
+        }
+        Tools::error('getCategoryInfo: API: no pages');
+
+        return [];
+    }
+
+    /**
+     * @param string $category
+     * @return bool
+     */
+    public function getSubcats($category)
+    {
+        if (!$category || $category=='' || !is_string($category)) {
+            Tools::error('::get_subcats: ERROR - no category');
+
+            return false;
+        }
+        Tools::notice('::get_subcats: ' . $category);
+        $call = $this->commonsApiUrl . '?action=query&format=json&cmlimit=50'
+            . '&list=categorymembers'
+            . '&cmtype=subcat'
+            . '&cmprop=title'
+            . '&cmlimit=500'
+            . '&cmtitle=' . urlencode($category) ;
+        if (!$this->callCommons($call, 'categorymembers')
+            || !isset($this->response['query']['categorymembers'])
+            || !is_array($this->response['query']['categorymembers'])
+        ) {
+            Tools::error('::get_subcats: Nothing Found');
+
+            return false;
+        }
+        foreach ($this->response['query']['categorymembers'] as $subcat) {
+            $this->database->insertCategory($subcat['title']);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $search
+     * @return bool
+     */
+    public function findCategories($search = '')
+    {
+        if (!$search || $search == '' || !is_string($search)) {
+            Tools::error('::find_categories: invalid search string: ' . $search);
+
+            return false;
+        }
+        $call = $this->commonsApiUrl . '?action=query&format=json'
+            . '&list=search'
+            . '&srnamespace=14' // 6 = File   14 = Category
+            . '&srprop=size|snippet' // titlesnippet|timestamp|title
+            . '&srlimit=500'
+            . '&srsearch=' . urlencode($search);
+        if (!$this->callCommons($call, 'search')) {
+            Tools::error('::find_categories: nothing found');
+
+            return false;
+        }
+
+        return true;
     }
 }

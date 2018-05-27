@@ -9,21 +9,21 @@
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
-$me = $smt->url('reviews');
-$tags = $smt->getTags();
+$me = Tools::url('reviews');
+$tags = $smt->database->getTags();
 
 $smt->title = 'Reviews - ' . Config::$siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
 
-$order = isset($_GET['o']) ? $smt->categoryUrldecode($_GET['o']) : '';
+$order = isset($_GET['o']) ? Tools::categoryUrldecode($_GET['o']) : '';
 
 print '<div class="box white">Reviews:<br />';
 
 foreach ($tags as $tag) {
     $tagCount = $smt->database->getTaggingCount($tag['id']);
     print '<span class="reviewbutton tag' . $tag['position'] . '">'
-    . '<a href="' . $me . '?o=reviews.' . $smt->categoryUrlencode($tag['name']) . '">'
+    . '<a href="' . $me . '?o=reviews.' . Tools::categoryUrlencode($tag['name']) . '">'
     . '+' . $tagCount . ' ' . $tag['name'] . '</a></span>';
 }
 print '<span class="reviewbutton"><a href="' . $me . '?o=total.reviews">+'
@@ -51,7 +51,7 @@ switch ($order) {
         exit;
 
     case 'PER.TAG':
-        $tags = $smt->getTags();
+        $tags = $smt->database->getTags();
         $orderDesc = $tagName; // . ' reviews';
         $sql = '
         SELECT t.count, t.tag_id, m.*

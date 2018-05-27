@@ -15,7 +15,7 @@ if (!isset($_GET['i']) || !$_GET['i'] || !Tools::isPositiveNumber($_GET['i'])) {
 
 $pageid = (int) $_GET['i'];
 
-$media = $smt->getMedia($pageid);
+$media = $smt->database->getMedia($pageid);
 if (!$media || !isset($media[0]) || !is_array($media[0])) {
     $smt->fail404('404 Media Not Found');
 }
@@ -24,7 +24,7 @@ $media = $media[0];
 $smt->useBootstrap = true;
 
 /////////////////////////////////////////////////////////////////////
-$smt->title = 'Info: ' . $smt->stripPrefix($media['title']);
+$smt->title = 'Info: ' . Tools::stripPrefix($media['title']);
 $smt->use_bootstrap = true;
 $smt->use_jquery = true;
 $smt->includeHeader();
@@ -40,7 +40,7 @@ print ''
 . $smt->displayMedia($media)
 . '<div class="left" style="margin:auto; width:' . Config::$sizeMedium . 'px;">'
 . '<br />'
-. $smt->getReviews($pageid)
+. $smt->displayReviews($smt->database->getReviews($pageid))
 . $smt->displayCategories($pageid)
 . '</div>';
 ?>
@@ -49,7 +49,7 @@ print ''
 <br />
 <h1><a target="commons" href="<?php
     print $media['url']; ?>"><?php
-    print $smt->stripPrefix($media['title']); ?></a></h1>
+    print Tools::stripPrefix($media['title']); ?></a></h1>
 <br />
 <br />
 <p><?php print ($media['imagedescription']); ?></p>
@@ -104,9 +104,9 @@ li { margin-bottom:6px; }
 <ul>
 <li><a target="commons" href="<?php print $media['descriptionshorturl']; ?>">commons.wikimedia.org</a></li>
 <li><a target="commons" href="//en.wikipedia.org/wiki/<?php
-    print $smt->categoryUrlencode($media['title']); ?>">en.wikipedia.org</a></li>
+    print Tools::categoryUrlencode($media['title']); ?>">en.wikipedia.org</a></li>
 <li><a target="commons" href="//wikidata.org/wiki/<?php
-        print $smt->categoryUrlencode($media['title']); ?>">wikidata.org</a></li>
+        print Tools::categoryUrlencode($media['title']); ?>">wikidata.org</a></li>
 </ul>
 </p>
 
@@ -139,7 +139,7 @@ if (isset($media['sha1']) && $media['sha1'] != null) {
 
 <br />
 <p><a href="<?php
-print $smt->url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
+print Tools::url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;">REPORT this file</a></p>
 <?php
 
 if ($smt->isAdmin()) {

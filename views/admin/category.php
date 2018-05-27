@@ -22,13 +22,13 @@ print '<div class="box white">';
 ///////////////////////////////////////////////////////////////////////////////
 // Import images from a category
 if (isset($_GET['i']) && $_GET['i']) {
-    $categoryName = $smt->categoryUrldecode($_GET['i']);
-    $catUrl = '<a href="' . $smt->url('category')
-    . '?c=' . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
-    . htmlentities($smt->stripPrefix($categoryName)) . '</a>';
+    $categoryName = Tools::categoryUrldecode($_GET['i']);
+    $catUrl = '<a href="' . Tools::url('category')
+    . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
+    . htmlentities(Tools::stripPrefix($categoryName)) . '</a>';
     print '<p>Importing media from <b>' . $catUrl . '</b></p>';
-    $smt->getMediaFromCategory($categoryName);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->getMediaFromCategory($categoryName);
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<p>Imported media from <b>' . $catUrl . '</b></p>';
     print '</div>';
     $smt->includeFooter();
@@ -38,7 +38,7 @@ if (isset($_GET['i']) && $_GET['i']) {
 ///////////////////////////////////////////////////////////////////////////////
 if (isset($_POST['cats']) && $_POST['cats']) {
     $smt->importCategories($_POST['cats']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -47,9 +47,9 @@ if (isset($_POST['cats']) && $_POST['cats']) {
 if (isset($_GET['c']) && $_GET['c']) {
     if ($smt->saveCategoryInfo(urldecode($_GET['c']))) {
         Tools::notice(
-            'OK: Refreshed Category Info: <b><a href="' . $smt->url('category')
-            . '?c=' . $smt->stripPrefix($smt->categoryUrlencode($_GET['c'])) . '">'
-            . htmlentities($smt->categoryUrldecode($_GET['c'])) . '</a></b>'
+            'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
+            . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
+            . htmlentities(Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
         );
     }
     print '</div>';
@@ -58,8 +58,8 @@ if (isset($_GET['c']) && $_GET['c']) {
 }
 
 if (isset($_GET['d']) && $_GET['d']) {
-    $smt->deleteCategory($_GET['d']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->deleteCategory($_GET['d']);
+    $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -73,8 +73,8 @@ if (isset($_GET['scommons']) && $_GET['scommons']) {
 }
 
 if (isset($_GET['sc']) && $_GET['sc']) {
-    $smt->getSubcats($smt->categoryUrldecode($_GET['sc']));
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->getSubcats(Tools::categoryUrldecode($_GET['sc']));
+    $smt->database->updateCategoriesLocalFilesCount();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -83,19 +83,24 @@ if (isset($_GET['sc']) && $_GET['sc']) {
 $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
 
 if (isset($_GET['g']) && $_GET['g']=='all') {
+    Tools::notice('refresh Info for all categories');
     $toget = [];
     $cats = $smt->database->queryAsArray('SELECT * FROM category ' . $orderBy);
     foreach ($cats as $cat) {
         if ($cat['subcats'] != '' && $cat['files'] != '' && $cat['pageid'] != '') {
             continue;
         }
-        if (sizeof($toget) == 50) {
+        if (sizeof($toget) == 50) { // @TODO split into blocks
             break;
         }
         $toget[] = $cat['name'];
     }
     $_GET['c'] = implode('|', $toget);
-    $smt->getCategoryInfo($_GET['c']);
+    //Tools::notice('refreshing: ' . $_GET['c']);
+    $categoryInfo = $smt->commons->getCategoryInfo($_GET['c']);
+    //Tools::debug('got categoryInfo: <pre>' . print_r($categoryInfo, true) . '</pre>');
+
+    Tools::error('@TODO - import categoryInfo to DB');
     print '</div>';
     $smt->includeFooter();
     return;
@@ -143,12 +148,12 @@ print ''
 . '<input type="submit" value="   Search LOCAL Categories   "></form>'
 . '<br /><br />'
 
-. '<a href="' . $smt->url('admin') . 'category.php?v=1">[View&nbsp;Category&nbsp;List]</a>'
+. '<a href="' . Tools::url('admin') . 'category.php?v=1">[View&nbsp;Category&nbsp;List]</a>'
 . $spacer
 . ' <a href="./sqladmin.php?table=category&action=row_create" target="sqlite">'
 . ' [Manually&nbsp;add&nbsp;category]</a>'
 . $spacer
-. '<a href="' . $smt->url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
+. '<a href="' . Tools::url('admin') . 'category.php?g=all">[Import&nbsp;Category&nbsp;Info]</a>'
 . '</p>';
 
 if (($smt->database->getCategoriesCount() > 1000) && isset($_GET['v']) && ($_GET['v'] != 1)) {
@@ -179,9 +184,9 @@ foreach ($cats as $cat) {
     $commonFilesCount += $cat['files'];
 
     print '<tr>'
-    . '<td><b><a href="' . $smt->url('category') . '?c='
-    . $smt->categoryUrlencode($smt->stripPrefix($cat['name']))
-    . '">' . $smt->stripPrefix($cat['name']) . '</a></b></td>';
+    . '<td><b><a href="' . Tools::url('category') . '?c='
+    . Tools::categoryUrlencode(Tools::stripPrefix($cat['name']))
+    . '">' . Tools::stripPrefix($cat['name']) . '</a></b></td>';
 
     $localFiles = '';
 
@@ -204,7 +209,7 @@ foreach ($cats as $cat) {
         . ($cat['files'] ? number_format($cat['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
     ;
     if ($cat['subcats'] > 0) {
-        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . $smt->categoryUrlencode($cat['name']) . '"">+'
+        $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . Tools::categoryUrlencode($cat['name']) . '"">+'
         . $cat['subcats'] . '</a>';
     } else {
         $subcatslink = '';
@@ -216,13 +221,13 @@ foreach ($cats as $cat) {
 
     print ''
     . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/'
-        . $smt->categoryUrlencode($cat['name']) . '">View</a></td>'
+        . Tools::categoryUrlencode($cat['name']) . '">View</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
-        . '?c=' . $smt->categoryUrlencode($cat['name']) . '">Info</a></td>'
+        . '?c=' . Tools::categoryUrlencode($cat['name']) . '">Info</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
-        . '?i=' . $smt->categoryUrlencode($cat['name']) . '">Import</a></td>'
+        . '?i=' . Tools::categoryUrlencode($cat['name']) . '">Import</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./media.php?dc='
-        . $smt->categoryUrlencode($cat['name']) . '">Clear</a></td>'
+        . Tools::categoryUrlencode($cat['name']) . '">Clear</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./' . basename(__FILE__)
         . '?d=' . urlencode($cat['id']) . '">Delete</a></td>'
     . '</tr>'
@@ -244,8 +249,9 @@ function getSearchResults(TaggerAdmin $smt)
 {
     $search = urldecode($_GET['scommons']);
 
-    if (!$smt->findCategories($search)) {
+    if (!$smt->commons->findCategories($search)) {
         Tools::notice('Error: no categories found');
+
         return;
     }
     $cats = isset($smt->commons->response['query']['search'])
@@ -283,7 +289,7 @@ function getSearchResults(TaggerAdmin $smt)
         . $cat['title']
         . '</strong><small> '
         . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
-            . $smt->categoryUrlencode($cat['title']) . '">(view)</a> '
+            . Tools::categoryUrlencode($cat['title']) . '">(view)</a> '
         . ' (' . $cat['snippet'] . ')'
         . ' (size:' . $cat['size'] . ')</small><br />';
     }

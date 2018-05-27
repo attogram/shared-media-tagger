@@ -47,7 +47,7 @@ $footer = '
 
 if (isset($_GET['r']) && Tools::isPositiveNumber($_GET['r'])) {
     $pageid = (int)$_GET['r'];
-    $media = $smt->getMedia($pageid);
+    $media = $smt->database->getMedia($pageid);
     if (!$media || !isset($media[0])) {
         Tools::notice('ERROR: no media ID #' . $pageid . ' found.');
         goto form;

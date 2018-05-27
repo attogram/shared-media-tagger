@@ -6,13 +6,15 @@
  * @var Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+use Attogram\SharedMedia\Tagger\Tools;
+
 $smt->title = 'Blocked Media Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();
 $smt->includeAdminMenu();
 print '<div class="box white"><p>Blocked Media Admin:</p>';
 ?>
-* <a target="sqlite" href="<?php print $smt->url('admin'); ?>sqladmin.php?table=block&action=row_view">'
+* <a target="sqlite" href="<?php print Tools::url('admin'); ?>sqladmin.php?table=block&action=row_view">'
     . 'Database: View/Edit Blocked Media</a>
 <hr />
 
@@ -43,7 +45,7 @@ foreach ($blocks as $block) {
     . $block['pageid']
     . ': '
     . '<a target="commmons" href="https://commons.wikimedia.org/w/index.php?curid=' . $block['pageid'] . '">'
-    . $smt->stripPrefix($block['title'])
+    . Tools::stripPrefix($block['title'])
     . '<br />'
     . '<br />'
     . '<a target="sqlite" href="./sqladmin.php?table=block&action=row_editordelete&pk=%5B'

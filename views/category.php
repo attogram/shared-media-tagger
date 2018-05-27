@@ -7,10 +7,11 @@
  */
 
 use Attogram\SharedMedia\Tagger\Config;
+use Attogram\SharedMedia\Tagger\Tools;
 
 $pageLimit = 20; // # of files per page
 
-$categoryName = isset($_GET['c']) ? $smt->categoryUrldecode($_GET['c']) : false;
+$categoryName = isset($_GET['c']) ? Tools::categoryUrldecode($_GET['c']) : false;
 
 if (!$categoryName) {
     $smt->fail404('404 Category Name Not Found');
@@ -20,7 +21,7 @@ $smt->title = $categoryName . ' - ' . Config::$siteName;
 
 $categoryName = 'Category:' . $categoryName;
 
-$categoryInfo = $smt->getCategory($categoryName);
+$categoryInfo = $smt->database->getCategory($categoryName);
 
 if (!$categoryInfo) {
     $smt->fail404(
@@ -29,7 +30,7 @@ if (!$categoryInfo) {
     );
 }
 
-$categorySize = $smt->getCategorySize($categoryName);
+$categorySize = $smt->database->getCategorySize($categoryName);
 
 $pager = '';
 $sqlLimit = '';
@@ -45,7 +46,7 @@ if ($categorySize > $pageLimit) {
             continue;
         }
         $pager .= '<a href="?o=' . $count . '&amp;c='
-            . $smt->categoryUrlencode($smt->stripPrefix($categoryName)) . '">'
+            . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
                 . '&nbsp;' . ++$pageCount . '&nbsp;</a> ';
     }
 }
@@ -80,14 +81,14 @@ print '<div class="box white">'
     . '<div style="float:right; padding:0px 20px 4px 0px; font-size:80%;">'
         . $smt->getReviewsPerCategory($categoryInfo['id'])
     . '</div>'
-    . '<h1>' . $smt->stripPrefix($categoryName) . '</h1>'
+    . '<h1>' . Tools::stripPrefix($categoryName) . '</h1>'
     . '<br /><b>' . $categorySize . '</b> files'
     . ($pager ? ', '.$pager : '')
     . '<br clear="all" />'
     ;
 
 if ($smt->isAdmin()) {
-    print '<form action="' . $smt->url('admin') .'media.php" method="GET" name="media">';
+    print '<form action="' . Tools::url('admin') .'media.php" method="GET" name="media">';
 }
 
 foreach ($category as $media) {

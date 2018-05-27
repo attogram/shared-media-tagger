@@ -16,25 +16,25 @@ print '<div class="box white"><p>Media Admin:</p>';
 
 if (isset($_GET['am'])) {
     print $smt->addMedia($_GET['am']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
 if (isset($_GET['media'])) {
     print multiDeleteMedia($smt, $_GET['media']);
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
 if (isset($_GET['dm'])) {
-    print $smt->deleteMedia($_GET['dm']);
-    $smt->updateCategoriesLocalFilesCount();
+    print $smt->database->deleteMedia($_GET['dm']);
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
 if (isset($_GET['dc'])) {
-    print deleteMediaInCategory($smt, $smt->categoryUrldecode($_GET['dc']));
-    $smt->updateCategoriesLocalFilesCount();
+    print deleteMediaInCategory($smt, Tools::categoryUrldecode($_GET['dc']));
+    $smt->database->updateCategoriesLocalFilesCount();
     print '<hr />';
 }
 
@@ -79,7 +79,7 @@ function multiDeleteMedia(\Attogram\SharedMedia\Tagger\TaggerAdmin $smt, $list)
     }
     $response = '<p>Deleting &amp; Blocking ' . sizeof($list) . ' Media files:';
     foreach ($list as $mediaId) {
-        $response .= $smt->deleteMedia($mediaId);
+        $response .= $smt->database->deleteMedia($mediaId);
     }
 
     return $response;
@@ -98,11 +98,11 @@ function deleteMediaInCategory(\Attogram\SharedMedia\Tagger\TaggerAdmin $smt, $c
     }
     $return = '<div style="white-space:nowrap; font-family:monospace; background-color:lightsalmon;">'
         . 'Deleting Media in <b>' . $category_name . '</b>';
-    $media = $smt->getMediaInCategory($category_name);
+    $media = $smt->database->getMediaInCategory($category_name);
     $return .= '<br /><b>' . count($media) . '</b> Media files found in Category';
     foreach ($media as $pageid) {
         $return .= '<br />Deleting #' . $pageid;
-        $return .= $smt->deleteMedia($pageid, true);
+        $return .= $smt->database->deleteMedia($pageid, true);
     }
     $return .= '</div><br />';
 

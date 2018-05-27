@@ -21,7 +21,7 @@ if (isset($_GET['tagid']) && Tools::isPositiveNumber($_GET['tagid'])) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-$tags = $smt->getTags();
+$tags = $smt->database->getTags();
 
 print '<br /><em>Tags preview:</em>'
 . $smt->displayTags(0)
@@ -63,10 +63,10 @@ function saveTag(TaggerAdmin $smt)
         display_name = :display_name
     WHERE id = :id';
     $bind = [
-        ':id' => @$_GET['tagid'],
-        ':position' => @$_GET['position'],
-        ':name' => @$_GET['name'],
-        ':display_name' => @$_GET['display_name']
+        ':id' => !empty($_GET['tagid']) ? $_GET['tagid'] : null,
+        ':position' => !empty($_GET['position']) ? $_GET['position'] : null,
+        ':name' => !empty($_GET['name']) ? $_GET['name'] : null,
+        ':display_name' => !empty($_GET['display_name']) ? $_GET['display_name'] : null,
     ];
 
     if ($smt->database->queryAsBool($sql, $bind)) {

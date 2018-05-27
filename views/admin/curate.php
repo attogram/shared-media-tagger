@@ -41,7 +41,7 @@ $sql = "SELECT *
         LIMIT " . $pageLimit;
 
 if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
-    $medias = $smt->getMedia($_GET['i']);
+    $medias = $smt->database->getMedia($_GET['i']);
 } else {
     $medias = $smt->database->queryAsArray($sql);
 }
@@ -134,7 +134,7 @@ foreach ($medias as $media) {
 
     print '<div>';
     print '<a target="site" style="font-size:10pt; text-align:center;" href="'
-        . $smt->url('info') . '?i=' . $pageid . '">' . $pageid . '</a><br />';
+        . Tools::url('info') . '?i=' . $pageid . '">' . $pageid . '</a><br />';
 
     print '<img name="' . $pageid . '" id="' . $pageid.'"  src="' . $url . '"'
         . ' width="' . $width . '" height="' . $height . '" title="'
@@ -215,10 +215,10 @@ function curateDelete(array $id_array, TaggerAdmin $smt)
         return false;
     }
     foreach ($id_array as $pageid) {
-        $smt->deleteMedia($pageid);
+        $smt->database->deleteMedia($pageid);
     }
     Tools::notice('Curate: DELETE ' . sizeof($id_array));
-    $smt->updateCategoriesLocalFilesCount();
+    $smt->database->updateCategoriesLocalFilesCount();
     return true;
 }
 
