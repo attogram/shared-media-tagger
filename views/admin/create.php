@@ -213,7 +213,7 @@ print ''
 . '</map>';
 
 print '</p>';
-print '<p>Data URL: ' . number_format(strlen($dataUrl))
+print '<p>Data URL: ' . number_format((float) strlen($dataUrl))
 . ' characters<br /><textarea cols="60" rows="20">' . $dataUrl . '</textarea><br /></p>';
 print '</div>';
 

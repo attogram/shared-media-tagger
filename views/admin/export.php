@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
@@ -121,7 +123,7 @@ function tagReport(TaggerAdmin $smt, $tagId = '')
     print '<textarea cols="90" rows="20">'
     . '== ' . $reportName . ' ==' . $cr
     . '* Collection ID: <code>' . md5(Config::$siteName) . '</code>' . $cr
-    . '* Collection Size: ' . number_format($smt->database->getImageCount()) . $cr
+    . '* Collection Size: ' . number_format((float) $smt->database->getImageCount()) . $cr
     . '* Created on: ' . Tools::timeNow() . ' UTC' . $cr
     . '* Created with: Shared Media Tagger v' . SHARED_MEDIA_TAGGER . $cr
     . '<gallery caption="' . $reportName . '" widths="100px" heights="100px" perrow="6">' . $cr;

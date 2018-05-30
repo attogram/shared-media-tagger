@@ -6,6 +6,8 @@
  * @var TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -38,8 +40,8 @@ foreach ($tags as $tag) {
     . '<tr><td><a target="sqlite" href="./sqladmin.php?table=tag&action=row_editordelete&pk=['
     . $tag['id'] . ']&type=edit">' . $tag['id'] . '</a></td>'
     . '<td><input name="position" value="' . $tag['position'] . '" size="1" /></td>'
-    . '<td><textarea name="name" rows="4" cols="20">' . htmlentities($tag['name']) . '</textarea></td>'
-    . '<td><textarea name="display_name" rows="4" cols="25">' . htmlentities($tag['display_name']) . '</textarea></td>'
+    . '<td><textarea name="name" rows="4" cols="20">' . htmlentities((string) $tag['name']) . '</textarea></td>'
+    . '<td><textarea name="display_name" rows="4" cols="25">' . htmlentities((string) $tag['display_name']) . '</textarea></td>'
     . '<td><input type="submit" value="    Save Tag #' . $tag['id'] .'  "></td>'
     . '</tr></form>';
 }
@@ -74,6 +76,6 @@ function saveTag(TaggerAdmin $smt)
         return true;
     }
     Tools::notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>'
-        . print_r($bind, 1) . ' </pre>');
+        . print_r($bind, true) . ' </pre>');
     return false;
 }

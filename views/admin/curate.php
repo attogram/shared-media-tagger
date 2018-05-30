@@ -130,7 +130,7 @@ foreach ($medias as $media) {
     $width = $thumb['width'];
     $height = $thumb['height'];
     $pageid = $media['pageid'];
-    $imgInfo = str_replace("Array\n(", '', htmlentities(print_r($media, 1)));
+    $imgInfo = str_replace("Array\n(", '', htmlentities((string) print_r($media, true)));
 
     print '<div>';
     print '<a target="site" style="font-size:10pt; text-align:center;" href="'
@@ -167,7 +167,7 @@ function curationMenu()
     . ' <a href="javascript:mark_all_delete();">[DELETE]</a>'
     . ' <a href="javascript:mark_all_que();">[QUE]</a></span>'
     . ' - <a href="./curate.php?l='.$pageLimit.'">'.$pageLimit.'</a> of '
-        . number_format($uncuratedCount) . ' in que'
+        . number_format((float) $uncuratedCount) . ' in que'
     . '</div>';
 }
 

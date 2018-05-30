@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -57,17 +59,17 @@ $smt->includeFooter();
 function category2media(TaggerAdmin $smt)
 {
     $c2ms = $smt->database->queryAsArray('SELECT * FROM category2media');
-    print '<p>' . number_format(sizeof($c2ms)) . ' category2media</p>';
+    print '<p>' . number_format((float) sizeof($c2ms)) . ' category2media</p>';
 
     $categoriesRaw = $smt->database->queryAsArray('SELECT id FROM category');
-    print '<p>' . number_format(sizeof($categoriesRaw)) . ' Categories</p>';
+    print '<p>' . number_format((float) sizeof($categoriesRaw)) . ' Categories</p>';
     $categories = [];
     foreach ($categoriesRaw as $cats) {
         $categories[$cats['id']] = true;
     }
 
     $mediaRaw = $smt->database->queryAsArray('SELECT pageid FROM media');
-    print '<p>' . number_format(sizeof($mediaRaw)) . ' Media</p>';
+    print '<p>' . number_format((float) sizeof($mediaRaw)) . ' Media</p>';
     $media = [];
     foreach ($mediaRaw as $med) {
         $media[$med['pageid']] = true;
@@ -92,8 +94,8 @@ function category2media(TaggerAdmin $smt)
         }
     }
     print '</pre>';
-    print '<p>' . number_format($checked) . ' checked</p>';
-    print '<p>' . number_format(sizeof($errors)) . ' ERRORS</p>';
+    print '<p>' . number_format((float) $checked) . ' checked</p>';
+    print '<p>' . number_format((float) sizeof($errors)) . ' ERRORS</p>';
 
     $sql = 'DELETE FROM category2media WHERE id IN ( '
         . implode($errors, ', ') . ' );';
@@ -173,7 +175,7 @@ function catClean(TaggerAdmin $smt)
     $categories = $smt->database->queryAsArray(
         'SELECT * FROM category ORDER BY hidden ASC, local_files DESC, name ASC'
     );
-    print '<p><b>' . number_format(sizeof($categories)) . '</b> Categories</p>';
+    print '<p><b>' . number_format((float) sizeof($categories)) . '</b> Categories</p>';
 
     print '<pre>'
     . '<b>LOCAL' . $tab
@@ -183,8 +185,8 @@ function catClean(TaggerAdmin $smt)
     . 'Category</b><br />';
     foreach ($categories as $category) {
         print ''
-        . number_format($category['local_files']) . $tab
-        . number_format($category['files']) . $tab
+        . number_format((float) $category['local_files']) . $tab
+        . number_format((float) $category['files']) . $tab
         . $category['hidden'] . ' '
         . $category['missing'] . ' '
         . $category['id'] . $tab

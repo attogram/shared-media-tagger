@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -178,7 +180,7 @@ $sql .= $where . $orderby . $sqlDir . ' LIMIT ' . $pageLimit . $sqlOffset;
 
 $medias = $smt->database->queryAsArray($sql);
 
-$smt->title = 'Browse ' . number_format($resultSize) . ' Files, sorted by ' . $sort . ' ' . $sqlDir
+$smt->title = 'Browse ' . number_format((float) $resultSize) . ' Files, sorted by ' . $sort . ' ' . $sqlDir
     . ', page #' . $currentPage . ' - ' . Config::$siteName;
 $smt->includeHeader();
 $smt->includeMediumMenu();
@@ -212,7 +214,7 @@ Browse Files, sorty by <select name="s">
 <option value="a"' . Tools::isSelected('a', $dir) . '>Ascending</option>
 </select>
 <input type="submit" value="Browse" />
-</form><br />' . number_format($resultSize) . ' Files' . ($pager ? ', '.$pager : '');
+</form><br />' . number_format((float) $resultSize) . ' Files' . ($pager ? ', '.$pager : '');
 
 if (Tools::isAdmin()) {
     print '<form action="' . Tools::url('admin') .'media.php" method="GET" name="media">';
@@ -227,7 +229,7 @@ foreach ($medias as $media) {
         . '<span style="background-color:#eee; border:1px solid #f99; font-size:80%;">';
 
         if (isset($extraNumberformat)) {
-            print number_format($media[$extra]);
+            print number_format((float) $media[$extra]);
         } else {
             print $media[$extra];
         }

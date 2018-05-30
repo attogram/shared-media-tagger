@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 

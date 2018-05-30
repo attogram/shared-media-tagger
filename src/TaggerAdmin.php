@@ -45,6 +45,7 @@ class TaggerAdmin extends Tagger
             . $space . '<a href="' . $admin . 'create.php">CREATE</a>'
             . $space . '<a href="' . $admin . 'export.php">EXPORT</a>'
             . $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
+            . $space . '<a href="' . $admin . 'api-sandbox.php">api-sandbox</a>'
             . '</div>';
     }
 

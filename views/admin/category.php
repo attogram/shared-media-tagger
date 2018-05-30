@@ -6,6 +6,8 @@
  * @var TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -25,7 +27,7 @@ if (isset($_GET['i']) && $_GET['i']) {
     $categoryName = Tools::categoryUrldecode($_GET['i']);
     $catUrl = '<a href="' . Tools::url('category')
     . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
-    . htmlentities(Tools::stripPrefix($categoryName)) . '</a>';
+    . htmlentities((string) Tools::stripPrefix($categoryName)) . '</a>';
     print '<p>Importing media from <b>' . $catUrl . '</b></p>';
     $smt->database->getMediaFromCategory($categoryName);
     $smt->database->updateCategoriesLocalFilesCount();
@@ -45,11 +47,11 @@ if (isset($_POST['cats']) && $_POST['cats']) {
 }
 
 if (isset($_GET['c']) && $_GET['c']) {
-    if ($smt->admin->saveCategoryInfo(urldecode($_GET['c']))) {
+    if ($smt->database->saveCategoryInfo(urldecode($_GET['c']))) {
         Tools::notice(
             'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
             . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
-            . htmlentities(Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
+            . htmlentities((string) Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
         );
     }
     print '</div>';
@@ -134,7 +136,7 @@ $spacer = ' &nbsp; &nbsp; &nbsp; ';
 
 print ''
 . '<ul>'
-. '<li><b>' . number_format($smt->database->getCategoriesCount()) . '</b> Active Categories</li>'
+. '<li><b>' . number_format((float) $smt->database->getCategoriesCount()) . '</b> Active Categories</li>'
 . '<li><b>?</b> Technical Categories</li>'
 . '<li><b>?</b> Empty Categories</li>'
 . '</ul>'
@@ -206,7 +208,7 @@ foreach ($cats as $cat) {
     print ''
     . '<td class="right" ' . $alertTd . '>' . $localFiles . '</td>'
     . '<td class="right">'
-        . ($cat['files'] ? number_format($cat['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
+        . ($cat['files'] ? number_format((float) $cat['files']) : '<span style="color:#ccc;">0</span>') . '</td>'
     ;
     if ($cat['subcats'] > 0) {
         $subcatslink = '<a href="./' . basename(__FILE__) . '?sc=' . Tools::categoryUrlencode($cat['name']) . '"">+'

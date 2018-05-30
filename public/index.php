@@ -109,6 +109,7 @@ function setAdminRoutes(Router $router)
     $router->allow('/admin/sqladmin.php', 'admin/sqladmin');
     $router->allow('/admin/tag.php', 'admin/tag');
     $router->allow('/admin/user.php', 'admin/user');
+    $router->allow('/admin/api-sandbox.php', 'admin/api-sandbox');
     return $router;
 }
 

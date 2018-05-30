@@ -6,6 +6,8 @@
  * @var TaggerAdmin $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -36,19 +38,19 @@ print ''
 . '<input type="submit" value="           Save Site Setup           ">'
 
 . '<br /><br />Name:<br />'
-. '<input name="name" type="text" size="30" value="' . htmlentities(@$site['name']) . '">'
+. '<input name="name" type="text" size="30" value="' . htmlentities((string) @$site['name']) . '">'
 
 . '<br /><br />About:<br />'
-. '<textarea name="about" rows="5" cols="70">' . htmlentities(@$site['about']) . '</textarea>'
+. '<textarea name="about" rows="5" cols="70">' . htmlentities((string) @$site['about']) . '</textarea>'
 
 . '<br /><br /><input type="checkbox" name="curation"'
 . (@$site['curation'] ? ' checked="checked"' : '') . '/> Show only Curated Media'
 
 . '<br /><br />Header:<br />'
-. '<textarea name="header" rows="5" cols="70">' . htmlentities(@$site['header']) . '</textarea>'
+. '<textarea name="header" rows="5" cols="70">' . htmlentities((string) @$site['header']) . '</textarea>'
 
 . '<br /><br />Footer:<br />'
-. '<textarea name="footer" rows="5" cols="70">' . htmlentities(@$site['footer']) . '</textarea>'
+. '<textarea name="footer" rows="5" cols="70">' . htmlentities((string) @$site['footer']) . '</textarea>'
 
 . '<br /><br /><input type="checkbox" name="use_cdn"'
 . (@$site['use_cdn'] ? ' checked="checked"' : '') . '/> Use CDN for jquery, bootstrap'
@@ -66,7 +68,7 @@ print ''
 . 'CREATE NEW site</a></li>'
 . '</ul>'
 
-.'<hr>DEBUG: site: <pre>' . htmlentities(print_r($site, 1)) . '</pre>'
+.'<hr>DEBUG: site: <pre>' . htmlentities((string) print_r($site, true)) . '</pre>'
 .'</div>';
 $smt->includeFooter();
 
@@ -110,6 +112,6 @@ function saveSiteInfo(TaggerAdmin $smt)
         Tools::notice('OK: Site Info Saved');
         return true;
     }
-    Tools::error('Unable to update site: ' . print_r($smt->database->lastError, 1));
+    Tools::error('Unable to update site: ' . print_r($smt->database->lastError, true));
     return false;
 }

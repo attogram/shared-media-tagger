@@ -86,7 +86,7 @@ class Database
     /**
      * @param string $sql
      * @param array $bind
-     * @return array|bool
+     * @return array
      */
     public function queryAsArray($sql, array $bind = [])
     {
@@ -94,26 +94,30 @@ class Database
             $this->initDatabase();
         }
         if (!$this->db) {
-            return false;
+            return [];
         }
 
         $statement = $this->db->prepare($sql);
         if (!$statement) {
             return [];
         }
-        while (($xbind = each($bind))) { // @TODO each deprecated - to foreach
-            $statement->bindParam($xbind[0], $xbind[1]);
+//        while (($xbind = each($bind))) { // @TODO each deprecated - to foreach
+//            $statement->bindParam($xbind[0], $xbind[1]);
+//        }
+        foreach ($bind as $name => &$value) {
+            $statement->bindParam($name, $value);
         }
 
         if (!$statement->execute()) {
-            Tools::error('::queryAsArray(): ERROR EXECUTE: ' . print_r($this->db->errorInfo(), true));
+            Tools::error('queryAsArray: ERROR EXECUTE: ' . print_r($this->db->errorInfo(), true));
 
             return [];
         }
         $response = $statement->fetchAll(PDO::FETCH_ASSOC);
         if (!$response && $this->db->errorCode() != '00000') {
-            Tools::error('::queryAsArray(): ERROR FETCH: '  .print_r($this->db->errorInfo(), true));
-            $response = [];
+            Tools::error('queryAsArray: ERROR FETCH: ' . print_r($this->db->errorInfo(), true));
+
+            return [];
         }
 
         return $response;
@@ -139,10 +143,12 @@ class Database
 
             return false;
         }
-        while (($xbind = each($bind))) { // @TODO each deprecated
-            $statement->bindParam($xbind[0], $xbind[1]);
+//        while (($xbind = each($bind))) { // @TODO each deprecated
+//            $statement->bindParam($xbind[0], $xbind[1]);
+//        }
+        foreach ($bind as $name => &$value) {
+            $statement->bindParam($name, $value);
         }
-
 
         if (!$statement->execute()) {
             $this->lastError = $this->db->errorInfo();
@@ -261,11 +267,11 @@ class Database
             $bind[':tag_id'] = $tagId;
         }
         $count = $this->queryAsArray($sql, $bind);
-        if (!isset($count[0]['count'])) {
-            return 0;
+        if (isset($count[0]['count'])) {
+            return $count[0]['count'];
         }
 
-        return $count[0]['count'];
+        return 0;
     }
 
     /**

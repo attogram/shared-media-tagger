@@ -59,11 +59,8 @@ print '<p>Installation:
 
 print '<p>Discovery / Restrictions:
 <ul>
-<li>./admin/.htaccess: '
-. (is_readable(Config::$installDirectory.'/admin/.htaccess') ? '✔ACTIVE: ' : '❌MISSING')
-. '</li>
-<li>./admin/.htpasswd: '
-. (is_readable(Config::$installDirectory.'/admin/.htpasswd') ? '✔ACTIVE: ' : '❌MISSING')
+<li>/public/.htaccess: '
+. (is_readable(Config::$installDirectory . '/public/.htaccess') ? '✔ACTIVE: ' : '❌MISSING')
 . '</li>
 <li><a href="' . Tools::url('home') . 'sitemap.php">sitemap.php</a></li>
 <li><a href="' . Tools::url('home') . 'robots.txt">robots.txt</a>:

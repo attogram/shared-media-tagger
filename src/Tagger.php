@@ -22,10 +22,15 @@ class Tagger
     public function __construct()
     {
         Config::setup();
+
         $this->database = new Database();
-        $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
-        Config::setSiteInfo($siteInfo);
+
+        Config::setSiteInfo(
+            $this->database->queryAsArray('SELECT * FROM site WHERE id = 1')
+        );
+
         $this->database->getUser();
+
         if (isset($_GET['logoff'])) {
             Tools::adminLogoff();
         }
@@ -378,7 +383,7 @@ function checkAll(formname, checktoggle) {
             . '<img src="' . $thumb['url'] . '"'
             . ' width="' . $thumb['width'] . '"'
             . ' height="' . $thumb['height'] . '"'
-            . ' title="' . htmlentities($title) . '" /></a>'
+            . ' title="' . htmlentities((string) $title) . '" /></a>'
             . '</div>';
     }
 
@@ -541,7 +546,7 @@ function checkAll(formname, checktoggle) {
         $title = htmlspecialchars(Tools::stripPrefix($media['title']));
 
         return '<div class="mediatitle left">'
-        . '<a href="' . $infourl . '" title="' . htmlentities($title) . '">'
+        . '<a href="' . $infourl . '" title="' . htmlentities((string) $title) . '">'
         . Tools::truncate($title, $titleTruncate)
         . '</a></div>'
         . '<div class="attribution left">'
@@ -626,8 +631,6 @@ function checkAll(formname, checktoggle) {
             . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
             . '<a href="' . Tools::url('home') . '?logoff">LOGOFF</a>'
             . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC'
-            . '<br />MEMORY usage: ' . number_format(memory_get_usage())
-            . '<br />MEMORY peak : ' . number_format(memory_get_peak_usage())
             . '</div><br /><br /><br />';
         }
 

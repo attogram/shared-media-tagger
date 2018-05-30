@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ba88bf5bc8870f13bdecae9017d9e6d",
+    "content-hash": "29441467cd6e083f91183f3162ebbb3e",
     "packages": [
         {
             "name": "attogram/router",
@@ -85,6 +85,47 @@
             "description": "MediaWiki Query API wrapper to easily get Category and Media file information into simple PHP arrays. Fine-tuned for WikiMedia Commmons.",
             "homepage": "https://github.com/attogram/shared-media-api",
             "time": "2018-04-06T19:57:57+00:00"
+        },
+        {
+            "name": "attogram/shared-media-sandbox",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/attogram/shared-media-sandbox.git",
+                "reference": "2507e3401ccf497987a82dd12349975f99849e30"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/attogram/shared-media-sandbox/zipball/2507e3401ccf497987a82dd12349975f99849e30",
+                "reference": "2507e3401ccf497987a82dd12349975f99849e30",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5",
+                "psr/log": "~1.0"
+            },
+            "suggest": {
+                "attogram/shared-media-api": "MediaWiki Query API wrapper to easily get Category and Media file information into simple PHP arrays. Fine-tuned for WikiMedia Commmons.",
+                "attogram/shared-media-orm": "ORM for attogram/shared-media-api"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Attogram\\SharedMedia\\Sandbox\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Web Sandbox for testing packages attogram/shared-media-api and attogram/shared-media-orm",
+            "homepage": "https://github.com/attogram/shared-media-sandbox",
+            "time": "2017-12-03T19:38:17+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -411,7 +452,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "attogram/router": 20,
-        "attogram/shared-media-api": 20
+        "attogram/shared-media-api": 20,
+        "attogram/shared-media-sandbox": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -43,7 +45,7 @@ if ($categorySize > $pageLimit) {
         . '">&nbsp;' . ++$pageCount . '&nbsp;</a> ';
     }
 }
-$pager = '<b>' . number_format($categorySize) . '</b> '
+$pager = '<b>' . number_format((float) $categorySize) . '</b> '
     . ($hidden ? 'Technical' : 'Active') . ' Categories' . $pager;
 
 $bind = [];
@@ -64,7 +66,7 @@ $sql .= $sqlLimit;
 
 $categories = $smt->database->queryAsArray($sql, $bind);
 
-$pageName = number_format($categorySize);
+$pageName = number_format((float) $categorySize);
 if ($hidden) {
     $pageName .= ' Technical';
 } else {
@@ -88,7 +90,7 @@ if ($hidden) {
     print '<input type="hidden" name="h" value="1">';
 } ?>
 <input type="text" name="s" value="<?php
-    $search ? print htmlentities(urldecode($search)) : print '';
+    $search ? print htmlentities((string) urldecode($search)) : print '';
 ?>" size="16">
 <input type="submit" value="search">
 </form></div>
@@ -109,7 +111,7 @@ foreach ($categories as $category) {
     $localUrl = Tools::url('category') . '?c='
         . Tools::categoryUrlencode(Tools::stripPrefix(@$category['name']));
     print '<div class="catcon">'
-    . '<div class="catfiles">' . number_format(@$category['local_files']) . '</div>'
+    . '<div class="catfiles">' . number_format((float) @$category['local_files']) . '</div>'
     . '<div class="catname" onclick="window.location=\'' . $localUrl . '\'">'
     . '<a href="' . $localUrl . '">' . Tools::stripPrefix(@$category['name']) . '</a>'
     . '</div>'

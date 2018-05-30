@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -25,7 +27,7 @@ if (isset($_POST['c'])) {
     if ($insert) {
         print '<p>Thank you for your message.</p>';
         print '<p>You sent the following:</p>';
-        print '<pre style="background-color:lightsalmon;">' . htmlentities($comment) . '</pre>';
+        print '<pre style="background-color:lightsalmon;">' . htmlentities((string) $comment) . '</pre>';
         print '</div>';
         $smt->includeFooter();
         exit;

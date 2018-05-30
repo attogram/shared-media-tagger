@@ -6,6 +6,8 @@
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  */
 
+declare(strict_types = 1);
+
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
@@ -54,9 +56,11 @@ print ''
 <br />
 <p><?php print($media['imagedescription']); ?></p>
 <p><em>by:</em> <b><?php print($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
-<?php if ($media['datetimeoriginal']) {
-        print ' / ' . $media['datetimeoriginal'];
-    } ?></p>
+<?php
+if ($media['datetimeoriginal']) {
+    print ' / ' . $media['datetimeoriginal'];
+}
+    ?></p>
 <div style="border:1px solid #ccc; display:inline-block; padding:10px; background-color:#eee;">
 <em>License:</em>
 <?php
@@ -112,10 +116,10 @@ li { margin-bottom:6px; }
 
 <p><em>Media info:</em>
 <ul>
-<li>width x height: <b><?php print number_format($media['width']);
-?> x <?php print number_format($media['height']); ?></b> pixels</li>
+<li>width x height: <b><?php print number_format((float) $media['width']);
+?> x <?php print number_format((float) $media['height']); ?></b> pixels</li>
 <li>mime: <b><?php print $media['mime']; ?></b></li>
-<li>size: <b><?php print number_format($media['size']); ?></b> bytes</li>
+<li>size: <b><?php print number_format((float) $media['size']); ?></b> bytes</li>
 <?php
 if ($media['duration'] > 0) {
     //print '<li>duration: <b>' . $media['duration'] . '</b> seconds</li>';
@@ -131,8 +135,8 @@ if ($media['duration'] > 0) {
 <ul>
 <?php
 if (isset($media['sha1']) && $media['sha1'] != null) {
-        print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
-    }
+    print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
+}
 ?>
 </ul>
 </p>
@@ -143,7 +147,7 @@ print Tools::url('contact') . '?r=' . $media['pageid'] ?>" style="color:#ff9999;
 <?php
 
 if (Tools::isAdmin()) {
-    print '<pre>ADMIN: media: ' . print_r($media, 1) . '</pre>';
+    print '<pre>ADMIN: media: ' . print_r($media, true) . '</pre>';
 }
 
 ?>

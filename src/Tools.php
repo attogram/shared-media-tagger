@@ -300,7 +300,7 @@ class Tools
                 return;
         }
         if (is_array($message)) {
-            $message = '<pre>' . htmlentities(print_r($message, true)) . '</pre>';
+            $message = '<pre>' . htmlentities((string) print_r($message, true)) . '</pre>';
         }
         print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
     }

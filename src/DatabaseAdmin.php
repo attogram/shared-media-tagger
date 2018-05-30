@@ -358,7 +358,7 @@ class DatabaseAdmin extends Database
             'SAVED CATEGORY: ' . $this->categoryId . ' = +<a href="'
             . Tools::url('category') . '?c='
             . Tools::categoryUrlencode(Tools::stripPrefix($name))
-            . '">' . htmlentities(Tools::stripPrefix($name)) . '</a>'
+            . '">' . htmlentities((string) Tools::stripPrefix($name)) . '</a>'
         );
 
         return true;
@@ -386,7 +386,7 @@ class DatabaseAdmin extends Database
             $categoryInfo = $onesy; // is always just 1 result
         }
         $bind = [];
-        if ($categoryInfo['pageid'] != $categoryRow['pageid']) {
+        if (@$categoryInfo['pageid'] != $categoryRow['pageid']) {
             $bind[':pageid'] = $categoryInfo['pageid'];
         }
         if ($categoryInfo['categoryinfo']['files'] != $categoryRow['files']) {

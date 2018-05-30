@@ -61,7 +61,7 @@ print '</pre><hr />';
 . (is_writeable($smt->database->databaseName) ? '✔️OK: WRITEABLE' : '❌ERROR: READ ONLY')
 . '</li>
 <li>Size: '
-. (file_exists($smt->database->databaseName) ? number_format(filesize($smt->database->databaseName)) : 'NULL')
+. (file_exists($smt->database->databaseName) ? number_format((float) filesize($smt->database->databaseName)) : 'NULL')
 . ' bytes</li>
 
 <li>Download URL: <a href="' . Tools::url('admin')  . 'db/media.sqlite">'
