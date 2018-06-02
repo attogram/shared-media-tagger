@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger;
 
+use Attogram\Router\Router;
+
 /**
  * Class Tagger
  */
@@ -15,13 +17,21 @@ class Tagger
     public $useJquery;
     /** @var Database */
     public $database;
+    /** @var Router */
+    public $router;
+    /** @var array */
+    public $setup;
 
     /**
      * Tagger constructor.
+     * @param Router $router
+     * @param array $setup
      */
-    public function __construct()
+    public function __construct(Router $router, array $setup = [])
     {
-        Config::setup();
+        $this->router = $router;
+
+        Config::setup($this->router, $setup);
 
         $this->database = new Database();
 

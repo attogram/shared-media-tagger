@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger;
 
+use Attogram\Router\Router;
+
 /**
  * Configuration for Shared Media Tagger
  */
@@ -23,19 +25,18 @@ class Config
     public static $sizeThumb;
 
     /**
-     * setup
+     * @param Router $router
+     * @param array $setup
      */
-    public static function setup()
+    public static function setup(Router $router, array $setup = [])
     {
-        global $setup, $router; // @TODO - remove global usage
-
         self::$installDirectory = realpath(__DIR__ . '/..');
         self::$server = $_SERVER['SERVER_NAME'];
         self::$sizeMedium = 325;
         self::$sizeThumb = 100;
 
         self::$setup = [];
-        if (is_array($setup)) { // if ../_setup.php was loaded
+        if ($setup) { // if optional setup
             self::$setup = $setup;
         }
         if (isset(self::$setup['site_url'])) {

@@ -304,4 +304,37 @@ class Tools
         }
         print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
     }
+
+    /**
+     * @param string $message
+     */
+    public static function error404(string $message = '')
+    {
+        self::shutdown('404 Not Found', $message);
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function error500(string $message)
+    {
+        self::shutdown('500 Internal Server Error', $message);
+    }
+
+    /**
+     * @param string $header
+     * @param string $message
+     */
+    public static function shutdown($header = '', $message = '')
+    {
+        if ($header) {
+            header('HTTP/1.0 ' . $header);
+            print '<h1>' . $header . '</h1>';
+        }
+        if ($message) {
+            print '<h2>' . $message . '</h2>';
+        }
+
+        exit;
+    }
 }

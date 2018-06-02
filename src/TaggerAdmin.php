@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger;
 
+use Attogram\Router\Router;
+
 /**
  * Class TaggerAdmin
  */
@@ -13,12 +15,14 @@ class TaggerAdmin extends Tagger
     /** @var DatabaseAdmin */
     public $database;
 
-    /*
+    /**
      * TaggerAdmin constructor.
+     * @param Router $router
+     * @param array $setup
      */
-    public function __construct()
+    public function __construct(Router $router, array $setup = [])
     {
-        parent::__construct();
+        parent::__construct($router, $setup);
         ini_set('user_agent', 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER);
         $this->setAdminCookie();
         $this->commons = new Commons();
