@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Attogram\SharedMedia\Tagger;
 
 /**
- * Class Config
+ * Configuration for Shared Media Tagger
  */
 class Config
 {
@@ -27,7 +27,7 @@ class Config
      */
     public static function setup()
     {
-        global $setup, $router;
+        global $setup, $router; // @TODO - remove global usage
 
         self::$installDirectory = realpath(__DIR__ . '/..');
         self::$server = $_SERVER['SERVER_NAME'];
@@ -275,7 +275,7 @@ class Config
     /**
      * @return array
      */
-    public static function getDefaultDatabaseSetup()
+    public static function getSeedDemoSetup()
     {
         return [
             'default_site' =>

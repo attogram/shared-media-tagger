@@ -58,8 +58,8 @@ print ''
 <p><em>by:</em> <b><?php print($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
 <?php
 if ($media['datetimeoriginal']) {
-    print ' / ' . $media['datetimeoriginal'];
-}
+        print ' / ' . $media['datetimeoriginal'];
+    }
     ?></p>
 <div style="border:1px solid #ccc; display:inline-block; padding:10px; background-color:#eee;">
 <em>License:</em>
@@ -135,8 +135,8 @@ if ($media['duration'] > 0) {
 <ul>
 <?php
 if (isset($media['sha1']) && $media['sha1'] != null) {
-    print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
-}
+        print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
+    }
 ?>
 </ul>
 </p>

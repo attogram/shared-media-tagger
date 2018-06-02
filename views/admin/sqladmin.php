@@ -2671,7 +2671,7 @@ if (isset($_GET['action']) && !isset($_GET['confirm'])) {
                         $_SESSION[COOKIENAME.$target_table.'chartlabels'] = $_POST['chartlabels'];
                         $_SESSION[COOKIENAME.$target_table.'chartvalues'] = $_POST['chartvalues'];
                     }
-                    //- Chart javascript code ?>
+                    //- Chart javascript code?>
 					<script type='text/javascript' src='https://www.google.com/jsapi'></script>
 					<script type='text/javascript'>
 					google.load('visualization', '1.0', {'packages':['corechart']});

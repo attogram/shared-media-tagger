@@ -244,4 +244,23 @@ class DatabaseUpdater
 
         return 0;
     }
+
+    /**
+     * @return array
+     */
+    public function seedDemo()
+    {
+        $results = [];
+        foreach (Config::getSeedDemoSetup() as $name => $sql) {
+            $seed = $this->database->queryAsBool($sql);
+            if ($seed) {
+                $result = 'OK: ' . $this->database->lastInsertId;
+            } else {
+                $result = 'ERROR: ' . implode(', ', $this->database->lastError);
+            }
+            $results[] = "<br />$name<br />$result<br />$sql";
+        }
+
+        return $results;
+    }
 }

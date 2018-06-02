@@ -20,10 +20,13 @@ print '<div class="box white">';
 
 $siteCount = $smt->database->queryAsArray('SELECT count(id) AS count FROM site');
 if (!$siteCount) {
+    Tools::notice('Welcome to your new Site!  Creating new site setup...');
     $databaseUpdater = new DatabaseUpdater();
     $databaseUpdater->setDatabase($smt->database);
-    print '<p>Welome!  Creating new Shared Media Tagger Database:</p><pre>'
-    . $databaseUpdater->createTables() . '</pre>';
+    $createdTables = $databaseUpdater->createTables();
+    $seededDemo = implode('<br />', $databaseUpdater->seedDemo());
+    Tools::notice('<pre>Created Tables:<br />' . $createdTables . '</pre>');
+    Tools::notice('<pre>Seeded Demo:<br />' . $seededDemo . '</pre>');
 }
 
 $msgCount = 0;

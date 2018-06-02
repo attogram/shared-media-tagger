@@ -101,9 +101,6 @@ class Database
         if (!$statement) {
             return [];
         }
-//        while (($xbind = each($bind))) { // @TODO each deprecated - to foreach
-//            $statement->bindParam($xbind[0], $xbind[1]);
-//        }
         foreach ($bind as $name => &$value) {
             $statement->bindParam($name, $value);
         }
@@ -143,9 +140,6 @@ class Database
 
             return false;
         }
-//        while (($xbind = each($bind))) { // @TODO each deprecated
-//            $statement->bindParam($xbind[0], $xbind[1]);
-//        }
         foreach ($bind as $name => &$value) {
             $statement->bindParam($name, $value);
         }
@@ -153,12 +147,13 @@ class Database
         if (!$statement->execute()) {
             $this->lastError = $this->db->errorInfo();
             if ($this->lastError[0] == '00000') {
+                $this->lastInsertId = $this->db->lastInsertId();
+
                 return true;
             }
 
             return false;
         }
-        $this->lastError = $this->db->errorInfo();
         $this->lastInsertId = $this->db->lastInsertId();
 
         return true;
