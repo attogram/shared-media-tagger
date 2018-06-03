@@ -8,11 +8,13 @@
 declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Loader;
-use Attogram\SharedMedia\Tagger\Tools;
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_readable($autoload)) {
-    Tools::error500('Vendor Autoloader Not Found');
+    header('HTTP/1.0 500 Internal Server Error');
+    print 'Error: Vendor Autoloader Not Found';
+
+    return;
 }
 /** @noinspection PhpIncludeInspection */
 require_once $autoload;
