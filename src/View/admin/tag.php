@@ -19,7 +19,7 @@ print '<div class="box white">';
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['tagid']) && Tools::isPositiveNumber($_GET['tagid'])) {
-    saveTag($smt);
+    $smt->saveTag();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,8 @@ foreach ($tags as $tag) {
     . $tag['id'] . ']&type=edit">' . $tag['id'] . '</a></td>'
     . '<td><input name="position" value="' . $tag['position'] . '" size="1" /></td>'
     . '<td><textarea name="name" rows="4" cols="20">' . htmlentities((string) $tag['name']) . '</textarea></td>'
-    . '<td><textarea name="display_name" rows="4" cols="25">' . htmlentities((string) $tag['display_name']) . '</textarea></td>'
+    . '<td><textarea name="display_name" rows="4" cols="25">'
+        . htmlentities((string) $tag['display_name']) . '</textarea></td>'
     . '<td><input type="submit" value="    Save Tag #' . $tag['id'] .'  "></td>'
     . '</tr></form>';
 }
@@ -51,31 +52,3 @@ print '<br /><a href="./sqladmin.php?table=tag&action=row_create" target="sqlite
 
 print '</div>';
 $smt->includeFooter();
-
-/**
- * @param TaggerAdmin $smt
- * @return bool
- */
-function saveTag(TaggerAdmin $smt)
-{
-    $sql = '
-    UPDATE tag
-    SET position = :position,
-        name = :name,
-        display_name = :display_name
-    WHERE id = :id';
-    $bind = [
-        ':id' => !empty($_GET['tagid']) ? $_GET['tagid'] : null,
-        ':position' => !empty($_GET['position']) ? $_GET['position'] : null,
-        ':name' => !empty($_GET['name']) ? $_GET['name'] : null,
-        ':display_name' => !empty($_GET['display_name']) ? $_GET['display_name'] : null,
-    ];
-
-    if ($smt->database->queryAsBool($sql, $bind)) {
-        Tools::notice('OK: Saved Tag ID#'.$_GET['tagid']);
-        return true;
-    }
-    Tools::notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>'
-        . print_r($bind, true) . ' </pre>');
-    return false;
-}

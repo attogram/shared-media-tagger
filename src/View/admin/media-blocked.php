@@ -46,7 +46,7 @@ foreach ($blocks as $block) {
     . '<div style="display:inline-block;border:1px solid red;padding:10px;">'
     . $block['pageid']
     . ': '
-    . '<a target="commmons" href="https://commons.wikimedia.org/w/index.php?curid=' . $block['pageid'] . '">'
+    . '<a target="commmons" href="https://commons.wikimedia.org/w/Home.php?curid=' . $block['pageid'] . '">'
     . Tools::stripPrefix($block['title'])
     . '<br />'
     . '<br />'

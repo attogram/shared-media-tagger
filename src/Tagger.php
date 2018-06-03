@@ -19,28 +19,20 @@ class Tagger
     public $database;
     /** @var Router */
     public $router;
-    /** @var array */
-    public $setup;
 
     /**
      * Tagger constructor.
      * @param Router $router
-     * @param array $setup
      */
-    public function __construct(Router $router, array $setup = [])
+    public function __construct(Router $router)
     {
         $this->router = $router;
-
-        Config::setup($this->router, $setup);
-
+        Config::setup($this->router);
         $this->database = new Database();
-
         Config::setSiteInfo(
             $this->database->queryAsArray('SELECT * FROM site WHERE id = 1')
         );
-
         $this->database->getUser();
-
         if (isset($_GET['logoff'])) {
             Tools::adminLogoff();
         }
@@ -65,7 +57,7 @@ class Tagger
         print '</div>';
         $this->includeFooter(false);
 
-        exit;
+        Tools::shutdown();
     }
 
     /**
@@ -425,13 +417,9 @@ function checkAll(formname, checktoggle) {
     {
         $mime = $media['mime'];
         $url = $media['url'];
-        //$width = $media['thumbwidth'];
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        //if (!$width || $width > Config::$sizeMedium) {
-        //    $height = $this->get_resized_height($width, $height, Config::$sizeMedium); // @TODO find
-        //}
         $divwidth = $width = $media['thumbwidth'];
         if ($divwidth < Config::$sizeMedium) {
             $divwidth = Config::$sizeMedium;
@@ -455,13 +443,9 @@ function checkAll(formname, checktoggle) {
     {
         $mime = $media['mime'];
         $url = $media['url'];
-        //$width = $media['thumbwidth'];
         $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        //if (!$width || $width > Config::$sizeMedium) {
-        //    $height = $this->get_resized_height($width, $height, Config::$sizeMedium );
-        //}
         $divwidth = $width = $media['thumbwidth'];
         if ($divwidth < Config::$sizeMedium) {
             $divwidth = Config::$sizeMedium;
@@ -520,7 +504,7 @@ function checkAll(formname, checktoggle) {
     public function displayLicensing(array $media, $artistTruncate = 42)
     {
         if (!$media || !is_array($media)) {
-            Tools::error('::displayLicensing: Media Not Found');
+            Tools::error('displayLicensing: Media Not Found');
 
             return false;
         }

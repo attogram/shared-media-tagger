@@ -1,36 +1,16 @@
 <?php
+declare(strict_types = 1);
 /**
  * Shared Media Tagger
  * Media Info
  *
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
+ * @var int|string $pageid
+ * @var array $media
  */
-
-declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
-
-if (!isset($_GET['i']) || !$_GET['i'] || !Tools::isPositiveNumber($_GET['i'])) {
-    $smt->fail404('404 Media Not Found');
-}
-
-$pageid = (int) $_GET['i'];
-
-$media = $smt->database->getMedia($pageid);
-if (!$media || !isset($media[0]) || !is_array($media[0])) {
-    $smt->fail404('404 Media Not Found');
-}
-$media = $media[0];
-
-$smt->useBootstrap = true;
-
-/////////////////////////////////////////////////////////////////////
-$smt->title = 'Info: ' . Tools::stripPrefix($media['title']);
-$smt->use_bootstrap = true;
-$smt->use_jquery = true;
-$smt->includeHeader();
-$smt->includeMediumMenu();
 
 ?>
 <div class="container">
@@ -38,12 +18,12 @@ $smt->includeMediumMenu();
 <div class="col-sm-6 box grey center">
 <?php
 print ''
-. $smt->displayTags($pageid)
-. $smt->displayMedia($media)
+. $this->smt->displayTags($pageid)
+. $this->smt->displayMedia($media)
 . '<div class="left" style="margin:auto; width:' . Config::$sizeMedium . 'px;">'
 . '<br />'
-. $smt->displayReviews($smt->database->getReviews($pageid))
-. $smt->displayCategories($pageid)
+. $this->smt->displayReviews($this->smt->database->getReviews($pageid))
+. $this->smt->displayCategories($pageid)
 . '</div>';
 ?>
 </div>
@@ -57,10 +37,12 @@ print ''
 <p><?php print($media['imagedescription']); ?></p>
 <p><em>by:</em> <b><?php print($media['artist'] ? $media['artist'] : 'unknown'); ?></b>
 <?php
+
 if ($media['datetimeoriginal']) {
-        print ' / ' . $media['datetimeoriginal'];
-    }
-    ?></p>
+    print ' / ' . $media['datetimeoriginal'];
+}
+
+?></p>
 <div style="border:1px solid #ccc; display:inline-block; padding:10px; background-color:#eee;">
 <em>License:</em>
 <?php
@@ -134,9 +116,11 @@ if ($media['duration'] > 0) {
 <p><em>Media analysis:</em>
 <ul>
 <?php
+
 if (isset($media['sha1']) && $media['sha1'] != null) {
-        print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
-    }
+    print '<li>SHA1 Hash: <small><b>' . $media['sha1'] . ' </b></small></li>';
+}
+
 ?>
 </ul>
 </p>
@@ -155,6 +139,3 @@ if (Tools::isAdmin()) {
 </div>
 </div>
 <br />
-<?php
-
-$smt->includeFooter();

@@ -159,6 +159,36 @@ class Database
         return true;
     }
 
+    // Site
+
+    /**
+     * @return array
+     */
+    public function getSite()
+    {
+        $site = $this->queryAsArray('SELECT * FROM site WHERE id = 1');
+        if ($site && isset($site[0])) {
+            return $site[0];
+        }
+
+        return $this->createSite();
+    }
+
+    /**
+     * @return array
+     */
+    private function createSite()
+    {
+        $created = $this->queryAsBool(
+            "INSERT INTO site (id, name) VALUES (1, 'Demo')"
+        );
+        Tools::notice(
+            'Creating New Site: ' . ($created ? 'OK' : 'ERROR: ' . implode(', ', $this->lastError))
+        );
+
+        return ['id' => 1, 'name' => 'Demo'];
+    }
+
     // Counts
 
     /**
@@ -409,26 +439,6 @@ class Database
             'UPDATE user SET last = :last WHERE id = :user_id',
             [':user_id' => $this->userId, ':last' => Tools::timeNow()]
         );
-    }
-
-    /**
-     * @return bool
-     * @TODO NOT USED
-     */
-    public function saveUserView()
-    {
-        if (!$this->userId) {
-            return false;
-        }
-        $view = $this->queryAsBool(
-            'UPDATE user SET page_views = page_views + 1, last = :last WHERE id = :id',
-            [':id' => $this->userId, ':last' => Tools::timeNow()]
-        );
-        if ($view) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

@@ -656,22 +656,4 @@ class DatabaseAdmin extends Database
 
         return 0;
     }
-
-    /**
-     * @param int|string $pageid
-     * @return bool
-     * @TODO NOT USED
-     */
-    public function isBlocked($pageid)
-    {
-        $block = $this->queryAsArray(
-            'SELECT pageid FROM block WHERE pageid = :pageid',
-            [':pageid' => $pageid]
-        );
-        if (isset($block[0]['pageid'])) {
-            return true;
-        }
-
-        return false;
-    }
 }

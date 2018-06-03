@@ -220,7 +220,7 @@ $lang = array(
     "create_tbl_db" => "Create new table on database",
     "create_trigger" => "Creating new trigger on table",
     "create_index" => "Creating new index on table",
-    "create_index1" => "Create Index",
+    "create_index1" => "Create Home",
     "create_view" => "Create new view on database",
 
     "trigger" => "Trigger",
@@ -229,9 +229,9 @@ $lang = array(
     "trigger_act" => "Trigger Action",
     "trigger_step" => "Trigger Steps (semicolon terminated)",
     "when_exp" => "WHEN expression (type expression without 'WHEN')",
-    "index" => "Index",
+    "index" => "Home",
     "indexes" => "Indexes",
-    "index_name" => "Index name",
+    "index_name" => "Home name",
     "name" => "Name",
     "unique" => "Unique",
     "seq_no" => "Seq. No.",
@@ -242,7 +242,7 @@ $lang = array(
     "inserted" => "inserted",
     "deleted" => "deleted",
     "affected" => "affected",
-    "blank_index" => "Index name must not be blank.",
+    "blank_index" => "Home name must not be blank.",
     "one_index" => "You must specify at least one index column.",
     "docu" => "Documentation",
     "license" => "License",
@@ -386,7 +386,7 @@ $lang = array(
     "help2" => "Creating a New Database",
     "help2_x" => "When you create a new database, the name you entered will be appended with the appropriate file extension (.db, .db3, .sqlite, etc.) if you do not include it yourself. The database will be created in the directory you specified as the \$directory variable.",
     "help3" => "Tables vs. Views",
-    "help3_x" => "On the main database page, there is a list of tables and views. Since views are read-only, certain operations will be disabled. These disabled operations will be apparent by their omission in the location where they should appear on the row for a view. If you want to change the data for a view, you need to drop that view and create a new view with the appropriate SELECT statement that queries other existing tables. For more information, see <a href='http://en.wikipedia.org/wiki/View_(database)' target='_blank'>http://en.wikipedia.org/wiki/View_(database)</a>",
+    "help3_x" => "On the main database page, there is a list of tables and View. Since View are read-only, certain operations will be disabled. These disabled operations will be apparent by their omission in the location where they should appear on the row for a view. If you want to change the data for a view, you need to drop that view and create a new view with the appropriate SELECT statement that queries other existing tables. For more information, see <a href='http://en.wikipedia.org/wiki/View_(database)' target='_blank'>http://en.wikipedia.org/wiki/View_(database)</a>",
     "help4" => "Writing a Select Statement for a New View",
     "help4_x" => "When you create a new view, you must write an SQL SELECT statement that it will use as its data. A view is simply a read-only table that can be accessed and queried like a regular table, except it cannot be modified through insertion, column editing, or row editing. It is only used for conveniently fetching data.",
     "help5" => "Export Structure to SQL File",
@@ -3624,7 +3624,7 @@ if (!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (i
         }
 
         if ($auth->isPasswordDefault()) {
-            echo "<div class='confirm' style='margin:20px 0px;'>";
+            echo "<div class='confirm' style='margin:20px 0;'>";
             echo sprintf($lang['warn_passwd'], (is_readable('phpliteadmin.config.php')?'phpliteadmin.config.php':PAGE))."<br />".$lang['warn0'];
             echo "</div>";
         }
@@ -5109,7 +5109,7 @@ class Database
                             if ($debug) {
                                 echo 'Not recreating the following index: <hr /><br />'.htmlencode($recreate_query['sql']).'<hr /><br />';
                             }
-                            // Index on a column that was dropped. Skip recreation.
+                            // Home on a column that was dropped. Skip recreation.
                             continue 2;
                         }
                     }

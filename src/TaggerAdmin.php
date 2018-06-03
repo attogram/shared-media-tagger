@@ -18,11 +18,10 @@ class TaggerAdmin extends Tagger
     /**
      * TaggerAdmin constructor.
      * @param Router $router
-     * @param array $setup
      */
-    public function __construct(Router $router, array $setup = [])
+    public function __construct(Router $router)
     {
-        parent::__construct($router, $setup);
+        parent::__construct($router);
         ini_set('user_agent', 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER);
         $this->setAdminCookie();
         $this->commons = new Commons();
@@ -197,5 +196,136 @@ class TaggerAdmin extends Tagger
         }
         $this->database->commit();
         $this->database->vacuum();
+    }
+
+    /**
+     * getSearchResults
+     */
+    public function getSearchResults()
+    {
+        $search = urldecode($_GET['scommons']);
+
+        if (!$this->commons->findCategories($search)) {
+            Tools::notice('Error: no categories found');
+
+            return;
+        }
+        $cats = isset($this->commons->response['query']['search'])
+            ? $this->commons->response['query']['search']
+            : null;
+        if (!$cats || !is_array($cats)) {
+            Tools::notice('Error: no categories returned');
+
+            return;
+        }
+        print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>'
+            . $this->commons->totalHits . '</b> categories</p>';
+        print '
+    <script type="text/javascript" language="javascript">// <![CDATA[
+    function checkAll(formname, checktoggle)
+    {
+      var checkboxes = new Array();
+      checkboxes = document[formname].getElementsByTagName(\'input\');
+      for (var i=0; i<checkboxes.length; i++)  {
+        if (checkboxes[i].type == \'checkbox\')   {
+          checkboxes[i].checked = checktoggle;
+        }
+      }
+    }
+    // ]]></script>
+    <a onclick="javascript:checkAll(\'cats\', true);" href="javascript:void();">check all</a>
+    <a onclick="javascript:checkAll(\'cats\', false);" href="javascript:void();">uncheck all</a>
+    ';
+
+        print '<form action="" name="cats" method="POST">'
+            . '<input type="submit" value="  save to database  "><br /><br />';
+
+        foreach ($cats as $id => $cat) {
+            print '<input type="checkbox" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
+                . $cat['title']
+                . '</strong><small> '
+                . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
+                . Tools::categoryUrlencode($cat['title']) . '">(view)</a> '
+                . ' (' . $cat['snippet'] . ')'
+                . ' (size:' . $cat['size'] . ')</small><br />';
+        }
+        print '</form>';
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveTag()
+    {
+        $sql = 'UPDATE tag
+                SET position = :position,
+                    name = :name,
+                    display_name = :display_name
+                WHERE id = :id';
+        $bind = [
+            ':id' => !empty($_GET['tagid']) ? $_GET['tagid'] : null,
+            ':position' => !empty($_GET['position']) ? $_GET['position'] : null,
+            ':name' => !empty($_GET['name']) ? $_GET['name'] : null,
+            ':display_name' => !empty($_GET['display_name']) ? $_GET['display_name'] : null,
+        ];
+
+        if ($this->database->queryAsBool($sql, $bind)) {
+            Tools::notice('OK: Saved Tag ID#'.$_GET['tagid']);
+
+            return true;
+        }
+        Tools::notice('save_tag: Can Not Save Tag Data.<br />'.$sql.'<br/>  bind: <pre>'
+            . print_r($bind, true) . ' </pre>');
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function saveSiteInfo()
+    {
+        $bind = $set = [];
+        foreach ($_POST as $name => $value) {
+            switch ($name) {
+                case 'id':
+                    $bind[':id'] = $value;
+                    break;
+                case 'name':
+                case 'about':
+                case 'header':
+                case 'footer':
+                    $set[] = "$name = :$name";
+                    $bind[":$name"] = $value;
+                    break;
+                case 'use_cdn':
+                    if ($value == 'on') {
+                        $set[] = "use_cdn = '1'";
+                    } else {
+                        $set[] = "use_cdn = '0'";
+                    }
+                    break;
+                case 'curation':
+                    if ($value == 'on') {
+                        $set[] = "curation = '1'";
+                    } else {
+                        $set[] = "curation = '0'";
+                    }
+                    break;
+            }
+        }
+
+        $set[] = "updated = '" . gmdate('Y-m-d H:i:s') . "'";
+
+        $sql = 'UPDATE site SET ' . implode($set, ', ') . ' WHERE id = :id';
+
+        if ($this->database->queryAsBool($sql, $bind)) {
+            Tools::notice('OK: Site Info Saved');
+
+            return true;
+        }
+        Tools::error('Unable to update site: ' . print_r($this->database->lastError, true));
+
+        return false;
     }
 }

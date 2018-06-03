@@ -38,7 +38,7 @@ if (isset($result[0]['count'])) {
 print '<p>Site: <b><a href="./site.php">' . Config::$siteName . '</a></b>
 <ul>
 <li><b>' . $msgCount . '</b> <a target="sqlite" href="sqladmin.php?table=contact&action=row_view">Messages</a></li>
-<li><b>' . sizeof($smt->database->getTags()) . '</b> <a href="./site.php">Tags</a></li>
+<li><b>' . sizeof($smt->database->getTags()) . '</b> <a href="./tags.php">Tags</a></li>
 <li><b>' . number_format((float) $smt->database->getImageCount()) . '</b> Files</li>
 <li><b>' . number_format((float) $smt->database->getBlockCount()) . '</b> Blocked Files</li>
 <li><b>' . number_format((float) $smt->database->getTotalFilesReviewedCount()) . '</b> Files reviewed</li>
@@ -65,7 +65,7 @@ print '<p>Discovery / Restrictions:
 <li>/public/.htaccess: '
 . (is_readable(Config::$installDirectory . '/public/.htaccess') ? '✔ACTIVE: ' : '❌MISSING')
 . '</li>
-<li><a href="' . Tools::url('home') . 'sitemap.php">sitemap.php</a></li>
+<li><a href="' . Tools::url('home') . 'sitemap.xml">sitemap.xml</a></li>
 <li><a href="' . Tools::url('home') . 'robots.txt">robots.txt</a>:
 <span style="font-family:monospace;">'
     . $smt->checkRobotstxt()

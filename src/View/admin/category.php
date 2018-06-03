@@ -68,7 +68,7 @@ if (isset($_GET['d']) && $_GET['d']) {
 }
 
 if (isset($_GET['scommons']) && $_GET['scommons']) {
-    getSearchResults($smt);
+    $smt->getSearchResults();
     print '</div>';
     $smt->includeFooter();
     return;
@@ -242,58 +242,3 @@ print '<br /><b>' . $commonFilesCount . '</b> Total Files on Commons';
 
 print '</div>';
 $smt->includeFooter();
-
-
-/**
- * @param TaggerAdmin $smt
- */
-function getSearchResults(TaggerAdmin $smt)
-{
-    $search = urldecode($_GET['scommons']);
-
-    if (!$smt->commons->findCategories($search)) {
-        Tools::notice('Error: no categories found');
-
-        return;
-    }
-    $cats = isset($smt->commons->response['query']['search'])
-        ? $smt->commons->response['query']['search']
-        : null;
-    if (!$cats || !is_array($cats)) {
-        Tools::notice('Error: no categories returned');
-
-        return;
-    }
-    print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>'
-        . $smt->commons->totalHits . '</b> categories</p>';
-    print '
-    <script type="text/javascript" language="javascript">// <![CDATA[
-    function checkAll(formname, checktoggle)
-    {
-      var checkboxes = new Array();
-      checkboxes = document[formname].getElementsByTagName(\'input\');
-      for (var i=0; i<checkboxes.length; i++)  {
-        if (checkboxes[i].type == \'checkbox\')   {
-          checkboxes[i].checked = checktoggle;
-        }
-      }
-    }
-    // ]]></script>
-    <a onclick="javascript:checkAll(\'cats\', true);" href="javascript:void();">check all</a>
-    <a onclick="javascript:checkAll(\'cats\', false);" href="javascript:void();">uncheck all</a>
-    ';
-
-    print '<form action="" name="cats" method="POST">'
-    . '<input type="submit" value="  save to database  "><br /><br />';
-
-    foreach ($cats as $id => $cat) {
-        print '<input type="checkbox" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
-        . $cat['title']
-        . '</strong><small> '
-        . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
-            . Tools::categoryUrlencode($cat['title']) . '">(view)</a> '
-        . ' (' . $cat['snippet'] . ')'
-        . ' (size:' . $cat['size'] . ')</small><br />';
-    }
-    print '</form>';
-}

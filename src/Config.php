@@ -26,25 +26,14 @@ class Config
 
     /**
      * @param Router $router
-     * @param array $setup
      */
-    public static function setup(Router $router, array $setup = [])
+    public static function setup(Router $router)
     {
         self::$installDirectory = realpath(__DIR__ . '/..');
         self::$server = $_SERVER['SERVER_NAME'];
         self::$sizeMedium = 325;
         self::$sizeThumb = 100;
-
-        self::$setup = [];
-        if ($setup) { // if optional setup
-            self::$setup = $setup;
-        }
-        if (isset(self::$setup['site_url'])) {
-            self::$siteUrl = $setup['site_url'];
-        } else {
-            self::$siteUrl = $router->getUriBase() . '/';
-        }
-
+        self::$siteUrl = $router->getUriBase() . '/';
         self::setLinks();
         self::setProtocol();
         self::setMimeTypes();
@@ -58,16 +47,16 @@ class Config
         self::$links = [
             'home'          => self::$siteUrl . '',
             'css'           => self::$siteUrl . 'css.css',
-            'info'          => self::$siteUrl . 'info.php',
-            'browse'        => self::$siteUrl . 'browse.php',
-            'categories'    => self::$siteUrl . 'categories.php',
-            'category'      => self::$siteUrl . 'category.php',
-            'about'         => self::$siteUrl . 'about.php',
-            'reviews'       => self::$siteUrl . 'reviews.php',
+            'info'          => self::$siteUrl . 'info',
+            'browse'        => self::$siteUrl . 'browse',
+            'categories'    => self::$siteUrl . 'categories',
+            'category'      => self::$siteUrl . 'category',
+            'about'         => self::$siteUrl . 'about',
+            'reviews'       => self::$siteUrl . 'reviews',
             'admin'         => self::$siteUrl . 'admin/',
-            'contact'       => self::$siteUrl . 'contact.php',
-            'tag'           => self::$siteUrl . 'tag.php',
-            'users'         => self::$siteUrl . 'users.php',
+            'contact'       => self::$siteUrl . 'contact',
+            'tag'           => self::$siteUrl . 'tag',
+            'users'         => self::$siteUrl . 'users',
             'jquery'        => self::$siteUrl . 'use/jquery.min.js',
             'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
             'bootstrap_css' => self::$siteUrl . 'use/bootstrap/css/bootstrap.min.css',
@@ -288,15 +277,70 @@ class Config
                     'This is a demonstration of the Shared Media Tagger software.'
                 )",
             'default_tag1' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '☹️ Worst',  '☹️')",
+                "INSERT INTO tag (position, name, display_name) VALUES (1, '☹️ Worst',  '☹️')",
             'default_tag2' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (2, 2, '🙁 Bad',    '🙁')",
+                "INSERT INTO tag (position, name, display_name) VALUES (2, '🙁 Bad',    '🙁')",
             'default_tag3' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (3, 3, '😐 Unsure', '😐')",
+                "INSERT INTO tag (position, name, display_name) VALUES (3, '😐 Unsure', '😐')",
             'default_tag4' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙂 Good',   '🙂')",
+                "INSERT INTO tag (position, name, display_name) VALUES (4, '🙂 Good',   '🙂')",
             'default_tag5' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '😊 Best',   '😊')",
+                "INSERT INTO tag (position, name, display_name) VALUES (5, '😊 Best',   '😊')",
+
+            'category1' =>
+                "INSERT INTO category (
+                    id, name, curated, pageid, files, subcats, local_files, curated_files, 
+                    missing, hidden, force, updated
+                ) VALUES (
+                    1, 'Category:Test patterns', 0, 202140, 99, 3, 1, 0, 
+                    0, 0, null, '1970-01-01 01:23:45'
+                )",
+
+            'media1' =>
+                "INSERT INTO media (
+                    pageid, curated, title, url, descriptionurl, descriptionshorturl, 
+                    imagedescription, artist, datetimeoriginal, 
+                    licenseuri, licensename, licenseshortname, usageterms, attributionrequired, restrictions, 
+                    size, width, height, sha1, mime, thumburl, thumbwidth, thumbheight, thumbmime, 
+                    user, userid, duration, timestamp, updated
+                ) VALUES (
+                    11108315, 
+                    0, 
+                    'File:Test card.png', 
+                    'https://upload.wikimedia.org/wikipedia/commons/b/bf/Test_card.png', 
+                    'https://commons.wikimedia.org/wiki/File:Test_card.png', 
+                    'https://commons.wikimedia.org/w/Home.php?curid=11108315', 
+                    '<p>Test card</p>', 
+                    '<span lang=\"en\">Unknown</span>',
+                    'Unknown date',
+                    'https://creativecommons.org/publicdomain/mark/1.0/',
+                    'Public Domain',
+                    'Public domain',
+                    'Public domain',
+                    'false',
+                    '',
+                    26271,
+                    640,
+                    360,
+                    '2e95a28d7449fea6a0b6b8610a43f89859153eee',
+                    'image/png',
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Test_card.png/325px-Test_card.png',
+                    325,
+                    183,
+                    'image/png',
+                    'Galzigler',
+                    1242770,
+                    null,
+                    '2010-08-06T21:59:56Z',
+                    '1970-01-01 01:23:45'
+                    )",
+
+        'category2media1' =>
+            "INSERT INTO category2media (
+                id, category_id, media_pageid, updated
+            ) VALUES (
+                1, 1, 11108315, '1970-01-01 01:23:45'
+            )",
         ];
     }
 }
