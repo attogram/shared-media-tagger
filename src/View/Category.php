@@ -28,7 +28,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <?php
     if (Tools::isAdmin()) {
         print '<form action="' . Tools::url('admin')
-            . 'media.php" method="GET" name="media">';
+            . 'media" method="GET" name="media">';
     }
 
     foreach ($category as $media) {

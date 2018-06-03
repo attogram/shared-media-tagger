@@ -37,7 +37,7 @@ print '<br /><em>Tags preview:</em>'
 . '</tr>';
 foreach ($tags as $tag) {
     print '<form action="" method="GET"><input type="hidden" name="tagid" value="' . $tag['id'] . '">'
-    . '<tr><td><a target="sqlite" href="./sqladmin.php?table=tag&action=row_editordelete&pk=['
+    . '<tr><td><a target="sqlite" href="./sqladmin?table=tag&action=row_editordelete&pk=['
     . $tag['id'] . ']&type=edit">' . $tag['id'] . '</a></td>'
     . '<td><input name="position" value="' . $tag['position'] . '" size="1" /></td>'
     . '<td><textarea name="name" rows="4" cols="20">' . htmlentities((string) $tag['name']) . '</textarea></td>'
@@ -47,8 +47,8 @@ foreach ($tags as $tag) {
     . '</tr></form>';
 }
 print '</table>';
-print '<br /><a href="./sqladmin.php?table=tag&action=row_create" target="sqlite">ADD NEW tag</a>'
- . '<br /><a href="./sqladmin.php?action=row_view&table=tag" target="sqlite">VIEW/EDIT tag table</a>';
+print '<br /><a href="./sqladmin?table=tag&action=row_create" target="sqlite">ADD NEW tag</a>'
+ . '<br /><a href="./sqladmin?action=row_view&table=tag" target="sqlite">VIEW/EDIT tag table</a>';
 
 print '</div>';
 $smt->includeFooter();

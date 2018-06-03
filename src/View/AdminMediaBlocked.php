@@ -16,7 +16,7 @@ $smt->includeMediumMenu();
 $smt->includeAdminMenu();
 print '<div class="box white"><p>Blocked Media Admin:</p>';
 ?>
-* <a target="sqlite" href="<?php print Tools::url('admin'); ?>sqladmin.php?table=block&action=row_view">'
+* <a target="sqlite" href="<?php print Tools::url('admin'); ?>sqladmin?table=block&action=row_view">'
     . 'Database: View/Edit Blocked Media</a>
 <hr />
 
@@ -50,7 +50,7 @@ foreach ($blocks as $block) {
     . Tools::stripPrefix($block['title'])
     . '<br />'
     . '<br />'
-    . '<a target="sqlite" href="./sqladmin.php?table=block&action=row_editordelete&pk=%5B'
+    . '<a target="sqlite" href="./sqladmin?table=block&action=row_editordelete&pk=%5B'
         . $block['pageid'] . '%5D&type=delete">* Remove from Block List</a>'
     . '</div>'
     . '<br clear="all" />'

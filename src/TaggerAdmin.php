@@ -39,16 +39,16 @@ class TaggerAdmin extends Tagger
         $space = ' &nbsp; &nbsp; ';
         print '<div class="menu admin">'
             . '<a href="' . $admin . '">ADMIN</a>'
-            . $space . '<a href="' . $admin . 'site.php">SITE</a>'
-            . $space . '<a href="' . $admin . 'tag.php">TAG</a>'
-            . $space . '<a href="' . $admin . 'category.php">CATEGORY</a>'
-            . $space . '<a href="' . $admin . 'media.php">MEDIA</a>'
-            . $space . '<a href="' . $admin . 'curate.php">CURATE</a>'
-            . $space . '<a href="' . $admin . 'user.php">USER</a>'
-            . $space . '<a href="' . $admin . 'create.php">CREATE</a>'
-            . $space . '<a href="' . $admin . 'export.php">EXPORT</a>'
-            . $space . '<a href="' . $admin . 'database.php">DATABASE</a>'
-            . $space . '<a href="' . $admin . 'api-sandbox.php">api-sandbox</a>'
+            . $space . '<a href="' . $admin . 'site">SITE</a>'
+            . $space . '<a href="' . $admin . 'tag">TAG</a>'
+            . $space . '<a href="' . $admin . 'category">CATEGORY</a>'
+            . $space . '<a href="' . $admin . 'media">MEDIA</a>'
+            . $space . '<a href="' . $admin . 'curate">CURATE</a>'
+            . $space . '<a href="' . $admin . 'user">USER</a>'
+            . $space . '<a href="' . $admin . 'create">CREATE</a>'
+            . $space . '<a href="' . $admin . 'export">EXPORT</a>'
+            . $space . '<a href="' . $admin . 'database">DATABASE</a>'
+            . $space . '<a href="' . $admin . 'api-sandbox">api-sandbox</a>'
             . '</div>';
     }
 
@@ -70,7 +70,7 @@ class TaggerAdmin extends Tagger
     {
         $robotstxt = Config::$installDirectory . '/robots.txt';
         $tagUrl = str_replace('//'.Config::$server, '', Tools::url('tag'));
-        $sitemapUrl = Config::$protocol . Tools::url('home') . 'sitemap.php';
+        $sitemapUrl = Config::$protocol . Tools::url('sitemap');
         $reportUrl = str_replace('//'.Config::$server, '', Tools::url('contact')) . '?r=*';
         $response = $robotstxt;
         if (!file_exists($robotstxt)) {
@@ -167,7 +167,7 @@ class TaggerAdmin extends Tagger
             return $response . '<p>ERROR: failed to save media to database</p></div>';
         }
         $response .= '<p>OK: Saved media: <b><a href="' . Tools::url('info')
-        . '?i=' . $pageid . '">info.php?i=' . $pageid . '</a></b></p>';
+        . '?i=' . $pageid . '">info?i=' . $pageid . '</a></b></p>';
 
         if (!$this->commons->categories) {
             return $response . '<p>No Categories Found</p></div>';

@@ -60,7 +60,7 @@ if (isset($_GET['dc'])) {
 <input type="submit" value="  Delete via Category Name  "/>
 </form>
 <br /><br />
-* <a href="./media-blocked.php">View/Edit Blocked Media</a>
+* <a href="./media-blocked">View/Edit Blocked Media</a>
 <br /><br />
 <?php
 

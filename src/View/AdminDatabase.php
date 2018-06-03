@@ -72,24 +72,24 @@ if (isset($_GET['a'])) {
 
 ?>
 <ul>
-    <li><a href="sqladmin.php" target="sqlite">SQLite ADMIN</a></li>
-    <li><a href="database.php?a=create">CREATE tables</a></li>
-    <li><a href="database.php?a=seed">SEED demo setup</a></li>
+    <li><a href="sqladmin" target="sqlite">SQLite ADMIN</a></li>
+    <li><a href="database?a=create">CREATE tables</a></li>
+    <li><a href="database?a=seed">SEED demo setup</a></li>
 </ul>
 <br /><br />
 <div style="color:darkred; background-color:lightpink; padding:10px; display:inline-block;">
 DANGER ZONE:
 <br />
-<br />- <a onclick="return confirm('Confirm: EMPTY Tagging tables?');" href="database.php?a=et">EMPTY Tagging tables</a>
+<br />- <a onclick="return confirm('Confirm: EMPTY Tagging tables?');" href="database?a=et">EMPTY Tagging tables</a>
 <br />
-<br />- <a onclick="return confirm('Confirm: EMPTY User tables?');" href="database.php?a=eu">EMPTY User tables</a>
+<br />- <a onclick="return confirm('Confirm: EMPTY User tables?');" href="database?a=eu">EMPTY User tables</a>
 <br />
-<br />- <a onclick="return confirm('Confirm: EMPTY Media tables?');" href="database.php?a=em">EMPTY Media tables</a>
+<br />- <a onclick="return confirm('Confirm: EMPTY Media tables?');" href="database?a=em">EMPTY Media tables</a>
 <br />
 <br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');"
-           href="database.php?a=ec">EMPTY Category tables</a>
+           href="database?a=ec">EMPTY Category tables</a>
 <br />
-<br />- <a onclick="return confirm('Confirm: DROP tables?');" href="database.php?a=d">DROP ALL tables</a>
+<br />- <a onclick="return confirm('Confirm: DROP tables?');" href="database?a=d">DROP ALL tables</a>
 </div>
 <?php
 

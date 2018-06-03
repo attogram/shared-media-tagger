@@ -19,13 +19,13 @@ $smt->title = 'Admin Reports';
 $smt->includeHeader();
 $smt->includeMediumMenu();
 $smt->includeAdminMenu();
-print '<div class="box white"><p><a href="' . Tools::url('admin') .'reports.php">' . $smt->title . '</a></p>
+print '<div class="box white"><p><a href="' . Tools::url('admin') .'reports">' . $smt->title . '</a></p>
 <ul>
-<li><a href="' . Tools::url('admin') . 'reports.php?r=localfiles">update_categories_local_files_count()</a>
+<li><a href="' . Tools::url('admin') . 'reports?r=localfiles">update_categories_local_files_count()</a>
 <br /><br />
-<li><a href="' . Tools::url('admin') . 'reports.php?r=category2media">Check: category2media</a>
+<li><a href="' . Tools::url('admin') . 'reports?r=category2media">Check: category2media</a>
 <br /><br />
-<li><a href="' . Tools::url('admin') . 'reports.php?r=catclean">Check/Clean: category</a></li>
+<li><a href="' . Tools::url('admin') . 'reports?r=catclean">Check/Clean: category</a></li>
 </ul>
 <hr />';
 

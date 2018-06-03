@@ -49,7 +49,7 @@ Browse Files, sorty by <select name="s">
     . ($pager ? ', ' . $pager : '');
 
 if (Tools::isAdmin()) {
-    print '<form action="' . Tools::url('admin') . 'media.php" method="GET" name="media">';
+    print '<form action="' . Tools::url('admin') . 'media" method="GET" name="media">';
     print $this->smt->displayAdminMediaListFunctions();
 }
 

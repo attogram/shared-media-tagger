@@ -32,12 +32,12 @@ $smt->title = 'Create';
 $smt->includeHeader();
 $smt->includeMediumMenu();
 $smt->includeAdminMenu();
-print '<div class="box white"><p><a href="create.php">Create</a></p>';
+print '<div class="box white"><p><a href="create">Create</a></p>';
 print '<ul>'
-. '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t=R">Random Images</a></li>';
+. '<li>Montage 100x100, 2x2: <a href="create?montage=1&amp;t=R">Random Images</a></li>';
 
 foreach ($smt->database->getTags() as $tag) {
-    print '<li>Montage 100x100, 2x2: <a href="create.php?montage=1&amp;t='
+    print '<li>Montage 100x100, 2x2: <a href="create?montage=1&amp;t='
     . $tag['id'] . '">Images tagged: ' . $tag['name'] . '</a></li>';
 }
 print '</ul>';

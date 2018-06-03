@@ -95,20 +95,19 @@ class Loader
     private function setAdminRoutes()
     {
         $this->isAdmin = true;
-        $this->router->allow('/admin/', 'admin/index');
-        $this->router->allow('/admin/category.php', 'admin/category');
-        $this->router->allow('/admin/create.php', 'admin/create');
-        $this->router->allow('/admin/curate.php', 'admin/curate');
-        $this->router->allow('/admin/database.php', 'admin/database');
-        $this->router->allow('/admin/export.php', 'admin/export');
-        $this->router->allow('/admin/media.php', 'admin/media');
-        $this->router->allow('/admin/media-analysis.php', 'admin/media-analysis');
-        $this->router->allow('/admin/media-blocked.php', 'admin/media-blocked');
-        $this->router->allow('/admin/reports.php', 'admin/reports');
-        $this->router->allow('/admin/site.php', 'AdminSite');
-        $this->router->allow('/admin/sqladmin.php', 'admin/sqladmin');
-        $this->router->allow('/admin/tag.php', 'admin/tag');
-        $this->router->allow('/admin/user.php', 'admin/user');
-        $this->router->allow('/admin/api-sandbox.php', 'admin/api-sandbox');
+        $this->router->allow('/admin/', 'AdminHome');
+        $this->router->allow('/admin/category', 'AdminCategory');
+        $this->router->allow('/admin/create', 'AdminCreate');
+        $this->router->allow('/admin/curate', 'AdminCurate');
+        $this->router->allow('/admin/database', 'AdminDatabase');
+        $this->router->allow('/admin/export', 'AdminExport');
+        $this->router->allow('/admin/media', 'AdminMedia');
+        $this->router->allow('/admin/media-blocked', 'aAdminMediaBlocked');
+        $this->router->allow('/admin/reports', 'AdminReports');
+        $this->router->allow('/admin/site', 'AdminSite');
+        $this->router->allow('/admin/sqladmin', 'AdminSqladmin');
+        $this->router->allow('/admin/tag', 'AdminTag');
+        $this->router->allow('/admin/user', 'AdminUser');
+        $this->router->allow('/admin/api-sandbox', 'AdminApiSandbox');
     }
 }

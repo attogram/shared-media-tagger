@@ -57,6 +57,7 @@ class Config
             'contact'       => self::$siteUrl . 'contact',
             'tag'           => self::$siteUrl . 'tag',
             'users'         => self::$siteUrl . 'users',
+            'sitemap'       => self::$siteUrl . 'sitemap.xml',
             'jquery'        => self::$siteUrl . 'use/jquery.min.js',
             'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
             'bootstrap_css' => self::$siteUrl . 'use/bootstrap/css/bootstrap.min.css',

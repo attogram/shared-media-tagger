@@ -160,14 +160,14 @@ function checkAll(formname, checktoggle) {
             return '';
         }
         return '<div class="attribution left" style="display:inline-block; float:right;">'
-        . '<a style="font-size:140%;" href="' . Tools::url('admin') . 'media.php?dm=' . $mediaId
+        . '<a style="font-size:140%;" href="' . Tools::url('admin') . 'media?dm=' . $mediaId
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
         . $mediaId . ' ?\');">❌</a>'
         . '<input type="checkbox" name="media[]" value="' . $mediaId . '" />'
-        . '<a style="font-size:170%;" href="' . Tools::url('admin') . 'media.php?am=' . $mediaId
+        . '<a style="font-size:170%;" href="' . Tools::url('admin') . 'media?am=' . $mediaId
         . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
         . $mediaId . ' ?\');">♻</a>'
-        . ' <a style="font-size:140%;" href="' . Tools::url('admin') . 'curate.php?i=' . $mediaId. '">C</a>'
+        . ' <a style="font-size:140%;" href="' . Tools::url('admin') . 'curate?i=' . $mediaId. '">C</a>'
         . '</div>';
     }
 
@@ -203,22 +203,22 @@ function checkAll(formname, checktoggle) {
         . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
         . '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
         . Tools::categoryUrlencode($category['name']) . '">VIEW ON COMMONS</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category.php/?c='
+        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?c='
         . Tools::categoryUrlencode($category['name']) . '">Get Category Info</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category.php/?i='
+        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?i='
         . Tools::categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import '
             . !empty($category['files']) ? $category['files'] : '?'
             . ' Files into Category</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category.php/?sc='
+        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?sc='
         . Tools::categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add '
             . !empty($category['subcats']) ? $category['subcats'] : '?'
             . ' Sub-Categories</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'media.php?dc='
+        . '<br /><br /><a href="' . Tools::url('admin') . 'media?dc='
         . Tools::categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category.php/?d=' . urlencode($category['id'])
+        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?d=' . urlencode($category['id'])
         . '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>'
         . '<br /><pre>' . print_r($category, true) . '</pre>'
         . '</form>'

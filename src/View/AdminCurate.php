@@ -168,7 +168,7 @@ function curationMenu()
     . ' <a href="javascript:mark_all_keep();">[KEEP]</a>'
     . ' <a href="javascript:mark_all_delete();">[DELETE]</a>'
     . ' <a href="javascript:mark_all_que();">[QUE]</a></span>'
-    . ' - <a href="./curate.php?l='.$pageLimit.'">'.$pageLimit.'</a> of '
+    . ' - <a href="./curate?l='.$pageLimit.'">'.$pageLimit.'</a> of '
         . number_format((float) $uncuratedCount) . ' in que'
     . '</div>';
 }

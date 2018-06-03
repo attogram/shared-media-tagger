@@ -44,9 +44,9 @@ declare(strict_types = 1);
 Modify Database directly:
 <ul>
 <li><a target="sqlite"
-       href="./sqladmin.php?table=site&action=row_editordelete&pk=[<?= $site['id'] ?>]&type=edit">EDIT site</a></li>
+       href="./sqladmin?table=site&action=row_editordelete&pk=[<?= $site['id'] ?>]&type=edit">EDIT site</a></li>
 <li><a target="sqlite"
-       href="./sqladmin.php?table=site&action=row_create">CREATE NEW site</a></li>
+       href="./sqladmin?table=site&action=row_create">CREATE NEW site</a></li>
 </ul>
 
 </div>
