@@ -1,22 +1,18 @@
 <?php
 /**
  * Shared Media Tagger
- *
- *  Router
+ *  Public Index File
  */
-
 declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Loader;
 
-$autoload = __DIR__ . '/../vendor/autoload.php';
-if (!is_readable($autoload)) {
-    header('HTTP/1.0 500 Internal Server Error');
-    print 'Error: Vendor Autoloader Not Found';
+if (is_readable(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+    new Loader();
 
     return;
 }
-/** @noinspection PhpIncludeInspection */
-require_once $autoload;
 
-$loader = new Loader();
+header('HTTP/1.0 500 Internal Server Error');
+print 'Error: Vendor Autoloader Not Found';

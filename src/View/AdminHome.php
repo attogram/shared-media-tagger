@@ -17,7 +17,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     Site: <b><a href="./site"><?= Config::$siteName ?></a></b>
     <ul>
     <li><b><?= $data['messageCount'] ?></b>
-        <a target="sqlite" href="sqladmin?table=contact&action=row_view">Messages</a></li>
+        <a target="sqlite" href="./sqladmin?table=contact&action=row_view">Messages</a></li>
     <li><b><?= sizeof($this->smt->database->getTags()) ?></b> <a href="./tags">Tags</a></li>
     <li><b><?= number_format((float) $this->smt->database->getImageCount()) ?></b> Files</li>
     <li><b><?= number_format((float) $this->smt->database->getBlockCount()) ?></b> Blocked Files</li>
@@ -32,37 +32,38 @@ use Attogram\SharedMedia\Tagger\Tools;
 <p>
     Installation:
     <ul>
-    <li>Server: <?= Config::$server ?></li>
-    <li>URL: <a href="<?= Tools::url('home') ?>"><?= Tools::url('home') ?></a></li>
-    <li>Protocol: <?= Config::$protocol ?></li>
-    <li>Directory: <?= Config::$installDirectory ?></li>
-    <li>Setup: <?= (Config::$setup ? print_r(Config::$setup, true) : 'none') ?></li>
+        <li>Server: <?= Config::$server ?></li>
+        <li>Site Name: <?= Config::$siteName ?></li>
+        <li>URL: <a href="<?= Tools::url('home') ?>"><?= Tools::url('home') ?></a></li>
+        <li>Protocol: <?= Config::$protocol ?></li>
+        <li>Install Directory: <?= Config::$installDirectory ?></li>
     </ul>
 </p>
 
-<p>Discovery / Restrictions:
+<p>
+    Discovery:
     <ul>
-    <li>/public/.htaccess:
-        <?= (
-    is_readable(Config::$installDirectory . '/public/.htaccess')
-            ? '✔ACTIVE: '
-            : '❌MISSING'
-        ) ?></li>
-    <li><a href="<?= Tools::url('sitemap') ?>">sitemap.xml</a></li>
-    <li><a href="<?= Tools::url('home') ?>robots.txt">robots.txt</a>:
-        <span style="font-family:monospace;"><?= $this->smt->checkRobotstxt() ?></span>
-    </li>
+        <li>/public/.htaccess:
+            <?= (is_readable(Config::$installDirectory . '/public/.htaccess')
+                ? '✔ACTIVE: '
+                : '❌MISSING'
+            ) ?></li>
+        <li><a href="<?= Tools::url('sitemap') ?>">sitemap.xml</a></li>
+        <li><a href="<?= Tools::url('home') ?>robots.txt">robots.txt</a>:
+            <span style="font-family:monospace;"><?= $this->smt->checkRobotstxt() ?></span>
+        </li>
     </ul>
 </p>
 
-<p>About Shared Media Tagger:
+<p>
+    About Shared Media Tagger:
     <ul>
-    <li> Github: <a target="commons"
-                    href="https://github.com/attogram/shared-media-tagger">attogram/shared-media-tagger</a></li>
     <li><a target="commons"
-           href="https://github.com/attogram/shared-media-tagger/blob/master/README.md">README</a></li>
+                    href="<?= Tools::url('github_smt') ?>">Github: attogram/shared-media-tagger</a></li>
     <li><a target="commons"
-           href="https://github.com/attogram/shared-media-tagger/blob/master/LICENSE.md">LICENSE</a></li>
+           href="<?= Tools::url('github_smt') ?>/blob/master/README.md">README</a></li>
+    <li><a target="commons"
+           href="<?= Tools::url('github_smt') ?>/blob/master/LICENSE.md">LICENSE</a></li>
     </ul>
 </p>
 

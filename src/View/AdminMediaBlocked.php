@@ -14,22 +14,20 @@ $smt->title = 'Blocked Media Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();
 $smt->includeAdminMenu();
-print '<div class="box white"><p>Blocked Media Admin:</p>';
 ?>
-* <a target="sqlite" href="<?php print Tools::url('admin'); ?>sqladmin?table=block&action=row_view">'
-    . 'Database: View/Edit Blocked Media</a>
-<hr />
+<div class="box white">
+    <p>Blocked Media Admin:</p>
+    * <a target="sqlite" href="<?=
+        Tools::url('admin');
+    ?>sqladmin?table=block&action=row_view">Database: View/Edit Blocked Media</a>
+    <hr />
 
 <?php
-
-// TODO - pager
 
 $sql = "SELECT * 
 		FROM block 
 		ORDER BY pageid ASC
-		LIMIT 200
-		";
-
+		LIMIT 200"; // TODO - pager
 $blocks = $smt->database->queryAsArray($sql);
 if (!$blocks || !is_array($blocks)) {
     $blocks = [];

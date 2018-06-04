@@ -102,7 +102,7 @@ class Loader
         $this->router->allow('/admin/database', 'AdminDatabase');
         $this->router->allow('/admin/export', 'AdminExport');
         $this->router->allow('/admin/media', 'AdminMedia');
-        $this->router->allow('/admin/media-blocked', 'aAdminMediaBlocked');
+        $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
         $this->router->allow('/admin/reports', 'AdminReports');
         $this->router->allow('/admin/site', 'AdminSite');
         $this->router->allow('/admin/sqladmin', 'AdminSqladmin');
