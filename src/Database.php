@@ -703,16 +703,20 @@ class Database
     }
 
     /**
+     * @param string $order - DESC / ASC - default ASC
      * @return array
      */
-    public function getTags()
+    public function getTags(string $order = '')
     {
         if (isset($this->tags)) {
             reset($this->tags);
 
             return $this->tags;
         }
-        $tags = $this->queryAsArray('SELECT * FROM tag ORDER BY position');
+        if (empty($order)) {
+            $order = 'ASC';
+        }
+        $tags = $this->queryAsArray('SELECT * FROM tag ORDER BY position ' . $order);
         if (!$tags) {
             return $this->tags = [];
         }

@@ -24,6 +24,10 @@ class About extends ControllerBase
         $site['urlReviews'] = Tools::url('reviews');
         $site['urlUsers'] = Tools::url('users');
         $site['urlContact'] =  Tools::url('contact');
+        $sites['tags'] = '';
+        foreach ($this->smt->database->getTags() as $tag) {
+            $sites['tags'] .= $tag['name'] . ', ';
+        }
 
         $this->smt->title = 'About ' . Config::$siteName;
         $this->smt->includeHeader();

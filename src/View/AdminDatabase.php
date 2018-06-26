@@ -21,9 +21,9 @@ declare(strict_types = 1);
     <pre><?= $data['result'] ?></pre>
 
     <ul>
-        <li><a href="sqladmin" target="sqlite">SQLite ADMIN</a></li>
-        <li><a href="database?a=create">CREATE tables</a></li>
-        <li><a href="database?a=seed">SEED demo setup</a></li>
+        <li><a href="./sqladmin" target="sqlite">SQLite ADMIN</a></li>
+        <li><a href="?a=create">CREATE tables</a></li>
+        <li><a href="?a=seed">SEED demo setup</a></li>
     </ul>
     <br />
     <br />
@@ -31,18 +31,18 @@ declare(strict_types = 1);
         DANGER ZONE:
         <br />
         <br />- <a onclick="return confirm('Confirm: EMPTY Tagging tables?');"
-                   href="database?a=et">EMPTY Tagging tables</a>
+                   href="?a=et">EMPTY Tagging tables</a>
         <br />
         <br />- <a onclick="return confirm('Confirm: EMPTY User tables?');"
-                   href="database?a=eu">EMPTY User tables</a>
+                   href="?a=eu">EMPTY User tables</a>
         <br />
         <br />- <a onclick="return confirm('Confirm: EMPTY Media tables?');"
-                   href="database?a=em">EMPTY Media tables</a>
+                   href="?a=em">EMPTY Media tables</a>
         <br />
         <br />- <a onclick="return confirm('Confirm: EMPTY Category tables?');"
-                   href="database?a=ec">EMPTY Category tables</a>
+                   href="?a=ec">EMPTY Category tables</a>
         <br />
         <br />- <a onclick="return confirm('Confirm: DROP tables?');"
-                   href="database?a=d">DROP ALL tables</a>
+                   href="?a=d">DROP ALL tables</a>
     </div>
 </div>

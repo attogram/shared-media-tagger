@@ -26,16 +26,22 @@ class Tagger
      */
     public function __construct(Router $router)
     {
+
         $this->router = $router;
         Config::setup($this->router);
+
+        if (isset($_GET['logoff'])) {
+            Tools::adminLogoff();
+            header('Location: ' . Tools::url('home'));
+            Tools::shutdown();
+        }
+
         $this->database = new Database();
         Config::setSiteInfo(
             $this->database->queryAsArray('SELECT * FROM site WHERE id = 1')
         );
+
         $this->database->getUser();
-        if (isset($_GET['logoff'])) {
-            Tools::adminLogoff();
-        }
     }
 
     /**
@@ -159,7 +165,7 @@ function checkAll(formname, checktoggle) {
         if (!Tools::isAdmin() || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        return '<div class="attribution left" style="display:inline-block; float:right;">'
+        return '<div class="attribution left" style="display:inline-block; float:right; border:1px solid red;">'
         . '<a style="font-size:140%;" href="' . Tools::url('admin') . 'media?dm=' . $mediaId
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
         . $mediaId . ' ?\');">❌</a>'
@@ -175,7 +181,7 @@ function checkAll(formname, checktoggle) {
      * @param string $categoryName
      * @return string
      */
-    public function displayAdminCategoryFunctions($categoryName)
+    public function displayAdminCategoryFunctions(string $categoryName)
     {
         if (!Tools::isAdmin()) {
             return '';
@@ -184,20 +190,20 @@ function checkAll(formname, checktoggle) {
         if (!$category) {
             return '<p>ADMIN: category not in database</p>';
         }
+
         return '<br clear="all" />'
         . '<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">'
         . '<input type="submit" value="Delete selected media">'
         . '<script type="text/javascript" language="javascript">'
-        . "
-function checkAll(formname, checktoggle) {
-    var checkboxes = new Array();
-    checkboxes = document[formname].getElementsByTagName('input');
-    for (var i=0; i<checkboxes.length; i++) {
-        if (checkboxes[i].type == 'checkbox') { 
-            checkboxes[i].checked = checktoggle; 
-        }
-    } 
-}"
+        . "function checkAll(formname, checktoggle) {
+            var checkboxes = new Array();
+            checkboxes = document[formname].getElementsByTagName('input');
+            for (var i=0; i<checkboxes.length; i++) {
+                if (checkboxes[i].type == 'checkbox') {
+                    checkboxes[i].checked = checktoggle;
+                }
+            }
+        }"
         . '</script>'
         . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
         . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
@@ -208,12 +214,12 @@ function checkAll(formname, checktoggle) {
         . '<br /><br /><a href="' . Tools::url('admin') . 'category/?i='
         . Tools::categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import '
-            . !empty($category['files']) ? $category['files'] : '?'
+            . (!empty($category['files']) ? $category['files'] : '?')
             . ' Files into Category</a>'
         . '<br /><br /><a href="' . Tools::url('admin') . 'category/?sc='
         . Tools::categoryUrlencode($category['name'])
         . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add '
-            . !empty($category['subcats']) ? $category['subcats'] : '?'
+            . (!empty($category['subcats']) ? $category['subcats'] : '?')
             . ' Sub-Categories</a>'
         . '<br /><br /><a href="' . Tools::url('admin') . 'media?dc='
         . Tools::categoryUrlencode($category['name'])
@@ -222,14 +228,16 @@ function checkAll(formname, checktoggle) {
         . '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>'
         . '<br /><pre>' . print_r($category, true) . '</pre>'
         . '</form>'
-        . '</div><br /><br />';
+        . '</div>'
+        . '<br /><br />';
     }
 
     /**
      * @param int|string $mediaId
+     * @param bool $showHidden
      * @return string
      */
-    public function displayCategories($mediaId)
+    public function displayCategories($mediaId, $showHidden = false)
     {
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
             return '';
@@ -253,11 +261,15 @@ function checkAll(formname, checktoggle) {
         if (!$hidden) {
             return $response . '</div>';
         }
-        $response .= '<br /><div style="font-size:80%;">';
+        $response .= '<div style="font-size:80%;">';
+        if (!$showHidden) {
+            return $response . '</div></div>';
+        }
+
         foreach ($hidden as $hcat) {
             $response .= '+<a href="' . Tools::url('category')
             . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($hcat)) . '">'
-            . Tools::stripPrefix($hcat) . '</a><br />';
+            . Tools::stripPrefix($hcat) . '</a>';
         }
 
         return $response . '</div></div>';
@@ -269,7 +281,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displayTags($mediaId)
     {
-        $tags = $this->database->getTags();
+        $tags = $this->database->getTags('DESC');
         $response = '<div class="nobr" style="display:block; margin:auto;">';
         foreach ($tags as $tag) {
             $response .=  ''
@@ -492,7 +504,6 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . $infourl . '">'
         . '<img src="'. $url .'" height="'. $height .'" width="'. $width . '" alt=""></a>'
         . $this->displayAttribution($media)
-        . $this->displayAdminMediaFunctions($media['pageid'])
         . '</div>';
     }
 
@@ -624,7 +635,6 @@ function checkAll(formname, checktoggle) {
             print '<br /><br />'
             . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
             . '<a href="' . Tools::url('home') . '?logoff">LOGOFF</a>'
-            . '<br />' . gmdate('Y-m-d H:i:s') . ' UTC'
             . '</div><br /><br /><br />';
         }
 

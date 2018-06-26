@@ -32,7 +32,7 @@ class Home extends ControllerBase
         $data['reviews']  = $this->smt->displayReviews($this->smt->database->getReviews($media['pageid']));
         $data['categories']  = $this->smt->displayCategories($media['pageid']);
         $data['reportUrl']  = Tools::url('contact') . '?r=' . $media['pageid'];
-
+        $data['admin'] =  $this->smt->displayAdminMediaFunctions($media['pageid']);
         $this->smt->title = Config::$siteName;
         $this->smt->includeHeader(false);
         $this->smt->includeSmallMenu();

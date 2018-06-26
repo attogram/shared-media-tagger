@@ -29,10 +29,10 @@ class AdminCategory extends ControllerBase
             $catUrl = '<a href="' . Tools::url('category')
                 . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
                 . htmlentities((string) Tools::stripPrefix($categoryName)) . '</a>';
-            print '<p>Importing media from <b>' . $catUrl . '</b></p>';
+            Tools::debug('Importing media from <b>' . $catUrl . '</b>');
             $this->smt->database->getMediaFromCategory($categoryName);
             $this->smt->database->updateCategoriesLocalFilesCount();
-            print '<p>Imported media from <b>' . $catUrl . '</b></p>';
+            Tools::debug('Imported media from <b>' . $catUrl . '</b>');
             print '</div>';
             $this->smt->includeFooter();
             Tools::shutdown();

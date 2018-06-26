@@ -11,10 +11,9 @@ declare(strict_types = 1);
     <?= $data['tags'] ?>
     <?= $data['media'] ?>
     <div class="left" style="margin:auto;width:<?= $data['width'] ?>px;">
-        <br />
-        <?= $data['reviews'] ?>
+        <?= $data['admin'] ?>
         <?= $data['categories'] ?>
-        <br />
-        <a href="<?= $data['reportUrl'] ?>" style="color:#666;font-size:85%;">REPORT this file</a>
+        <?= $data['reviews'] ?>
+
     </div>
 </div>

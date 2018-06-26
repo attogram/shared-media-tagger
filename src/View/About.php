@@ -16,8 +16,9 @@ declare(strict_types = 1);
 <br /><br />
 <dl>
     <dt><h3><a href="<?= $site['urlHome'] ?>">Review a file</a><h3></dt>
-    <dd>Click a rating for each media file shown.
-    Click an image to goto the <b>Info</b> page with details on the media file.
+    <dd>- Click a ratings tag to review a media file.
+        <br />- Available tags are: <?= $sites['tags'] ?>
+        <br />- Click an image to goto the <b>Info</b> page with details on the media file.
     </dd>
     <br />
     <dt><h3><a href="<?= $site['urlCategories'] ?>">Browse Categories</a><h3></dt>

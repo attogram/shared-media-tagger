@@ -278,15 +278,15 @@ class Config
                     'This is a demonstration of the Shared Media Tagger software.'
                 )",
             'default_tag1' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (1, '☹️ Worst',  '☹️')",
+                "INSERT INTO tag (position, name, display_name) VALUES (1, '😊 Best', '😊')",
             'default_tag2' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (2, '🙁 Bad',    '🙁')",
+                "INSERT INTO tag (position, name, display_name) VALUES (2, '🙂 Good', '🙂')",
             'default_tag3' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (3, '😐 Unsure', '😐')",
+                "INSERT INTO tag (position, name, display_name) VALUES (3, '😐 OK', '😐')",
             'default_tag4' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (4, '🙂 Good',   '🙂')",
+                "INSERT INTO tag (position, name, display_name) VALUES (4, '🙁 Unsure', '🙁')",
             'default_tag5' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (5, '😊 Best',   '😊')",
+                "INSERT INTO tag (position, name, display_name) VALUES (5, '☹️ Bad', '☹️')",
 
             'category1' =>
                 "INSERT INTO category (
