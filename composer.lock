@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "29441467cd6e083f91183f3162ebbb3e",
+    "content-hash": "b3a9643223028279d71cebefa13a2094",
     "packages": [
         {
             "name": "attogram/router",
@@ -87,58 +87,17 @@
             "time": "2018-04-06T19:57:57+00:00"
         },
         {
-            "name": "attogram/shared-media-sandbox",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/attogram/shared-media-sandbox.git",
-                "reference": "2507e3401ccf497987a82dd12349975f99849e30"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/attogram/shared-media-sandbox/zipball/2507e3401ccf497987a82dd12349975f99849e30",
-                "reference": "2507e3401ccf497987a82dd12349975f99849e30",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5",
-                "psr/log": "~1.0"
-            },
-            "suggest": {
-                "attogram/shared-media-api": "MediaWiki Query API wrapper to easily get Category and Media file information into simple PHP arrays. Fine-tuned for WikiMedia Commmons.",
-                "attogram/shared-media-orm": "ORM for attogram/shared-media-api"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Attogram\\SharedMedia\\Sandbox\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Web Sandbox for testing packages attogram/shared-media-api and attogram/shared-media-orm",
-            "homepage": "https://github.com/attogram/shared-media-sandbox",
-            "time": "2017-12-03T19:38:17+00:00"
-        },
-        {
             "name": "guzzlehttp/guzzle",
-            "version": "dev-master",
+            "version": "6.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "0773d442aa96baf19d7195f14ba6e9c2da11f8ed"
+                "reference": "407b0cb880ace85c9b63c5f9551db498cb2d50ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/0773d442aa96baf19d7195f14ba6e9c2da11f8ed",
-                "reference": "0773d442aa96baf19d7195f14ba6e9c2da11f8ed",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/407b0cb880ace85c9b63c5f9551db498cb2d50ba",
+                "reference": "407b0cb880ace85c9b63c5f9551db498cb2d50ba",
                 "shasum": ""
             },
             "require": {
@@ -190,27 +149,27 @@
                 "rest",
                 "web service"
             ],
-            "time": "2018-04-23T13:18:18+00:00"
+            "time": "2018-04-22T15:46:56+00:00"
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "dev-master",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "136531aa4e42f9b1971a47fb0faf60da00d2fefa"
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/136531aa4e42f9b1971a47fb0faf60da00d2fefa",
-                "reference": "136531aa4e42f9b1971a47fb0faf60da00d2fefa",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8.36"
+                "phpunit/phpunit": "^4.0"
             },
             "type": "library",
             "extra": {
@@ -241,26 +200,25 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2018-03-25T01:26:01+00:00"
+            "time": "2016-12-20T10:07:11+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "dev-master",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "239912a01c502f2d8f3c642eb2fcd4e58cf82a72"
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/239912a01c502f2d8f3c642eb2fcd4e58cf82a72",
-                "reference": "239912a01c502f2d8f3c642eb2fcd4e58cf82a72",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0",
-                "psr/http-message": "~1.0",
-                "ralouphie/getallheaders": "^2.0.5"
+                "psr/http-message": "~1.0"
             },
             "provide": {
                 "psr/http-message-implementation": "1.0"
@@ -307,11 +265,11 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-04-24T00:35:57+00:00"
+            "time": "2017-03-20T17:10:46+00:00"
         },
         {
             "name": "psr/http-message",
-            "version": "dev-master",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-message.git",
@@ -361,16 +319,16 @@
         },
         {
             "name": "psr/log",
-            "version": "dev-master",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "3490ba5925e6dcbe6de950c5c6b8dce9f6e96eda"
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/3490ba5925e6dcbe6de950c5c6b8dce9f6e96eda",
-                "reference": "3490ba5925e6dcbe6de950c5c6b8dce9f6e96eda",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
                 "shasum": ""
             },
             "require": {
@@ -404,56 +362,15 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-04-03T15:59:15+00:00"
-        },
-        {
-            "name": "ralouphie/getallheaders",
-            "version": "2.0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ralouphie/getallheaders.git",
-                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
-                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~3.7.0",
-                "satooshi/php-coveralls": ">=1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/getallheaders.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ralph Khattar",
-                    "email": "ralph.khattar@gmail.com"
-                }
-            ],
-            "description": "A polyfill for getallheaders.",
-            "time": "2016-02-11T07:05:27+00:00"
+            "time": "2016-10-10T12:19:37+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {
         "attogram/router": 20,
-        "attogram/shared-media-api": 20,
-        "attogram/shared-media-sandbox": 20
+        "attogram/shared-media-api": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

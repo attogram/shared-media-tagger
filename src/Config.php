@@ -244,22 +244,6 @@ class Config
                 'count' INTEGER,
                 'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
                 CONSTRAINT utu UNIQUE (user_id, tag_id, media_pageid) )",
-            'network' =>
-                "CREATE TABLE IF NOT EXISTS 'network' (
-                'id' INTEGER PRIMARY KEY,
-                'site_id' INTEGER NOT NULL,
-                'ns' INTEGER NOT NULL,
-                'pageid' INTEGER,
-                'name' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT nu UNIQUE (ns, pageid) )",
-            'network_site' =>
-                "CREATE TABLE IF NOT EXISTS 'network_site' (
-                'id' INTEGER PRIMARY KEY,
-                'url' TEXT,
-                'name' TEXT,
-                'updated' TEXT DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT nsu UNIQUE (url) )",
         ];
     }
 

@@ -51,6 +51,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         <br />
         <?= $data['menu'] ?>
     </div>
+
 </form>
 <script type="text/javascript" language="javascript">
     function mark_all_keep() {

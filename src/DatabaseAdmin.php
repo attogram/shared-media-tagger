@@ -636,8 +636,6 @@ class DatabaseAdmin extends Database
                 'DROP TABLE IF EXISTS tagging',
                 'DROP TABLE IF EXISTS user',
                 'DROP TABLE IF EXISTS user_tagging',
-                'DROP TABLE IF EXISTS network',
-                'DROP TABLE IF EXISTS network_site',
             ]
         );
     }

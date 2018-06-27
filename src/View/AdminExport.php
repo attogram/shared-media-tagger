@@ -10,7 +10,6 @@ declare(strict_types = 1);
 <div class="box white">
     <p>Export  Admin</p>
     <ul>
-        <li><a href="?r=network">Network Export</a></li>
         <?php
 
         foreach ($data['tags'] as $tag) {

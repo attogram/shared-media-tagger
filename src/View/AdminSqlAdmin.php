@@ -44,7 +44,7 @@
 // Please see https://bitbucket.org/phpliteadmin/public/wiki/Configuration for more details
 
 //password to gain access
-$password = 'admin';
+$password = 'smt';
 
 //directory relative to this file to search for databases (if false, manually list databases in the $databases variable)
 $directory = false;
@@ -57,7 +57,7 @@ $subdirectories = false;
 $databases = array(
     array(
         'path' =>  '../db/media.sqlite',
-        'name' => 'Media Database'
+        'name' => 'Shared Media Tagger Database'
     ),
 );
 
@@ -101,7 +101,7 @@ function leet_text($value)
 /* ---- Advanced options ---- */
 
 //changing the following variable allows multiple phpLiteAdmin installs to work under the same domain.
-$cookie_name = 'pla3412';
+$cookie_name = 'pla3412smt';
 
 //whether or not to put the app in debug mode where errors are outputted
 $debug = false;
@@ -419,7 +419,8 @@ if (is_readable($config_filename)) {
 //constants 1
 define("PROJECT", "phpLiteAdmin");
 define("VERSION", "1.9.7.1");
-define("PAGE", basename(__FILE__));
+//define("PAGE", basename(__FILE__));
+define("PAGE", \Attogram\SharedMedia\Tagger\Tools::url('admin') . 'sqladmin');
 define("FORCETYPE", false); //force the extension that will be used (set to false in almost all circumstances except debugging)
 define("SYSTEMPASSWORD", $password); // Makes things easier.
 define('PROJECT_URL', 'http://www.phpliteadmin.org/');

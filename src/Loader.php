@@ -21,7 +21,7 @@ class Loader
      */
     public function __construct()
     {
-        define('SHARED_MEDIA_TAGGER', '1.0.0');
+        define('SHARED_MEDIA_TAGGER', '1.0.1');
 
         ob_start('ob_gzhandler');
 
@@ -97,7 +97,6 @@ class Loader
         $this->isAdmin = true;
         $this->router->allow('/admin/', 'AdminHome');
         $this->router->allow('/admin/category', 'AdminCategory');
-        $this->router->allow('/admin/create', 'AdminCreate');
         $this->router->allow('/admin/curate', 'AdminCurate');
         $this->router->allow('/admin/database', 'AdminDatabase');
         $this->router->allow('/admin/export', 'AdminExport');
@@ -108,6 +107,5 @@ class Loader
         $this->router->allow('/admin/sqladmin', 'AdminSqladmin');
         $this->router->allow('/admin/tag', 'AdminTag');
         $this->router->allow('/admin/user', 'AdminUser');
-        $this->router->allow('/admin/api-sandbox', 'AdminApiSandbox');
     }
 }
