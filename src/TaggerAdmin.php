@@ -40,12 +40,11 @@ class TaggerAdmin extends Tagger
         print '<div class="menu admin">'
             . '<a href="' . $admin . '">ADMIN</a>'
             . $space . '<a href="' . $admin . 'site">SITE</a>'
-            . $space . '<a href="' . $admin . 'tag">TAG</a>'
+            . $space . '<a href="' . $admin . 'tag">TAGS</a>'
             . $space . '<a href="' . $admin . 'category">CATEGORY</a>'
             . $space . '<a href="' . $admin . 'media">MEDIA</a>'
             . $space . '<a href="' . $admin . 'curate">CURATE</a>'
             . $space . '<a href="' . $admin . 'user">USER</a>'
-            . $space . '<a href="' . $admin . 'export">EXPORT</a>'
             . $space . '<a href="' . $admin . 'database">DATABASE</a>'
             . '</div>';
     }
@@ -69,13 +68,11 @@ class TaggerAdmin extends Tagger
         $robotstxt = Config::$installDirectory . '/robots.txt';
         $tagUrl = str_replace('//'.Config::$server, '', Tools::url('tag'));
         $sitemapUrl = Config::$protocol . Tools::url('sitemap');
-        $reportUrl = str_replace('//'.Config::$server, '', Tools::url('contact')) . '?r=*';
         $response = $robotstxt;
         if (!file_exists($robotstxt)) {
             return '<br />❌file not found: ' . $robotstxt
             . '<br />❌rule not found: user-agent: *'
             . '<br />❌rule not found: disallow: ' . $tagUrl
-            . '<br />❌rule not found: disallow: ' . $reportUrl
             . '<br />❌rule not found: sitemap: ' . $sitemapUrl
             ;
         }
@@ -85,7 +82,6 @@ class TaggerAdmin extends Tagger
             return $response . ''
             . '<br />❌rule not found: user-agent: *'
             . '<br />❌rule not found: disallow: ' . $tagUrl
-            . '<br />❌rule not found: disallow: ' . $reportUrl
             . '<br />❌rule not found: sitemap: ' . $sitemapUrl
             ;
         }
@@ -93,7 +89,6 @@ class TaggerAdmin extends Tagger
         $userAgentStar = false;
         $tagDisallow = false;
         $sitemap = false;
-        $reportDisallow = false;
 
         foreach ($content as $line) {
             if (strtolower(trim($line)) == 'sitemap: ' . $sitemapUrl) {
@@ -114,11 +109,6 @@ class TaggerAdmin extends Tagger
                 $response .= '<br />✔️rule ok: disallow: ' . $tagUrl;
                 continue;
             }
-            if (strtolower(trim($line)) == 'disallow: ' . $reportUrl) {
-                $reportDisallow = true;
-                $response .= '<br />✔️rule ok: disallow: ' . $reportUrl;
-                continue;
-            }
         }
         if (!$sitemap) {
             $response .= '<br />❌rule not found: sitemap: ' . $sitemapUrl;
@@ -128,9 +118,6 @@ class TaggerAdmin extends Tagger
         }
         if (!$tagDisallow) {
             $response .= '<br />❌rule not found: disallow: ' . $tagUrl;
-        }
-        if (!$reportDisallow) {
-            $response .= '<br />❌rule not found: disallow: ' . $reportUrl;
         }
 
         return $response;

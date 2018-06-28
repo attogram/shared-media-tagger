@@ -629,7 +629,6 @@ class DatabaseAdmin extends Database
                 'DROP TABLE IF EXISTS block',
                 'DROP TABLE IF EXISTS category',
                 'DROP TABLE IF EXISTS category2media',
-                'DROP TABLE IF EXISTS contact',
                 'DROP TABLE IF EXISTS media',
                 'DROP TABLE IF EXISTS site',
                 'DROP TABLE IF EXISTS tag',

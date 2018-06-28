@@ -11,9 +11,8 @@ declare(strict_types = 1);
     <?= $data['tags'] ?>
     <?= $data['media'] ?>
     <div class="left" style="margin:auto;width:<?= $data['width'] ?>px;">
-        <?= $data['admin'] ?>
         <?= $data['categories'] ?>
         <?= $data['reviews'] ?>
-
+        <?= $data['admin'] ?>
     </div>
 </div>

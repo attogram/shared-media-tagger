@@ -33,8 +33,7 @@ foreach ($users as $user) {
     }
     print '<tr>'
     . '<td>' . $user['id'] . '</td>'
-    . '<td><a href="' . Tools::url('users') . '?i=' . $user['id'] . '">+'
-    . $smt->database->getUserTagCount($user['id']) . '</a></td>'
+    . '<td>+' . $smt->database->getUserTagCount($user['id']) . '</td>'
     . '<td class="nobr"><small>' . $user['last'] . '</small></td>'
     . '<td><small>' . $iphost . '</small></td>'
     . '<td><small>' . $user['user_agent'] . '</small></td>'

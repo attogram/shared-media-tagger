@@ -14,15 +14,21 @@ class Home extends ControllerBase
     protected function display()
     {
         $view = $this->getView('Home');
+        $this->smt->title = Config::$siteName;
 
         if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
             $media = $this->smt->database->getMedia($_GET['i']);
         } else {
             $media = $this->smt->database->getRandomMedia(1);
         }
-        if (!$media || !isset($media[0])) {
-            $this->smt->fail404('404 Media Not Found');
+        if (empty($media[0])) {
+            $this->smt->includeHeader(true);
+            $this->smt->includeMenu();
+            Tools::error('No Media Files found... yet');
+            $this->smt->includeFooter();
+            Tools::shutdown();
         }
+
         $media = $media[0];
 
         $data = [];
@@ -31,9 +37,8 @@ class Home extends ControllerBase
         $data['width']  = Config::$sizeMedium;
         $data['reviews']  = $this->smt->displayReviews($this->smt->database->getReviews($media['pageid']));
         $data['categories']  = $this->smt->displayCategories($media['pageid']);
-        $data['reportUrl']  = Tools::url('contact') . '?r=' . $media['pageid'];
         $data['admin'] =  $this->smt->displayAdminMediaFunctions($media['pageid']);
-        $this->smt->title = Config::$siteName;
+
         $this->smt->includeHeader(false);
         $this->smt->includeSmallMenu();
         /** @noinspection PhpIncludeInspection */

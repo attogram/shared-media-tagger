@@ -116,11 +116,10 @@ class DatabaseUpdater
             $toUpdate[] = $name;
         }
         if (!$toUpdate) {
-            Tools::notice('OK: ' . sizeof($this->sqlNew) . ' tables up-to-date');
-
+            //Tools::notice('OK: ' . sizeof($this->sqlNew) . ' tables up-to-date');
             return true;
         }
-        Tools::notice(sizeof($toUpdate) . ' tables to update: ' . implode($toUpdate, ', '));
+        //Tools::notice(sizeof($toUpdate) . ' tables to update: ' . implode($toUpdate, ', '));
         foreach ($toUpdate as $tableName) {
             $this->updateTable($tableName);
         }
@@ -183,7 +182,7 @@ class DatabaseUpdater
             return false;
         }
         $this->database->commit();
-        Tools::notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
+        //Tools::notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
         $this->database->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
         $this->database->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
         $this->database->vacuum();

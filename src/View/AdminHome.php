@@ -5,7 +5,6 @@ declare(strict_types = 1);
  * Admin Home
  *
  * @var \Attogram\SharedMedia\Tagger\TaggerAdmin $smt
- * @var array $data
  */
 
 use Attogram\SharedMedia\Tagger\Config;
@@ -13,23 +12,19 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="box white">
-<p>
+
     Site: <b><a href="./site"><?= Config::$siteName ?></a></b>
     <ul>
-    <li><b><?= $data['messageCount'] ?></b>
-        <a target="sqlite" href="./sqladmin?table=contact&action=row_view">Messages</a></li>
-    <li><b><?= sizeof($this->smt->database->getTags()) ?></b> <a href="./tags">Tags</a></li>
-    <li><b><?= number_format((float) $this->smt->database->getImageCount()) ?></b> Files</li>
-    <li><b><?= number_format((float) $this->smt->database->getBlockCount()) ?></b> Blocked Files</li>
-    <li><b><?= number_format((float) $this->smt->database->getTotalFilesReviewedCount()) ?></b> Files reviewed</li>
-    <li><b><?= number_format((float) $this->smt->database->getTaggingCount()) ?></b> Tagging Count</li>
-    <li><b><?= number_format((float) $this->smt->database->getTotalReviewCount()) ?></b> Total Review Count</li>
-    <li><b><?= number_format((float) $this->smt->database->getUserTagCount()) ?></b> User Tag Count</li>
-    <li><b><?= number_format((float) $this->smt->database->getUserCount()) ?></b> Users</li>
+        <li><b><?= sizeof($this->smt->database->getTags()) ?></b> <a href="./tags">Tags</a></li>
+        <li><b><?= number_format((float) $this->smt->database->getImageCount()) ?></b> Files</li>
+        <li><b><?= number_format((float) $this->smt->database->getBlockCount()) ?></b> Blocked Files</li>
+        <li><b><?= number_format((float) $this->smt->database->getTotalFilesReviewedCount()) ?></b> Files reviewed</li>
+        <li><b><?= number_format((float) $this->smt->database->getTaggingCount()) ?></b> Tagging Count</li>
+        <li><b><?= number_format((float) $this->smt->database->getTotalReviewCount()) ?></b> Total Review Count</li>
+        <li><b><?= number_format((float) $this->smt->database->getUserTagCount()) ?></b> User Tag Count</li>
     </ul>
-</p>
 
-<p>
+    <hr />
     Installation:
     <ul>
         <li>Server: <?= Config::$server ?></li>
@@ -38,9 +33,8 @@ use Attogram\SharedMedia\Tagger\Tools;
         <li>Protocol: <?= Config::$protocol ?></li>
         <li>Install Directory: <?= Config::$installDirectory ?></li>
     </ul>
-</p>
 
-<p>
+    <hr />
     Discovery:
     <ul>
         <li>/public/.htaccess:
@@ -53,18 +47,16 @@ use Attogram\SharedMedia\Tagger\Tools;
             <span style="font-family:monospace;"><?= $this->smt->checkRobotstxt() ?></span>
         </li>
     </ul>
-</p>
 
-<p>
+    <hr />
     About Shared Media Tagger:
     <ul>
-    <li><a target="commons"
-                    href="<?= Tools::url('github_smt') ?>">Github: attogram/shared-media-tagger</a></li>
-    <li><a target="commons"
-           href="<?= Tools::url('github_smt') ?>/blob/master/README.md">README</a></li>
-    <li><a target="commons"
-           href="<?= Tools::url('github_smt') ?>/blob/master/LICENSE.md">LICENSE</a></li>
+        <li><a target="commons"
+                        href="<?= Tools::url('github_smt') ?>">Github: attogram/shared-media-tagger</a></li>
+        <li><a target="commons"
+               href="<?= Tools::url('github_smt') ?>/blob/master/README.md">README</a></li>
+        <li><a target="commons"
+               href="<?= Tools::url('github_smt') ?>/blob/master/LICENSE.md">LICENSE</a></li>
     </ul>
-</p>
 
 </div>

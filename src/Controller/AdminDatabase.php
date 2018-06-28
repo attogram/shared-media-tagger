@@ -35,33 +35,33 @@ class AdminDatabase extends ControllerBase
             switch ($data['action']) {
                 case 'create':
                     /** @noinspection PhpUndefinedVariableInspection */
-                    $data['result'] = '<p>Creating Database tables:</p>'
-                        . $databaseUpdater->createTables();
+                    $databaseUpdater->createTables();
+                    $data['result'] = 'Created Database Tables';
                     break;
                 case 'seed':
                     /** @noinspection PhpUndefinedVariableInspection */
-                    $data['result'] = '<p>Seeding Demo Setup:</p>'
-                        . implode('<br />', $databaseUpdater->seedDemo());
+                    $databaseUpdater->seedDemo();
+                    $data['result'] = 'Demo Setup Seeded';
                     break;
                 case 'd':
-                    $data['result'] = '<p>Dropping Database tables:</p>'
-                        . print_r($this->smt->database->dropTables(), true);
+                    $this->smt->database->dropTables();
+                    $data['result'] = 'Dropped All Database Tables';
                     break;
                 case 'em':
-                    $data['result'] = '<p>Emptying Media tables:</p>'
-                        . print_r($this->smt->database->emptyMediaTables(), true);
+                    $this->smt->database->emptyMediaTables();
+                    $data['result'] = 'Emptied Media Tables';
                     break;
                 case 'ec':
-                    $data['result'] = '<p>Emptying Category tables:</p>'
-                        . print_r($this->smt->database->emptyCategoryTables(), true);
+                    $this->smt->database->emptyCategoryTables();
+                    $data['result'] = 'Emptied Category Tables';
                     break;
                 case 'et':
-                    $data['result'] = '<p>Emptying Tagging tables:</p>'
-                        . print_r($this->smt->database->emptyTaggingTables(), true);
+                    $this->smt->database->emptyTaggingTables();
+                    $data['result'] = 'Emptied Tagging Tables';
                     break;
                 case 'eu':
-                    $data['result'] = '<p>Emptying User tables:</p>'
-                        . print_r($this->smt->database->emptyUserTables(), true);
+                    $this->smt->database->emptyUserTables();
+                    $data['result'] = 'Emptied User tables';
                     break;
             }
         }

@@ -81,12 +81,10 @@ class Loader
         $this->router->allow('/browse', 'Browse');
         $this->router->allow('/category', 'Category');
         $this->router->allow('/categories', 'Categories');
-        $this->router->allow('/contact', 'Contact');
         $this->router->allow('/info', 'Info');
         $this->router->allow('/reviews', 'Reviews');
         $this->router->allow('/sitemap.xml', 'Sitemap');
         $this->router->allow('/tag', 'Tag');
-        $this->router->allow('/users', 'Users');
     }
 
     /**
@@ -99,7 +97,6 @@ class Loader
         $this->router->allow('/admin/category', 'AdminCategory');
         $this->router->allow('/admin/curate', 'AdminCurate');
         $this->router->allow('/admin/database', 'AdminDatabase');
-        $this->router->allow('/admin/export', 'AdminExport');
         $this->router->allow('/admin/media', 'AdminMedia');
         $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
         $this->router->allow('/admin/reports', 'AdminReports');

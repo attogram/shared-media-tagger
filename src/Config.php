@@ -54,9 +54,7 @@ class Config
             'about'         => self::$siteUrl . 'about',
             'reviews'       => self::$siteUrl . 'reviews',
             'admin'         => self::$siteUrl . 'admin/',
-            'contact'       => self::$siteUrl . 'contact',
             'tag'           => self::$siteUrl . 'tag',
-            'users'         => self::$siteUrl . 'users',
             'sitemap'       => self::$siteUrl . 'sitemap.xml',
             'jquery'        => self::$siteUrl . 'use/jquery.min.js',
             'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
@@ -212,12 +210,6 @@ class Config
                 'duration' REAL,
                 'timestamp' TEXT,
                 'updated' TEXT DEFAULT CURRENT_TIMESTAMP )",
-            'contact' =>
-                "CREATE TABLE IF NOT EXISTS 'contact' (
-                'id' INTEGER PRIMARY KEY,
-                'comment' TEXT,
-                'datetime' TEXT,
-                'ip' TEXT )",
             'block' =>
                 "CREATE TABLE IF NOT EXISTS 'block' (
                 'pageid' INTEGER PRIMARY KEY,
@@ -258,19 +250,22 @@ class Config
                     id, name, about
                 ) VALUES (
                     1,
-                    'Shared Media Tagger Demo',
-                    'This is a demonstration of the Shared Media Tagger software.'
+                    'Demo',
+                    'Welcome to the Shared Media Tagger!
+                    Find out more at: <a href=\""
+                    . Tools::url('github_smt') . "\">"
+                    . Tools::url('github_smt') . "</a>'
                 )",
             'default_tag1' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (1, '😊 Best', '😊')",
+                "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '😊 Best', '😊')",
             'default_tag2' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (2, '🙂 Good', '🙂')",
+                "INSERT INTO tag (id, position, name, display_name) VALUES (2, 2, '🙂 Good', '🙂')",
             'default_tag3' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (3, '😐 OK', '😐')",
+                "INSERT INTO tag (id, position, name, display_name) VALUES (3, 3, '😐 OK', '😐')",
             'default_tag4' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (4, '🙁 Unsure', '🙁')",
+                "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙁 Unsure', '🙁')",
             'default_tag5' =>
-                "INSERT INTO tag (position, name, display_name) VALUES (5, '☹️ Bad', '☹️')",
+                "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '☹️ Bad', '☹️')",
 
             'category1' =>
                 "INSERT INTO category (

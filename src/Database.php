@@ -27,8 +27,6 @@ class Database
     /** @var int */
     private $imageCount;
     /** @var int */
-    private $userCount;
-    /** @var int */
     private $tagId;
     /** @var array */
     private $tags;
@@ -241,22 +239,6 @@ class Database
         }
 
         return $this->imageCount = $response[0]['count'];
-    }
-
-    /**
-     * @return int
-     */
-    public function getUserCount()
-    {
-        if (isset($this->userCount)) {
-            return $this->userCount;
-        }
-        $count = $this->queryAsArray('SELECT count(id) AS count FROM user');
-        if (isset($count[0]['count'])) {
-            return $this->userCount = $count[0]['count'];
-        }
-
-        return $this->userCount = 0;
     }
 
     /**

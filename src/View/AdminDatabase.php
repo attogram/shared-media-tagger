@@ -15,13 +15,13 @@ declare(strict_types = 1);
             ? '✔️OK: WRITEABLE'
             : '❌ERROR: READ ONLY' ?></li>
         <li>Size: <?= $data['databaseSize'] ?> bytes</li>
+        <li><a href="./sqladmin" target="sqlite">SQLite ADMIN</a></li>
     </ul>
     <hr />
 
-    <pre><?= $data['result'] ?></pre>
+    <pre class="error"><?= $data['result'] ?></pre>
 
     <ul>
-        <li><a href="./sqladmin" target="sqlite">SQLite ADMIN</a></li>
         <li><a href="?a=create">CREATE tables</a></li>
         <li><a href="?a=seed">SEED demo setup</a></li>
     </ul>

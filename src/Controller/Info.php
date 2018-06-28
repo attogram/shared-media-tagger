@@ -26,6 +26,9 @@ class Info extends ControllerBase
         }
         $media = $media[0];
 
+        $data = [];
+        $data['admin'] =  $this->smt->displayAdminMediaFunctions($media['pageid']);
+
         $this->smt->useBootstrap = true;
 
         $this->smt->title = 'Info: ' . Tools::stripPrefix($media['title']);

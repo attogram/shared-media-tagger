@@ -267,7 +267,7 @@ function checkAll(formname, checktoggle) {
         }
 
         foreach ($hidden as $hcat) {
-            $response .= '+<a href="' . Tools::url('category')
+            $response .= '<br />+<a href="' . Tools::url('category')
             . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($hcat)) . '">'
             . Tools::stripPrefix($hcat) . '</a>';
         }
@@ -332,15 +332,11 @@ function checkAll(formname, checktoggle) {
         $countFiles = number_format((float) $this->database->getImageCount());
         $countCategories = number_format((float) $this->database->getCategoriesCount());
         $countReviews = number_format((float) $this->database->getTotalReviewCount());
-        $countUsers = number_format((float) $this->database->getUserCount());
         print '<div class="menu" style="font-weight:bold;">'
         . '<span class="nobr"><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></span>' .  $space
         . '<a href="' . Tools::url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
         . '<a href="' . Tools::url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
         . '<a href="' . Tools::url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
-        . '<a href="'. Tools::url('users') . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">'
-            . $countUsers .'&nbsp;Users</a>' . $space
-        . '<a href="' . Tools::url('contact') . '">Contact</a>' . $space
         . '<a href="'. Tools::url('about') . '">❔About</a>'
         . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
@@ -357,9 +353,6 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . Tools::url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . Tools::url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . Tools::url('reviews') . '">🗳Reviews</a>' . $space
-        . '<a href="'. Tools::url('users')
-            . ($this->database->userId ? '?i=' . $this->database->userId : '') . '">Users</a>' . $space
-        . '<a href="' . Tools::url('contact') . '">Contact</a>' . $space
         . '<a href="'. Tools::url('about') . '">❔About</a>'
         . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
@@ -443,7 +436,6 @@ function checkAll(formname, checktoggle) {
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</video>'
         . $this->displayAttribution($media)
-        . $this->displayAdminMediaFunctions($media['pageid'])
         . '</div>';
     }
 
@@ -469,7 +461,6 @@ function checkAll(formname, checktoggle) {
         . '<source src="' . $url . '" type="' . $mime . '">'
         . '</audio>'
         . $this->displayAttribution($media)
-        . $this->displayAdminMediaFunctions($media['pageid'])
         . '</div>';
     }
 
