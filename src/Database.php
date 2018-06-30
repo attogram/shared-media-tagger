@@ -519,25 +519,29 @@ class Database
     }
 
     /**
-     * @param int|string $pageid
+     * @param $pageid
+     * @param bool $onlyHidden
      * @return array
      */
-    public function getImageCategories($pageid)
+    public function getImageCategories($pageid, $onlyHidden = false)
     {
-        $error = ['Category database unavailable'];
         if (!$pageid|| !Tools::isPositiveNumber($pageid)) {
-            return $error;
+            return [];
         }
         $response = $this->queryAsArray(
             'SELECT category.name
             FROM category, category2media
-            WHERE category2media.category_id = category.id
+            WHERE category.hidden = :hidden
+            AND category2media.category_id = category.id
             AND category2media.media_pageid = :pageid
             ORDER BY category.name',
-            [':pageid' => $pageid]
+            [
+                ':pageid' => $pageid,
+                ':hidden' => ($onlyHidden ? 1 : 0),
+            ]
         );
         if (!isset($response[0]['name'])) {
-            return $error;
+            return [];
         }
         $categories = [];
         foreach ($response as $category) {

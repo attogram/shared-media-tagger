@@ -227,46 +227,29 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * @param int|string $mediaId
-     * @param bool $showHidden
+     * @param $mediaId
+     * @param bool $onlyHidden
      * @return string
      */
-    public function displayCategories($mediaId, $showHidden = false)
+    public function displayCategories($mediaId, $onlyHidden = false)
     {
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        $cats = $this->database->getImageCategories($mediaId);
-        $response = '<div class="categories" style="width:' . Config::$sizeMedium . 'px;">';
+        $cats = $this->database->getImageCategories($mediaId, $onlyHidden);
+        //$response = '<div class="xxcategories" style="width:' . Config::$sizeMedium . 'px;">';
         if (!$cats) {
-            return $response . '<em>Uncategorized</em></div>';
+            return '<em>- None</em>';
         }
-        $hidden = [];
+        $response = '';
         foreach ($cats as $cat) {
-            if ($this->database->isHiddenCategory($cat)) {
-                $hidden[] = $cat;
-                continue;
-            }
             $response .= ''
-            . '+<a href="' . Tools::url('category')
+            . '+ <a href="' . Tools::url('category')
             . '/' . Tools::categoryUrlencode(Tools::stripPrefix($cat)) . '">'
             . Tools::stripPrefix($cat) . '</a><br />';
         }
-        if (!$hidden) {
-            return $response . '</div>';
-        }
-        $response .= '<div style="font-size:80%;">';
-        if (!$showHidden) {
-            return $response . '</div></div>';
-        }
 
-        foreach ($hidden as $hcat) {
-            $response .= '<br />+<a href="' . Tools::url('category')
-            . '/' . Tools::categoryUrlencode(Tools::stripPrefix($hcat)) . '">'
-            . Tools::stripPrefix($hcat) . '</a>';
-        }
-
-        return $response . '</div></div>';
+        return $response; // . '</div>';
     }
 
     /**

@@ -27,7 +27,6 @@ class Home extends ControllerBase
         $this->smt->useBootstrap = true;
         $this->smt->useJquery = true;
         $this->smt->includeHeader();
-        $this->smt->includeMenu();
         /** @noinspection PhpIncludeInspection */
         include($view);
         $this->smt->includeFooter();

@@ -16,7 +16,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 ?>
 <div class="container">
     <div class="row">
-        <div class="col-sm-6 box grey center">
+        <div class="col-sm-6 box grey center" style="height:stretch;">
             <?= $this->smt->displayTags($pageid) ?>
             <?= $this->smt->displayMedia($media) ?>
             <div class="left" style="margin:auto; width:<?= Config::$sizeMedium ?>px;">
@@ -35,7 +35,7 @@ use Attogram\SharedMedia\Tagger\Tools;
                 ?></textarea>
             </p>
             <p>
-                Download file:
+                <em>Download file:</em>
             <ul>
                 <li><b><a target="commons" href="<?= $media['url'] ?>"><?=
                             Tools::stripPrefix($media['title']) ?></a></b></li>
@@ -100,15 +100,11 @@ use Attogram\SharedMedia\Tagger\Tools;
             </p>
             <p>
                 <style>li { margin-bottom:6px; }</style>
-                Media information:
+                <em>Media information:</em>
                 <ul>
                     <li>ID: <b><?= $media['pageid']; ?></b></li>
-                    <li>Source info: <a target="commons" href="<?=
-                        $media['descriptionshorturl'] ?>">commons.wikimedia.org</a></li>
-                    <li>info: <a target="commons" href="//en.wikipedia.org/wiki/<?=
-                        Tools::categoryUrlencode($media['title']) ?>">en.wikipedia.org</a></li>
-                    <li>info: <a target="commons" href="//wikidata.org/wiki/<?=
-                        Tools::categoryUrlencode($media['title']) ?>">wikidata.org</a></li>
+                    <li>Source: <a target="commons" href="<?=
+                        $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
                     <li>Original datetime: <b><?= $media['datetimeoriginal'] ?></b></li>
                     <li>Upload datetime: <b><?= $media['timestamp'] ?></b></li>
                     <li>Upload by: <b>User:<?= $media['user'] ?></b></li>
@@ -117,8 +113,14 @@ use Attogram\SharedMedia\Tagger\Tools;
                 </ul>
             </p>
             <p>
-                Categories:
-                <?= $this->smt->displayCategories($pageid, true) ?>
+                <em>Categories:</em>
+                <br />
+                <?= $this->smt->displayCategories($pageid) ?>
+            </p>
+            <p>
+                <em>Technical Categories:</em>
+                <br />
+                <small><?= $this->smt->displayCategories($pageid, true) ?></small>
             </p>
         </div>
     </div>

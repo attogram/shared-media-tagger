@@ -252,10 +252,7 @@ class Config
                 ) VALUES (
                     1,
                     'Demo',
-                    'Welcome to the Shared Media Tagger!
-                    Find out more at: <a href=\""
-                    . Tools::url('github_smt') . "\">"
-                    . Tools::url('github_smt') . "</a>'
+                    'Welcome to the Shared Media Tagger!'
                 )",
             'default_tag1' =>
                 "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '😊 Best', '😊')",
