@@ -10,25 +10,36 @@ use Attogram\Router\Router;
  */
 class Tagger
 {
+    /** @var string */
     public $protocol;
+    /** @var string */
     public $site;
+    /** @var string */
     public $title;
+    /** @var bool */
     public $useBootstrap;
+    /** @var bool */
     public $useJquery;
     /** @var Database */
     public $database;
     /** @var Router */
     public $router;
+    /** @var array  */
+    public $config;
 
+    public $testss = ['a' => 'b'];
     /**
      * Tagger constructor.
      * @param Router $router
+     * @param array $config
      */
-    public function __construct(Router $router)
+    public function __construct(Router $router, array $config = [])
     {
-
         $this->router = $router;
-        Config::setup($this->router);
+        $this->config = $config;
+
+        Config::setSiteUrl($router->getUriBase() . '/');
+        Config::setup($this->config);
 
         $this->database = new Database();
         Config::setSiteInfo(

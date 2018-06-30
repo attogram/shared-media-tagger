@@ -3,19 +3,15 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger;
 
-use Attogram\Router\Router;
-
 /**
  * Configuration for Shared Media Tagger
  */
 class Config
 {
-    public static $installDirectory;
+    public static $adminConfigFile;
     public static $links;
     public static $protocol;
-    public static $mimeTypesAudio;
-    public static $mimeTypesImage;
-    public static $mimeTypesVideo;
+    public static $publicDirectory;
     public static $server;
     public static $setup = [];
     public static $siteInfo;
@@ -23,22 +19,83 @@ class Config
     public static $siteUrl;
     public static $sizeMedium;
     public static $sizeThumb;
+    public static $sourceDirectory;
+    public static $mimeTypesAudio = [
+        'audio/mpeg',
+        'audio/x-flac',
+        'audio/midi',
+        'audio/wav',
+        'audio/webm',
+    ];
+    public static $mimeTypesImage = [
+        'image/jpeg',
+        'image/png',
+        'image/svg+xml',
+        'image/tiff',
+        'image/gif',
+        'image/vnd.djvu',
+        'image/x-xcf',
+        'image/webp',
+        'application/pdf',
+    ];
+    public static $mimeTypesVideo = [
+        'application/ogg',
+        'video/webm',
+    ];
 
     /**
-     * @param Router $router
+     * @param array $config
      */
-    public static function setup(Router $router)
+    public static function setup(array $config = [])
     {
-        self::$installDirectory = realpath(__DIR__ . '/..');
         self::$server = $_SERVER['SERVER_NAME'];
+
+        self::$publicDirectory = '../public';
+        if (!empty($config['publicDirectory'])) {
+            self::$publicDirectory = $config['publicDirectory'];
+        }
+
+        self::$sourceDirectory = '../src';
+        if (!empty($config['sourceDirectory'])) {
+            self::$sourceDirectory = $config['sourceDirectory'];
+        }
+
+        self::$adminConfigFile = './config.admin.php';
+        if (!empty($config['adminConfigFile'])) {
+            self::$adminConfigFile = $config['adminConfigFile'];
+        }
+
         self::$sizeMedium = 325;
+        if (!empty($config['sizeMedium'])) {
+            self::$sizeMedium = $config['sizeMedium'];
+        }
+
         self::$sizeThumb = 100;
-        self::$siteUrl = $router->getUriBase() . '/';
+        if (!empty($config['sizeThumb'])) {
+            self::$sizeThumb = $config['sizeThumb'];
+        }
+
+        self::$protocol = 'http:';
+        if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+        ) {
+            self::$protocol = 'https:';
+        }
+
         self::setLinks();
-        self::setProtocol();
-        self::setMimeTypes();
+
+        //Tools::debug('config = <pre>' . print_r($config, true) . '</pre>');
+        //$class = new \ReflectionClass(self::class);
+        //Tools::debug('<pre>' . print_r($class->getStaticProperties(), true) . '</pre>');
     }
 
+    /**
+     * @param string $siteUrl
+     */
+    public static function setSiteUrl(string $siteUrl)
+    {
+        self::$siteUrl = $siteUrl;
+    }
     /**
      * setLinks
      */
@@ -49,7 +106,7 @@ class Config
             'css'           => self::$siteUrl . 'css.css',
             'info'          => self::$siteUrl . 'i',
             'browse'        => self::$siteUrl . 'b',
-            'categories'    => self::$siteUrl . 'cc',
+            'categories'    => self::$siteUrl . 'categories',
             'category'      => self::$siteUrl . 'c',
             'reviews'       => self::$siteUrl . 'reviews',
             'login'         => self::$siteUrl . 'login',
@@ -61,35 +118,6 @@ class Config
             'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
             'bootstrap_css' => self::$siteUrl . 'use/bootstrap/css/bootstrap.min.css',
             'github_smt'    => 'https://github.com/attogram/shared-media-tagger',
-        ];
-    }
-
-    /**
-     * setMimeTypes
-     */
-    private static function setMimeTypes()
-    {
-        self::$mimeTypesAudio = [
-            'audio/mpeg',
-            'audio/x-flac',
-            'audio/midi',
-            'audio/wav',
-            'audio/webm',
-        ];
-        self::$mimeTypesImage = [
-            'image/jpeg',
-            'image/png',
-            'image/svg+xml',
-            'image/tiff',
-            'image/gif',
-            'image/vnd.djvu',
-            'image/x-xcf',
-            'image/webp',
-            'application/pdf',
-        ];
-        self::$mimeTypesVideo = [
-            'application/ogg',
-            'video/webm',
         ];
     }
 
@@ -110,19 +138,6 @@ class Config
         self::$siteInfo = $siteInfo[0];
         if (!isset(self::$siteInfo['curation'])) {
             self::$siteInfo['curation'] = 0;
-        }
-    }
-
-    /**
-     * setProtocol
-     */
-    private static function setProtocol()
-    {
-        self::$protocol = 'http:';
-        if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
-        ) {
-            self::$protocol = 'https:';
         }
     }
 
@@ -251,8 +266,10 @@ class Config
                     id, name, about
                 ) VALUES (
                     1,
-                    'Demo',
-                    'Welcome to the Shared Media Tagger!'
+                    'Shared Media Tagger',
+                    '<p>Welcome to your new Shared Media Tagger website.</p>
+                     <p>Setup your site now in the <a href=\"" . Tools::url('admin')
+                        . "\">Admin Backend</a>.</p>'
                 )",
             'default_tag1' =>
                 "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '😊 Best', '😊')",
@@ -280,7 +297,7 @@ class Config
                     imagedescription, artist, datetimeoriginal, 
                     licenseuri, licensename, licenseshortname, usageterms, attributionrequired, restrictions, 
                     size, width, height, sha1, mime, thumburl, thumbwidth, thumbheight, thumbmime, 
-                    user, userid, duration, timestamp, updated
+                    user, userid, duration, timestamp
                 ) VALUES (
                     11108315, 
                     0, 
@@ -309,8 +326,7 @@ class Config
                     'Galzigler',
                     1242770,
                     null,
-                    '2010-08-06T21:59:56Z',
-                    '1970-01-01 01:23:45'
+                    '2010-08-06T21:59:56Z'
                     )",
 
         'category2media1' =>

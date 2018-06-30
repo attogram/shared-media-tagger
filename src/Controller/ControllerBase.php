@@ -32,7 +32,7 @@ class ControllerBase
      */
     protected function getView($name)
     {
-        $view = Config::$installDirectory . '/src/View/' . $name . '.php';
+        $view = Config::$sourceDirectory . '/View/' . $name . '.php';
         if (!is_readable($view)) {
             Tools::error404('Page View Not Found');
         }

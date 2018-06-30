@@ -18,10 +18,11 @@ class TaggerAdmin extends Tagger
     /**
      * TaggerAdmin constructor.
      * @param Router $router
+     * @param array $config
      */
-    public function __construct(Router $router)
+    public function __construct(Router $router, array $config = [])
     {
-        parent::__construct($router);
+        parent::__construct($router, $config);
 
         if (empty($_SESSION['user'])) {
             header('Location: ' . Tools::url('login'));
@@ -58,7 +59,7 @@ class TaggerAdmin extends Tagger
      */
     public function checkRobotstxt()
     {
-        $robotstxt = Config::$installDirectory . '/robots.txt';
+        $robotstxt = Config::$publicDirectory . '/robots.txt';
         $tagUrl = str_replace('//'.Config::$server, '', Tools::url('tag'));
         $sitemapUrl = Config::$protocol . Tools::url('sitemap');
         $response = $robotstxt;

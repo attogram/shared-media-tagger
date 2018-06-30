@@ -31,14 +31,14 @@ use Attogram\SharedMedia\Tagger\Tools;
         <li>Site Name: <?= Config::$siteName ?></li>
         <li>URL: <a href="<?= Tools::url('home') ?>"><?= Tools::url('home') ?></a></li>
         <li>Protocol: <?= Config::$protocol ?></li>
-        <li>Install Directory: <?= Config::$installDirectory ?></li>
+        <li>Source Directory: <?= Config::$sourceDirectory ?></li>
     </ul>
 
     <hr />
     Discovery:
     <ul>
         <li>/public/.htaccess:
-            <?= (is_readable(Config::$installDirectory . '/public/.htaccess')
+            <?= (is_readable(Config::$publicDirectory . '/.htaccess')
                 ? '✔ACTIVE: '
                 : '❌MISSING'
             ) ?></li>

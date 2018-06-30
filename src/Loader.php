@@ -10,20 +10,26 @@ use Attogram\Router\Router;
  */
 class Loader
 {
+    /** @var array - Site Configuration */
+    private $config = [];
+
+    /** @var bool */
+    private $isAdminRoute = false;
+
     /** @var Router */
     private $router;
 
-    /** @var bool */
-    private $isAdmin = false;
-
     /**
      * Loader constructor.
+     * @param array $config - optional configuration settings
      */
-    public function __construct()
+    public function __construct(array $config = [])
     {
-        define('SHARED_MEDIA_TAGGER', '1.0.1');
+        define('SHARED_MEDIA_TAGGER', '1.0.0');
 
         ob_start('ob_gzhandler');
+
+        $this->config = $config;
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -34,6 +40,7 @@ class Loader
         $this->setPublicRoutes();
         $this->show();
 
+        $this->isAdminRoute = true;
         $this->setAdminRoutes();
         $this->show();
 
@@ -41,7 +48,7 @@ class Loader
     }
 
     /**
-     * show
+     * Show a page if there is a match
      */
     private function show()
     {
@@ -50,13 +57,13 @@ class Loader
             return;
         }
 
-        if ($this->isAdmin) {
-            $smt = new TaggerAdmin($this->router);
+        if ($this->isAdminRoute) {
+            $smt = new TaggerAdmin($this->router, $this->config);
         } else {
-            $smt = new Tagger($this->router);
+            $smt = new Tagger($this->router, $this->config);
         }
 
-        $control = Config::$installDirectory . '/src/Controller/' . $page . '.php';
+        $control = Config::$sourceDirectory . '/Controller/' . $page . '.php';
         if (is_readable($control)) {
             $class = 'Attogram\\SharedMedia\\Tagger\\Controller\\' . $page;
             if (class_exists($class)) {
@@ -65,7 +72,7 @@ class Loader
             }
         }
 
-        $view = Config::$installDirectory . '/src/View/' . $page . '.php';
+        $view = Config::$sourceDirectory . '/View/' . $page . '.php';
         if (is_readable($view)) {
             /** @noinspection PhpIncludeInspection */
             include $view;
@@ -76,13 +83,13 @@ class Loader
     }
 
     /**
-     * setPublicRoutes
+     * Set Public Routes
      */
     private function setPublicRoutes()
     {
         $this->router->allow('/', 'Home');
         $this->router->allow('/b', 'Browse');
-        $this->router->allow('/cc', 'Categories');
+        $this->router->allow('/categories', 'Categories');
         $this->router->allow('/c/?', 'Category');
         $this->router->allow('/i/?', 'Info');
         $this->router->allow('/reviews', 'Reviews');
@@ -93,11 +100,10 @@ class Loader
     }
 
     /**
-     * setAdminRoutes
+     * Set Admin Routes
      */
     private function setAdminRoutes()
     {
-        $this->isAdmin = true;
         $this->router->allow('/admin/', 'AdminHome');
         $this->router->allow('/admin/category', 'AdminCategory');
         $this->router->allow('/admin/curate', 'AdminCurate');
