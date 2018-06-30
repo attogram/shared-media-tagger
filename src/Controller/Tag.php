@@ -152,7 +152,7 @@ class Tag extends ControllerBase
 
         $next = $this->smt->database->getRandomMedia();
         if (isset($next[0]['pageid'])) {
-            header('Location: ./info?i=' . $next[0]['pageid']);
+            header('Location: ' . Tools::url('info') . '/' . $next[0]['pageid']);
             Tools::shutdown();
         }
 

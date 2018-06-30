@@ -144,7 +144,7 @@ class DatabaseAdmin extends Database
                 return false;
             }
             Tools::notice('SAVED MEDIA: ' . $new[':pageid'] . ' = <a href="' . Tools::url('info')
-                . '?i=' . $new[':pageid'] . '">' . Tools::stripPrefix($new[':title']) . '</a>');
+                . '/' . $new[':pageid'] . '">' . Tools::stripPrefix($new[':title']) . '</a>');
             if (!$this->linkMediaCategories($new[':pageid'])) {
                 Tools::error('::: FAILED to link media categories - p:' . $new[':pageid']);
             }
@@ -356,7 +356,7 @@ class DatabaseAdmin extends Database
         }
         Tools::notice(
             'SAVED CATEGORY: ' . $this->categoryId . ' = +<a href="'
-            . Tools::url('category') . '?c='
+            . Tools::url('category') . '/'
             . Tools::categoryUrlencode(Tools::stripPrefix($name))
             . '">' . htmlentities((string) Tools::stripPrefix($name)) . '</a>'
         );

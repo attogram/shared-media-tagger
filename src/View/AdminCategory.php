@@ -76,7 +76,7 @@ foreach ($cats as $cat) {
     $commonFilesCount += $cat['files'];
 
     print '<tr>'
-    . '<td><b><a href="' . Tools::url('category') . '?c='
+    . '<td><b><a href="' . Tools::url('category') . '/'
     . Tools::categoryUrlencode(Tools::stripPrefix($cat['name']))
     . '">' . Tools::stripPrefix($cat['name']) . '</a></b></td>';
 

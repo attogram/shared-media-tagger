@@ -22,13 +22,13 @@ use Attogram\SharedMedia\Tagger\Tools;
             <div class="left" style="margin:auto; width:<?= Config::$sizeMedium ?>px;">
                 <br />
                 <?= $this->smt->displayReviews($this->smt->database->getReviews($pageid)) ?>
-                <?= $this->smt->displayCategories($pageid, true) ?>
+                <?= $this->smt->displayCategories($pageid, false) ?>
                 <?= $data['admin'] ?>
             </div>
         </div>
         <div class="col-sm-6 box white">
             <p style="font-size:130%; font-weight:bold;">
-                <textarea disabled rows="5" style="width:100%;"><?=
+                <textarea readonly rows="5" style="width:100%;"><?=
                     !empty($media['imagedescription'])
                         ? strip_tags($media['imagedescription'])
                         : Tools::stripPrefix($media['title'])
@@ -103,7 +103,7 @@ use Attogram\SharedMedia\Tagger\Tools;
                 Media information:
                 <ul>
                     <li>ID: <b><?= $media['pageid']; ?></b></li>
-                    <li>source info: <a target="commons" href="<?=
+                    <li>Source info: <a target="commons" href="<?=
                         $media['descriptionshorturl'] ?>">commons.wikimedia.org</a></li>
                     <li>info: <a target="commons" href="//en.wikipedia.org/wiki/<?=
                         Tools::categoryUrlencode($media['title']) ?>">en.wikipedia.org</a></li>
@@ -116,7 +116,10 @@ use Attogram\SharedMedia\Tagger\Tools;
                     <li>Last refresh: <?= $media['updated'] ?> UTC</li>
                 </ul>
             </p>
-            <br />
+            <p>
+                Categories:
+                <?= $this->smt->displayCategories($pageid, true) ?>
+            </p>
         </div>
     </div>
 </div>

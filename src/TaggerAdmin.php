@@ -22,8 +22,12 @@ class TaggerAdmin extends Tagger
     public function __construct(Router $router)
     {
         parent::__construct($router);
+
+        if (empty($_SESSION['user'])) {
+            header('Location: ' . Tools::url('login'));
+        }
+
         ini_set('user_agent', 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER);
-        $this->setAdminCookie();
         $this->commons = new Commons();
         $this->database = new DatabaseAdmin();
         $this->commons->setDatabase($this->database);
@@ -47,17 +51,6 @@ class TaggerAdmin extends Tagger
             . $space . '<a href="' . $admin . 'user">USER</a>'
             . $space . '<a href="' . $admin . 'database">DATABASE</a>'
             . '</div>';
-    }
-
-    /**
-     * setAdminCookie
-     */
-    public function setAdminCookie()
-    {
-        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == '1') {
-            return;
-        }
-        setcookie('admin', '1', time()+28800, '/'); // 8 hour admin cookie
     }
 
     /**
@@ -152,7 +145,7 @@ class TaggerAdmin extends Tagger
             return $response . '<p>ERROR: failed to save media to database</p></div>';
         }
         $response .= '<p>OK: Saved media: <b><a href="' . Tools::url('info')
-        . '?i=' . $pageid . '">info?i=' . $pageid . '</a></b></p>';
+        . '/' . $pageid . '">info/' . $pageid . '</a></b></p>';
 
         if (!$this->commons->categories) {
             return $response . '<p>No Categories Found</p></div>';
@@ -160,7 +153,7 @@ class TaggerAdmin extends Tagger
         foreach ($this->commons->categories as $category) {
             $response .= '+'
             . '<a href="' . Tools::url('category')
-            . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($category['title']))
+            . '/' . Tools::categoryUrlencode(Tools::stripPrefix($category['title']))
             . '">' . Tools::stripPrefix($category['title']) . '</a><br />';
         }
         $response .= '</div>';

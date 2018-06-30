@@ -27,7 +27,7 @@ class AdminCategory extends ControllerBase
         if (isset($_GET['i']) && $_GET['i']) {
             $categoryName = Tools::categoryUrldecode($_GET['i']);
             $catUrl = '<a href="' . Tools::url('category')
-                . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
+                . '/' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
                 . htmlentities((string) Tools::stripPrefix($categoryName)) . '</a>';
             Tools::debug('Importing media from <b>' . $catUrl . '</b>');
             $this->smt->database->getMediaFromCategory($categoryName);
@@ -50,7 +50,7 @@ class AdminCategory extends ControllerBase
             if ($this->smt->database->saveCategoryInfo(urldecode($_GET['c']))) {
                 Tools::notice(
                     'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
-                    . '?c=' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
+                    . '/' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
                     . htmlentities((string) Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
                 );
             }

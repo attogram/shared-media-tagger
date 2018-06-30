@@ -30,12 +30,6 @@ class Tagger
         $this->router = $router;
         Config::setup($this->router);
 
-        if (isset($_GET['logoff'])) {
-            Tools::adminLogoff();
-            header('Location: ' . Tools::url('home'));
-            Tools::shutdown();
-        }
-
         $this->database = new Database();
         Config::setSiteInfo(
             $this->database->queryAsArray('SELECT * FROM site WHERE id = 1')
@@ -255,7 +249,7 @@ function checkAll(formname, checktoggle) {
             }
             $response .= ''
             . '+<a href="' . Tools::url('category')
-            . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($cat)) . '">'
+            . '/' . Tools::categoryUrlencode(Tools::stripPrefix($cat)) . '">'
             . Tools::stripPrefix($cat) . '</a><br />';
         }
         if (!$hidden) {
@@ -268,7 +262,7 @@ function checkAll(formname, checktoggle) {
 
         foreach ($hidden as $hcat) {
             $response .= '<br />+<a href="' . Tools::url('category')
-            . '?c=' . Tools::categoryUrlencode(Tools::stripPrefix($hcat)) . '">'
+            . '/' . Tools::categoryUrlencode(Tools::stripPrefix($hcat)) . '">'
             . Tools::stripPrefix($hcat) . '</a>';
         }
 
@@ -337,7 +331,6 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . Tools::url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
         . '<a href="' . Tools::url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
         . '<a href="' . Tools::url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
-        . '<a href="'. Tools::url('about') . '">❔About</a>'
         . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
@@ -353,7 +346,6 @@ function checkAll(formname, checktoggle) {
         . '<a href="' . Tools::url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . Tools::url('categories') . '">📂Categories</a>' . $space
         . '<a href="' . Tools::url('reviews') . '">🗳Reviews</a>' . $space
-        . '<a href="'. Tools::url('about') . '">❔About</a>'
         . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
@@ -370,7 +362,6 @@ function checkAll(formname, checktoggle) {
         . '<a class="menuj" title="Browse" href="' . Tools::url('browse') . '">🔎</a>' . $space
         . '<a class="menuj" title="Categories" href="' . Tools::url('categories') . '">📂</a>' . $space
         . '<a class="menuj" title="Reviews" href="' . Tools::url('reviews') . '">🗳</a>' . $space
-        . '<a class="menuj" title="About" href="' . Tools::url('about') . '">❔</a>' . $space
         . (Tools::isAdmin() ? '<a class="menuj" title="ADMIN" href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</span>'
         . '</div><div style="clear:both;"></div>';
@@ -386,7 +377,7 @@ function checkAll(formname, checktoggle) {
         $pageid = !empty($media['pageid']) ? $media['pageid'] : null;
         $title = !empty($media['title']) ? $media['title'] : null;
         return '<div style="display:inline-block;text-align:center;">'
-            . '<a href="' .  Tools::url('info') . '?i=' . $pageid . '">'
+            . '<a href="' .  Tools::url('info') . '/' . $pageid . '">'
             . '<img src="' . $thumb['url'] . '"'
             . ' width="' . $thumb['width'] . '"'
             . ' height="' . $thumb['height'] . '"'
@@ -489,7 +480,7 @@ function checkAll(formname, checktoggle) {
         if ($divwidth < Config::$sizeMedium) {
             $divwidth = Config::$sizeMedium;
         }
-        $infourl =  Tools::url('info') . '?i=' . $media['pageid'];
+        $infourl =  Tools::url('info') . '/' . $media['pageid'];
 
         return  '<div style="width:' . $divwidth . 'px; margin:auto;">'
         . '<a href="' . $infourl . '">'
@@ -538,7 +529,7 @@ function checkAll(formname, checktoggle) {
      */
     public function displayAttribution(array $media, $titleTruncate = 250, $artistTruncate = 48)
     {
-        $infourl = Tools::url('info') . '?i=' . $media['pageid'];
+        $infourl = Tools::url('info') . '/' . $media['pageid'];
         $title = htmlspecialchars(Tools::stripPrefix($media['title']));
 
         return '<div class="mediatitle left">'
@@ -622,22 +613,15 @@ function checkAll(formname, checktoggle) {
         . '<a target="commons" href="' . Tools::url('github_smt') . '">'
         . 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER . '</a></b></span>';
 
-        if (Tools::isAdmin()) {
-            print '<br /><br />'
-            . '<div style="text-align:left; word-wrap:none; line-height:1.42; font-family:monospace; font-size:10pt;">'
-            . '<a href="' . Tools::url('home') . '?logoff">LOGOFF</a>'
-            . '</div><br /><br /><br />';
+        if (!empty($_SESSION['user'])) {
+            print '<br />User: <b>' . $_SESSION['user'] . '</b>'
+                . '  &nbsp; &nbsp; '
+                . '<a href="' . Tools::url('logout') . '">Logout</a>';
+        } else {
+            print '<br /><a href="' . Tools::url('login') . '">Login</a>';
         }
 
         print '</div></footer>';
-
-        // Site footers
-        if (Tools::isAdmin() || get_class($this) == 'TaggerAdmin' || !$showSiteFooter) {
-            print '</body></html>';
-
-            return;
-        }
-
         $this->displaySiteFooter();
         print '</body></html>';
     }

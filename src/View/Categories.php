@@ -43,7 +43,7 @@ foreach ($categories as $category) {
     if (!isset($category['local_files'])) {
         $category['local_files'] = 0;
     }
-    $localUrl = Tools::url('category') . '?c='
+    $localUrl = Tools::url('category') . '/'
         . Tools::categoryUrlencode(Tools::stripPrefix($category['name']));
     print '<div class="catcon">'
     . '<div class="catfiles">' . number_format((float) $category['local_files']) . '</div>'

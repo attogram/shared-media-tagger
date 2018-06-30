@@ -17,7 +17,6 @@ use Attogram\SharedMedia\Tagger\Tools;
     <lastmod><?= $data['time'] ?></lastmod>
     <changefreq>always</changefreq>
 </url>
-<url><loc><?= $data['protocol'] . Tools::url('about') ?></loc></url>
 <url><loc><?= $data['protocol'] . Tools::url('categories') ?></loc></url>
 <url><loc><?= $data['protocol'] . Tools::url('browse') ?></loc></url>
 <url><loc><?= $data['protocol'] . Tools::url('reviews') ?></loc></url>
@@ -25,14 +24,14 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 foreach ($data['categories'] as $category) {
     print '<url><loc>' . $data['protocol']
-        . Tools::url('category') . '?c='
+        . Tools::url('category') . '/'
         . Tools::categoryUrlencode(Tools::stripPrefix($category['name']))
         . '</loc></url>';
 }
 
 foreach ($data['media'] as $media) {
     print '<url><loc>' . $data['protocol']
-        . Tools::url('info') . '?i=' . $media['pageid']
+        . Tools::url('info') . '/' . $media['pageid']
         . '</loc></url>';
 }
 

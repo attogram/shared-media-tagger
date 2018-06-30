@@ -1,13 +1,13 @@
 body { background-color:#222; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
-a { text-decoration:none !important; color:darkblue; }
+a { text-decoration:none; color:darkblue; }
 a:visited { color:darkblue; }
 a:hover { background-color:yellow; color:darkblue; }
 table { border-spacing:0; border:1px solid grey; border-collapse:collapse; margin:auto; background-color:white; }
 table td { padding:2px; vertical-align:top; }
 table th { padding:4px; vertical-align:center; font-size:75%; background-color:#ccc; }
 form { display:inline; }
-h1 { display:inline; font-size:150% !important; font-weight:bold !important; }
-h2 { display:inline; font-size:110% !important; font-weight:bold !important; }
+h1 { font-size:150%; font-weight:bold; }
+h2 { font-size:110%; font-weight:bold; }
 h3 { font-size:95%; display:inline; }
 h4 { font-size:70%; display:inline; }
 h5 { font-size:60%; display:inline; }

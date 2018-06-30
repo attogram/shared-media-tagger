@@ -7,25 +7,21 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 /**
- * Class About
+ * Class Category
  */
 class Category extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('Category');
-
-
-        $pageLimit = 20; // # of files per page
-
-        $categoryName = isset($_GET['c']) ? Tools::categoryUrldecode($_GET['c']) : false;
-
-        if (!$categoryName) {
-            $this->smt->fail404('404 Category Name Not Found');
+        $vars = $this->smt->router->getVars();
+        if (empty($vars[0])) {
+            $this->smt->fail404('404 Category Not Found');
         }
 
-        $this->smt->title = $categoryName . ' - ' . Config::$siteName;
+        $categoryName = Tools::categoryUrldecode($vars[0]);
 
+        $pageLimit = 20; // # of files per page
+        $this->smt->title = $categoryName . ' - ' . Config::$siteName;
         $categoryName = 'Category:' . $categoryName;
 
         $categoryInfo = $this->smt->database->getCategory($categoryName);
@@ -87,6 +83,7 @@ class Category extends ControllerBase
         $this->smt->includeHeader();
         $this->smt->includeMediumMenu();
 
+        $view = $this->getView('Category');
         /** @noinspection PhpIncludeInspection */
         include($view);
 

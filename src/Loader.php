@@ -25,6 +25,10 @@ class Loader
 
         ob_start('ob_gzhandler');
 
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
         $this->router = new Router();
 
         $this->setPublicRoutes();
@@ -68,7 +72,7 @@ class Loader
             Tools::shutdown();
         }
 
-        Tools::error404('Page view not found');
+        Tools::error404('Page Not found');
     }
 
     /**
@@ -77,14 +81,15 @@ class Loader
     private function setPublicRoutes()
     {
         $this->router->allow('/', 'Home');
-        $this->router->allow('/about', 'About');
-        $this->router->allow('/browse', 'Browse');
-        $this->router->allow('/category', 'Category');
-        $this->router->allow('/categories', 'Categories');
-        $this->router->allow('/info', 'Info');
+        $this->router->allow('/b', 'Browse');
+        $this->router->allow('/cc', 'Categories');
+        $this->router->allow('/c/?', 'Category');
+        $this->router->allow('/i/?', 'Info');
         $this->router->allow('/reviews', 'Reviews');
         $this->router->allow('/sitemap.xml', 'Sitemap');
         $this->router->allow('/tag', 'Tag');
+        $this->router->allow('/login', 'Login');
+        $this->router->allow('/logout', 'Logout');
     }
 
     /**

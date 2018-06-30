@@ -28,7 +28,7 @@ class Tools
      */
     public static function isAdmin()
     {
-        if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == 1) {
+        if (!empty($_SESSION['user'])) {
             return true;
         }
 

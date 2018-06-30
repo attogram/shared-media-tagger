@@ -178,11 +178,11 @@ class Database
     private function createSite()
     {
         $created = $this->queryAsBool(
-            "INSERT INTO site (id, name) VALUES (1, 'Demo')"
+            "INSERT INTO site (id, name) VALUES (1, 'Shared Media Tagger')"
         );
-        Tools::notice(
-            'Creating New Site: ' . ($created ? 'OK' : 'ERROR: ' . implode(', ', $this->lastError))
-        );
+        //Tools::notice(
+        //    'Creating New Site: ' . ($created ? 'OK' : 'ERROR: ' . implode(', ', $this->lastError))
+        //);
 
         return ['id' => 1, 'name' => 'Demo'];
     }

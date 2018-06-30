@@ -14,33 +14,20 @@ class Home extends ControllerBase
     protected function display()
     {
         $view = $this->getView('Home');
+
+        $data = $this->smt->database->getSite();
+        if (empty($data['about'])) {
+            $data['about'] = 'Site Offline: Database is not accessible.';
+        }
+        $data['name'] = !empty($data['name']) ? $data['name'] : 'Shared Media Tagger';
+
+        $data['random'] = $this->smt->database->getRandomMedia(4);
+
         $this->smt->title = Config::$siteName;
-
-        if (isset($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
-            $media = $this->smt->database->getMedia($_GET['i']);
-        } else {
-            $media = $this->smt->database->getRandomMedia(1);
-        }
-        if (empty($media[0])) {
-            $this->smt->includeHeader(true);
-            $this->smt->includeMenu();
-            Tools::error('No Media Files found... yet');
-            $this->smt->includeFooter();
-            Tools::shutdown();
-        }
-
-        $media = $media[0];
-
-        $data = [];
-        $data['tags'] = $this->smt->displayTags($media['pageid']);
-        $data['media']  = $this->smt->displayMedia($media);
-        $data['width']  = Config::$sizeMedium;
-        $data['reviews']  = $this->smt->displayReviews($this->smt->database->getReviews($media['pageid']));
-        $data['categories']  = $this->smt->displayCategories($media['pageid']);
-        $data['admin'] =  $this->smt->displayAdminMediaFunctions($media['pageid']);
-
-        $this->smt->includeHeader(false);
-        $this->smt->includeSmallMenu();
+        $this->smt->useBootstrap = true;
+        $this->smt->useJquery = true;
+        $this->smt->includeHeader();
+        $this->smt->includeMenu();
         /** @noinspection PhpIncludeInspection */
         include($view);
         $this->smt->includeFooter();

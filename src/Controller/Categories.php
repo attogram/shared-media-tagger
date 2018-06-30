@@ -6,7 +6,7 @@ namespace Attogram\SharedMedia\Tagger\Controller;
 use Attogram\SharedMedia\Tagger\Config;
 
 /**
- * Class About
+ * Class Categories
  */
 class Categories extends ControllerBase
 {

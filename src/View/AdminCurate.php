@@ -36,7 +36,7 @@ use Attogram\SharedMedia\Tagger\Tools;
             );
             print '<div>'
                 . '<a target="site" style="font-size:10pt; text-align:center;" href="'
-                . Tools::url('info') . '?i=' . $pageid . '">' . $pageid . '</a><br />'
+                . Tools::url('info') . '/' . $pageid . '">' . $pageid . '</a><br />'
                 . '<img name="' . $pageid . '" id="' . $pageid.'"  src="' . $url . '"'
                 . ' width="' . $width . '" height="' . $height . '" title="'
                 . $imgInfo . '" onclick="curation_click(this.id);" class="curation_que">'

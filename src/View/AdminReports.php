@@ -191,7 +191,7 @@ function catClean(TaggerAdmin $smt)
         . $category['missing'] . ' '
         . $category['id'] . $tab
         . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00') . $tab
-        . '<a target="site" href="' . Tools::url('category') . '?c='
+        . '<a target="site" href="' . Tools::url('category') . '/'
         . Tools::categoryUrlencode(Tools::stripPrefix($category['name']))
         . '">' . $category['name'] . '</a>'
         . '<br />';
