@@ -124,23 +124,40 @@ class Loader
      */
     private function redirects()
     {
+        Config::setSiteUrl($this->router->getUriBase() . '/');
+        Config::setLinks();
         $redirect = false;
-
-        new Tagger($this->router, $this->config);
-
-        //Tools::debug('<pre>getUriRelative: ' . $this->router->getUriRelative());
-        //Tools::debug('<pre>_GET: ' . print_r($_GET, true));
-
         switch ($this->router->getUriRelative()) {
-            case '/info':
+            case '/info.php':
                 if (!empty($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
                     $redirect = Tools::url('info') . '/' . $_GET['i'];
                     break;
                 }
                 $redirect = Tools::url('home');
                 break;
+            case '/categories.php':
+                $redirect = Tools::url('categories');
+                break;
+            case '/category.php':
+                print "HI!";
+                if (!empty($_GET['c'])) {
+                    $redirect = Tools::url('category') . '/' . $_GET['c'];
+                    break;
+                }
+                $redirect = Tools::url('categories');
+                break;
+            case '/contact.php':
+                if (!empty($_GET['r']) && Tools::isPositiveNumber($_GET['r'])) {
+                    $redirect = Tools::url('info') . '/' . $_GET['r'];
+                    break;
+                }
+                $redirect = Tools::url('home');
+                break;
+            case '/about.php':
+            case '/users.php':
+                $redirect = Tools::url('home');
+                break;
         }
-
         if ($redirect) {
             Tools::redirect301($redirect);
         }

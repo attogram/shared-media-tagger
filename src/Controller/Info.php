@@ -12,7 +12,7 @@ class Info extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('Info');
+
 
         $vars = $this->smt->router->getVars();
         if (empty($vars[0]) || !Tools::isPositiveNumber($vars[0])) {
@@ -26,11 +26,23 @@ class Info extends ControllerBase
             $this->smt->fail404('404 Media Not Found');
         }
         $media = $media[0];
+        $media['imagedescriptionSafe'] = !empty($media['imagedescription'])
+            ? trim(strip_tags($media['imagedescription']))
+            : Tools::stripPrefix($media['title']);
+
+
+        $rows = 2;
+        $rows += substr_count("\n", $media['imagedescriptionSafe']);
+        $rows += round(strlen($media['imagedescriptionSafe']) / 70);
+        $maxRows = 10;
+        if ($rows > $maxRows) {
+            $rows = $maxRows;
+        }
+        $media['imagedescriptionRows'] = $rows;
+
 
         $data = [];
         $data['admin'] =  $this->smt->displayAdminMediaFunctions($media['pageid']);
-
-        $this->smt->useBootstrap = true;
 
         $this->smt->title = 'Info: ' . Tools::stripPrefix($media['title']);
         $this->smt->useBootstrap = true;
@@ -39,7 +51,7 @@ class Info extends ControllerBase
         $this->smt->includeMediumMenu();
 
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('Info'));
 
         $this->smt->includeFooter();
     }

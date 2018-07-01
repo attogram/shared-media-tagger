@@ -20,7 +20,6 @@ use Attogram\SharedMedia\Tagger\Tools;
             <?= $this->smt->displayTags($pageid) ?>
             <?= $this->smt->displayMedia($media) ?>
             <div class="left" style="margin:auto; width:<?= Config::$sizeMedium ?>px;">
-                <br />
                 <?= $this->smt->displayReviews($this->smt->database->getReviews($pageid)) ?>
                 <?= $this->smt->displayCategories($pageid, false) ?>
                 <?= $data['admin'] ?>
@@ -28,12 +27,9 @@ use Attogram\SharedMedia\Tagger\Tools;
         </div>
         <div class="col-sm-6 box white">
             <p style="font-size:130%; font-weight:bold;">
-                <textarea readonly rows="5" style="width:100%;"><?=
-                    !empty($media['imagedescription'])
-                        ? strip_tags($media['imagedescription'])
-                        : Tools::stripPrefix($media['title'])
-                ?></textarea>
-
+                <textarea readonly rows="<?= $media['imagedescriptionRows'] ?>" style="width:100%;"><?=
+                    $media['imagedescriptionSafe']
+                    ?></textarea>
                 <ul>
                     <li>Source: <a target="c" href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
                     <li>ID: <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a></li>

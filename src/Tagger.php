@@ -180,14 +180,14 @@ function checkAll(formname, checktoggle) {
         if (!Tools::isAdmin() || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        return '<div class="attribution left" style="display:inline-block; float:right; border:1px solid red;">'
+        return '<div class="attribution left" style="display:inline-block;">'
         . '<a style="font-size:140%;" href="' . Tools::url('admin') . 'media?dm=' . $mediaId
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
-        . $mediaId . ' ?\');">❌</a>'
-        . '<input type="checkbox" name="media[]" value="' . $mediaId . '" />'
+        . $mediaId . ' ?\');">❌</a> &nbsp; '
+        . '<input type="checkbox" name="media[]" value="' . $mediaId . '" />  &nbsp; '
         . '<a style="font-size:170%;" href="' . Tools::url('admin') . 'media?am=' . $mediaId
         . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
-        . $mediaId . ' ?\');">♻</a>'
+        . $mediaId . ' ?\');">♻</a>  &nbsp; '
         . ' <a style="font-size:140%;" href="' . Tools::url('admin') . 'curate?i=' . $mediaId. '">C</a>'
         . '</div>';
     }
@@ -265,7 +265,7 @@ function checkAll(formname, checktoggle) {
         $response = '';
         foreach ($cats as $cat) {
             $response .= ''
-            . '+ <a href="' . Tools::url('category')
+            . '&nbsp;&nbsp; + <a href="' . Tools::url('category')
             . '/' . Tools::categoryUrlencode(Tools::stripPrefix($cat)) . '">'
             . Tools::stripPrefix($cat) . '</a><br />';
         }
@@ -605,7 +605,7 @@ function checkAll(formname, checktoggle) {
      */
     public function includeFooter($showSiteFooter = true)
     {
-        $this->includeMenu();
+        //$this->includeMenu();
         print '<footer><div class="menu" style="line-height:2; font-size:80%;">';
         if (empty(Config::$setup['hide_hosted_by']) || !Config::$setup['hide_hosted_by']) {
             $serverName = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : null;
