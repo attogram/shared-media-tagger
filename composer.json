@@ -1,0 +1,17 @@
+{
+    "name": "attogram/shared-media-tagger",
+    "description": "Shared Media Tagger",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/attogram/shared-media-tagger",
+    "require": {
+        "php": ">=7.0",
+        "attogram/router": "dev-master",
+        "attogram/shared-media-api": "^1.0@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Attogram\\SharedMedia\\Tagger\\": "src/"
+        }
+    }
+}

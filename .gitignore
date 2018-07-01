@@ -1,4 +1,6 @@
-_setup.php
-header.php
-footer.php
-robots.txt
+/vendor/
+/public/config.php
+/public/config.admin.php
+/public/robots.txt
+/public/favicon.ico
+/.idea
