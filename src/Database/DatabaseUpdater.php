@@ -1,7 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Attogram\SharedMedia\Tagger;
+namespace Attogram\SharedMedia\Tagger\Database;
+
+use Attogram\SharedMedia\Tagger\Config;
+use Attogram\SharedMedia\Tagger\Tools;
 
 /**
  * Class DatabaseUpdater
@@ -116,10 +119,8 @@ class DatabaseUpdater
             $toUpdate[] = $name;
         }
         if (!$toUpdate) {
-            //Tools::notice('OK: ' . sizeof($this->sqlNew) . ' tables up-to-date');
             return true;
         }
-        //Tools::notice(sizeof($toUpdate) . ' tables to update: ' . implode($toUpdate, ', '));
         foreach ($toUpdate as $tableName) {
             $this->updateTable($tableName);
         }
@@ -154,9 +155,7 @@ class DatabaseUpdater
                 $cols[] = $newCol['name'];
             }
         }
-        if (!$cols) {
-            $newSize = 0;
-        } else {
+        if ($cols) {
             $oldSize = $this->getTableSize($tableName);
             $cols = implode($cols, ', ');
             $sql = "INSERT INTO '$tmpName' ( $cols ) SELECT $cols FROM $tableName";
@@ -182,7 +181,6 @@ class DatabaseUpdater
             return false;
         }
         $this->database->commit();
-        //Tools::notice('OK: Table Structure Updated: ' . $tableName . ': +' . number_format((float) $newSize) . ' rows');
         $this->database->queryAsBool("DROP TABLE IF EXISTS '$tmpName'");
         $this->database->queryAsBool("DROP TABLE IF EXISTS '$backupName'");
         $this->database->vacuum();

@@ -1,6 +1,6 @@
 /vendor/
 /public/config.php
 /public/config.admin.php
-/robots.txt
-/favicon.ico
-/.idea/
+/public/robots.txt
+/public/favicon.ico
+/.idea

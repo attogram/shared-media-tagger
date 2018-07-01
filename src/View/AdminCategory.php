@@ -112,7 +112,7 @@ foreach ($cats as $cat) {
     print '<td class="right">' . $subcatslink . '</td>';
 
     print ''
-    . '<td style="padding:0 10px 0 10px;"><a target="commons" href="https://commons.wikimedia.org/wiki/'
+    . '<td style="padding:0 10px 0 10px;"><a target="c" href="https://commons.wikimedia.org/wiki/'
         . Tools::categoryUrlencode($cat['name']) . '">View</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="?c='
         . Tools::categoryUrlencode($cat['name']) . '">Info</a></td>'

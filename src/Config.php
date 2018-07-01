@@ -9,6 +9,7 @@ namespace Attogram\SharedMedia\Tagger;
 class Config
 {
     public static $adminConfigFile;
+    public static $databaseDirectory;
     public static $links;
     public static $protocol;
     public static $publicDirectory;
@@ -58,6 +59,11 @@ class Config
         self::$sourceDirectory = '../src';
         if (!empty($config['sourceDirectory'])) {
             self::$sourceDirectory = $config['sourceDirectory'];
+        }
+
+        self::$databaseDirectory = '../src';
+        if (!empty($config['databaseDirectory'])) {
+            self::$databaseDirectory = $config['databaseDirectory'];
         }
 
         self::$adminConfigFile = './config.admin.php';
@@ -268,7 +274,7 @@ class Config
                     1,
                     'Shared Media Tagger',
                     '<p>Welcome to your new Shared Media Tagger website.</p>
-                     <p>Setup your site now in the <a href=\"" . Tools::url('admin')
+                     <p>Setup your installation now in the <a href=\"" . Tools::url('admin')
                         . "\">Admin Backend</a>.</p>'
                 )",
             'default_tag1' =>
@@ -285,10 +291,10 @@ class Config
             'category1' =>
                 "INSERT INTO category (
                     id, name, curated, pageid, files, subcats, local_files, curated_files, 
-                    missing, hidden, force, updated
+                    missing, hidden, force
                 ) VALUES (
                     1, 'Category:Test patterns', 0, 202140, 99, 3, 1, 0, 
-                    0, 0, null, '1970-01-01 01:23:45'
+                    0, 0, null
                 )",
 
             'media1' =>
@@ -331,9 +337,9 @@ class Config
 
         'category2media1' =>
             "INSERT INTO category2media (
-                id, category_id, media_pageid, updated
+                id, category_id, media_pageid
             ) VALUES (
-                1, 1, 11108315, '1970-01-01 01:23:45'
+                1, 1, 11108315
             )",
         ];
     }

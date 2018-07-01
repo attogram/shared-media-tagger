@@ -4,6 +4,8 @@ declare(strict_types = 1);
 namespace Attogram\SharedMedia\Tagger;
 
 use Attogram\Router\Router;
+use Attogram\SharedMedia\Tagger\Database\Database;
+use Attogram\SharedMedia\Tagger\Database\DatabaseUpdater;
 
 /**
  * Class Tagger
@@ -42,9 +44,17 @@ class Tagger
         Config::setup($this->config);
 
         $this->database = new Database();
-        Config::setSiteInfo(
-            $this->database->queryAsArray('SELECT * FROM site WHERE id = 1')
-        );
+
+        $siteInfo = $this->database->queryAsArray('SELECT * FROM site WHERE id = 1');
+        if (!$siteInfo) {
+            $databaseUpdater = new DatabaseUpdater();
+            $databaseUpdater->setDatabase($this->database);
+            $databaseUpdater->createTables();
+            $databaseUpdater->seedDemo();
+            Tools::debug('New site database created and seeded.');
+        }
+
+        Config::setSiteInfo($siteInfo);
 
         $this->database->getUser();
     }
@@ -212,7 +222,7 @@ function checkAll(formname, checktoggle) {
         . '</script>'
         . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
         . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-        . '<br /><br /><a target="commons" href="https://commons.wikimedia.org/wiki/'
+        . '<br /><br /><a target="c" href="https://commons.wikimedia.org/wiki/'
         . Tools::categoryUrlencode($category['name']) . '">VIEW ON COMMONS</a>'
         . '<br /><br /><a href="' . Tools::url('admin') . 'category/?c='
         . Tools::categoryUrlencode($category['name']) . '">Get Category Info</a>'
@@ -604,7 +614,7 @@ function checkAll(formname, checktoggle) {
         print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
 
         print '<span class="nobr">Powered by <b>'
-        . '<a target="commons" href="' . Tools::url('github_smt') . '">'
+        . '<a target="c" href="' . Tools::url('github_smt') . '">'
         . 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER . '</a></b></span>';
 
         if (!empty($_SESSION['user'])) {
@@ -616,7 +626,11 @@ function checkAll(formname, checktoggle) {
         }
 
         print '</div></footer>';
-        $this->displaySiteFooter();
+
+        if ($showSiteFooter) {
+            $this->displaySiteFooter();
+        }
+
         print '</body></html>';
     }
 }

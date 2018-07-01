@@ -51,11 +51,11 @@ use Attogram\SharedMedia\Tagger\Tools;
     <hr />
     About Shared Media Tagger:
     <ul>
-        <li><a target="commons"
+        <li><a target="c"
                         href="<?= Tools::url('github_smt') ?>">Github: attogram/shared-media-tagger</a></li>
-        <li><a target="commons"
+        <li><a target="c"
                href="<?= Tools::url('github_smt') ?>/blob/master/README.md">README</a></li>
-        <li><a target="commons"
+        <li><a target="c"
                href="<?= Tools::url('github_smt') ?>/blob/master/LICENSE.md">LICENSE</a></li>
     </ul>
 

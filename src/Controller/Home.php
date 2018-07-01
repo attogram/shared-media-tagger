@@ -13,7 +13,10 @@ class Home extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('Home');
+        // v.0 old uris
+        if (!empty($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
+            Tools::redirect301(Tools::url('info') . '/' . $_GET['i']);
+        }
 
         $data = $this->smt->database->getSite();
         if (empty($data['about'])) {
@@ -27,6 +30,7 @@ class Home extends ControllerBase
         $this->smt->useBootstrap = true;
         $this->smt->useJquery = true;
         $this->smt->includeHeader();
+        $view = $this->getView('Home');
         /** @noinspection PhpIncludeInspection */
         include($view);
         $this->smt->includeFooter();

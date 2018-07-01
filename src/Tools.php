@@ -238,8 +238,6 @@ class Tools
         }
     }
 
-    // Logging
-
     /**
      * @param string $message
      */
@@ -331,10 +329,31 @@ class Tools
             header('HTTP/1.0 ' . $header);
             print '<h1>' . $header . '</h1>';
         }
+
         if ($message) {
             print '<h2>' . $message . '</h2>';
         }
 
+        session_write_close();
+
         exit;
+    }
+
+    /**
+     * @param string $url
+     */
+    public static function redirect(string $url)
+    {
+        header('Location: ' . $url);
+        Tools::shutdown();
+    }
+
+    /**
+     * @param string $url
+     */
+    public static function redirect301(string $url)
+    {
+        header('HTTP/1.1 301 Moved Permanently');
+        self::redirect($url);
     }
 }

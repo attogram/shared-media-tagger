@@ -44,6 +44,8 @@ class Loader
         $this->setAdminRoutes();
         $this->show();
 
+        $this->redirects();
+
         Tools::error404('Page Not Found');
     }
 
@@ -115,5 +117,32 @@ class Loader
         $this->router->allow('/admin/sqladmin', 'AdminSqladmin');
         $this->router->allow('/admin/tag', 'AdminTag');
         $this->router->allow('/admin/user', 'AdminUser');
+    }
+
+    /**
+     * Redirect old v.0 urls
+     */
+    private function redirects()
+    {
+        $redirect = false;
+
+        new Tagger($this->router, $this->config);
+
+        //Tools::debug('<pre>getUriRelative: ' . $this->router->getUriRelative());
+        //Tools::debug('<pre>_GET: ' . print_r($_GET, true));
+
+        switch ($this->router->getUriRelative()) {
+            case '/info':
+                if (!empty($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
+                    $redirect = Tools::url('info') . '/' . $_GET['i'];
+                    break;
+                }
+                $redirect = Tools::url('home');
+                break;
+        }
+
+        if ($redirect) {
+            Tools::redirect301($redirect);
+        }
     }
 }

@@ -8,8 +8,6 @@
 
 declare(strict_types = 1);
 
-use Attogram\SharedMedia\Tagger\Tools;
-
 $smt->title = 'User Admin';
 $smt->includeHeader();
 $smt->includeMediumMenu();

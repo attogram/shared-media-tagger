@@ -14,7 +14,7 @@ $config['publicDirectory'] = '../public';
 $config['sourceDirectory'] = '../src';
 
 /** Path to database directory, with NO trailing slash  */
-$config['database'] = '../db';
+$config['databaseDirectory'] = '../db';
 
 /** Default Medium width for media, in pixels */
 $config['sizeMedium'] = 325;

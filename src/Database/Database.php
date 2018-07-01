@@ -1,8 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Attogram\SharedMedia\Tagger;
+namespace Attogram\SharedMedia\Tagger\Database;
 
+use Attogram\SharedMedia\Tagger\Config;
+use Attogram\SharedMedia\Tagger\Tools;
 use PDO;
 use PDOException;
 
@@ -37,14 +39,12 @@ class Database
     /** @var int */
     private $totalReviewCount;
 
-    // Database
-
     /**
      * Database constructor.
      */
     public function __construct()
     {
-        $this->databaseName = realpath(__DIR__ . '/..') . '/db/media.sqlite';
+        $this->databaseName = Config::$databaseDirectory . '/media.sqlite';
     }
 
     /**
@@ -75,7 +75,7 @@ class Database
         try {
             return $this->db = new PDO('sqlite:' . $this->databaseName);
         } catch (PDOException $error) {
-            Tools::error('::initDatabase: ' . $this->databaseName . '  ERROR: ' . $error->getMessage());
+            Tools::error('Error Initalizing Database: ' . $error->getMessage());
 
             return $this->db = false;
         }
@@ -177,14 +177,11 @@ class Database
      */
     private function createSite()
     {
-        $created = $this->queryAsBool(
+        $this->queryAsBool(
             "INSERT INTO site (id, name) VALUES (1, 'Shared Media Tagger')"
         );
-        //Tools::notice(
-        //    'Creating New Site: ' . ($created ? 'OK' : 'ERROR: ' . implode(', ', $this->lastError))
-        //);
 
-        return ['id' => 1, 'name' => 'Demo'];
+        return ['id' => 1, 'name' => 'Shared Media Tagger'];
     }
 
     // Counts
@@ -305,16 +302,17 @@ class Database
      */
     public function getRandomMedia($limit = 1)
     {
-        if (mt_rand(1, 7) == 1) { // 1 in 7 chance of getting UNREVIEWED media
-            $unreviewed = $this->getRandomUnreviewedMedia($limit);
-            if ($unreviewed) {
-                return $unreviewed;
-            }
+
+        $unreviewed = $this->getRandomUnreviewedMedia($limit);
+        if ($unreviewed) {
+            return $unreviewed;
         }
+
         $where = '';
         if (Config::$siteInfo['curation'] == 1) {
             $where = "WHERE curated == '1'";
         }
+
         $sql = 'SELECT *
                 FROM media ' . $where . '
                 ORDER BY RANDOM()
@@ -788,5 +786,44 @@ class Database
         }
 
         return $this->queryAsArray($sql, [':pageid' => $pageid]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function vacuum()
+    {
+        if ($this->queryAsBool('VACUUM')) {
+            return true;
+        }
+        Tools::error('FAILED to VACUUM');
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function beginTransaction()
+    {
+        if ($this->queryAsBool('BEGIN TRANSACTION')) {
+            return true;
+        }
+        Tools::error('FAILED to BEGIN TRANSACTION');
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function commit()
+    {
+        if ($this->queryAsBool('COMMIT')) {
+            return true;
+        }
+        Tools::error('FAILED to COMMIT');
+
+        return false;
     }
 }

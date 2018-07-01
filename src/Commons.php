@@ -3,6 +3,9 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger;
 
+use Attogram\SharedMedia\Tagger\Database\Database;
+use Attogram\SharedMedia\Tagger\Database\DatabaseAdmin;
+
 /**
  * Class Commons
  */
@@ -57,7 +60,7 @@ class Commons
         $getResponse = @file_get_contents($url);
         if ($getResponse === false) {
             Tools::error('Cannnot reach API endpoint'
-                . '<br />URL: <a target="commons" href="' . $url . '">' . $url  .'</a>'
+                . '<br />URL: <a target="c" href="' . $url . '">' . $url  .'</a>'
                 . '<br />Exiting.');
             print '</div>';
 

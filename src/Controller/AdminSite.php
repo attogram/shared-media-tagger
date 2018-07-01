@@ -3,9 +3,6 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger\Controller;
 
-use Attogram\SharedMedia\Tagger\Config;
-use Attogram\SharedMedia\Tagger\Tools;
-
 /**
  * Class AdminSite
  */
@@ -13,8 +10,6 @@ class AdminSite extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('AdminSite');
-
         if (isset($_POST) && $_POST) {
             $this->smt->saveSiteInfo();
         }
@@ -32,6 +27,7 @@ class AdminSite extends ControllerBase
         $this->smt->includeHeader();
         $this->smt->includeMediumMenu();
         $this->smt->includeAdminMenu();
+        $view = $this->getView('AdminSite');
         /** @noinspection PhpIncludeInspection */
         include($view);
         $this->smt->includeFooter();

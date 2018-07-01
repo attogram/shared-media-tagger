@@ -1,7 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Attogram\SharedMedia\Tagger;
+namespace Attogram\SharedMedia\Tagger\Database;
+
+use Attogram\SharedMedia\Tagger\Commons;
+use Attogram\SharedMedia\Tagger\Tools;
 
 /**
  * Class DatabaseAdmin
@@ -29,45 +32,6 @@ class DatabaseAdmin extends Database
         $this->commons = $commons;
     }
 
-    /**
-     * @return bool
-     */
-    public function vacuum()
-    {
-        if ($this->queryAsBool('VACUUM')) {
-            return true;
-        }
-        Tools::error('FAILED to VACUUM');
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function beginTransaction()
-    {
-        if ($this->queryAsBool('BEGIN TRANSACTION')) {
-            return true;
-        }
-        Tools::error('FAILED to BEGIN TRANSACTION');
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function commit()
-    {
-        if ($this->queryAsBool('COMMIT')) {
-            return true;
-        }
-        Tools::error('FAILED to COMMIT');
-
-        return false;
-    }
-
     // Media
 
     /**
@@ -85,41 +49,66 @@ class DatabaseAdmin extends Database
         $this->beginTransaction();
         foreach ($media as $id => $mediaFile) {
             $new = [];
-            $new[':pageid'] = @$mediaFile['pageid'];
-            $new[':title'] = @$mediaFile['title'];
-            $new[':url'] = @$mediaFile['imageinfo'][0]['url'];
+            $new[':pageid'] = !empty($mediaFile['pageid']) ? $mediaFile['pageid'] : '';
+            $new[':title'] = !empty($mediaFile['title']) ? $mediaFile['title'] : '';
+            $new[':url'] = !empty($mediaFile['imageinfo'][0]['url']) ? $mediaFile['imageinfo'][0]['url'] : '';
             if (!isset($new[':url']) || $new[':url'] == '') {
                 Tools::error(
                     '::save_media_to_database: ERROR: NO URL: SKIPPING: pageid='
-                    . @$new[':pageid'] . ' title=' . @$new[':title']
+                    . (!empty($new[':pageid']) ? $new[':pageid'] : '?')
+                    . ' title='
+                    . (!empty($new[':title']) ? $new[':title'] : '?')
                 );
                 $errors[ $new[':pageid'] ] = $new[':title'];
                 continue;
             }
-            $new[':descriptionurl'] = @$mediaFile['imageinfo'][0]['descriptionurl'];
-            $new[':descriptionshorturl'] = @$mediaFile['imageinfo'][0]['descriptionshorturl'];
-            $new[':imagedescription'] = @$mediaFile['imageinfo'][0]['extmetadata']['ImageDescription']['value'];
-            $new[':artist'] = @$mediaFile['imageinfo'][0]['extmetadata']['Artist']['value'];
-            $new[':datetimeoriginal'] = @$mediaFile['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'];
-            $new[':licenseshortname'] = @$mediaFile['imageinfo'][0]['extmetadata']['LicenseShortName']['value'];
-            $new[':usageterms'] = @$mediaFile['imageinfo'][0]['extmetadata']['UsageTerms']['value'];
-            $new[':attributionrequired'] = @$mediaFile['imageinfo'][0]['extmetadata']['AttributionRequired']['value'];
-            $new[':restrictions'] = @$mediaFile['imageinfo'][0]['extmetadata']['Restrictions']['value'];
+            $new[':descriptionurl'] = !empty($mediaFile['imageinfo'][0]['descriptionurl'])
+                ? $mediaFile['imageinfo'][0]['descriptionurl'] : '';
+            $new[':descriptionshorturl'] = !empty($mediaFile['imageinfo'][0]['descriptionshorturl'])
+                ? $mediaFile['imageinfo'][0]['descriptionshorturl'] : '';
+            $new[':imagedescription'] = !empty($mediaFile['imageinfo'][0]['extmetadata']['ImageDescription']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['ImageDescription']['value'] : '';
+            $new[':artist'] = !empty($mediaFile['imageinfo'][0]['extmetadata']['Artist']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['Artist']['value'] : '';
+            $new[':datetimeoriginal'] = !empty($mediaFile['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['DateTimeOriginal']['value'] : '';
+            $new[':licenseshortname'] = !empty($mediaFile['imageinfo'][0]['extmetadata']['LicenseShortName']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['LicenseShortName']['value'] : '';
+            $new[':usageterms'] = !empty($mediaFile['imageinfo'][0]['extmetadata']['UsageTerms']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['UsageTerms']['value'] : '';
+            $new[':attributionrequired'] =
+                !empty($mediaFile['imageinfo'][0]['extmetadata']['AttributionRequired']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['AttributionRequired']['value'] : '';
+            $new[':restrictions'] = !empty($mediaFile['imageinfo'][0]['extmetadata']['Restrictions']['value'])
+                ? $mediaFile['imageinfo'][0]['extmetadata']['Restrictions']['value'] : '';
             $new[':licenseuri'] = Tools::openContentLicenseUri($new[':licenseshortname']);
             $new[':licensename'] = Tools::openContentLicenseName($new[':licenseuri']);
-            $new[':size'] = @$mediaFile['imageinfo'][0]['size'];
-            $new[':width'] = @$mediaFile['imageinfo'][0]['width'];
-            $new[':height'] = @$mediaFile['imageinfo'][0]['height'];
-            $new[':sha1'] = @$mediaFile['imageinfo'][0]['sha1'];
-            $new[':mime'] = @$mediaFile['imageinfo'][0]['mime'];
-            $new[':thumburl'] = @$mediaFile['imageinfo'][0]['thumburl'];
-            $new[':thumbwidth'] = @$mediaFile['imageinfo'][0]['thumbwidth'];
-            $new[':thumbheight'] = @$mediaFile['imageinfo'][0]['thumbheight'];
-            $new[':thumbmime'] = @$mediaFile['imageinfo'][0]['thumbmime'];
-            $new[':user'] = @$mediaFile['imageinfo'][0]['user'];
-            $new[':userid'] = @$mediaFile['imageinfo'][0]['userid'];
-            $new[':duration'] = @$mediaFile['imageinfo'][0]['duration'];
-            $new[':timestamp'] = @$mediaFile['imageinfo'][0]['timestamp'];
+            $new[':size'] = !empty($mediaFile['imageinfo'][0]['size'])
+                ? $mediaFile['imageinfo'][0]['size'] : '';
+            $new[':width'] = !empty($mediaFile['imageinfo'][0]['width'])
+                ? $mediaFile['imageinfo'][0]['width'] : '';
+            $new[':height'] = !empty($mediaFile['imageinfo'][0]['height'])
+                ? $mediaFile['imageinfo'][0]['height'] : '';
+            $new[':sha1'] = !empty($mediaFile['imageinfo'][0]['sha1'])
+                ? $mediaFile['imageinfo'][0]['sha1'] : '';
+            $new[':mime'] = !empty($mediaFile['imageinfo'][0]['mime'])
+                ? $mediaFile['imageinfo'][0]['mime'] : '';
+            $new[':thumburl'] = !empty($mediaFile['imageinfo'][0]['thumburl'])
+                ? $mediaFile['imageinfo'][0]['thumburl'] : '';
+            $new[':thumbwidth'] = !empty($mediaFile['imageinfo'][0]['thumbwidth'])
+                ? $mediaFile['imageinfo'][0]['thumbwidth'] : '';
+            $new[':thumbheight'] = !empty($mediaFile['imageinfo'][0]['thumbheight'])
+                ? $mediaFile['imageinfo'][0]['thumbheight'] : '';
+            $new[':thumbmime'] = !empty($mediaFile['imageinfo'][0]['thumbmime'])
+                ? $mediaFile['imageinfo'][0]['thumbmime'] : '';
+            $new[':user'] = !empty($mediaFile['imageinfo'][0]['user'])
+                ? $mediaFile['imageinfo'][0]['user'] : '';
+            $new[':userid'] = !empty($mediaFile['imageinfo'][0]['userid'])
+                ? $mediaFile['imageinfo'][0]['userid'] : '';
+            $new[':duration'] = !empty($mediaFile['imageinfo'][0]['duration'])
+                ? $mediaFile['imageinfo'][0]['duration'] : '';
+            $new[':timestamp'] = !empty($mediaFile['imageinfo'][0]['timestamp'])
+                ? $mediaFile['imageinfo'][0]['timestamp'] : '';
             $sql = "INSERT OR REPLACE INTO media (
                         pageid, title, url,
                         descriptionurl, descriptionshorturl, imagedescription,
@@ -386,7 +375,7 @@ class DatabaseAdmin extends Database
             $categoryInfo = $onesy; // is always just 1 result
         }
         $bind = [];
-        if (@$categoryInfo['pageid'] != $categoryRow['pageid']) {
+        if (!empty($categoryInfo['pageid']) && ($categoryInfo['pageid'] != $categoryRow['pageid'])) {
             $bind[':pageid'] = $categoryInfo['pageid'];
         }
         if ($categoryInfo['categoryinfo']['files'] != $categoryRow['files']) {
@@ -410,8 +399,7 @@ class DatabaseAdmin extends Database
             $bind[':missing'] = $missing;
         }
         if (!$bind) {
-            Tools::debug('saveCategoryInfo: nothing to update');
-
+            //Tools::debug('saveCategoryInfo: Category OK. nothing to update');
             return true;
         }
         $sql = 'UPDATE category SET ';

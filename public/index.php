@@ -10,7 +10,7 @@ if (is_readable('config.php')) {
     include('config.php');
 }
 
-if (!is_array($config)) {
+if (empty($config) || !is_array($config)) {
     /** @var array $config */
     $config = [];
 }

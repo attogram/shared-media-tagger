@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Attogram\SharedMedia\Tagger;
 
 use Attogram\Router\Router;
+use Attogram\SharedMedia\Tagger\Database\DatabaseAdmin;
 
 /**
  * Class TaggerAdmin
@@ -223,7 +224,7 @@ class TaggerAdmin extends Tagger
             print '<input type="checkbox" name="cats[]" value="' . urlencode($cat['title']) . '"><strong>'
                 . $cat['title']
                 . '</strong><small> '
-                . '<a target="commons" href="https://commons.wikimedia.org/wiki/'
+                . '<a target="c" href="https://commons.wikimedia.org/wiki/'
                 . Tools::categoryUrlencode($cat['title']) . '">(view)</a> '
                 . ' (' . $cat['snippet'] . ')'
                 . ' (size:' . $cat['size'] . ')</small><br />';
