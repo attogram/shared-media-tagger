@@ -18,7 +18,7 @@ class Home extends ControllerBase
         }
         $data = $this->smt->database->getSite();
         if (empty($data['about'])) {
-            $data['about'] = 'Site Offline: Database is not accessible.';
+            $data['about'] = 'Site Database not accessible.';
         }
         $data['name'] = !empty($data['name']) ? $data['name'] : 'Shared Media Tagger';
         $data['random'] = $this->smt->database->getRandomMedia(4);

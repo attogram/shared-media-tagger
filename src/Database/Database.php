@@ -294,15 +294,12 @@ class Database
         return $this->totalReviewCount = 0;
     }
 
-    // Random
-
     /**
      * @param int $limit
      * @return array|bool
      */
     public function getRandomMedia($limit = 1)
     {
-
         $unreviewed = $this->getRandomUnreviewedMedia($limit);
         if ($unreviewed) {
             return $unreviewed;
@@ -333,7 +330,7 @@ class Database
         $sql = "
             SELECT m.*
             FROM media AS m
-            LEFT JOIN tagging AS t ON t.media_pageid = m.pageid
+            LEFT JOIN user_tagging AS t ON t.media_pageid = m.pageid
             WHERE t.media_pageid IS NULL $and
             ORDER BY RANDOM()
             LIMIT :limit";
