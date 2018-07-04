@@ -23,6 +23,8 @@ class AdminSite extends ControllerBase
         $site['curation'] = !empty($site['curation']) ? $site['curation'] :false;
         $site['updated'] = !empty($site['updated']) ? htmlentities((string) $site['updated']) : '';
 
+        header('X-XSS-Protection:0'); // allow html in admin forms
+
         $this->smt->title = 'Site Admin';
         $this->smt->includeHeader();
         $this->smt->includeMediumMenu();
