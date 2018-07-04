@@ -10,10 +10,6 @@ class AdminSite extends ControllerBase
 {
     protected function display()
     {
-        if (isset($_POST) && $_POST) {
-            $this->smt->saveSiteInfo();
-        }
-
         $site = $this->smt->database->getSite();
         $site['id'] = !empty($site['id']) ? (int) $site['id'] : 1;
         $site['name'] = !empty($site['name']) ? htmlentities((string) $site['name']) : '';
@@ -23,12 +19,17 @@ class AdminSite extends ControllerBase
         $site['curation'] = !empty($site['curation']) ? $site['curation'] :false;
         $site['updated'] = !empty($site['updated']) ? htmlentities((string) $site['updated']) : '';
 
-        header('X-XSS-Protection:0'); // allow html in admin forms
+        header('X-XSS-Protection:0');
 
         $this->smt->title = 'Site Admin';
         $this->smt->includeHeader();
         $this->smt->includeMediumMenu();
         $this->smt->includeAdminMenu();
+
+        if (isset($_POST) && $_POST) {
+            $this->smt->saveSiteInfo();
+        }
+        
         $view = $this->getView('AdminSite');
         /** @noinspection PhpIncludeInspection */
         include($view);
