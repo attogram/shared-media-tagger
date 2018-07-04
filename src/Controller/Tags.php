@@ -59,7 +59,7 @@ class Tags extends ControllerBase
                 break;
 
             case 'total.reviews':
-                $orderDesc = 'Total # of reviews';
+                $orderDesc = 'Total # of tags';
                 $sql = '
                     SELECT SUM(t.count) AS tcount, t.tag_id, m.*
                     FROM tagging AS t, media AS m

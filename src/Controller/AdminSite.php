@@ -29,7 +29,7 @@ class AdminSite extends ControllerBase
         if (isset($_POST) && $_POST) {
             $this->smt->saveSiteInfo();
         }
-        
+
         $view = $this->getView('AdminSite');
         /** @noinspection PhpIncludeInspection */
         include($view);

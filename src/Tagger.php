@@ -305,7 +305,7 @@ function checkAll(formname, checktoggle) {
         $response = '';
         foreach ($reviews as $review) {
             $response .= '+<a href="' . Tools::url('tags')
-                . '?o=reviews.' . urlencode($review['name']) . '">'
+                . '?o=' . $review['id'] . '">'
                 . $review['count'] . ' ' . $review['name'] . '</a><br />';
         }
 
