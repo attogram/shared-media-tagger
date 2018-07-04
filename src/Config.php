@@ -114,7 +114,7 @@ class Config
             'browse'        => self::$siteUrl . 'b',
             'categories'    => self::$siteUrl . 'categories',
             'category'      => self::$siteUrl . 'c',
-            'reviews'       => self::$siteUrl . 'reviews',
+            'tags'          => self::$siteUrl . 'tags',
             'login'         => self::$siteUrl . 'login',
             'logout'        => self::$siteUrl . 'logout',
             'admin'         => self::$siteUrl . 'admin/',
@@ -269,13 +269,15 @@ class Config
         return [
             'default_site' =>
                 "INSERT INTO site (
-                    id, name, about
+                    id, name, about, header, footer
                 ) VALUES (
                     1,
                     'Shared Media Tagger',
                     '<p>Welcome to your new Shared Media Tagger website.</p>
                      <p>Setup your installation now in the <a href=\"" . Tools::url('admin')
-                        . "\">Admin Backend</a>.</p>'
+                        . "\">Admin Backend</a>.</p>',
+                     '<div style=\"border:1px solid green;\">Custom Header goes here</div>',
+                     '<div style=\"border:1px solid green;\">Custom Footer goes here</div>'
                 )",
             'default_tag1' =>
                 "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '😊 Best', '😊')",
@@ -287,15 +289,6 @@ class Config
                 "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙁 Unsure', '🙁')",
             'default_tag5' =>
                 "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '☹️ Bad', '☹️')",
-
-            'category1' =>
-                "INSERT INTO category (
-                    id, name, curated, pageid, files, subcats, local_files, curated_files, 
-                    missing, hidden, force
-                ) VALUES (
-                    1, 'Category:Test patterns', 0, 202140, 99, 3, 1, 0, 
-                    0, 0, null
-                )",
 
             'media1' =>
                 "INSERT INTO media (
@@ -334,13 +327,6 @@ class Config
                     null,
                     '2010-08-06T21:59:56Z'
                     )",
-
-        'category2media1' =>
-            "INSERT INTO category2media (
-                id, category_id, media_pageid
-            ) VALUES (
-                1, 1, 11108315
-            )",
         ];
     }
 }

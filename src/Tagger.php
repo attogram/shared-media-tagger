@@ -260,7 +260,7 @@ function checkAll(formname, checktoggle) {
         $cats = $this->database->getImageCategories($mediaId, $onlyHidden);
         //$response = '<div class="xxcategories" style="width:' . Config::$sizeMedium . 'px;">';
         if (!$cats) {
-            return '<em>- None</em>';
+            return '';
         }
         $response = '';
         foreach ($cats as $cat) {
@@ -304,7 +304,7 @@ function checkAll(formname, checktoggle) {
         }
         $response = '';
         foreach ($reviews as $review) {
-            $response .= '+<a href="' . Tools::url('reviews')
+            $response .= '+<a href="' . Tools::url('tags')
                 . '?o=reviews.' . urlencode($review['name']) . '">'
                 . $review['count'] . ' ' . $review['name'] . '</a><br />';
         }
@@ -334,8 +334,7 @@ function checkAll(formname, checktoggle) {
         . '<span class="nobr"><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></span>' .  $space
         . '<a href="' . Tools::url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
         . '<a href="' . Tools::url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
-        . '<a href="' . Tools::url('reviews') . '">🗳' . $countReviews . '&nbsp;Reviews</a>' . $space
-        . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
+        . '<a href="' . Tools::url('tags') . '">🗳️' . $countReviews . '&nbsp;Tags</a>' . $space
         . '</div>';
     }
 
@@ -349,8 +348,8 @@ function checkAll(formname, checktoggle) {
         . '<span class="nobr"><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></span>' .  $space
         . '<a href="' . Tools::url('browse') . '">🔎Files' . '</a>' . $space
         . '<a href="' . Tools::url('categories') . '">📂Categories</a>' . $space
-        . '<a href="' . Tools::url('reviews') . '">🗳Reviews</a>' . $space
-        . (Tools::isAdmin() ? $space . '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
+        . '<a href="' . Tools::url('tags') . '">🗳️Tags</a>' . $space
+        . (Tools::isAdmin() ? '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</div>';
     }
 
@@ -365,7 +364,7 @@ function checkAll(formname, checktoggle) {
         . '<span style="float:right;">'
         . '<a class="menuj" title="Browse" href="' . Tools::url('browse') . '">🔎</a>' . $space
         . '<a class="menuj" title="Categories" href="' . Tools::url('categories') . '">📂</a>' . $space
-        . '<a class="menuj" title="Reviews" href="' . Tools::url('reviews') . '">🗳</a>' . $space
+        . '<a class="menuj" title="Tags" href="' . Tools::url('tags') . '">🗳️</a>' . $space
         . (Tools::isAdmin() ? '<a class="menuj" title="ADMIN" href="' . Tools::url('admin') . '">🔧</a>' : '')
         . '</span>'
         . '</div><div style="clear:both;"></div>';
@@ -593,11 +592,9 @@ function checkAll(formname, checktoggle) {
         . '<link rel="icon" type="image/png" href="' . Tools::url('home') . 'favicon.ico" />'
         . '</head><body>';
 
-        // Site headers
-        if (Tools::isAdmin() || get_class($this) == 'TaggerAdmin' || !$showSiteHeader) {
-            return;
+        if ($showSiteHeader) {
+            $this->displaySiteHeader();
         }
-        $this->displaySiteHeader();
     }
 
     /**
@@ -605,7 +602,7 @@ function checkAll(formname, checktoggle) {
      */
     public function includeFooter($showSiteFooter = true)
     {
-        //$this->includeMenu();
+        $this->includeMenu();
         print '<footer><div class="menu" style="line-height:2; font-size:80%;">';
         if (empty(Config::$setup['hide_hosted_by']) || !Config::$setup['hide_hosted_by']) {
             $serverName = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : null;
@@ -618,11 +615,11 @@ function checkAll(formname, checktoggle) {
         . 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER . '</a></b></span>';
 
         if (!empty($_SESSION['user'])) {
-            print '<br />User: <b>' . $_SESSION['user'] . '</b>'
+            print '<br /><a href="'
+                . Tools::url('admin')
+                . '">🔧 Admin: <b>' . $_SESSION['user'] . '</b></a>'
                 . '  &nbsp; &nbsp; '
                 . '<a href="' . Tools::url('logout') . '">Logout</a>';
-        } else {
-            print '<br /><a href="' . Tools::url('login') . '">Login</a>';
         }
 
         print '</div></footer>';

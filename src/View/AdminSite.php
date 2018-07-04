@@ -35,7 +35,7 @@ declare(strict_types = 1);
 
 <br /><br /><input type="checkbox" name="use_cdn"<?=
 ($site['use_cdn'] ? ' checked="checked"' : '')
-?>/> Use CDN for jquery, bootstrap'
+?>/> Use CDN for jquery, bootstrap
 
 <br /><br /><input type="submit" value="           Save Site Setup           ">
 </form>

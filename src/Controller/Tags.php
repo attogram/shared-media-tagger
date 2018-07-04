@@ -7,27 +7,26 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 /**
- * Class Reviews
+ * Class Tags
  */
-class Reviews extends ControllerBase
+class Tags extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('Reviews');
+        $view = $this->getView('Tags');
 
-        $this->smt->title = 'Reviews - ' . Config::$siteName;
+        $this->smt->title = 'Tags - ' . Config::$siteName;
         $this->smt->includeHeader();
         $this->smt->includeMediumMenu();
 
-        $me = Tools::url('reviews');
+        $me = Tools::url('tags');
 
-        $tags = $this->smt->database->getTags();
+        $tags = $this->smt->database->getTags('DESC');
 
         $menu = '';
         foreach ($tags as $tag) {
             $menu .= '<span class="reviewbutton tag' . $tag['position'] . '">'
-                . '<a href="' . $me . '?o=reviews.'
-                . Tools::categoryUrlencode($tag['name']) . '">+'
+                . '<a href="' . $me . '?o=' . $tag['id'] . '">+'
                 . $this->smt->database->getTaggingCount($tag['id'])
                 . ' ' . $tag['name'] . '</a></span>';
         }
@@ -40,15 +39,9 @@ class Reviews extends ControllerBase
 
         // Reviews per tag
         $tagName = null;
-        if ((preg_match('/^reviews\.(.*)/', $order, $matches)) === 1) {
-            $tagName = $matches[1];
-            $tagId = $this->smt->database->getTagIdByName($tagName);
-            if (!$tagId) {
-                Tools::notice('Invalid Review Name');
-                $order = '';
-            } else {
-                $order = 'PER.TAG';
-            }
+        if (!empty($_GET['o']) && Tools::isPositiveNumber($_GET['o'])) {
+            $tagId = $_GET['o'];
+            $order = 'PER.TAG';
         }
 
         $limit = 100;  // @TODO TMP DEV

@@ -2,7 +2,7 @@
 declare(strict_types = 1);
 /**
  * Shared Media Tagger
- * Reviews
+ * Tags
  *
  * @var string $me
  * @var array $rates
@@ -11,12 +11,12 @@ declare(strict_types = 1);
  */
 ?>
 <div class="box white">
-    Reviews:
+    Tags:
     <br />
     <?= $menu ?>
     <hr />
     <p>
-        <b><?= $orderDesc ?></b>: <?= sizeof($rates) ?> files reviewed.
+        <b><?= $orderDesc ?></b>: <?= sizeof($rates) ?> files tagged.
     </p>
     <?php
     foreach ($rates as $media) {

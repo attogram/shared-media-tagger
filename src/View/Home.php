@@ -21,8 +21,8 @@ $this->smt->includeHeader();
                         $data['countFiles']; ?></b> Media Files</a></p>
             <p>- <a href="<?= Tools::url('categories') ?>"><b><?=
                         $data['countCategories']; ?></b> Categories</a></p>
-            <p>- <a href="<?= Tools::url('reviews') ?>"><b><?=
-                        $data['countReviews']; ?></b> Reviews</a></p>
+            <p>- <a href="<?= Tools::url('tags') ?>"><b><?=
+                        $data['countReviews']; ?></b> Tags</a></p>
         </div>
         <div class="col-sm-6 box white">
             <em>Random media:</em>
