@@ -330,12 +330,18 @@ class Database
         $sql = "
             SELECT m.*
             FROM media AS m
-            LEFT JOIN user_tagging AS t ON t.media_pageid = m.pageid
-            WHERE t.media_pageid IS NULL $and
+            WHERE m.pageid NOT IN (
+                SELECT media_pageid
+                FROM user_tagging AS t
+                WHERE t.user_id = :user_id
+            )
+            $and
             ORDER BY RANDOM()
             LIMIT :limit";
-
-        return $this->queryAsArray($sql, ['limit' => $limit]);
+        return $this->queryAsArray($sql, [
+            'user_id' => $this->userId,
+            'limit' => $limit
+        ]);
     }
 
     // User
