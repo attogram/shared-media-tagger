@@ -94,7 +94,7 @@ class Loader
         $this->router->allow('/categories', 'Categories');
         $this->router->allow('/c/?', 'Category');
         $this->router->allow('/i/?', 'Info');
-        $this->router->allow('/tags', 'Tags');
+        $this->router->allow('/scores', 'Scores');
         $this->router->allow('/sitemap.xml', 'Sitemap');
         $this->router->allow('/tag', 'Tag');
         $this->router->allow('/login', 'Login');

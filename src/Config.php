@@ -114,7 +114,7 @@ class Config
             'browse'        => self::$siteUrl . 'b',
             'categories'    => self::$siteUrl . 'categories',
             'category'      => self::$siteUrl . 'c',
-            'tags'          => self::$siteUrl . 'tags',
+            'scores'        => self::$siteUrl . 'scores',
             'login'         => self::$siteUrl . 'login',
             'logout'        => self::$siteUrl . 'logout',
             'admin'         => self::$siteUrl . 'admin/',
@@ -269,15 +269,13 @@ class Config
         return [
             'default_site' =>
                 "INSERT INTO site (
-                    id, name, about, header, footer
+                    id, name, about
                 ) VALUES (
                     1,
                     'Shared Media Tagger',
                     '<p>Welcome to your new Shared Media Tagger website.</p>
                      <p>Setup your installation now in the <a href=\"" . Tools::url('admin')
-                        . "\">Admin Backend</a>.</p>',
-                     '<div style=\"border:1px solid green;\">Custom Header goes here</div>',
-                     '<div style=\"border:1px solid green;\">Custom Footer goes here</div>'
+                        . "\">Curator Backend</a> (user/pass:  admin1)</p>'
                 )",
             'default_tag1' =>
                 "INSERT INTO tag (id, position, name, display_name) VALUES (1, 1, '😊 Best', '😊')",
@@ -288,7 +286,7 @@ class Config
             'default_tag4' =>
                 "INSERT INTO tag (id, position, name, display_name) VALUES (4, 4, '🙁 Unsure', '🙁')",
             'default_tag5' =>
-                "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '☹️ Bad', '☹️')",
+                "INSERT INTO tag (id, position, name, display_name) VALUES (5, 5, '☹️  Bad', '☹️')",
 
             'media1' =>
                 "INSERT INTO media (

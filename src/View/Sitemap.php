@@ -19,7 +19,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 </url>
 <url><loc><?= $data['protocol'] . Tools::url('categories') ?></loc></url>
 <url><loc><?= $data['protocol'] . Tools::url('browse') ?></loc></url>
-<url><loc><?= $data['protocol'] . Tools::url('tags') ?></loc></url>
+<url><loc><?= $data['protocol'] . Tools::url('scores') ?></loc></url>
 <?php
 
 foreach ($data['categories'] as $category) {

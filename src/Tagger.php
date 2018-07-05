@@ -29,7 +29,6 @@ class Tagger
     /** @var array  */
     public $config;
 
-    public $testss = ['a' => 'b'];
     /**
      * Tagger constructor.
      * @param Router $router
@@ -180,8 +179,8 @@ function checkAll(formname, checktoggle) {
         if (!Tools::isAdmin() || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        return '<div class="attribution left" style="display:inline-block;">'
-        . '<a style="font-size:140%;" href="' . Tools::url('admin') . 'media?dm=' . $mediaId
+        return '<div class="attribution" style="display:block;">'
+        . '<a style="font-size:130%;" href="' . Tools::url('admin') . 'media?dm=' . $mediaId
         . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
         . $mediaId . ' ?\');">❌</a> &nbsp; '
         . '<input type="checkbox" name="media[]" value="' . $mediaId . '" />  &nbsp; '
@@ -304,9 +303,7 @@ function checkAll(formname, checktoggle) {
         }
         $response = '';
         foreach ($reviews as $review) {
-            $response .= '+<a href="' . Tools::url('tags')
-                . '?o=' . $review['id'] . '">'
-                . $review['count'] . ' ' . $review['name'] . '</a><br />';
+            $response .= '+' . $review['count'] . ' ' . $review['name'] . '</a><br />';
         }
 
         return $response;
@@ -329,12 +326,17 @@ function checkAll(formname, checktoggle) {
         $space = ' &nbsp; &nbsp; ';
         $countFiles = number_format((float) $this->database->getImageCount());
         $countCategories = number_format((float) $this->database->getCategoriesCount());
-        $countReviews = number_format((float) $this->database->getTotalReviewCount());
-        print '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></span>' .  $space
-        . '<a href="' . Tools::url('browse') . '">🔎' . $countFiles . '&nbsp;Files' . '</a>' . $space
-        . '<a href="' . Tools::url('categories') . '">📂' . $countCategories . '&nbsp;Categories</a>' . $space
-        . '<a href="' . Tools::url('tags') . '">🗳️' . $countReviews . '&nbsp;Tags</a>' . $space
+        $countScores = number_format((float) $this->database->getTotalReviewCount());
+        print '<div class="menu">'
+        . $this->getUserScoreBox()
+        . '<span class="nobr"><b><a href="' . Tools::url('home') . '">'
+            . Config::$siteName . '</a></b></span>' .  $space
+        . '<span class="nobr"><a href="' . Tools::url('browse') . '">🔎'
+            . $countFiles . '&nbsp;Files' . '</a></span>' . $space
+        . '<span class="nobr"><a href="' . Tools::url('categories') . '">📂'
+            . $countCategories . '&nbsp;Categories</a></span>' . $space
+        . '<span class="nobr"><a href="' . Tools::url('scores') . '">🗳️'
+            . $countScores . '&nbsp;Scores</a></span>' . $space
         . '</div>';
     }
 
@@ -344,32 +346,32 @@ function checkAll(formname, checktoggle) {
     public function includeMediumMenu()
     {
         $space = ' &nbsp; &nbsp; ';
-        print '<div class="menu" style="font-weight:bold;">'
-        . '<span class="nobr"><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></span>' .  $space
-        . '<a href="' . Tools::url('browse') . '">🔎Files' . '</a>' . $space
-        . '<a href="' . Tools::url('categories') . '">📂Categories</a>' . $space
-        . '<a href="' . Tools::url('tags') . '">🗳️Tags</a>' . $space
-        . (Tools::isAdmin() ? '<a href="' . Tools::url('admin') . '">🔧</a>' : '')
-        . '</div>';
+        print '<div class="menu">'
+            . $this->getUserScoreBox()
+            . '<span class="nobr"><b><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></b></span>'
+            . $space . '<span class="nobr"><a href="' . Tools::url('browse') . '">🔎Files' . '</a></span>'
+            . $space . '<span class="nobr"><a href="' . Tools::url('categories') . '">📂Topics</a></span>'
+            . $space . '<span class="nobr"><a href="' . Tools::url('scores') . '">🗳️Scores</a></span>'
+            . '</div>';
     }
 
     /**
-     * includeSmallMenu
+     * @return string
      */
-    public function includeSmallMenu()
+    public function getUserScoreBox()
     {
-        $space = ' ';
-        print '<div class="menujcon">'
-        . '<a style="font-weight:bold; font-size:85%;" href="' . Tools::url('home') . '">' . Config::$siteName . '</a>'
-        . '<span style="float:right;">'
-        . '<a class="menuj" title="Browse" href="' . Tools::url('browse') . '">🔎</a>' . $space
-        . '<a class="menuj" title="Categories" href="' . Tools::url('categories') . '">📂</a>' . $space
-        . '<a class="menuj" title="Tags" href="' . Tools::url('tags') . '">🗳️</a>' . $space
-        . (Tools::isAdmin() ? '<a class="menuj" title="ADMIN" href="' . Tools::url('admin') . '">🔧</a>' : '')
-        . '</span>'
-        . '</div><div style="clear:both;"></div>';
-    }
+        $totalUserTags = $this->database->getUserTagCount($this->database->userId);
+        $countFiles = $this->database->getImageCount();
+        $score = 0;
+        if ($countFiles) {
+            $score = round((($totalUserTags / $countFiles)) * 100, 2);
+        }
+        $box = '<span class="nobr" style="background:darkslategray;color:lightcyan;'
+            . 'float:left;font-size:110%;margin:0; padding:0 4px 0 4px;">'
+            . 'Score: <b>' . $score . '</b>%</span>';
 
+        return $box;
+    }
     /**
      * @param array $media
      * @return string
@@ -401,10 +403,10 @@ function checkAll(formname, checktoggle) {
                 '<br />',
                 $this->displayAttribution($media, 17, 21)
             )
-            . $this->displayAdminMediaFunctions($media['pageid'])
             . '<div class="thumbnail_reviews left">'
             . $this->displayReviews($this->database->getReviews($media['pageid']))
             . '</div>'
+            . $this->displayAdminMediaFunctions($media['pageid'])
             . '</div>';
     }
 

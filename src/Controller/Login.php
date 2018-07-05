@@ -22,7 +22,7 @@ class Login extends ControllerBase
         $this->loadAdminConfig();
         $this->realm = session_id();
         if ($this->isAuthenticated()) {
-            header('Location: ' . Tools::url('home'));
+            header('Location: ' . Tools::url('admin'));
             Tools::shutdown();
         }
         $this->authenticate();
@@ -30,14 +30,13 @@ class Login extends ControllerBase
 
     private function loadAdminConfig()
     {
-        $errorMessage = 'Login system disabled.';
         if (!is_readable(Config::$adminConfigFile)) {
-            $this->smt->fail404($errorMessage);
+            $this->smt->fail404('Login System Offline');
         }
         /** @noinspection PhpIncludeInspection */
         include(Config::$adminConfigFile);
         if (empty($admins) || !is_array($admins)) {
-            $this->smt->fail404($errorMessage);
+            $this->smt->fail404('No Admin Users Configured');
         }
         /** @noinspection PhpUndefinedVariableInspection */
         $this->admins = $admins;

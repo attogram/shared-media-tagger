@@ -746,7 +746,7 @@ class Database
             AND c2m.category_id = :category_id
             AND t.count > 0
             GROUP BY (tag.id)
-            ORDER BY tag.position',
+            ORDER BY tag.position DESC',
             [':category_id' => $categoryId]
         );
     }

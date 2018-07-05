@@ -35,6 +35,7 @@ class Category extends ControllerBase
 
         $categorySize = $this->smt->database->getCategorySize($categoryName);
 
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $pager = '';
         $sqlLimit = '';
         if ($categorySize > $pageLimit) {
@@ -71,13 +72,14 @@ class Category extends ControllerBase
 
         if (!$category || !is_array($category)) {
             $this->smt->fail404(
-                '404 Category In Curation Que',
+                '404 Category On Hold',
                 $this->smt->displayAdminCategoryFunctions($categoryName)
             );
         }
 
-
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $reviewsPerCategory = $this->smt->getReviewsPerCategory($categoryInfo['id']);
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $categoryNameDisplay = Tools::stripPrefix($categoryName);
 
         $this->smt->includeHeader();

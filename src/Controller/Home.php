@@ -28,7 +28,11 @@ class Home extends ControllerBase
         $this->smt->title = Config::$siteName;
         $this->smt->useBootstrap = true;
         $this->smt->useJquery = true;
+
+        $this->smt->includeHeader();
+        $this->smt->includeMediumMenu();
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Home'));
+        $this->smt->includeFooter();
     }
 }

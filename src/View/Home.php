@@ -8,25 +8,21 @@ declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Tools;
 
-$this->smt->includeHeader();
-
 ?>
 <div class="container white">
     <div class="row">
-        <div class="col-sm-6 box white">
+        <div class="col-xs-6 box">
             <h1><?= $data['name'] ?></h1>
             <p><?= $data['about'] ?></p>
-            <hr />
-            <p>- <a href="<?= Tools::url('browse') ?>"><b><?=
-                        $data['countFiles']; ?></b> Media Files</a></p>
-            <p>- <a href="<?= Tools::url('categories') ?>"><b><?=
-                        $data['countCategories']; ?></b> Categories</a></p>
-            <p>- <a href="<?= Tools::url('tags') ?>"><b><?=
-                        $data['countReviews']; ?></b> Tags</a></p>
-        </div>
-        <div class="col-sm-6 box white">
-            <em>Random media:</em>
             <br />
+            <p><a href="<?= Tools::url('browse') ?>">🔎 <b><?=
+                $data['countFiles']; ?></b> Files</a></p>
+            <p><a href="<?= Tools::url('categories') ?>">📂 <b><?=
+                $data['countCategories']; ?></b> Topics</a></p>
+            <p><a href="<?= Tools::url('scores') ?>">🗳️ <b><?=
+                $data['countReviews']; ?></b> Scores</a></p>
+        </div>
+        <div class="col-xs-6 box">
             <?php
             foreach ($data['random'] as $media) {
                 print $this->smt->displayThumbnailBox($media);
@@ -35,7 +31,3 @@ $this->smt->includeHeader();
         </div>
     </div>
 </div>
-<?php
-
-$this->smt->includeFooter();
-

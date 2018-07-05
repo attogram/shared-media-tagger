@@ -2,7 +2,7 @@
 declare(strict_types = 1);
 /**
  * Shared Media Tagger
- * Tags
+ * Scores View
  *
  * @var string $me
  * @var array $rates
@@ -11,13 +11,8 @@ declare(strict_types = 1);
  */
 ?>
 <div class="box white">
-    Tags:
+    Scores:
     <br />
-    <?= $menu ?>
-    <hr />
-    <p>
-        <b><?= $orderDesc ?></b>: <?= sizeof($rates) ?> files tagged.
-    </p>
     <?php
     foreach ($rates as $media) {
         print $this->smt->displayThumbnailBox($media);
