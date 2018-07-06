@@ -360,14 +360,17 @@ function checkAll(formname, checktoggle) {
      */
     public function getUserScoreBox()
     {
-        $totalUserTags = $this->database->getUserTagCount($this->database->userId);
-        $countFiles = $this->database->getImageCount();
         $score = 0;
-        if ($countFiles) {
+        $totalUserTags = 0;
+        if (!empty($this->database->userId)) {
+            $totalUserTags = $this->database->getUserTagCount($this->database->userId);
+        }
+        $countFiles = $this->database->getImageCount();
+        if ($totalUserTags && $countFiles) {
             $score = round((($totalUserTags / $countFiles)) * 100, 2);
         }
         $box = '<span class="nobr" style="background:darkslategray;color:lightcyan;'
-            . 'float:left;font-size:110%;margin:0; padding:0 4px 0 4px;">'
+            . 'float:left;font-size:110%;margin:0;padding:0 4px 0 4px;">'
             . 'Score: <b>' . $score . '</b>%</span>';
 
         return $box;
@@ -487,11 +490,19 @@ function checkAll(formname, checktoggle) {
         }
         $infourl =  Tools::url('info') . '/' . $media['pageid'];
 
-        return  '<div style="width:' . $divwidth . 'px; margin:auto;">'
-        . '<a href="' . $infourl . '">'
-        . '<img src="'. $url .'" height="'. $height .'" width="'. $width . '" alt=""></a>'
-        . $this->displayAttribution($media)
-        . '</div>';
+        return  '<div class="img">'
+            . '<a href="'
+            . $infourl
+            . '">'
+            . '<img src="'
+            . $url
+            .'" class="img-fluid" style="height:100%;width:100%;" height="'
+            . $height
+            . '" width="'
+            . $width
+            . '" alt=""></a>'
+            . $this->displayAttribution($media)
+            . '</div>';
     }
 
     /**

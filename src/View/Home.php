@@ -9,7 +9,7 @@ declare(strict_types = 1);
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="container white">
+<div class="container-fluid white">
     <div class="row">
         <div class="col-xs-6 box">
             <h1><?= $data['name'] ?></h1>

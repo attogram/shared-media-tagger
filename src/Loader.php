@@ -114,7 +114,7 @@ class Loader
         $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
         $this->router->allow('/admin/reports', 'AdminReports');
         $this->router->allow('/admin/site', 'AdminSite');
-        $this->router->allow('/admin/sqladmin', 'AdminSqladmin');
+        $this->router->allow('/admin/sqladmin', 'AdminSqlAdmin');
         $this->router->allow('/admin/tag', 'AdminTag');
         $this->router->allow('/admin/user', 'AdminUser');
     }

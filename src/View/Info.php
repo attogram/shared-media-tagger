@@ -14,9 +14,9 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-sm-6 box grey center" style="height:stretch;">
+        <div class="col-sm-7 box grey center" style="height:stretch;">
             <?= $this->smt->displayTags($pageid) ?>
             <?= $this->smt->displayMedia($media) ?>
             <div class="left" style="margin:auto; width:<?= Config::$sizeMedium ?>px;">
@@ -25,26 +25,29 @@ use Attogram\SharedMedia\Tagger\Tools;
                 <?= $data['admin'] ?>
             </div>
         </div>
-        <div class="col-sm-6 box white">
+        <div class="col-sm-5 box white">
             <p style="font-size:130%; font-weight:bold;">
-                <textarea readonly rows="<?= $media['imagedescriptionRows'] ?>" style="width:100%;"><?=
+                <textarea readonly rows="<?= $media['imagedescriptionRows'] ?>" style="width:100%;border:none;"><?=
                     $media['imagedescriptionSafe']
                     ?></textarea>
                 <ul>
                     <li>Source: <a target="c" href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
                     <li>ID: <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a></li>
-
-                    <li>Download: <a target="c" href="<?= $media['url'] ?>"><?=
-                            Tools::stripPrefix($media['title']) ?></a></li>
-                    <li>Size: <?= number_format((float) $media['size']) ?> bytes</li>
-                    <li>W x H: <?= number_format((float) $media['width']); ?>
-                            x <?= number_format((float) $media['height']) ?> pixels</li>
-                    <li>Mime: <?= $media['mime']; ?></li>
-                    <?php
-                    if ($media['duration'] > 0) {
-                        print '<li>Duration: ' . Tools::secondsToTime($media['duration']) . '</li>';
-                    } ?>
-
+                    <li>Filename: <b><?= Tools::stripPrefix($media['title']) ?></b></li>
+                    <li>Download Medium: <a target="c" href="<?= $media['thumburl']
+                        ?>"><?= $media['thumbwidth'] ?>x<?= $media['thumbheight'] ?> pixels
+                        - <?= $media['thumbmime']; ?>
+                        </a></li>
+                    <li>Download Full: <a target="c" href="<?= $media['url']
+                        ?>"><?= $media['width'] ?>x<?= $media['height'] ?> pixels
+                        - <?= $media['mime']; ?>
+                        - <?= number_format((float) $media['size']) ?> bytes
+                        </a></li>
+                <?php
+                if ($media['duration'] > 0) {
+                    print '<li>Duration: ' . Tools::secondsToTime($media['duration']) . '</li>';
+                }
+                ?>
                 </ul>
             </p>
             <p>
