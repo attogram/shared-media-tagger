@@ -19,39 +19,54 @@ use Attogram\SharedMedia\Tagger\Tools;
         <div class="col-sm-7 box grey center" style="height:stretch;">
             <?= $this->smt->displayTags($pageid) ?>
             <?= $this->smt->displayMedia($media) ?>
-            <div class="left" style="margin:auto; width:<?= Config::$sizeMedium ?>px;">
-                <?= $this->smt->displayReviews($this->smt->database->getReviews($pageid)) ?>
-                <?= $this->smt->displayCategories($pageid, false) ?>
-                <?= $data['admin'] ?>
-            </div>
         </div>
         <div class="col-sm-5 box white">
             <p style="font-size:130%; font-weight:bold;">
                 <textarea readonly rows="<?= $media['imagedescriptionRows'] ?>" style="width:100%;border:none;"><?=
                     $media['imagedescriptionSafe']
-                    ?></textarea>
-                <ul>
-                    <li>Source: <a target="c" href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
-                    <li>ID: <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a></li>
-                    <li>Filename: <b><?= Tools::stripPrefix($media['title']) ?></b></li>
-                    <li>Download Medium: <a target="c" href="<?= $media['thumburl']
-                        ?>"><?= $media['thumbwidth'] ?>x<?= $media['thumbheight'] ?> pixels
-                        - <?= $media['thumbmime']; ?>
-                        </a></li>
-                    <li>Download Full: <a target="c" href="<?= $media['url']
-                        ?>"><?= $media['width'] ?>x<?= $media['height'] ?> pixels
-                        - <?= $media['mime']; ?>
-                        - <?= number_format((float) $media['size']) ?> bytes
-                        </a></li>
-                <?php
-                if ($media['duration'] > 0) {
-                    print '<li>Duration: ' . Tools::secondsToTime($media['duration']) . '</li>';
-                }
-                ?>
-                </ul>
+                ?></textarea>
             </p>
+
+            <dl>
+                <dt>Scoring:</dt>
+                <dd><?= $this->smt->displayReviews($this->smt->database->getReviews($pageid)) ?></dd>
+            </dl>
+
             <p>
-                <em>Licensing information:</em>
+                <em>Categories:</em>
+                <br />
+                <?= $this->smt->displayCategories($pageid) ?>
+            </p>
+
+            <em>Download:</em>
+            <ul>
+                <li>Source: <a target="c" href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
+                <li>ID: <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a></li>
+                <li>Filename: <b><?= Tools::stripPrefix($media['title']) ?></b></li>
+                <?php
+                    $thumb = $this->smt->getThumbnail($media, 100);
+                ?><li>Thumbnail: <a target="c" href="<?= $thumb['url']
+                    ?>"><?= $thumb['width'] ?>x<?= $thumb['height'] ?> pixels
+                    - <?= $media['thumbmime']; ?></a>
+                </li>
+                <li>Medium size: <a target="c" href="<?= $media['thumburl']
+                    ?>"><?= $media['thumbwidth'] ?>x<?= $media['thumbheight'] ?> pixels
+                    - <?= $media['thumbmime']; ?>
+                    </a></li>
+                <li>Full size: <a target="c" href="<?= $media['url']
+                    ?>"><?= $media['width'] ?>x<?= $media['height'] ?> pixels
+                    - <?= $media['mime']; ?>
+                    - <?= number_format((float) $media['size']) ?> bytes
+                    </a></li>
+            <?php
+            if ($media['duration'] > 0) {
+                print '<li>Duration: ' . Tools::secondsToTime($media['duration']) . '</li>';
+            }
+            ?>
+            </ul>
+
+            <p>
+                <em>Licensing:</em>
                 <ul>
                 <li>Artist: <?= ($media['artist']
                             ? htmlentities(strip_tags($media['artist']))
@@ -105,11 +120,6 @@ use Attogram\SharedMedia\Tagger\Tools;
                     <li>SHA1: <small><?= $media['sha1'] ?></small></li>
                     <li>Last refresh: <?= $media['updated'] ?> UTC</li>
                 </ul>
-            </p>
-            <p>
-                <em>Categories:</em>
-                <br />
-                <?= $this->smt->displayCategories($pageid) ?>
             </p>
             <p>
                 <em>Technical Categories:</em>

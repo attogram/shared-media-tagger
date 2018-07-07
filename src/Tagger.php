@@ -299,11 +299,14 @@ function checkAll(formname, checktoggle) {
     public function displayReviews(array $reviews)
     {
         if (!$reviews || !is_array($reviews)) {
-            return '';
+            return '- unreviewed';
         }
         $response = '';
         foreach ($reviews as $review) {
-            $response .= '+' . $review['count'] . ' ' . $review['name'] . '</a><br />';
+                $response .= '+ ' . $review['count'] . ' ' . $review['name'] . '</a><br />';
+        }
+        if (empty($response)) {
+            $response = '- unreviewed';
         }
 
         return $response;
@@ -370,7 +373,7 @@ function checkAll(formname, checktoggle) {
             $score = round((($totalUserTags / $countFiles)) * 100, 2);
         }
         $box = '<span class="nobr" style="background:darkslategray;color:lightcyan;'
-            . 'float:left;font-size:110%;margin:0;padding:0 4px 0 4px;">'
+            . 'float:left;font-size:110%;margin:0;padding:0 1px 0 4px;">'
             . 'Score: <b>' . $score . '</b>%</span>';
 
         return $box;
@@ -407,10 +410,9 @@ function checkAll(formname, checktoggle) {
                 '<br />',
                 $this->displayAttribution($media, 17, 21)
             )
-            . '<div class="left" style="background-color:inherit; display:inline-block; '
-            . 'text-align:left; margin:0; padding:1px; font-size:80%;">'
-            . $this->displayReviews($this->database->getReviews($media['pageid']))
-            . '</div>'
+            . '<span style="font-size:80%;">'
+                . $this->displayReviews($this->database->getReviews($media['pageid']))
+            . '</span>'
             . $this->displayAdminMediaFunctions($media['pageid'])
             . '</div>';
     }

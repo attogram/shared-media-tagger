@@ -31,7 +31,7 @@ class Info extends ControllerBase
             : Tools::stripPrefix($media['title']);
 
 
-        $rows = 2;
+        $rows = 1;
         $rows += substr_count("\n", $media['imagedescriptionSafe']);
         $rows += round(strlen($media['imagedescriptionSafe']) / 70);
         $maxRows = 10;
