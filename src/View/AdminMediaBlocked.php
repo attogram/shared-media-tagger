@@ -11,11 +11,6 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="box white">
-    <p>Blocked Media Admin:</p>
-    * <a target="sqlite" href="<?=
-        Tools::url('admin');
-    ?>sqladmin?table=block&action=row_view">Database: View/Edit Blocked Media</a>
-    <hr />
     <p><b><?= sizeof($data['blocks']) ?></b> Blocked Media</p>
 <?php
 
@@ -26,12 +21,8 @@ foreach ($data['blocks'] as $block) {
     <div style="display:inline-block;border:1px solid red;padding:10px;">
         <?= $block['pageid'] ?> :
         <a target="commmons"
-           href="https://commons.wikimedia.org/w/Home.php?curid=<?= $block['pageid'] ?>">
+           href="https://commons.wikimedia.org/w/index.php?curid=<?= $block['pageid'] ?>">
         <?= Tools::stripPrefix($block['title']) ?>
-        <br /><br />
-        <a target="sqlite"
-           href="./sqladmin?table=block&action=row_editordelete&pk=%5B<?=
-            $block['pageid'] ?>%5D&type=delete">* Remove from Block List</a>
     </div>
     <br clear="all" />
     <?php

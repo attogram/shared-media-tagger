@@ -213,7 +213,6 @@ class DatabaseAdmin extends Database
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
         $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
         $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
-        $sqls[] = 'DELETE FROM user_tagging WHERE media_pageid = :pageid';
         $bind = [':pageid' => $pageid];
         foreach ($sqls as $sql) {
             if ($this->queryAsBool($sql, $bind)) {
@@ -572,7 +571,6 @@ class DatabaseAdmin extends Database
         return $this->runSqls(
             [
                 'DELETE FROM tagging',
-                'DELETE FROM user_tagging',
             ]
         );
     }
@@ -585,7 +583,6 @@ class DatabaseAdmin extends Database
         return $this->runSqls(
             [
                 'DELETE FROM tagging',
-                'DELETE FROM user_tagging',
                 'DELETE FROM category2media',
                 'DELETE FROM media',
                 'DELETE FROM block',
@@ -602,7 +599,6 @@ class DatabaseAdmin extends Database
             [
                 'DELETE FROM user',
                 'DELETE FROM tagging',
-                'DELETE FROM user_tagging',
             ]
         );
     }
@@ -622,7 +618,6 @@ class DatabaseAdmin extends Database
                 'DROP TABLE IF EXISTS tag',
                 'DROP TABLE IF EXISTS tagging',
                 'DROP TABLE IF EXISTS user',
-                'DROP TABLE IF EXISTS user_tagging',
             ]
         );
     }

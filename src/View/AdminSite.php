@@ -39,14 +39,4 @@ declare(strict_types = 1);
 
 <br /><br /><input type="submit" value="           Save Site Setup           ">
 </form>
-
-<br /><br /><br /><br /><br /><hr />
-Modify Database directly:
-<ul>
-<li><a target="sqlite"
-       href="./sqladmin?table=site&action=row_editordelete&pk=[<?= $site['id'] ?>]&type=edit">EDIT site</a></li>
-<li><a target="sqlite"
-       href="./sqladmin?table=site&action=row_create">CREATE NEW site</a></li>
-</ul>
-
 </div>

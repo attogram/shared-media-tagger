@@ -1,4 +1,4 @@
-/* shared-media-tagger css.css 1.0.2.1 */
+/* shared-media-tagger css.css 1.0.2.2 */
 body { background-color:#222; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
 a { text-decoration:none; color:darkblue; }
 a:visited { color:darkblue; }
@@ -12,7 +12,7 @@ h2 { font-size:110%; font-weight:bold; }
 h3 { font-size:95%; display:inline; }
 h4 { font-size:70%; display:inline; }
 h5 { font-size:60%; display:inline; }
-img { border:1px solid black; background-color:white; background-clip:content-box; }
+img { background-color:white; background-clip:content-box; }
 ul { line-height:1; display:block; margin:0 0 0 7px; padding:0; list-style:disc inside; }
 li { margin:6px 0 0 4px; }
 video { border:1px solid black; background-color:white; background-clip:content-box; }

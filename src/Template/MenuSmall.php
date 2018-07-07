@@ -21,4 +21,3 @@ use Attogram\SharedMedia\Tagger\Tools;
     &nbsp; &nbsp;
     <a href="<?= Tools::url('scores') ?>">🗳️Scores</a>
 </div>
-

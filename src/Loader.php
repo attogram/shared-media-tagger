@@ -25,17 +25,16 @@ class Loader
      */
     public function __construct(array $config = [])
     {
-        define('SHARED_MEDIA_TAGGER', '1.0.2');
+        define('SHARED_MEDIA_TAGGER', '1.1.0');
 
         ob_start('ob_gzhandler');
-
-        $this->config = $config;
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
 
         $this->router = new Router();
+        $this->config = $config;
 
         $this->setPublicRoutes();
         $this->show();
@@ -95,6 +94,7 @@ class Loader
         $this->router->allow('/c/?', 'Category');
         $this->router->allow('/i/?', 'Info');
         $this->router->allow('/scores', 'Scores');
+        $this->router->allow('/random', 'Random');
         $this->router->allow('/sitemap.xml', 'Sitemap');
         $this->router->allow('/tag', 'Tag');
         $this->router->allow('/login', 'Login');
@@ -114,7 +114,6 @@ class Loader
         $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
         $this->router->allow('/admin/reports', 'AdminReports');
         $this->router->allow('/admin/site', 'AdminSite');
-        $this->router->allow('/admin/sqladmin', 'AdminSqlAdmin');
         $this->router->allow('/admin/tag', 'AdminTag');
         $this->router->allow('/admin/user', 'AdminUser');
     }

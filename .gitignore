@@ -2,5 +2,8 @@
 /public/config.php
 /public/config.admin.php
 /public/robots.txt
-/public/favicon.ico
 /.idea
+/phpliteadmin.php
+/phpliteadmin.config.php
+/db/*.sqlite
+/db/*.sqlite-journal

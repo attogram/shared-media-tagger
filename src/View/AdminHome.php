@@ -20,8 +20,6 @@ use Attogram\SharedMedia\Tagger\Tools;
         <li><b><?= number_format((float) $this->smt->database->getBlockCount()) ?></b> Blocked Files</li>
         <li><b><?= number_format((float) $this->smt->database->getTotalFilesReviewedCount()) ?></b> Files reviewed</li>
         <li><b><?= number_format((float) $this->smt->database->getTaggingCount()) ?></b> Tagging Count</li>
-        <li><b><?= number_format((float) $this->smt->database->getTotalReviewCount()) ?></b> Total Review Count</li>
-        <li><b><?= number_format((float) $this->smt->database->getUserTagCount()) ?></b> User Tag Count</li>
     </ul>
 
     <hr />

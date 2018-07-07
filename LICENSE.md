@@ -10,7 +10,7 @@ The Shared Media Tagger is dual licensed under
 
 ## Shared Media Tagger - MIT License
 
-Copyright (c) 2017 Shared Media Tagger Developers <https://github.com/attogram/shared-media-tagger>
+Copyright (c) 2018 Shared Media Tagger Developers <https://github.com/attogram/shared-media-tagger>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 ## Shared Media Tagger - GNU General Public License
 
-Copyright (C) 2017 Shared Media Tagger Developers <https://github.com/attogram/shared-media-tagger>
+Copyright (C) 2018 Shared Media Tagger Developers <https://github.com/attogram/shared-media-tagger>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ Software     | License     | URL
 :----------- | :---------- | :-----------------------------
 Bootstrap    | MIT License | <http://getbootstrap.com/>
 jQuery       | MIT License | <http://jquery.org/license/>
-phpLiteAdmin | GPL License | <https://www.phpliteadmin.org/>
 
 -----
 

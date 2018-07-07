@@ -239,20 +239,20 @@ class Database
     }
 
     /**
-     * @param int $userId
+     * @param int|string $userId
      * @return int
      */
     public function getUserTagCount($userId = 0)
     {
-        $sql = 'SELECT sum(count) AS sum FROM user_tagging';
-        $bind = [];
-        if ($userId > 0) {
-            $sql .= ' WHERE user_id = :user_id';
-            $bind[':user_id'] = $userId;
+        if (empty($userId) || !Tools::isPositiveNumber($userId)) {
+            return 0;
         }
-        $count = $this->queryAsArray($sql, $bind);
-        if (isset($count[0]['sum'])) {
-            return $count[0]['sum'];
+        $count = $this->queryAsArray(
+            'SELECT COUNT(id) AS count FROM tagging WHERE user_id = :user_id',
+            [':user_id' => $userId]
+        );
+        if (isset($count[0]['count'])) {
+            return $count[0]['count'];
         }
 
         return 0;
@@ -264,7 +264,7 @@ class Database
      */
     public function getTaggingCount($tagId = 0)
     {
-        $sql = 'SELECT SUM(count) AS count FROM tagging';
+        $sql = 'SELECT COUNT(id) AS count FROM tagging';
         $bind = [];
         if ($tagId > 0) {
             $sql .= ' WHERE tag_id = :tag_id';
@@ -286,7 +286,10 @@ class Database
         if (isset($this->totalReviewCount)) {
             return $this->totalReviewCount;
         }
-        $response = $this->queryAsArray('SELECT SUM(count) AS total FROM tagging');
+        $response = $this->queryAsArray(
+            //'SELECT COUNT(DISTINCT media_pageid) AS total FROM tagging'
+            'SELECT COUNT(id) AS total FROM tagging'
+        );
         if (isset($response[0]['total'])) {
             return $this->totalReviewCount = $response[0]['total'];
         }
@@ -332,7 +335,7 @@ class Database
             FROM media AS m
             WHERE m.pageid NOT IN (
                 SELECT media_pageid
-                FROM user_tagging AS t
+                FROM tagging AS t
                 WHERE t.user_id = :user_id
             )
             $and
@@ -375,8 +378,16 @@ class Database
         }
         $userAgent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
         $user = $this->queryAsArray(
-            'SELECT id FROM user WHERE ip = :ip_address AND host = :host AND user_agent = :user_agent',
-            [':ip_address' => $ipAddress, ':host' => $host, ':user_agent' => $userAgent]
+            'SELECT id 
+            FROM user 
+            WHERE ip = :ip_address 
+            AND host = :host 
+            AND user_agent = :user_agent',
+            [
+                ':host' => $host,
+                ':ip_address' => $ipAddress,
+                ':user_agent' => $userAgent,
+            ]
         );
         if (!isset($user[0]['id'])) {
             if ($createNew) {
@@ -392,39 +403,6 @@ class Database
     }
 
     /**
-     * @param $userId
-     * @return array
-     */
-    public function getUserTagging($userId)
-    {
-        $tags = $this->queryAsArray(
-            'SELECT m.*, ut.tag_id, ut.count
-            FROM user_tagging AS ut, media AS m
-            WHERE ut.user_id = :user_id
-            AND ut.media_pageid = m.pageid
-            ORDER BY ut.media_pageid
-            LIMIT 100  -- TMP',
-            [':user_id' => $userId]
-        );
-        if ($tags) {
-            return $tags;
-        }
-
-        return [];
-    }
-
-    /**
-     * @return bool
-     */
-    public function saveUserLastTagTime()
-    {
-        return $this->queryAsBool(
-            'UPDATE user SET last = :last WHERE id = :user_id',
-            [':user_id' => $this->userId, ':last' => Tools::timeNow()]
-        );
-    }
-
-    /**
      * @param $ipAddress
      * @param $host
      * @param $userAgent
@@ -434,15 +412,15 @@ class Database
     {
         if ($this->queryAsBool(
             'INSERT INTO user (
-                ip, host, user_agent, page_views, last
+                ip, host, user_agent, last
             ) VALUES (
-                :ip_address, :host, :user_agent, 0, :last
+                :ip_address, :host, :user_agent, :last
             )',
             [
-                ':ip_address' => $ipAddress,
                 ':host' => $host,
+                ':ip_address' => $ipAddress,
+                ':last' => Tools::timeNow(),
                 ':user_agent' => $userAgent,
-                ':last' => Tools::timeNow()
             ]
         )
         ) {
@@ -714,19 +692,47 @@ class Database
     // Reviews
 
     /**
+     * @param int|string $limit
+     * @return array
+     */
+    public function getMediasByScore($limit = 100)
+    {
+        $scores = $this->queryAsArray(
+            'SELECT SUM(tag.score) AS total,
+                COUNT(tagging.id) AS votes,
+                SUM(tag.score)*1.0/COUNT(tagging.id) AS score,
+                media.*
+            FROM tagging, tag, media
+            WHERE tagging.tag_id = tag.id
+            AND tagging.media_pageid = media.pageid
+            GROUP BY tagging.media_pageid
+            ORDER BY score DESC, votes DESC
+            LIMIT :limit',
+            [':limit' => $limit]
+        );
+        if (empty($scores) || !is_array($scores)) {
+            $scores = [];
+        }
+
+        return $scores;
+    }
+
+    /**
      * @param int|string $pageid
      * @return array
      */
     public function getReviews($pageid)
     {
         return $this->queryAsArray(
-            'SELECT t.tag_id, t.count, tag.*
+            'SELECT count(t.id) AS count, t.tag_id, tag.*
             FROM tagging AS t, tag
             WHERE t.media_pageid = :media_pageid
             AND tag.id = t.tag_id
-            AND t.count > 0
+            GROUP BY t.tag_id
             ORDER BY tag.position',
-            [':media_pageid' => $pageid]
+            [
+                ':media_pageid' => $pageid,
+            ]
         );
     }
 
@@ -737,14 +743,13 @@ class Database
     public function getDbReviewsPerCategory($categoryId)
     {
         return $this->queryAsArray(
-            'SELECT SUM(t.count) AS count, tag.*
+            'SELECT count(t.id) AS count, tag.*
             FROM tagging AS t,
                  tag,
                  category2media AS c2m
             WHERE tag.id = t.tag_id
             AND c2m.media_pageid = t.media_pageid
             AND c2m.category_id = :category_id
-            AND t.count > 0
             GROUP BY (tag.id)
             ORDER BY tag.position DESC',
             [':category_id' => $categoryId]

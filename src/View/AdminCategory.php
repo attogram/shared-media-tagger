@@ -38,8 +38,6 @@ use Attogram\SharedMedia\Tagger\Tools;
 
     <a href="<?= Tools::url('admin') ?>category?v=1">[View&nbsp;Category&nbsp;List]</a>
     <?= $spacer ?>
-    <a href="./sqladmin?table=category&action=row_create" target="sqlite">[Manually&nbsp;add&nbsp;category]</a>
-    <?= $spacer ?>
     <a href="<?= Tools::url('admin') ?>category?g=all">[Import&nbsp;Category&nbsp;Info]</a>
 </p>
 

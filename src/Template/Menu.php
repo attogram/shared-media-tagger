@@ -6,29 +6,30 @@
 declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Config;
-
-$space = ' &nbsp; &nbsp; ';
-$countFiles = number_format((float) $this->database->getImageCount());
-$countCategories = number_format((float) $this->database->getCategoriesCount());
-$countScores = number_format((float) $this->database->getTotalReviewCount());
+use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="menu">
     <?= $this->getUserScoreBox() ?>
     <span class="nobr">
-        <b><a href="' . Tools::url('home') . '"><?= Config::$siteName ?></a></b>
+        <b><a href="<?= Tools::url('home') ?>"><?= Config::$siteName ?></a></b>
     </span>
-    &nbsp; &nbsp;
+    &nbsp; &nbsp
     <span class="nobr">
-        <a href="' . Tools::url('browse') . '">🔎<?= $countFiles ?>&nbsp;Files</a>
+        <a href="<?= Tools::url('browse') ?>">🔎<?=
+            number_format((float) $this->database->getImageCount())
+        ?>&nbsp;Files</a>
     </span>
-    &nbsp; &nbsp;
+    &nbsp; &nbsp
     <span class="nobr">
-        <a href="' . Tools::url('categories') . '">📂<?= $countCategories ?>&nbsp;Categories</a>
+        <a href="<?= Tools::url('categories') ?>">📂<?=
+            number_format((float) $this->database->getCategoriesCount())
+        ?>&nbsp;Categories</a>
     </span>
-    &nbsp; &nbsp;
+    &nbsp; &nbsp
     <span class="nobr">
-        <a href="' . Tools::url('scores') . '">🗳️<?= $countScores ?>&nbsp;Scores</a>
+        <a href="<?= Tools::url('scores') ?>">🗳️<?=
+            number_format((float) $this->database->getTotalReviewCount())
+        ?>&nbsp;Scores</a>
     </span>
-    &nbsp; &nbsp;
 </div>

@@ -24,9 +24,6 @@ $title = !empty($this->media['title']) ? $this->media['title'] : null;
     <?php
         print str_replace(' / ', '<br />', $this->displayAttribution($this->media, 17, 21));
     ?>
-    <span style="font-size:80%;">
-        <?= $this->displayReviews($this->database->getReviews($this->media['pageid'])) ?>
-    </span>
     <?php
         $this->includeAdminMediaFunctions($this->media['pageid']);
     ?>

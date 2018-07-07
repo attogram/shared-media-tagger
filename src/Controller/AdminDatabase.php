@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger\Controller;
 
-use Attogram\SharedMedia\Tagger\DatabaseUpdater;
+use Attogram\SharedMedia\Tagger\Database\DatabaseUpdater;
 
 /**
  * Class AdminDatabase

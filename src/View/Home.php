@@ -15,6 +15,7 @@ use Attogram\SharedMedia\Tagger\Tools;
             <h1><?= $data['name'] ?></h1>
             <p><?= $data['about'] ?></p>
             <br />
+            <p><a href="<?= Tools::url('random') ?>">❓ Random</a></p>
             <p><a href="<?= Tools::url('browse') ?>">🔎 <b><?=
                 $data['countFiles']; ?></b> Files</a></p>
             <p><a href="<?= Tools::url('categories') ?>">📂 <b><?=

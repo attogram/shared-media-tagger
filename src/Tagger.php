@@ -60,7 +60,6 @@ class Tagger
             $databaseUpdater->setDatabase($this->database);
             $databaseUpdater->createTables();
             $databaseUpdater->seedDemo();
-            Tools::debug('New site database created and seeded.');
         }
 
         Config::setSiteInfo($siteInfo);
@@ -219,7 +218,7 @@ class Tagger
         }
         $response = '';
         foreach ($reviews as $review) {
-                $response .= '+ ' . $review['count'] . ' ' . $review['name'] . '</a><br />';
+            $response .= '+ ' . $review['count'] . ' ' . $review['name'] . '</a><br />';
         }
         if (empty($response)) {
             $response = '- unreviewed';
@@ -251,11 +250,10 @@ class Tagger
         if ($totalUserTags && $countFiles) {
             $score = round((($totalUserTags / $countFiles)) * 100, 2);
         }
-        $box = '<span class="nobr" style="background:darkslategray;color:lightcyan;'
+
+        return '<span class="nobr" style="background:darkslategray;color:lightcyan;'
             . 'float:left;font-size:110%;margin:0;padding:0 1px 0 4px;">'
             . 'Score: <b>' . $score . '</b>%</span>';
-
-        return $box;
     }
 
     /**

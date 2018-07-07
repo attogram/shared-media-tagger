@@ -15,7 +15,6 @@ declare(strict_types = 1);
             ? '✔️OK: WRITEABLE'
             : '❌ERROR: READ ONLY' ?></li>
         <li>Size: <?= $data['databaseSize'] ?> bytes</li>
-        <li><a href="./sqladmin" target="sqlite">SQLite ADMIN</a></li>
     </ul>
     <hr />
 

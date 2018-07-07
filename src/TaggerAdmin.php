@@ -239,12 +239,14 @@ class TaggerAdmin extends Tagger
     {
         $sql = 'UPDATE tag
                 SET position = :position,
+                    score = :score,
                     name = :name,
                     display_name = :display_name
                 WHERE id = :id';
         $bind = [
             ':id' => !empty($_GET['tagid']) ? $_GET['tagid'] : null,
             ':position' => !empty($_GET['position']) ? $_GET['position'] : null,
+            ':score' => !empty($_GET['score']) ? $_GET['score'] : null,
             ':name' => !empty($_GET['name']) ? $_GET['name'] : null,
             ':display_name' => !empty($_GET['display_name']) ? $_GET['display_name'] : null,
         ];

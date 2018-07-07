@@ -16,146 +16,94 @@ class Tag extends ControllerBase
         $tagId = isset($_GET['t']) ? $_GET['t'] : false;
 
         if (!$tagId || !Tools::isPositiveNumber($tagId)) {
-            $this->smt->fail404('404 Tag ID Not Found');
+            $this->redirect('Tag ID invalid');
         }
 
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
-            $this->smt->fail404('404 Media ID Not Found');
+            $this->redirect('Media ID invalid');
+        }
+
+        // Get user, or create new user
+        if (!$this->smt->database->getUser(true)) {
+            $this->redirect('User invalid');
         }
 
         // Tag exists?
         if (!$this->smt->database->queryAsBool(
-            'SELECT id FROM tag 
-                WHERE id = :tag_id 
-                LIMIT 1',
+            'SELECT id FROM tag WHERE id = :tag_id',
             [':tag_id' => $tagId]
         )
         ) {
-            $this->smt->fail404('404 Tag Not Found');
+            $this->redirect('Tag Not Found');
         }
 
         // Media exists?
         if (!$this->smt->database->queryAsBool(
-            'SELECT pageid FROM media 
-                WHERE pageid = :media_id 
-                LIMIT 1',
+            'SELECT pageid FROM media WHERE pageid = :media_id',
             [':media_id' => $mediaId]
         )
         ) {
-            $this->smt->fail404('404 Media Not Found');
-        }
-
-        // Get user, or create new user
-        if (!$this->smt->database->getUser(1)) {
-            $this->smt->fail404('404 User Not Found');
+            $this->redirect('Media Not Found');
         }
 
         // has user already rated this file?
-        $addUserTag = true;
-        $rating = $this->smt->database->queryAsArray(
-            'SELECT tag_id, count
-            FROM user_tagging
+        $existingRating = $this->smt->database->queryAsArray(
+            'SELECT tag_id
+            FROM tagging
             WHERE user_id = :user_id
             AND media_pageid = :media_id',
             [
-                ':user_id' => $this->smt->database->userId,
-                ':media_id' => $mediaId
+                ':media_id' => $mediaId,
+                ':user_id'  => $this->smt->database->userId,
             ]
         );
-        if ($rating) {  // existing user rating for this media file
-            $oldTag = $rating[0]['tag_id'];
+        if ($existingRating) {
+            $oldTag = $existingRating[0]['tag_id'];
             if ($oldTag == $tagId) { // user NOT changing tag, do nothing
-                goto redirect;
+                $this->redirect('OK: user confirmed existing rating');
             }
-            $this->smt->database->saveUserLastTagTime();
-            $addUserTag = false;
-
-            // user_tagging: Switch old tag to new tag
+            // Switch old tag to new tag
             $this->smt->database->queryAsBool(
-                'UPDATE user_tagging
+                'UPDATE tagging
                     SET tag_id = :tag_id
                     WHERE user_id = :user_id
                     AND media_pageid = :media_id',
                 [
-                    ':tag_id' => $tagId,
-                    ':user_id' => $this->smt->database->userId,
-                    ':media_id' => $mediaId
-                ]
-            );
-
-            // global tagging: -1 old tag
-            $this->smt->database->queryAsBool(
-                'UPDATE tagging
-                    SET count = count - 1
-                    WHERE media_pageid = :media_id
-                    AND tag_id = :tag_id',
-                [
                     ':media_id' => $mediaId,
-                    ':tag_id' => $oldTag
+                    ':tag_id'   => $tagId,
+                    ':user_id'  => $this->smt->database->userId,
                 ]
             );
-        } // end if already rated
-
-        if ($addUserTag) {
-            // user tagging: +1 new tag
-            $where = 'WHERE user_id=:user_id 
-                      AND tag_id=:tag_id 
-                      AND media_pageid=:media_id';
-            $sql = 'SELECT count 
-                    FROM user_tagging ' . $where;
-            $bind = [
-                ':user_id' => $this->smt->database->userId,
-                ':tag_id' => $tagId,
-                ':media_id' => $mediaId
-            ];
-            if ($this->smt->database->queryAsArray($sql, $bind)) {
-                $this->smt->database->queryAsBool(
-                    'UPDATE user_tagging 
-                        SET count = count + 1 ' . $where,
-                    $bind
-                );
-            } else {
-                $this->smt->database->queryAsBool(
-                    'INSERT INTO user_tagging (count, tag_id, media_pageid, user_id) 
-                        VALUES (1, :tag_id, :media_id, :user_id)',
-                    $bind
-                );
-            }
-            $this->smt->database->saveUserLastTagTime();
+            $this->redirect('OK: user changed existing rating');
         }
 
-        // global tagging: +1 new tag
-        $where = 'WHERE tag_id=:tag_id 
-                  AND media_pageid=:media_id';
-        $sql = 'SELECT count FROM tagging ' . $where;
-        $bind = [
-            ':tag_id' => $tagId,
-            ':media_id' => $mediaId
-        ];
-        $gtag = $this->smt->database->queryAsArray($sql, $bind);
-        if (!$gtag) {
-            $this->smt->database->queryAsBool(
-                'INSERT INTO tagging (count, tag_id, media_pageid) 
-                    VALUES (1, :tag_id, :media_id)',
-                $bind
-            );
-        } else {
-            $this->smt->database->queryAsBool(
-                'UPDATE tagging 
-                    SET count = count + 1 ' . $where,
-                $bind
-            );
-        }
+        // insert new tag
+        $this->smt->database->queryAsBool(
+            'INSERT INTO tagging (tag_id, media_pageid, user_id) 
+                VALUES (:tag_id, :media_id, :user_id)',
+            [
+                ':media_id' => $mediaId,
+                ':tag_id'   => $tagId,
+                ':user_id'  => $this->smt->database->userId,
+            ]
+        );
+        $this->redirect('OK: user added rating');
+    }
 
-        // get next random image
-        redirect:
-
+    /**
+     * Redirect to a random media file
+     *
+     * @param string $message
+     */
+    private function redirect($message = '')
+    {
+        //Tools::debug($message); exit;
         $next = $this->smt->database->getRandomMedia();
+        $location = './';
         if (isset($next[0]['pageid'])) {
-            header('Location: ' . Tools::url('info') . '/' . $next[0]['pageid']);
-            Tools::shutdown();
+            $location = Tools::url('info') . '/' . $next[0]['pageid'];
         }
-
-        header('Location: ./');
+        header('Location: ' . $location);
+        Tools::shutdown();
     }
 }

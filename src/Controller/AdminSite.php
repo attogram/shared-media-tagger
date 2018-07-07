@@ -13,6 +13,7 @@ class AdminSite extends ControllerBase
         $site = $this->smt->database->getSite();
         $site['id'] = !empty($site['id']) ? (int) $site['id'] : 1;
         $site['name'] = !empty($site['name']) ? htmlentities((string) $site['name']) : '';
+        $site['about'] = !empty($site['about']) ? htmlentities((string) $site['about']) : '';
         $site['header'] = !empty($site['header']) ? htmlentities((string) $site['header']) : '';
         $site['footer'] = !empty($site['footer']) ? htmlentities((string) $site['footer']) : '';
         $site['use_cdn'] = !empty($site['use_cdn']) ? $site['use_cdn'] : false;
