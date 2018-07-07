@@ -399,14 +399,16 @@ function checkAll(formname, checktoggle) {
      */
     public function displayThumbnailBox(array $media)
     {
-        return '<div class="thumbnail_box">'
+        return '<div style="background-color:#eee; display:inline-block; '
+            . 'text-align:center; vertical-align:top; margin:3px; padding:3px;">'
             . $this->displayThumbnail($media)
             . str_replace(
                 ' / ',
                 '<br />',
                 $this->displayAttribution($media, 17, 21)
             )
-            . '<div class="thumbnail_reviews left">'
+            . '<div class="left" style="background-color:inherit; display:inline-block; '
+            . 'text-align:left; margin:0; padding:1px; font-size:80%;">'
             . $this->displayReviews($this->database->getReviews($media['pageid']))
             . '</div>'
             . $this->displayAdminMediaFunctions($media['pageid'])
@@ -484,23 +486,22 @@ function checkAll(formname, checktoggle) {
 
         $url = $media['thumburl'];
         $height = $media['thumbheight'];
-        $divwidth = $width = $media['thumbwidth'];
-        if ($divwidth < Config::$sizeMedium) {
-            $divwidth = Config::$sizeMedium;
-        }
-        $infourl =  Tools::url('info') . '/' . $media['pageid'];
+        $width = $media['thumbwidth'];
 
-        return  '<div class="img">'
-            . '<a href="'
-            . $infourl
-            . '">'
-            . '<img src="'
-            . $url
-            .'" class="img-fluid" style="height:100%;width:100%;" height="'
-            . $height
-            . '" width="'
-            . $width
-            . '" alt=""></a>'
+        $aspectRatio = 1;
+        if ($width && $height) {
+            $aspectRatio = $width / $height;
+        }
+        if ($aspectRatio < 1) { // Tall media
+            $width = round($aspectRatio * 100);
+        }
+        if ($width > 100) {
+            $width = 100;
+        }
+        $style = 'height:100%; width:' . $width . '%;';
+
+        return  '<div>'
+            . '<img src="' . $url .'" style="' . $style . '" alt="">'
             . $this->displayAttribution($media)
             . '</div>';
     }
@@ -548,11 +549,11 @@ function checkAll(formname, checktoggle) {
         $infourl = Tools::url('info') . '/' . $media['pageid'];
         $title = htmlspecialchars(Tools::stripPrefix($media['title']));
 
-        return '<div class="mediatitle left">'
+        return '<div class="mediatitle center">'
         . '<a href="' . $infourl . '" title="' . htmlentities((string) $title) . '">'
         . Tools::truncate($title, $titleTruncate)
         . '</a></div>'
-        . '<div class="attribution left">'
+        . '<div class="attribution center">'
         . '<a href="' . $infourl . '">'
         . $this->displayLicensing($media, $artistTruncate)
         . '</a></div>';
