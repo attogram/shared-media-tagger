@@ -15,7 +15,7 @@ declare(strict_types = 1);
     <br />
     <?php
     foreach ($rates as $media) {
-        print $this->smt->displayThumbnailBox($media);
+        $this->smt->includeThumbnailBox($media);
     }
     ?>
 </div>

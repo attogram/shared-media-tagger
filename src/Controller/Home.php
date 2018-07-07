@@ -30,7 +30,7 @@ class Home extends ControllerBase
         $this->smt->useJquery = true;
 
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Home'));
         $this->smt->includeFooter();

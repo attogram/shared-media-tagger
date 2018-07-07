@@ -18,7 +18,7 @@ class AdminMediaBlocked extends ControllerBase
 
         $this->smt->title = 'Blocked Media Admin';
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
         $this->smt->includeAdminMenu();
 
         $view = $this->getView('AdminMediaBlocked');

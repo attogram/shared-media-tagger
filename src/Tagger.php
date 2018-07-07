@@ -28,6 +28,16 @@ class Tagger
     public $router;
     /** @var array  */
     public $config;
+    /** @var string */
+    public $customSiteFooter;
+    /** @var string */
+    public $customSiteHeader;
+    /** @var string */
+    public $category;
+    /** @var int|string */
+    public $mediaId;
+    /** @var array */
+    public $media;
 
     /**
      * Tagger constructor.
@@ -56,28 +66,6 @@ class Tagger
         Config::setSiteInfo($siteInfo);
 
         $this->database->getUser();
-    }
-
-    /**
-     * @param string $message
-     * @param string $extra
-     */
-    public function fail404($message = '', $extra = '')
-    {
-        header('HTTP/1.0 404 Not Found');
-        $this->includeHeader(false);
-        if (!$message || !is_string($message)) {
-            $message = '404 Not Found';
-        }
-        print '<div class="box center" style="background-color:yellow; color:black;">'
-            . '<h1>' . $message . '</h1>';
-        if ($extra && is_string($extra)) {
-            print '<br />' . $extra;
-        }
-        print '</div>';
-        $this->includeFooter(false);
-
-        Tools::shutdown();
     }
 
     /**
@@ -146,104 +134,33 @@ class Tagger
     }
 
     /**
-     * @return string
-     */
-    public function displayAdminMediaListFunctions()
-    {
-        return
-        '<div class="left pre white" style="display:inline-block; border:1px solid red; margin:2px; padding:2px;">'
-        . '<input type="submit" value="Delete selected media">'
-        . '<script type="text/javascript" language="javascript">'
-        . "
-function checkAll(formname, checktoggle) { 
-    var checkboxes = new Array();
-    checkboxes = document[formname].getElementsByTagName('input');
-    for (var i=0; i<checkboxes.length; i++) {
-        if (checkboxes[i].type == 'checkbox') { 
-           checkboxes[i].checked = checktoggle; 
-        } 
-    } 
-}
-        </script>"
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-        . '</div>';
-    }
-
-    /**
      * @param $mediaId
-     * @return string
      */
-    public function displayAdminMediaFunctions($mediaId)
+    public function includeAdminMediaFunctions($mediaId)
     {
         if (!Tools::isAdmin() || !Tools::isPositiveNumber($mediaId)) {
-            return '';
+            return;
         }
-        return '<div class="attribution" style="display:block;">'
-        . '<a style="font-size:130%;" href="' . Tools::url('admin') . 'media?dm=' . $mediaId
-        . '" title="Delete" target="admin" onclick="return confirm(\'Confirm: Delete Media #'
-        . $mediaId . ' ?\');">❌</a> &nbsp; '
-        . '<input type="checkbox" name="media[]" value="' . $mediaId . '" />  &nbsp; '
-        . '<a style="font-size:170%;" href="' . Tools::url('admin') . 'media?am=' . $mediaId
-        . '" title="Refresh" target="admin" onclick="return confirm(\'Confirm: Refresh Media #'
-        . $mediaId . ' ?\');">♻</a>  &nbsp; '
-        . ' <a style="font-size:140%;" href="' . Tools::url('admin') . 'curate?i=' . $mediaId. '">C</a>'
-        . '</div>';
+        $this->mediaId = $mediaId;
+        $this->includeTemplate('AdminMediaFunctions');
     }
 
     /**
      * @param string $categoryName
-     * @return string
      */
-    public function displayAdminCategoryFunctions(string $categoryName)
+    public function includeAdminCategoryFunctions(string $categoryName)
     {
         if (!Tools::isAdmin()) {
-            return '';
+            return;
         }
-        $category = $this->database->getCategory($categoryName);
-        if (!$category) {
-            return '<p>ADMIN: category not in database</p>';
+        $this->category = $this->database->getCategory($categoryName);
+        if (!$this->category) {
+            Tools::error('ADMIN: category not in database');
+
+            return;
         }
 
-        return '<br clear="all" />'
-        . '<div class="left pre white" style="display:inline-block; border:1px solid red; padding:10px;">'
-        . '<input type="submit" value="Delete selected media">'
-        . '<script type="text/javascript" language="javascript">'
-        . "function checkAll(formname, checktoggle) {
-            var checkboxes = new Array();
-            checkboxes = document[formname].getElementsByTagName('input');
-            for (var i=0; i<checkboxes.length; i++) {
-                if (checkboxes[i].type == 'checkbox') {
-                    checkboxes[i].checked = checktoggle;
-                }
-            }
-        }"
-        . '</script>'
-        . ' &nbsp; <a onclick="javascript:checkAll(\'media\', true);" href="javascript:void();">check all</a>'
-        . ' &nbsp;&nbsp; <a onclick="javascript:checkAll(\'media\', false);" href="javascript:void();">uncheck all</a>'
-        . '<br /><br /><a target="c" href="https://commons.wikimedia.org/wiki/'
-        . Tools::categoryUrlencode($category['name']) . '">VIEW ON COMMONS</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?c='
-        . Tools::categoryUrlencode($category['name']) . '">Get Category Info</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?i='
-        . Tools::categoryUrlencode($category['name'])
-        . '" onclick="return confirm(\'Confirm: Import Media To Category?\');">Import '
-            . (!empty($category['files']) ? $category['files'] : '?')
-            . ' Files into Category</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?sc='
-        . Tools::categoryUrlencode($category['name'])
-        . '" onclick="return confirm(\'Confirm: Add Sub-Categories?\');">Add '
-            . (!empty($category['subcats']) ? $category['subcats'] : '?')
-            . ' Sub-Categories</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'media?dc='
-        . Tools::categoryUrlencode($category['name'])
-        . '" onclick="return confirm(\'Confirm: Clear Media from Category?\');">Clear Media from Category</a>'
-        . '<br /><br /><a href="' . Tools::url('admin') . 'category/?d=' . urlencode($category['id'])
-        . '" onclick="return confirm(\'Confirm: Delete Category?\');">Delete Category</a>'
-        . '<br /><pre>' . print_r($category, true) . '</pre>'
-        . '</form>'
-        . '</div>'
-        . '<br /><br />';
+        $this->includeTemplate('AdminCategoryFunctions');
     }
 
     /**
@@ -257,7 +174,6 @@ function checkAll(formname, checktoggle) {
             return '';
         }
         $cats = $this->database->getImageCategories($mediaId, $onlyHidden);
-        //$response = '<div class="xxcategories" style="width:' . Config::$sizeMedium . 'px;">';
         if (!$cats) {
             return '';
         }
@@ -322,43 +238,6 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * includeMenu
-     */
-    public function includeMenu()
-    {
-        $space = ' &nbsp; &nbsp; ';
-        $countFiles = number_format((float) $this->database->getImageCount());
-        $countCategories = number_format((float) $this->database->getCategoriesCount());
-        $countScores = number_format((float) $this->database->getTotalReviewCount());
-        print '<div class="menu">'
-        . $this->getUserScoreBox()
-        . '<span class="nobr"><b><a href="' . Tools::url('home') . '">'
-            . Config::$siteName . '</a></b></span>' .  $space
-        . '<span class="nobr"><a href="' . Tools::url('browse') . '">🔎'
-            . $countFiles . '&nbsp;Files' . '</a></span>' . $space
-        . '<span class="nobr"><a href="' . Tools::url('categories') . '">📂'
-            . $countCategories . '&nbsp;Categories</a></span>' . $space
-        . '<span class="nobr"><a href="' . Tools::url('scores') . '">🗳️'
-            . $countScores . '&nbsp;Scores</a></span>' . $space
-        . '</div>';
-    }
-
-    /**
-     * includeMediumMenu
-     */
-    public function includeMediumMenu()
-    {
-        $space = ' &nbsp; &nbsp; ';
-        print '<div class="menu">'
-            . $this->getUserScoreBox()
-            . '<span class="nobr"><b><a href="' . Tools::url('home') . '">' . Config::$siteName . '</a></b></span>'
-            . $space . '<span class="nobr"><a href="' . Tools::url('browse') . '">🔎Files' . '</a></span>'
-            . $space . '<span class="nobr"><a href="' . Tools::url('categories') . '">📂Topics</a></span>'
-            . $space . '<span class="nobr"><a href="' . Tools::url('scores') . '">🗳️Scores</a></span>'
-            . '</div>';
-    }
-
-    /**
      * @return string
      */
     public function getUserScoreBox()
@@ -378,43 +257,14 @@ function checkAll(formname, checktoggle) {
 
         return $box;
     }
-    /**
-     * @param array $media
-     * @return string
-     */
-    public function displayThumbnail(array $media)
-    {
-        $thumb = $this->getThumbnail($media);
-        $pageid = !empty($media['pageid']) ? $media['pageid'] : null;
-        $title = !empty($media['title']) ? $media['title'] : null;
-        return '<div style="display:inline-block;text-align:center;">'
-            . '<a href="' .  Tools::url('info') . '/' . $pageid . '">'
-            . '<img src="' . $thumb['url'] . '"'
-            . ' width="' . $thumb['width'] . '"'
-            . ' height="' . $thumb['height'] . '"'
-            . ' title="' . htmlentities((string) $title) . '" /></a>'
-            . '</div>';
-    }
 
     /**
      * @param array $media
-     * @return string
      */
-    public function displayThumbnailBox(array $media)
+    public function includeThumbnailBox(array $media)
     {
-        return '<div style="background-color:#eee; display:inline-block; '
-            . 'text-align:center; vertical-align:top; margin:3px; padding:3px;">'
-            . $this->displayThumbnail($media)
-            . str_replace(
-                ' / ',
-                '<br />',
-                $this->displayAttribution($media, 17, 21)
-            )
-            . '<span style="font-size:80%;">'
-                . $this->displayReviews($this->database->getReviews($media['pageid']))
-            . '</span>'
-            . $this->displayAdminMediaFunctions($media['pageid'])
-            . '</div>';
+        $this->media = $media;
+        $this->includeTemplate('Thumbnail');
     }
 
     /**
@@ -562,88 +412,76 @@ function checkAll(formname, checktoggle) {
     }
 
     /**
-     * displaySiteHeader
+     * @param bool $showCustomSiteHeader
      */
-    public function displaySiteHeader()
-    {
-        print !empty(Config::$siteInfo['header']) ? Config::$siteInfo['header'] : null;
-    }
-
-    /**
-     * displaySiteFooter
-     */
-    public function displaySiteFooter()
-    {
-        print !empty(Config::$siteInfo['footer']) ? Config::$siteInfo['footer'] : null;
-    }
-
-    /**
-     * @param bool $showSiteHeader
-     */
-    public function includeHeader($showSiteHeader = true)
+    public function includeHeader($showCustomSiteHeader = true)
     {
         if (!$this->title) {
             $this->title = Config::$siteName;
         }
-        print "<!doctype html>\n"
-        . '<html><head><title>' . $this->title . '</title>'
-        . '<meta charset="utf-8" />'
-        . '<meta name="viewport" content="initial-scale=1" />'
-        . '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
-        if ($this->useBootstrap) {
-            print '<link rel="stylesheet" href="' . Tools::url('bootstrap_css') . '" />'
-            . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<!--[if lt IE 9]>'
-            . '<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>'
-            . '<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>'
-            . '<![endif]-->';
-        }
-        if ($this->useBootstrap || $this->useJquery) {
-            print '<script src="' . Tools::url('jquery') . '"></script>';
-        }
-        if ($this->useBootstrap) {
-            print '<script src="' . Tools::url('bootstrap_js') . '"></script>';
-        }
-        print '<link rel="stylesheet" type="text/css" href="' . Tools::url('css') . '" />'
-        . '<link rel="icon" type="image/png" href="' . Tools::url('home') . 'favicon.ico" />'
-        . '</head><body>';
 
-        if ($showSiteHeader) {
-            $this->displaySiteHeader();
+        $this->customSiteHeader = '';
+        if (!empty(Config::$siteInfo['header'])
+            && $showCustomSiteHeader
+            && !Tools::isAdmin()
+        ) {
+            $this->customSiteHeader = Config::$siteInfo['header'];
         }
+
+        $this->includeTemplate('HtmlHeader');
     }
 
     /**
-     * @param bool $showSiteFooter
+     * @param bool $customSiteFooter
      */
-    public function includeFooter($showSiteFooter = true)
+    public function includeFooter($customSiteFooter = true)
     {
-        $this->includeMenu();
-        print '<footer><div class="menu" style="line-height:2; font-size:80%;">';
-        if (empty(Config::$setup['hide_hosted_by']) || !Config::$setup['hide_hosted_by']) {
-            $serverName = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : null;
-            print '<span class="nobr">Hosted by <b><a href="//' . $serverName . '/">' . $serverName . '</a></b></span>';
+        $this->customSiteFooter = '';
+        if (!empty(Config::$siteInfo['header'])
+            && $customSiteFooter
+            && !Tools::isAdmin()
+        ) {
+            $this->customSiteFooter = Config::$siteInfo['footer'];
         }
-        print ' &nbsp; &nbsp; &nbsp; &nbsp; ';
+        $this->includeTemplate('Menu');
+        $this->includeTemplate('HtmlFooter');
+    }
 
-        print '<span class="nobr">Powered by <b>'
-        . '<a target="c" href="' . Tools::url('github_smt') . '">'
-        . 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER . '</a></b></span>';
+    /**
+     * @param $name
+     */
+    public function includeTemplate($name)
+    {
+        $view = Config::$sourceDirectory . '/Template/' . $name . '.php';
+        if (!is_readable($view)) {
+            Tools::error('Template Not Found: ' . $name);
 
-        if (!empty($_SESSION['user'])) {
-            print '<br /><a href="'
-                . Tools::url('admin')
-                . '">🔧 Admin: <b>' . $_SESSION['user'] . '</b></a>'
-                . '  &nbsp; &nbsp; '
-                . '<a href="' . Tools::url('logout') . '">Logout</a>';
-        }
-
-        print '</div></footer>';
-
-        if ($showSiteFooter) {
-            $this->displaySiteFooter();
+            return;
         }
 
-        print '</body></html>';
+        /** @noinspection PhpIncludeInspection */
+        include($view);
+    }
+
+    /**
+     * @param string $message
+     * @param string $extra
+     */
+    public function fail404($message = '', $extra = '')
+    {
+        header('HTTP/1.0 404 Not Found');
+        $this->includeHeader(false);
+        if (!$message || !is_string($message)) {
+            $message = '404 Not Found';
+        }
+        print '<div class="box center" style="background-color:yellow; color:black;">'
+            . '<h1>' . $message . '</h1>';
+        if ($extra && is_string($extra)) {
+            print '<br />' . $extra;
+        }
+        print '</div>';
+        $this->includeFooter(false);
+
+        Tools::shutdown();
     }
 }

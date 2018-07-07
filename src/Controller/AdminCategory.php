@@ -16,7 +16,7 @@ class AdminCategory extends ControllerBase
 
         $this->smt->title = 'Category Admin';
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
         $this->smt->includeAdminMenu();
 
         if (function_exists('set_time_limit')) {

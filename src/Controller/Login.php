@@ -92,8 +92,7 @@ class Login extends ControllerBase
         );
         $this->smt->title = 'Login Failed';
         $this->smt->includeHeader();
-        $this->smt->displaySiteHeader();
-        $this->smt->includeMenu();
+        $this->smt->includeTemplate('Menu');
         ?>
         <div class="box white">
             <h1>
@@ -104,7 +103,6 @@ class Login extends ControllerBase
             </p>
         </div>
         <?php
-        $this->smt->displaySiteFooter();
         $this->smt->includeFooter();
         Tools::shutdown();
     }

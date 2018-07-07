@@ -21,7 +21,6 @@ use Attogram\SharedMedia\Tagger\Tools;
         <?= $reviewsPerCategory ?>
     </div>
     <h1><?= $categoryNameDisplay ?></h1>
-    <br />
     <b><?= $categorySize ?></b> files
     <?= $pager ? ', '.$pager : '' ?>
     <br clear="all" />
@@ -32,7 +31,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     }
 
     foreach ($category as $media) {
-        print $this->smt->displayThumbnailBox($media);
+        $this->smt->includeThumbnailBox($media);
     }
 
     if ($pager) {
@@ -40,7 +39,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     }
 
     if (Tools::isAdmin()) {
-        print $this->smt->displayAdminCategoryFunctions($categoryName);
+        print $this->smt->includeAdminCategoryFunctions($categoryName);
     }
     ?>
 </div>

@@ -68,7 +68,7 @@ class AdminDatabase extends ControllerBase
 
         $this->smt->title = 'Database Admin';
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
         $this->smt->includeAdminMenu();
 
         /** @noinspection PhpIncludeInspection */

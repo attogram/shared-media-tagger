@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 $smt->title = 'User Admin';
 $smt->includeHeader();
-$smt->includeMediumMenu();
+$smt->includeTemplate('MenuSmall');
 $smt->includeAdminMenu();
 
 $users = $smt->database->getUsers();

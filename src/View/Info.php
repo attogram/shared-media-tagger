@@ -10,7 +10,6 @@ declare(strict_types = 1);
  * @var array $data
  */
 
-use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
@@ -19,6 +18,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         <div class="col-sm-7 box grey center" style="height:stretch;">
             <?= $this->smt->displayTags($pageid) ?>
             <?= $this->smt->displayMedia($media) ?>
+            <?php $this->smt->includeAdminMediaFunctions($media['pageid']); ?>
         </div>
         <div class="col-sm-5 box white">
             <p style="font-size:130%; font-weight:bold;">
@@ -97,9 +97,9 @@ use Attogram\SharedMedia\Tagger\Tools;
 
                 if ($media['licenseuri'] && $media['licenseuri'] != 'false') {
                     print '<li>License: <a target="license" href="'
-                    . $media['licenseuri'] . '">' . implode(' - ', $lics)  . '</a></li>';
+                    . $media['licenseuri'] . '">' . implode(', ', $lics)  . '</a></li>';
                 } else {
-                    print '<li>License: ' . implode('<br />', $lics) . '</li>';
+                    print '<li>License: ' . implode(', ', $lics) . '</li>';
                 }
                 if ($media['attributionrequired'] && $media['attributionrequired'] != 'false') {
                     print '<li>Attribution Required</li>';

@@ -25,7 +25,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         <div class="col-xs-6 box">
             <?php
             foreach ($data['random'] as $media) {
-                print $this->smt->displayThumbnailBox($media);
+                $this->smt->includeThumbnailBox($media);
             }
             ?>
         </div>

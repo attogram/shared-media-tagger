@@ -17,7 +17,7 @@ class Scores extends ControllerBase
 
         $this->smt->title = 'Scores - ' . Config::$siteName;
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
 
         $limit = 100;  // @TODO TMP DEV
 

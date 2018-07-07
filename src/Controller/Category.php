@@ -27,10 +27,7 @@ class Category extends ControllerBase
         $categoryInfo = $this->smt->database->getCategory($categoryName);
 
         if (!$categoryInfo) {
-            $this->smt->fail404(
-                '404 Category Not Found',
-                $this->smt->displayAdminCategoryFunctions($categoryName)
-            );
+            $this->smt->fail404('404 Category Not Found');
         }
 
         $categorySize = $this->smt->database->getCategorySize($categoryName);
@@ -71,10 +68,7 @@ class Category extends ControllerBase
         $category = $this->smt->database->queryAsArray($sql, $bind);
 
         if (!$category || !is_array($category)) {
-            $this->smt->fail404(
-                '404 Category On Hold',
-                $this->smt->displayAdminCategoryFunctions($categoryName)
-            );
+            $this->smt->fail404('404 Category On Hold');
         }
 
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -83,7 +77,7 @@ class Category extends ControllerBase
         $categoryNameDisplay = Tools::stripPrefix($categoryName);
 
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
 
         $view = $this->getView('Category');
         /** @noinspection PhpIncludeInspection */

@@ -12,7 +12,7 @@ class AdminHome extends ControllerBase
     {
         $this->smt->title = 'Admin';
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
         $this->smt->includeAdminMenu();
 
         /** @noinspection PhpIncludeInspection */

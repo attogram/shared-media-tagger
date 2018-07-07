@@ -23,7 +23,7 @@ class AdminSite extends ControllerBase
 
         $this->smt->title = 'Site Admin';
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
         $this->smt->includeAdminMenu();
 
         if (isset($_POST) && $_POST) {

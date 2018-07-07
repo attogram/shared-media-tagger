@@ -17,7 +17,7 @@ if (function_exists('set_time_limit')) {
 
 $smt->title = 'Admin Reports';
 $smt->includeHeader();
-$smt->includeMediumMenu();
+$smt->includeTemplate('MenuSmall');
 $smt->includeAdminMenu();
 print '<div class="box white"><p><a href="' . Tools::url('admin') .'reports">' . $smt->title . '</a></p>
 <ul>

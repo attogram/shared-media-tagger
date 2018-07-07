@@ -13,7 +13,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 $smt->title = 'Tag Admin';
 $smt->includeHeader();
-$smt->includeMediumMenu();
+$smt->includeTemplate('MenuSmall');
 $smt->includeAdminMenu();
 print '<div class="box white">';
 

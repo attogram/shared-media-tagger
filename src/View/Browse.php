@@ -51,7 +51,7 @@ Browse Files, sorty by <select name="s">
 
 if (Tools::isAdmin()) {
     print '<form action="' . Tools::url('admin') . 'media" method="GET" name="media">';
-    print $this->smt->displayAdminMediaListFunctions();
+    $this->smt->includeTemplate('AdminMediaListFunctions');
 }
 
 print '<br clear="all" />';
@@ -68,7 +68,7 @@ foreach ($medias as $media) {
         }
         print '</span><br />';
     }
-    print $this->smt->displayThumbnailBox($media);
+    $this->smt->includeThumbnailBox($media);
     if (isset($extra)) {
         print '</div>';
     }
@@ -77,7 +77,8 @@ foreach ($medias as $media) {
 print '<br clear="all" />';
 
 if (Tools::isAdmin()) {
-    print $this->smt->displayAdminMediaListFunctions() . '</form>';
+    $this->smt->includeTemplate('AdminMediaListFunctions');
+    print '</form>';
 }
 
 if ($pager) {

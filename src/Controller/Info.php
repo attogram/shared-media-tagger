@@ -42,13 +42,13 @@ class Info extends ControllerBase
 
 
         $data = [];
-        $data['admin'] =  $this->smt->displayAdminMediaFunctions($media['pageid']);
+
 
         $this->smt->title = 'Info: ' . Tools::stripPrefix($media['title']);
         $this->smt->useBootstrap = true;
         $this->smt->useJquery = true;
         $this->smt->includeHeader();
-        $this->smt->includeMediumMenu();
+        $this->smt->includeTemplate('MenuSmall');
 
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Info'));
