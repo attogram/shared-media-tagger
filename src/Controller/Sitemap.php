@@ -16,7 +16,7 @@ class Sitemap extends ControllerBase
         $view = $this->getView('Sitemap');
         $data = [];
         $data['protocol'] = Config::$protocol . '//' . Config::$server;
-        $data['time'] = Tools::timeNow();
+        $data['time'] = gmdate('Y-m-d');
         $data['categories'] = $this->smt->database->queryAsArray(
             'SELECT DISTINCT(c2m.category_id), c.name
             FROM category2media AS c2m, category AS c

@@ -33,7 +33,7 @@ declare(strict_types = 1);
                 <?= $user['id'] ?>
             </td>
             <td>
-                + <?= $user['tagCount'] ?>
+                <?= $user['tagCount'] ?>
             </td>
             <td class="nobr">
                 <small><?= $user['last'] ?></small>
