@@ -351,13 +351,12 @@ class Database
 
     /**
      * @param int $limit
-     * @param string $orderby
      * @return array|bool
      */
-    public function getUsers($limit = 100, $orderby = 'last DESC, page_views DESC')
+    public function getUsers($limit = 100)
     {
-        $sql = 'SELECT * FROM user ORDER BY ' . $orderby . ' LIMIT ' . $limit;
-        $users = $this->queryAsArray($sql);
+        $sql = 'SELECT * FROM user ORDER BY last DESC LIMIT :limit';
+        $users = $this->queryAsArray($sql, [':limit' => $limit]);
         if (isset($users[0])) {
             return $users;
         }
