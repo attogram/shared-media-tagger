@@ -33,13 +33,25 @@ class AdminUser extends ControllerBase
             }
 
             $users[$id]['tagCount'] = $this->smt->database->getUserTagCount($user['id']);
+
+            $users[$id]['lastActive'] = '?';
+            $last = $this->smt->database->queryAsArray(
+                'SELECT updated FROM tagging
+                WHERE user_id = :user_id 
+                ORDER BY updated DESC 
+                LIMIT 1',
+                [':user_id' => $user['id']]
+            );
+            if (!empty($last[0]['updated'])) {
+                $users[$id]['lastActive'] = $last[0]['updated'];
+            }
         }
 
         // Sort by User Tag Count
         usort(
             $users,
             function ($a, $b) {
-                return ($a['tagCount'] >= $b['tagCount']) ? -1 : 1;
+                return ($a['lastActive'] >= $b['lastActive']) ? -1 : 1;
             }
         );
 

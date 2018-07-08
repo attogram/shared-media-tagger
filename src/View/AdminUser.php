@@ -8,7 +8,6 @@
  */
 declare(strict_types = 1);
 
-
 ?>
 <form method="POST">
 <div class="box white">
@@ -19,8 +18,8 @@ declare(strict_types = 1);
         <tr>
             <td>&nbsp;</td>
             <td>ID</td>
-            <td>Tags</td>
-            <td>Last</td>
+            <td>#Tags</td>
+            <td>Last Active</td>
             <td>IP/Host</td>
             <td>User Agent</td>
         </tr>
@@ -35,8 +34,8 @@ declare(strict_types = 1);
             <td>
                 <?= $user['tagCount'] ?>
             </td>
-            <td class="nobr">
-                <small><?= $user['last'] ?></small>
+            <td>
+                <small><?= $user['lastActive'] ?></small>
             </td>
             <td>
                 <small><?= $user['ipAndHost'] ?></small>
