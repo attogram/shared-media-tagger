@@ -39,7 +39,7 @@ declare(strict_types = 1);
             </td>
             <td class="right">
                 <small><?= $user['ipAndHost'] ?></small>
-            </td>   
+            </td>
             <td>
                 <small><?= $user['user_agent'] ?></small>
             </td>
