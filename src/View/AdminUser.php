@@ -28,18 +28,18 @@ declare(strict_types = 1);
             <td>
                 <input type="checkbox" name="d<?= $user['id'] ?>" />
             </td>
-            <td>
+            <td class="center">
                 <?= $user['id'] ?>
             </td>
-            <td>
+            <td class="right">
                 <?= $user['tagCount'] ?>
             </td>
-            <td>
+            <td class="right">
                 <small><?= $user['lastActive'] ?></small>
             </td>
-            <td>
+            <td class="right">
                 <small><?= $user['ipAndHost'] ?></small>
-            </td>
+            </td>   
             <td>
                 <small><?= $user['user_agent'] ?></small>
             </td>
