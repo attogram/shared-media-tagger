@@ -22,6 +22,17 @@ use Attogram\SharedMedia\Tagger\Tools;
                 $data['countCategories']; ?></b> Topics</a></p>
             <p><a href="<?= Tools::url('scores') ?>">🗳️ <b><?=
                 $data['countReviews']; ?></b> Scores</a></p>
+
+            <form method="GET" action="<?= Tools::url('search') ?>">
+                <input type="text" name="q" size="15" maxlength="256" value="<?=
+                !empty($data['query'])
+                   ? htmlentities($data['query'])
+                   : ''
+                ?>" />
+                <input type="submit" value=" search " />
+            </form>
+
+
         </div>
         <div class="col-xs-6 box">
             <?php

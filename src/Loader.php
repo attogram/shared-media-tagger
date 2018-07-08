@@ -49,6 +49,42 @@ class Loader
     }
 
     /**
+     * Set Public Routes
+     */
+    private function setPublicRoutes()
+    {
+        $this->router->allow('/', 'Home');
+        $this->router->allow('/b', 'Browse');
+        $this->router->allow('/c/?', 'Category');
+        $this->router->allow('/categories', 'Categories');
+        $this->router->allow('/i/?', 'Info');
+        $this->router->allow('/login', 'Login');
+        $this->router->allow('/logout', 'Logout');
+        $this->router->allow('/random', 'Random');
+        $this->router->allow('/scores', 'Scores');
+        $this->router->allow('/search', 'Search');
+        $this->router->allow('/sitemap.xml', 'Sitemap');
+        $this->router->allow('/tag', 'Tag');
+    }
+
+    /**
+     * Set Admin Routes
+     */
+    private function setAdminRoutes()
+    {
+        $this->router->allow('/admin/', 'AdminHome');
+        $this->router->allow('/admin/category', 'AdminCategory');
+        $this->router->allow('/admin/curate', 'AdminCurate');
+        $this->router->allow('/admin/database', 'AdminDatabase');
+        $this->router->allow('/admin/media', 'AdminMedia');
+        $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
+        $this->router->allow('/admin/reports', 'AdminReports');
+        $this->router->allow('/admin/site', 'AdminSite');
+        $this->router->allow('/admin/tag', 'AdminTag');
+        $this->router->allow('/admin/user', 'AdminUser');
+    }
+
+    /**
      * Show a page if there is a match
      */
     private function show()
@@ -81,41 +117,6 @@ class Loader
         }
 
         Tools::error404('Page Not found');
-    }
-
-    /**
-     * Set Public Routes
-     */
-    private function setPublicRoutes()
-    {
-        $this->router->allow('/', 'Home');
-        $this->router->allow('/b', 'Browse');
-        $this->router->allow('/categories', 'Categories');
-        $this->router->allow('/c/?', 'Category');
-        $this->router->allow('/i/?', 'Info');
-        $this->router->allow('/scores', 'Scores');
-        $this->router->allow('/random', 'Random');
-        $this->router->allow('/sitemap.xml', 'Sitemap');
-        $this->router->allow('/tag', 'Tag');
-        $this->router->allow('/login', 'Login');
-        $this->router->allow('/logout', 'Logout');
-    }
-
-    /**
-     * Set Admin Routes
-     */
-    private function setAdminRoutes()
-    {
-        $this->router->allow('/admin/', 'AdminHome');
-        $this->router->allow('/admin/category', 'AdminCategory');
-        $this->router->allow('/admin/curate', 'AdminCurate');
-        $this->router->allow('/admin/database', 'AdminDatabase');
-        $this->router->allow('/admin/media', 'AdminMedia');
-        $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
-        $this->router->allow('/admin/reports', 'AdminReports');
-        $this->router->allow('/admin/site', 'AdminSite');
-        $this->router->allow('/admin/tag', 'AdminTag');
-        $this->router->allow('/admin/user', 'AdminUser');
     }
 
     /**

@@ -10,7 +10,7 @@ class Config
 {
     public static $adminConfigFile;
     public static $databaseDirectory;
-    public static $links;
+    public static $links = [];
     public static $protocol;
     public static $publicDirectory;
     public static $server;
@@ -43,6 +43,33 @@ class Config
         'application/ogg',
         'video/webm',
     ];
+
+    public static function setLinks()
+    {
+        self::$links = [
+            // ui
+            'admin'         => self::$siteUrl . 'admin/',
+            'browse'        => self::$siteUrl . 'b',
+            'categories'    => self::$siteUrl . 'categories',
+            'category'      => self::$siteUrl . 'c',
+            'css'           => self::$siteUrl . 'css.css',
+            'home'          => self::$siteUrl . '',
+            'info'          => self::$siteUrl . 'i',
+            'login'         => self::$siteUrl . 'login',
+            'logout'        => self::$siteUrl . 'logout',
+            'random'        => self::$siteUrl . 'random',
+            'scores'        => self::$siteUrl . 'scores',
+            'search'        => self::$siteUrl . 'search',
+            'tag'           => self::$siteUrl . 'tag',
+            // system
+            'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
+            'bootstrap_css' => self::$siteUrl . 'use/bootstrap/css/bootstrap.min.css',
+            'github_smt'    => 'https://github.com/attogram/shared-media-tagger',
+            'jquery'        => self::$siteUrl . 'use/jquery.min.js',
+            'sitemap'       => self::$siteUrl . 'sitemap.xml',
+
+        ];
+    }
 
     /**
      * @param array $config
@@ -89,10 +116,6 @@ class Config
         }
 
         self::setLinks();
-
-        //Tools::debug('config = <pre>' . print_r($config, true) . '</pre>');
-        //$class = new \ReflectionClass(self::class);
-        //Tools::debug('<pre>' . print_r($class->getStaticProperties(), true) . '</pre>');
     }
 
     /**
@@ -101,31 +124,6 @@ class Config
     public static function setSiteUrl(string $siteUrl)
     {
         self::$siteUrl = $siteUrl;
-    }
-    /**
-     * setLinks
-     */
-    public static function setLinks()
-    {
-        self::$links = [
-            'home'          => self::$siteUrl . '',
-            'css'           => self::$siteUrl . 'css.css',
-            'info'          => self::$siteUrl . 'i',
-            'browse'        => self::$siteUrl . 'b',
-            'categories'    => self::$siteUrl . 'categories',
-            'category'      => self::$siteUrl . 'c',
-            'scores'        => self::$siteUrl . 'scores',
-            'random'        => self::$siteUrl . 'random',
-            'login'         => self::$siteUrl . 'login',
-            'logout'        => self::$siteUrl . 'logout',
-            'admin'         => self::$siteUrl . 'admin/',
-            'tag'           => self::$siteUrl . 'tag',
-            'sitemap'       => self::$siteUrl . 'sitemap.xml',
-            'jquery'        => self::$siteUrl . 'use/jquery.min.js',
-            'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
-            'bootstrap_css' => self::$siteUrl . 'use/bootstrap/css/bootstrap.min.css',
-            'github_smt'    => 'https://github.com/attogram/shared-media-tagger',
-        ];
     }
 
     /**

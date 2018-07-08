@@ -253,7 +253,7 @@ class Tagger
 
         return '<span class="nobr" style="background:darkslategray;color:lightcyan;'
             . 'float:left;font-size:110%;margin:0;padding:0 1px 0 4px;">'
-            . 'Score: <b>' . $score . '</b>%</span>';
+            . 'Tagged: <b>' . $score . '</b>%</span>';
     }
 
     /**
