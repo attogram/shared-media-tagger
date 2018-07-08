@@ -355,7 +355,7 @@ class Database
      */
     public function getUsers($limit = 100)
     {
-        $sql = 'SELECT * FROM user ORDER BY last DESC LIMIT :limit';
+        $sql = 'SELECT * FROM user ORDER BY id DESC LIMIT :limit';
         $users = $this->queryAsArray($sql, [':limit' => $limit]);
         if (isset($users[0])) {
             return $users;

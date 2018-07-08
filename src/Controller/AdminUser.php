@@ -35,6 +35,14 @@ class AdminUser extends ControllerBase
             $users[$id]['tagCount'] = $this->smt->database->getUserTagCount($user['id']);
         }
 
+        // Sort by User Tag Count
+        usort(
+            $users,
+            function ($a, $b) {
+                return ($a['tagCount'] >= $b['tagCount']) ? -1 : 1;
+            }
+        );
+
         /** @noinspection PhpIncludeInspection */
         include($this->getView('AdminUser'));
 
