@@ -9,27 +9,43 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="menu">
-    <?= $this->getUserScoreBox() ?>
+<div class="menu" style="text-align:left;">
     <span class="nobr">
         <b><a href="<?= Tools::url('home') ?>"><?= Config::$siteName ?></a></b>
     </span>
-    &nbsp; &nbsp
+    &nbsp;
+    &nbsp;
+    &nbsp;
     <span class="nobr">
-        <a href="<?= Tools::url('browse') ?>">🔎<?=
+        <a href="<?= Tools::url('random') ?>">≫ Random</a>
+    </span>
+    &nbsp;
+    &nbsp;
+    <span class="nobr">
+        <a href="<?= Tools::url('search') ?>">🔎 Search</a>
+    </span>
+    &nbsp;
+    &nbsp;
+    <span class="nobr">
+        <a href="<?= Tools::url('browse') ?>">⊟ <?=
             number_format((float) $this->database->getImageCount())
         ?>&nbsp;Files</a>
     </span>
-    &nbsp; &nbsp
+    &nbsp;
+    &nbsp;
     <span class="nobr">
-        <a href="<?= Tools::url('categories') ?>">📂<?=
+        <a href="<?= Tools::url('categories') ?>">∑ <?=
             number_format((float) $this->database->getCategoriesCount())
-        ?>&nbsp;Categories</a>
+        ?>&nbsp;Topics</a>
     </span>
-    &nbsp; &nbsp
+    &nbsp;
+    &nbsp;
     <span class="nobr">
-        <a href="<?= Tools::url('scores') ?>">🗳️<?=
+        <a href="<?= Tools::url('scores') ?>">⊜ ️<?=
             number_format((float) $this->database->getTotalReviewCount())
         ?>&nbsp;Scores</a>
+    </span>
+    <span class="uscorebox nobr" style="float:right;">
+        <?= $this->getUserScore() ?>%
     </span>
 </div>

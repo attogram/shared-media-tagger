@@ -1,4 +1,4 @@
-/* shared-media-tagger css.css 1.0.2.2 */
+/* shared-media-tagger css.css 1.1.0 */
 body { background-color:#222; color:white; margin:0; font-family:sans-serif,helvetica,arial; }
 a { text-decoration:none; color:darkblue; }
 a:visited { color:darkblue; }
@@ -59,3 +59,51 @@ audio { border:1px solid black; background-color:white; background-clip:content-
 .menujcon a:hover { color:yellow; }
 .menuj { font-size:120%; padding:1px; margin:0; border:1px solid #555; }
 .menuj:hover { border:1px solid yellow; }
+.btn_box {
+    display:inline-block;
+    padding:4px;
+}
+.btn_box a {
+    text-decoration:none;
+}
+.btn {
+    background-color:darkblue;
+    border:none;
+    border-radius:50%;
+    color:yellow;
+    display:inline-block;
+    font-size:120%;
+    font-weight:bolder;
+    margin-right:10px;
+    padding:2px;
+    text-align:center;
+    text-decoration:none;
+    vertical-align:middle;
+    width:30px;
+}
+.btn:hover {
+    background-color:greenyellow;
+    color:darkblue;
+}
+.scorebox {
+    background-color:#ddd;
+    display:inline-block;
+    vertical-align:top;
+}
+.score {
+    display:inline;
+    font-size:165%;
+    font-weight:bold;
+}
+.votes {
+    color:darkgrey;
+    font-size:50%;
+}
+.uscorebox {
+    background:darkslategray;
+    color:lightcyan;
+    font-size:110%;
+    font-weight:bold;
+    margin:0;
+    padding:0 4px 0 4px;
+}

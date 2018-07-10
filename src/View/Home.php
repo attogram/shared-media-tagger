@@ -9,38 +9,29 @@ declare(strict_types = 1);
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<style>
-    .im {
-        font-weight:bolder;
-        font-size:132%;
-        color:yellow;
-        background-color:darkblue;
-        padding:3px 4px 4px 4px;
-    }
-</style>
 <div class="container-fluid white">
     <div class="row">
         <div class="col-xs-6 box">
             <h1><?= $data['name'] ?></h1>
             <p><?= $data['about'] ?></p>
             <br />
-            <p><a href="<?= Tools::url('random') ?>">
-                    <span class="im">≫</span>
-                    &nbsp;
-                    <i>Random File</i></a></p>
-            <p><a href="<?= Tools::url('browse') ?>">
-                    <span class="im">⊟</span>
-                    &nbsp;
-                    <b><?= $data['countFiles']; ?></b> Files</a></p>
-            <p><a href="<?= Tools::url('categories') ?>">
-                    <span class="im" style="padding:3px 8px 4px 6px;">∑</span>
-                    &nbsp;
-                    <b><?= $data['countCategories']; ?></b> Topics</a></p>
-            <p><a href="<?= Tools::url('scores') ?>">
-                    <span class="im">⊜</span>
-                    &nbsp;
-                    <b><?= $data['countReviews']; ?></b> Scores</a></p>
-
+            <div class="btn_box"><a href="<?= Tools::url('random')
+                ?>"><span class="btn">≫</span><i>Random File</i></a>
+            </div>
+            <br />
+            <div class="btn_box"><a href="<?= Tools::url('browse')
+                ?>"><span class="btn">⊟</span><b><?= $data['countFiles']; ?></b> Files</a>
+            </div>
+            <br />
+            <div class="btn_box"><a href="<?= Tools::url('categories')
+                ?>"><span class="btn">∑</span><b><?= $data['countCategories']; ?></b> Topics</a>
+            </div>
+            <br />
+            <div class="btn_box"><a href="<?= Tools::url('scores')
+                ?>"><span class="btn">⊜</span><b><?= $data['countReviews']; ?></b> Scores</a>
+            </div>
+            <br />
+            <br />
             <form method="GET" action="<?= Tools::url('search') ?>">
                 <input type="text" name="q" size="15" maxlength="256" value="<?=
                 !empty($data['query'])
@@ -49,8 +40,6 @@ use Attogram\SharedMedia\Tagger\Tools;
                 ?>" />
                 <input type="submit" value=" search " />
             </form>
-
-
         </div>
         <div class="col-xs-6 box">
             <?php

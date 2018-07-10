@@ -239,7 +239,7 @@ class Tagger
     /**
      * @return string
      */
-    public function getUserScoreBox()
+    public function getUserScore()
     {
         $score = 0;
         $totalUserTags = 0;
@@ -251,9 +251,7 @@ class Tagger
             $score = round((($totalUserTags / $countFiles)) * 100, 2);
         }
 
-        return '<span class="nobr" style="background:darkslategray;color:lightcyan;'
-            . 'float:left;font-size:110%;margin:0;padding:0 1px 0 4px;">'
-            . 'Tagged: <b>' . $score . '</b>%</span>';
+        return $score;
     }
 
     /**

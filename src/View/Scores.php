@@ -7,29 +7,20 @@ declare(strict_types = 1);
  * @var array $scores
  */
 ?>
-<style>
-    .vt {
-        font-size:50%;
-        color:darkgrey;
-    }
-</style>
 <div class="box white">
     <h1>Top <?= count($scores) ?> Scores</h1>
     <p>
-        <em>rating media on a scale of 1 to 5</em>
+        <em>Scored on a scale of 1 to 5</em>
+        <span style="color:darkgrey;font-size:90%;">/ and # of votes</span>
     </p>
     <?php foreach ($scores as $media) { ?>
-        <div class="center" style="display:inline-block; background-color:#ddd; vertical-align:top;">
-            <div style="font-size:165%; font-weight:bold; display:inline;">
-                <?=
-                    round($media['score'], 1)
-                ?><span class="vt"> /<?=
-                    $media['votes']
-                ?></span>
-
-            </div>
-            <br />
-            <?php $this->smt->includeThumbnailBox($media); ?>
+    <div class="scorebox center">
+        <div class="score">
+            <?= round($media['score'], 1) ?>
+            <span class="votes"> /<?= $media['votes'] ?></span>
         </div>
+        <br />
+        <?php $this->smt->includeThumbnailBox($media); ?>
+    </div>
     <?php } ?>
 </div>

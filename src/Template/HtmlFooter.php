@@ -10,6 +10,8 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <footer>
+    <br />
+    <br />
     <div class="menu" style="line-height:2; font-size:80%;">
     <?php
     if (empty(Config::$setup['hide_hosted_by']) || !Config::$setup['hide_hosted_by']) {

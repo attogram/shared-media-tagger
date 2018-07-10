@@ -10,18 +10,24 @@ use Attogram\SharedMedia\Tagger\Config;
  */
 class Browse extends ControllerBase
 {
+
+    /** @var string Sorting Direction ASC, DESC */
+    public $direction;
+
+    /** @var string Sorting Type */
+    public $sort;
+
     protected function display()
     {
-        $view = $this->getView('Browse');
-
         $pageLimit = 20; // # of files per page
 
-        $sort = 'random';
+        $this->sort = 'random';
         if (isset($_GET['s'])) {
-            $sort = $_GET['s'];
+            $this->sort = $_GET['s'];
         }
+
         $where = '';
-        switch ($sort) {
+        switch ($this->sort) {
             default:
             case '':
             case 'random':
@@ -62,7 +68,7 @@ class Browse extends ControllerBase
                 break;
             case 'updated':
                 $orderby = ' ORDER BY updated';
-                $extra = 'updated';
+                $extra = 'refreshed';
                 break;
             case 'licenseuri':
                 $orderby = ' ORDER BY licenseuri';
@@ -107,22 +113,22 @@ class Browse extends ControllerBase
             }
         }
 
-        $dir = 'd';
+        $this->direction = 'd';
         $sqlDir = ' DESC';
         if (isset($_GET['d'])) {
             switch ($_GET['d']) {
                 case 'a':
-                    $dir = 'a';
+                    $this->direction = 'a';
                     $sqlDir = ' ASC';
                     break;
                 case 'd':
-                    $dir = 'd';
+                    $this->direction = 'd';
                     $sqlDir = ' DESC';
                     break;
             }
         }
 
-        switch ($sort) {
+        switch ($this->sort) {
             default:
                 $sqlCount = 'SELECT count(pageid) AS count FROM media' . $where;
                 $rawCount = $this->smt->database->queryAsArray($sqlCount);
@@ -145,7 +151,7 @@ class Browse extends ControllerBase
         $currentPage = ($offset / $pageLimit) + 1;
         $numberOfPages = ceil($resultSize / $pageLimit);
 
-        if ($sort != 'random' && ($resultSize > $pageLimit)) {
+        if ($resultSize > $pageLimit) {
             $sqlOffset = " OFFSET $offset";
             $pageCount = 0;
             $pager = '<small>page: ';
@@ -181,13 +187,13 @@ class Browse extends ControllerBase
         $medias = $this->smt->database->queryAsArray($sql);
 
         $this->smt->title = 'Browse ' . number_format((float) $resultSize)
-            . ' Files, sorted by ' . $sort . ' ' . $sqlDir
+            . ' Files, sorted by ' . $this->sort . ' ' . $sqlDir
             . ', page #' . $currentPage . ' - ' . Config::$siteName;
 
         $this->smt->includeHeader();
         $this->smt->includeTemplate('MenuSmall');
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('Browse'));
         $this->smt->includeFooter();
     }
 
@@ -197,13 +203,12 @@ class Browse extends ControllerBase
      */
     private function pagerLink($offset)
     {
-        global $sort, $dir;
         $link = '<a href="?o=' . $offset;
-        if ($sort) {
-            $link .= '&amp;s=' . $sort;
+        if ($this->sort) {
+            $link .= '&amp;s=' . $this->sort;
         }
-        if ($dir) {
-            $link .= '&amp;d=' . $dir;
+        if ($this->direction) {
+            $link .= '&amp;d=' . $this->direction;
         }
         $link .= '">';
 
