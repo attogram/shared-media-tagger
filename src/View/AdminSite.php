@@ -7,7 +7,7 @@ declare(strict_types = 1);
  * @var array $site
  */
 ?>
-<div class="box white">
+<div class="white">
 <small>
     Site ID: <?= $site['id'] ?>
     <br />Last updated: <?= $site['updated'] ?>

@@ -7,7 +7,7 @@ declare(strict_types = 1);
  * @var array $data
  */
 ?>
-<div class="box white">
+<div class="white">
     <p>Database Admin:</p>
     <ul>
         <li>File: <?= $data['databaseName'] ?></li>

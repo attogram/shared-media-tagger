@@ -19,7 +19,7 @@ $smt->title = 'Admin Reports';
 $smt->includeHeader();
 $smt->includeTemplate('MenuSmall');
 $smt->includeAdminMenu();
-print '<div class="box white"><p><a href="' . Tools::url('admin') .'reports">' . $smt->title . '</a></p>
+print '<div class="white"><p><a href="' . Tools::url('admin') .'reports">' . $smt->title . '</a></p>
 <ul>
 <li><a href="' . Tools::url('admin') . 'reports?r=localfiles">update_categories_local_files_count()</a>
 <br /><br />

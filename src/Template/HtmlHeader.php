@@ -19,4 +19,6 @@ integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhk
 <link rel="icon" type="image/png" href="<?= Tools::url('home') ?>favicon.ico" />
 </head>
 <body>
+<div class="container-fluid black">
 <?= $this->customSiteHeader ?>
+

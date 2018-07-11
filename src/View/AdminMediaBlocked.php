@@ -10,7 +10,7 @@ declare(strict_types = 1);
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="box white">
+<div class="white">
     <p><b><?= sizeof($data['blocks']) ?></b> Blocked Media</p>
 <?php
 

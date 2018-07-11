@@ -7,7 +7,7 @@ declare(strict_types = 1);
  * @var array $data
  */
 ?>
-<div class="box white">
+<div class="white">
     <p>
         Media Admin:
     </p>

@@ -11,7 +11,7 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="box white">
+<div class="white">
 
     Site: <b><a href="./site"><?= Config::$siteName ?></a></b>
     <ul>

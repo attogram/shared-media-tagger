@@ -7,7 +7,7 @@ declare(strict_types = 1);
  * @var array $scores
  */
 ?>
-<div class="box white">
+<div class="white">
     <h1>Top <?= count($scores) ?> Scores</h1>
     <p>
         <em>Scored on a scale of 1 to 5</em>

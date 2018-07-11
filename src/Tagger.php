@@ -18,10 +18,6 @@ class Tagger
     public $site;
     /** @var string */
     public $title;
-    /** @var bool */
-    public $useBootstrap;
-    /** @var bool */
-    public $useJquery;
     /** @var Database */
     public $database;
     /** @var Router */
@@ -470,7 +466,7 @@ class Tagger
         if (!$message || !is_string($message)) {
             $message = '404 Not Found';
         }
-        print '<div class="box center" style="background-color:yellow; color:black;">'
+        print '<div class="center" style="background-color:yellow; color:black;">'
             . '<h1>' . $message . '</h1>';
         if ($extra && is_string($extra)) {
             print '<br />' . $extra;

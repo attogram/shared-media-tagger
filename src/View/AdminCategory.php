@@ -13,7 +13,7 @@ use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="box white">
+<div class="white">
 <ul>
     <li><b><?=
         number_format((float) $this->smt->database->getCategoriesCount())

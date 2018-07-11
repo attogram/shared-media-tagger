@@ -14,7 +14,7 @@ declare(strict_types = 1);
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="box white">
+<div class="white">
 <div style="padding:10px 0 10px 0;float:right;">
 <form method="GET">
 <a href="<?php print Tools::url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;

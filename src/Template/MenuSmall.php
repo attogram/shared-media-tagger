@@ -13,33 +13,29 @@ use Attogram\SharedMedia\Tagger\Tools;
     <span class="nobr">
         <b><a href="<?= Tools::url('home') ?>"><?= Config::$siteName ?></a></b>
     </span>
-    &nbsp;
-    &nbsp;
-    &nbsp;
+    &nbsp; &nbsp; &nbsp;
     <span class="nobr" style="font-weight:bolder;">
-        <a href="<?= Tools::url('random') ?>" title="Goto a Random File">≫</a>
+        <a href="<?= Tools::url('random') ?>" title="Goto a Random File">▶</a>
     </span>
-    &nbsp;
-    &nbsp;
+    &nbsp; &nbsp;
     <span class="nobr" style="font-weight:bolder;">
         <a href="<?= Tools::url('search') ?>" title="Search">🔎</a>
     </span>
-    &nbsp;
-    &nbsp;
+    &nbsp; &nbsp;
     <span class="nobr" style="font-weight:bolder;">
         <a href="<?= Tools::url('browse') ?>" title="All Files">⊟</a>
     </span>
-    &nbsp;
-    &nbsp;
+    &nbsp; &nbsp;
     <span class="nobr" style="font-weight:bolder;">
         <a href="<?= Tools::url('categories') ?>" title="Topics">∑</a>
     </span>
-    &nbsp;
-    &nbsp;
+    &nbsp; &nbsp;
     <span class="nobr" style="font-weight:bolder;">
         <a href="<?= Tools::url('scores') ?>" title="Scores">⊜</a>
     </span>
-    <span class="uscorebox nobr" style="float:right;">
+    &nbsp; &nbsp;
+    &nbsp; &nbsp;
+    <span class="uscorebox nobr">
         <?= $this->getUserScore() ?>%
     </span>
 </div>

@@ -15,7 +15,7 @@ $smt->title = 'Tag Admin';
 $smt->includeHeader();
 $smt->includeTemplate('MenuSmall');
 $smt->includeAdminMenu();
-print '<div class="box white">';
+print '<div class="white">';
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['tagid']) && Tools::isPositiveNumber($_GET['tagid'])) {

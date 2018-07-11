@@ -58,7 +58,6 @@ class AdminCurate extends ControllerBase
             . '</div>';
 
         $this->smt->title = 'Curation Admin';
-        $this->smt->useJquery = true;
         $this->smt->includeHeader();
         $this->smt->includeTemplate('MenuSmall');
         $this->smt->includeAdminMenu();

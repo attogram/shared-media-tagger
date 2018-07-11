@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 ?>
 <form method="POST">
-<div class="box white">
+<div class="white">
     <p>
         <b><?= count($users) ?></b> Users
     </p>

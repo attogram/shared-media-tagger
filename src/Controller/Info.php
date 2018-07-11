@@ -12,8 +12,6 @@ class Info extends ControllerBase
 {
     protected function display()
     {
-
-
         $vars = $this->smt->router->getVars();
         if (empty($vars[0]) || !Tools::isPositiveNumber($vars[0])) {
             $this->smt->fail404('404 Media Request Not Found');
@@ -40,13 +38,7 @@ class Info extends ControllerBase
         }
         $media['imagedescriptionRows'] = $rows;
 
-
-        $data = [];
-
-
         $this->smt->title = 'Info: ' . Tools::stripPrefix($media['title']);
-        $this->smt->useBootstrap = true;
-        $this->smt->useJquery = true;
         $this->smt->includeHeader();
         $this->smt->includeTemplate('MenuSmall');
 

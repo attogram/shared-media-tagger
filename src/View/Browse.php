@@ -16,7 +16,7 @@ declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Tools;
 
-print '<div class="box white">';
+print '<div class="white">';
 print '<form>
 Browse Files, sorty by <select name="s">
 <option value="random" ' . Tools::isSelected('random', $this->sort) . '>Random</option>

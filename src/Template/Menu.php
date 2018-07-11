@@ -17,7 +17,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     &nbsp;
     &nbsp;
     <span class="nobr">
-        <a href="<?= Tools::url('random') ?>">≫ Random</a>
+        <a href="<?= Tools::url('random') ?>">▶ Random</a>
     </span>
     &nbsp;
     &nbsp;
@@ -45,7 +45,7 @@ use Attogram\SharedMedia\Tagger\Tools;
             number_format((float) $this->database->getTotalReviewCount())
         ?>&nbsp;Scores</a>
     </span>
-    <span class="uscorebox nobr" style="float:right;">
+    <span class="uscorebox nobr">
         <?= $this->getUserScore() ?>%
     </span>
 </div>

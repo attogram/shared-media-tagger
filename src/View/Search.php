@@ -8,7 +8,7 @@ declare(strict_types = 1);
  */
 
 ?>
-<div class="box white">
+<div class="white">
     <form method="GET">
         <input type="text" name="q" size="30" maxlength="256"
             value="<?=

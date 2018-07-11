@@ -16,7 +16,7 @@ declare(strict_types = 1);
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="box white">
+<div class="white">
     <div style="float:right; padding:0 20px 4px 0; font-size:80%;">
         <?= $reviewsPerCategory ?>
     </div>

@@ -26,8 +26,6 @@ class Home extends ControllerBase
         $data['countCategories'] = number_format((float) $this->smt->database->getCategoriesCount());
         $data['countReviews'] = number_format((float) $this->smt->database->getTotalReviewCount());
         $this->smt->title = Config::$siteName;
-        $this->smt->useBootstrap = true;
-        $this->smt->useJquery = true;
 
         $this->smt->includeHeader();
         $this->smt->includeTemplate('MenuSmall');

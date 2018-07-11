@@ -1,37 +1,40 @@
 <?php
 /**
- * Shared Media Tagger - Home page
- *
- * @var array $data
- */
+* Shared Media Tagger - Home page
+*
+* @var array $data
+*/
 declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="container-fluid white">
-    <div class="row">
-        <div class="col-6 box">
-            <h1><?= $data['name'] ?></h1>
-            <p><?= $data['about'] ?></p>
-            <br />
-            <div class="btn_box"><a href="<?= Tools::url('random')
-                ?>"><span class="btn">≫</span><i>Random File</i></a>
-            </div>
-            <br />
-            <div class="btn_box"><a href="<?= Tools::url('browse')
-                ?>"><span class="btn">⊟</span><b><?= $data['countFiles']; ?></b> Files</a>
-            </div>
-            <br />
-            <div class="btn_box"><a href="<?= Tools::url('categories')
-                ?>"><span class="btn">∑</span><b><?= $data['countCategories']; ?></b> Topics</a>
-            </div>
-            <br />
-            <div class="btn_box"><a href="<?= Tools::url('scores')
-                ?>"><span class="btn">⊜</span><b><?= $data['countReviews']; ?></b> Scores</a>
-            </div>
-            <br />
-            <br />
+<div class="row white">
+    <div class="col-6">
+        <p>
+            <?= $data['about'] ?>
+        </p>
+        <p>
+            <a href="<?= Tools::url('random') ?>" class="btn btn-dark text-white font-weight-bold"
+               role="button">▶</a>
+            <a href="<?= Tools::url('random') ?>" class="font-italic">Random File</a>
+        </p>
+        <p>
+            <a href="<?= Tools::url('scores') ?>" class="btn btn-dark text-white font-weight-bold"
+               role="button">⊜</a>
+            <a href="<?= Tools::url('scores') ?>"><?= $data['countReviews']; ?> Scores</a>
+        </p>
+        <p>
+            <a href="<?= Tools::url('browse') ?>" class="btn btn-dark text-white font-weight-bold"
+               role="button">⊟</a>
+            <a href="<?= Tools::url('browse') ?>"><?= $data['countFiles']; ?> Files</a>
+        </p>
+        <p>
+            <a href="<?= Tools::url('categories') ?>" class="btn btn-dark text-white font-weight-bold"
+               role="button">∑</a>
+            <a href="<?= Tools::url('categories') ?>"><?= $data['countCategories']; ?> Topics</a>
+        </p>
+        <p>
             <form method="GET" action="<?= Tools::url('search') ?>">
                 <input type="text" name="q" size="15" maxlength="256" value="<?=
                 !empty($data['query'])
@@ -40,13 +43,14 @@ use Attogram\SharedMedia\Tagger\Tools;
                 ?>" />
                 <input type="submit" value=" search " />
             </form>
-        </div>
-        <div class="col-6 box">
-            <?php
-            foreach ($data['random'] as $media) {
-                $this->smt->includeThumbnailBox($media);
-            }
-            ?>
-        </div>
+        </p>
+
+    </div>
+    <div class="col-6">
+        <?php
+        foreach ($data['random'] as $media) {
+            $this->smt->includeThumbnailBox($media);
+        }
+        ?>
     </div>
 </div>
