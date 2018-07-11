@@ -98,12 +98,12 @@ class Config
             self::$adminConfigFile = $config['adminConfigFile'];
         }
 
-        self::$sizeMedium = 325;
+        self::$sizeMedium = 320;
         if (!empty($config['sizeMedium'])) {
             self::$sizeMedium = $config['sizeMedium'];
         }
 
-        self::$sizeThumb = 100;
+        self::$sizeThumb = 120;
         if (!empty($config['sizeThumb'])) {
             self::$sizeThumb = $config['sizeThumb'];
         }

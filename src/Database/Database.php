@@ -691,32 +691,6 @@ class Database
     // Reviews
 
     /**
-     * @param int|string $limit
-     * @return array
-     */
-    public function getMediasByScore($limit = 100)
-    {
-        $scores = $this->queryAsArray(
-            'SELECT SUM(tag.score) AS total,
-                COUNT(tagging.id) AS votes,
-                SUM(tag.score)*1.0/COUNT(tagging.id) AS score,
-                media.*
-            FROM tagging, tag, media
-            WHERE tagging.tag_id = tag.id
-            AND tagging.media_pageid = media.pageid
-            GROUP BY tagging.media_pageid
-            ORDER BY score DESC, votes DESC
-            LIMIT :limit',
-            [':limit' => $limit]
-        );
-        if (empty($scores) || !is_array($scores)) {
-            $scores = [];
-        }
-
-        return $scores;
-    }
-
-    /**
      * @param int|string $pageid
      * @return array
      */

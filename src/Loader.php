@@ -62,6 +62,7 @@ class Loader
         $this->router->allow('/logout', 'Logout');
         $this->router->allow('/random', 'Random');
         $this->router->allow('/scores', 'Scores');
+        $this->router->allow('/scores/?', 'Scores');
         $this->router->allow('/search', 'Search');
         $this->router->allow('/sitemap.xml', 'Sitemap');
         $this->router->allow('/tag', 'Tag');

@@ -67,7 +67,7 @@ class Category extends ControllerBase
 
         $category = $this->smt->database->queryAsArray($sql, $bind);
 
-        if (!$category || !is_array($category)) {
+        if (!Tools::isAdmin() && (!$category || !is_array($category))) {
             $this->smt->fail404('404 Category On Hold');
         }
 

@@ -1,4 +1,4 @@
-/* shared-media-tagger css.css 1.1.0 */
+/* shared-media-tagger css.css 1.1.1 */
 body { background-color:#222; color:white; font-family:sans-serif,helvetica,arial; }
 a { text-decoration:none; color:darkblue; }
 a:visited { color:darkblue; }
@@ -17,7 +17,6 @@ ul { line-height:1; display:block; margin:0 0 0 7px; padding:0; list-style:disc 
 li { margin:6px 0 0 4px; }
 video { border:1px solid black; background-color:white; background-clip:content-box; }
 audio { border:1px solid black; background-color:white; background-clip:content-box; }
-.list img:hover { border:1px solid red; background-color:white; }
 .menu { background-color:#222; color:#ccc; padding:3px 0 3px 8px; margin:0; line-height:2; text-align:center; font-size:85%; }
 .menu a { background-color:#222; color:#ccc; }
 .menu a:visited { color:#ddd; }
@@ -34,7 +33,6 @@ audio { border:1px solid black; background-color:white; background-clip:content-
 .pre { white-space:nowrap; font-family:monospace; }
 .right { text-align:right; }
 .left { text-align:left; }
-.message { margin:0; padding:2px; text-align:left; }
 .debug { color:black; background-color:yellow; font-size:90%; }
 .notice { color:black; background-color:lightsalmon; font-size:90%; }
 .error { color:black; background-color:yellow; font-size:90%; }
@@ -51,7 +49,7 @@ audio { border:1px solid black; background-color:white; background-clip:content-
 .catname { display:table-cell; padding:0 0 0 10px; margin:0; border:1px solid #eee; text-align:left; }
 .catname:hover { background-color:yellow; }
 .cathead { font-style:italic; font-size:95%; background-color:#e3e3e3; }
-.scorebox { background-color:#ddd; display:inline-block; vertical-align:top; }
+.scorebox { background-color:#ddd; display:inline-block; vertical-align:top; margin-bottom:6px; }
 .score { display:inline; font-size:165%; font-weight:bold; }
 .votes { color:darkgrey; font-size:50%;}
 .uscorebox { background:darkslategray; color:lightcyan; font-size:110%; font-weight:bold; margin:0; padding:0 4px 0 4px; }

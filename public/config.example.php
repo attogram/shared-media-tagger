@@ -17,10 +17,10 @@ $config['sourceDirectory'] = '../src';
 $config['databaseDirectory'] = '../db';
 
 /** Default Medium width for media, in pixels */
-$config['sizeMedium'] = 325;
+$config['sizeMedium'] = 320;
 
 /** Default Thumb width for media, in pixels */
-$config['sizeThumb'] = 100;
+$config['sizeThumb'] = 120;
 
 /** Backend Admin configuration file - contains passwords, put in a safe place */
 $config['adminConfigFile'] = './config.admin.php';
