@@ -1,4 +1,4 @@
-# Shared Media Tagger
+# Shared Media Tagger v1.1
 
 BETA RELEASE
 

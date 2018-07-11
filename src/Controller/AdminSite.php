@@ -16,7 +16,6 @@ class AdminSite extends ControllerBase
         $site['about'] = !empty($site['about']) ? htmlentities((string) $site['about']) : '';
         $site['header'] = !empty($site['header']) ? htmlentities((string) $site['header']) : '';
         $site['footer'] = !empty($site['footer']) ? htmlentities((string) $site['footer']) : '';
-        $site['use_cdn'] = !empty($site['use_cdn']) ? $site['use_cdn'] : false;
         $site['curation'] = !empty($site['curation']) ? $site['curation'] :false;
         $site['updated'] = !empty($site['updated']) ? htmlentities((string) $site['updated']) : '';
 

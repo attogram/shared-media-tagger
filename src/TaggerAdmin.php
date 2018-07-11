@@ -280,13 +280,6 @@ class TaggerAdmin extends Tagger
                     $set[] = "$name = :$name";
                     $bind[":$name"] = $value;
                     break;
-                case 'use_cdn':
-                    if ($value == 'on') {
-                        $set[] = "use_cdn = '1'";
-                    } else {
-                        $set[] = "use_cdn = '0'";
-                    }
-                    break;
                 case 'curation':
                     if ($value == 'on') {
                         $set[] = "curation = '1'";

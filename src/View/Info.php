@@ -15,12 +15,12 @@ use Attogram\SharedMedia\Tagger\Tools;
 ?>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-7 box grey center" style="height:stretch;">
+        <div class="col-7 grey text-center align-top">
             <?= $this->smt->displayTags($pageid) ?>
             <?= $this->smt->displayMedia($media) ?>
             <?php $this->smt->includeAdminMediaFunctions($media['pageid']); ?>
         </div>
-        <div class="col-sm-5 box white">
+        <div class="col-5 white align-top">
             <p style="font-size:130%; font-weight:bold;">
                 <textarea readonly rows="<?= $media['imagedescriptionRows'] ?>" style="width:100%;border:none;"><?=
                     $media['imagedescriptionSafe']

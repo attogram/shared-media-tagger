@@ -48,15 +48,6 @@ GNU General Public License for more details.
 
 -----
 
-## Open Source Software included with the Shared Media Tagger distribution
-
-Software     | License     | URL
-:----------- | :---------- | :-----------------------------
-Bootstrap    | MIT License | <http://getbootstrap.com/>
-jQuery       | MIT License | <http://jquery.org/license/>
-
------
-
 ## GNU GENERAL PUBLIC LICENSE
 
 Version 3, 29 June 2007

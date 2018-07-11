@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS "site" (
   'about'    TEXT,
   'header'   TEXT,
   'footer'   TEXT,
-  'use_cdn'  BOOLEAN NOT NULL DEFAULT '0',
   'curation' BOOLEAN NOT NULL DEFAULT '0',
   'updated'  TEXT             DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT su UNIQUE (name)

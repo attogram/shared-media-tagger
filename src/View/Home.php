@@ -11,7 +11,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 ?>
 <div class="container-fluid white">
     <div class="row">
-        <div class="col-xs-6 box">
+        <div class="col-6 box">
             <h1><?= $data['name'] ?></h1>
             <p><?= $data['about'] ?></p>
             <br />
@@ -41,7 +41,7 @@ use Attogram\SharedMedia\Tagger\Tools;
                 <input type="submit" value=" search " />
             </form>
         </div>
-        <div class="col-xs-6 box">
+        <div class="col-6 box">
             <?php
             foreach ($data['random'] as $media) {
                 $this->smt->includeThumbnailBox($media);

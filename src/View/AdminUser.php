@@ -34,10 +34,10 @@ declare(strict_types = 1);
             <td class="right">
                 <?= $user['tagCount'] ?>
             </td>
-            <td class="right">
+            <td class="right nobr">
                 <small><?= $user['lastActive'] ?></small>
             </td>
-            <td class="right">
+            <td class="right nobr">
                 <small><?= $user['ipAndHost'] ?></small>
             </td>
             <td>

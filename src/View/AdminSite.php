@@ -33,10 +33,6 @@ declare(strict_types = 1);
 <br /><br />Footer:<br />
 <textarea name="footer" rows="5" cols="70"><?= $site['footer'] ?></textarea>
 
-<br /><br /><input type="checkbox" name="use_cdn"<?=
-($site['use_cdn'] ? ' checked="checked"' : '')
-?>/> Use CDN for jquery, bootstrap
-
 <br /><br /><input type="submit" value="           Save Site Setup           ">
 </form>
 </div>
