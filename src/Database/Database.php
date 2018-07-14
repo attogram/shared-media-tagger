@@ -724,7 +724,7 @@ class Database
             AND c2m.media_pageid = t.media_pageid
             AND c2m.category_id = :category_id
             GROUP BY (tag.id)
-            ORDER BY tag.position DESC',
+            ORDER BY tag.position ASC',
             [':category_id' => $categoryId]
         );
     }

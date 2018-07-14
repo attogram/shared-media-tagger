@@ -17,20 +17,25 @@ if (function_exists('set_time_limit')) {
 
 $smt->title = 'Admin Reports';
 $smt->includeHeader();
-$smt->includeTemplate('MenuSmall');
-$smt->includeAdminMenu();
-print '<div class="white"><p><a href="' . Tools::url('admin') .'reports">' . $smt->title . '</a></p>
-<ul>
-<li><a href="' . Tools::url('admin') . 'reports?r=localfiles">update_categories_local_files_count()</a>
-<br /><br />
-<li><a href="' . Tools::url('admin') . 'reports?r=category2media">Check: category2media</a>
-<br /><br />
-<li><a href="' . Tools::url('admin') . 'reports?r=catclean">Check/Clean: category</a></li>
-</ul>
-<hr />';
+$smt->includeTemplate('Menu');
+$smt->includeTemplate('AdminMenu');
+?>
+
+<div class="row bg-white">
+    <div class="col-12 mb-4">
+        <p>
+            <a href="<?= Tools::url('admin') ?>/reports"><?= $smt->title ?></a>
+        </p>
+        <ul>
+            <li><a href="<?= Tools::url('admin') ?>/reports?r=localfiles">update_categories_local_files_count()</a></li>
+            <li><a href="<?= Tools::url('admin') ?>/reports?r=category2media">Check: category2media</a>
+            <li><a href="<?= Tools::url('admin') ?>/reports?r=catclean">Check/Clean: category</a></li>
+        </ul>
+        <hr />
+<?php
 
 if (!isset($_GET['r'])) {
-    print '</div>';
+    print '</div></div>';
     $smt->includeFooter();
     exit;
 }
@@ -50,8 +55,9 @@ switch ($_GET['r']) {
         break;
 } // end switch
 
-print '</div>';
+print '</div></div>';
 $smt->includeFooter();
+
 
 /**
  * @param TaggerAdmin $smt

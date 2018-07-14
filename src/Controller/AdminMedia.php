@@ -36,8 +36,8 @@ class AdminMedia extends ControllerBase
 
         $this->smt->title = 'Media Admin';
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
-        $this->smt->includeAdminMenu();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
         include($view);

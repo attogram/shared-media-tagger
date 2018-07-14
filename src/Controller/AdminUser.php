@@ -14,8 +14,8 @@ class AdminUser extends ControllerBase
     {
         $this->smt->title = 'User Admin';
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
-        $this->smt->includeAdminMenu();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
 
         // Delete users
         if (!empty($_POST)) {

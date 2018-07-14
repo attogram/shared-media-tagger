@@ -20,7 +20,7 @@ $config['databaseDirectory'] = '../db';
 $config['sizeMedium'] = 320;
 
 /** Default Thumb width for media, in pixels */
-$config['sizeThumb'] = 120;
+$config['sizeThumb'] = 130;
 
 /** Backend Admin configuration file - contains passwords, put in a safe place */
 $config['adminConfigFile'] = './config.admin.php';

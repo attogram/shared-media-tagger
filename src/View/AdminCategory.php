@@ -13,7 +13,8 @@ use Attogram\SharedMedia\Tagger\TaggerAdmin;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="white">
+<div class="row bg-white">
+    <div class="col-12 mb-4">
 <ul>
     <li><b><?=
         number_format((float) $this->smt->database->getCategoriesCount())
@@ -21,26 +22,26 @@ use Attogram\SharedMedia\Tagger\Tools;
     <li><b>?</b> Technical Categories</li>
     <li><b>?</b> Empty Categories</li>
 </ul>
+<form action="" method="GET">
 <p>
-    <form action="" method="GET">
+
         <input name="scommons" type="text" size="35" value="">
         <input type="submit" value="   Find Categories on COMMONS  ">
-    </form>
+
 </p>
+</form>
+<form action="" method="GET">
 <p>
-    <form action="" method="GET">
-        <input type="hidden" name="v" value="1">
-        <input type="text" name="s" value="" size="20">
-        <input type="submit" value="   Search LOCAL Categories   ">
-    </form>
+    <input type="hidden" name="v" value="1">
+    <input type="text" name="s" value="" size="20">
+    <input type="submit" value="   Search LOCAL Categories   ">
     <br />
     <br />
-
-    <a href="<?= Tools::url('admin') ?>category?v=1">[View&nbsp;Category&nbsp;List]</a>
-    <?= $spacer ?>
-    <a href="<?= Tools::url('admin') ?>category?g=all">[Import&nbsp;Category&nbsp;Info]</a>
+    <a href="<?= Tools::url('admin') ?>/category?v=1">[View&nbsp;Category&nbsp;List]</a>
+    &nbsp; &nbps;
+    <a href="<?= Tools::url('admin') ?>/category?g=all">[Import&nbsp;Category&nbsp;Info]</a>
 </p>
-
+</form>
 <?php
 
 if (($this->smt->database->getCategoriesCount() > 1000)
@@ -123,10 +124,10 @@ foreach ($cats as $cat) {
 }
 
 ?>
-</table>
-<br />
-<b><?= $localFilesCount ?></b> Files Under Review
-<br />
-<b><?= $commonFilesCount ?></b> Total Files on Commons
-
+    </table>
+    <br />
+    <b><?= $localFilesCount ?></b> Files Under Review
+    <br />
+    <b><?= $commonFilesCount ?></b> Total Files on Commons
+    </div>
 </div>

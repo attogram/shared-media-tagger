@@ -13,8 +13,6 @@ class AdminCurate extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('AdminCurate');
-
         $data = [];
 
         if (isset($_GET) && $_GET) {
@@ -59,11 +57,11 @@ class AdminCurate extends ControllerBase
 
         $this->smt->title = 'Curation Admin';
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
-        $this->smt->includeAdminMenu();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('AdminCurate'));
 
         $this->smt->includeFooter();
     }

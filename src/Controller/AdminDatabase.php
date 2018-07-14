@@ -16,7 +16,7 @@ class AdminDatabase extends ControllerBase
 
         $data = [];
         $data['action'] = !empty($_GET['a']) ? $_GET['a'] : '';
-        $data['databaseName'] = $this->smt->database->databaseName;
+        $data['databaseName'] = realpath($this->smt->database->databaseName);
         $data['databaseWriteable'] = is_writeable($this->smt->database->databaseName);
         $data['databaseSize'] = file_exists($this->smt->database->databaseName)
             ? number_format((float) filesize($this->smt->database->databaseName))
@@ -68,8 +68,8 @@ class AdminDatabase extends ControllerBase
 
         $this->smt->title = 'Database Admin';
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
-        $this->smt->includeAdminMenu();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
         include($view);

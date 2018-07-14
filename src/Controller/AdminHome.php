@@ -12,8 +12,8 @@ class AdminHome extends ControllerBase
     {
         $this->smt->title = 'Admin';
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
-        $this->smt->includeAdminMenu();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
         include($this->getView('AdminHome'));

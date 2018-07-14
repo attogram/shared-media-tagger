@@ -33,29 +33,29 @@ function checkAll(formname, checktoggle) {
     ?>">VIEW ON COMMONS</a>
     <br />
     <br />
-    <a href="<?= Tools::url('admin') ?>category/?c=<?=
+    <a href="<?= Tools::url('admin') ?>/category/?c=<?=
         Tools::categoryUrlencode($this->category['name'])
     ?>">Get Category Info</a>
     <br />
     <br />
-    <a href="<?= Tools::url('admin') ?>category/?i=<?=
+    <a href="<?= Tools::url('admin') ?>/category/?i=<?=
         Tools::categoryUrlencode($this->category['name'])
     ?>" onclick="return confirm('Confirm: Import Media To Category?');">Import
     <?= !empty($this->category['files']) ? $this->category['files'] : '?' ?> Files into Category</a>
     <br />
     <br />
-    <a href="<?= Tools::url('admin') ?>category/?sc=<?=
+    <a href="<?= Tools::url('admin') ?>/category/?sc=<?=
         Tools::categoryUrlencode($this->category['name'])
     ?>" onclick="return confirm('Confirm: Add Sub-Categories?');">Add
     <?= !empty($this->category['subcats']) ? $this->category['subcats'] : '?' ?> Sub-Categories</a>
     <br />
     <br />
-    <a href="<?= Tools::url('admin') ?>media?dc=<?=
+    <a href="<?= Tools::url('admin') ?>/media?dc=<?=
         Tools::categoryUrlencode($this->category['name'])
         ?>" onclick="return confirm('Confirm: Clear Media from Category?');">Clear Media from Category</a>
     <br />
     <br />
-    <a href="<?= Tools::url('admin') ?>category/?d=<?=
+    <a href="<?= Tools::url('admin') ?>/category/?d=<?=
         urlencode($this->category['id'])
     ?>" onclick="return confirm('Confirm: Delete Category?');">Delete Category</a>
     <br />

@@ -40,7 +40,7 @@ class Info extends ControllerBase
 
         $this->smt->title = 'Info: ' . Tools::stripPrefix($media['title']);
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
 
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Info'));

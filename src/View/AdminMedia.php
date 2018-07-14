@@ -7,7 +7,8 @@ declare(strict_types = 1);
  * @var array $data
  */
 ?>
-<div class="white">
+<div class="row bg-white">
+    <div class="col-12 mb-4">
     <p>
         Media Admin:
     </p>
@@ -36,4 +37,5 @@ declare(strict_types = 1);
     <p>
         * <a href="./media-blocked">View/Edit Blocked Media</a>
     </p>
+    </div>
 </div>

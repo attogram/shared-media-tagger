@@ -1,32 +1,47 @@
 <?php
-declare(strict_types = 1);
 /**
  * Shared Media Tagger
  * Blocked Media Admin
  *
  * @var array $data
  */
+declare(strict_types = 1);
 
+use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="white">
-    <p><b><?= sizeof($data['blocks']) ?></b> Blocked Media</p>
-<?php
-
-foreach ($data['blocks'] as $block) {
-    $url = str_replace('325px', $data['width'] . 'px', $block['thumb']);
-    ?>
-    <img src="<?= $url ?>" width="<?= $data['width'] ?>" style="vertical-align:middle;">
-    <div style="display:inline-block;border:1px solid red;padding:10px;">
-        <?= $block['pageid'] ?> :
-        <a target="commmons"
-           href="https://commons.wikimedia.org/w/index.php?curid=<?= $block['pageid'] ?>">
-        <?= Tools::stripPrefix($block['title']) ?>
+<div class="row bg-white">
+    <div class="col-12">
+        <p>
+            <b><?= sizeof($data['blocks']) ?></b> Blocked Media
+        </p>
     </div>
-    <br clear="all" />
-    <?php
-}
+</div>
+<div class="row bg-white">
+    <div class="col-12">
+        <?php
 
-?>
+        $thumbSize = 57;
+
+        foreach ($data['blocks'] as $block) {
+            $thumbUrl = preg_replace(
+                '/\/(\d+)px-/',
+                //Config::$sizeThumb . 'px-',
+                '/' . $thumbSize . 'px-',
+                $block['thumb']
+            );
+            $url = 'https://commons.wikimedia.org/w/index.php?curid=' . $block['pageid'];
+            ?>
+            <div class="mt-2 mb-2 mr-2 ml-2 d-inline-block">
+                <a target="commmons" href="<?= $url ?>">
+                    <img src="<?= $thumbUrl ?>" width="<?= $thumbSize ?>">
+                    <br />
+                    <small>
+                        <?= $block['pageid'] ?>
+                    </small>
+                </a>
+            </div>
+        <?php } ?>
+    </div>
 </div>

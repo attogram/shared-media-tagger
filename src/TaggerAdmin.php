@@ -37,25 +37,6 @@ class TaggerAdmin extends Tagger
     }
 
     /**
-     * includeAdminMenu
-     */
-    public function includeAdminMenu()
-    {
-        $admin = Tools::url('admin');
-        $space = ' &nbsp; &nbsp; ';
-        print '<div class="menu admin">'
-            . '<a href="' . $admin . '">ADMIN</a>'
-            . $space . '<a href="' . $admin . 'site">SITE</a>'
-            . $space . '<a href="' . $admin . 'tag">TAGS</a>'
-            . $space . '<a href="' . $admin . 'category">CATEGORY</a>'
-            . $space . '<a href="' . $admin . 'media">MEDIA</a>'
-            . $space . '<a href="' . $admin . 'curate">CURATE</a>'
-            . $space . '<a href="' . $admin . 'user">USER</a>'
-            . $space . '<a href="' . $admin . 'database">DATABASE</a>'
-            . '</div>';
-    }
-
-    /**
      * @return string
      */
     public function checkRobotstxt()

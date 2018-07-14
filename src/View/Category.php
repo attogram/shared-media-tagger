@@ -16,7 +16,9 @@ declare(strict_types = 1);
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="white">
+<div class="row bg-white">
+    <div class="col-12">
+
     <div style="float:right; padding:0 20px 4px 0; font-size:80%;">
         <?= $reviewsPerCategory ?>
     </div>
@@ -27,7 +29,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <?php
     if (Tools::isAdmin()) {
         print '<form action="' . Tools::url('admin')
-            . 'media" method="GET" name="media">';
+            . '/media" method="GET" name="media">';
     }
 
     foreach ($category as $media) {
@@ -42,4 +44,5 @@ use Attogram\SharedMedia\Tagger\Tools;
         print $this->smt->includeAdminCategoryFunctions($categoryName);
     }
     ?>
+    </div>
 </div>

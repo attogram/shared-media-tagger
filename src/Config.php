@@ -47,12 +47,10 @@ class Config
     public static function setLinks()
     {
         self::$links = [
-            // ui
-            'admin'         => self::$siteUrl . 'admin/',
+            'admin'         => self::$siteUrl . 'admin',
             'browse'        => self::$siteUrl . 'b',
             'categories'    => self::$siteUrl . 'categories',
             'category'      => self::$siteUrl . 'c',
-            'css'           => self::$siteUrl . 'css.css',
             'home'          => self::$siteUrl . '',
             'info'          => self::$siteUrl . 'i',
             'login'         => self::$siteUrl . 'login',
@@ -61,13 +59,8 @@ class Config
             'scores'        => self::$siteUrl . 'scores',
             'search'        => self::$siteUrl . 'search',
             'tag'           => self::$siteUrl . 'tag',
-            // system
-            'bootstrap_js'  => self::$siteUrl . 'use/bootstrap/js/bootstrap.min.js',
-            'bootstrap_css' => self::$siteUrl . 'use/bootstrap/css/bootstrap.min.css',
-            'github_smt'    => 'https://github.com/attogram/shared-media-tagger',
-            'jquery'        => self::$siteUrl . 'use/jquery.min.js',
             'sitemap'       => self::$siteUrl . 'sitemap.xml',
-
+            'github_smt'    => 'https://github.com/attogram/shared-media-tagger',
         ];
     }
 
@@ -103,7 +96,7 @@ class Config
             self::$sizeMedium = $config['sizeMedium'];
         }
 
-        self::$sizeThumb = 120;
+        self::$sizeThumb = 130;
         if (!empty($config['sizeThumb'])) {
             self::$sizeThumb = $config['sizeThumb'];
         }

@@ -38,7 +38,7 @@ class Scores extends ControllerBase
 
         $this->smt->title = 'Scores - ' . Config::$siteName;
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Scores'));
         $this->smt->includeFooter();

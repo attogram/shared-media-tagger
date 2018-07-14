@@ -82,7 +82,7 @@ class Categories extends ControllerBase
         $this->smt->title = $pageName . ' - ' . Config::$siteName;
 
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
 
         /** @noinspection PhpIncludeInspection */
         include($view);

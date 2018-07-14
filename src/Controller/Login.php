@@ -94,7 +94,7 @@ class Login extends ControllerBase
         $this->smt->includeHeader();
         $this->smt->includeTemplate('Menu');
         ?>
-        <div class="white">
+        <div class="row white">
             <h1>
                 Login Failed
             </h1>

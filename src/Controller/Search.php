@@ -14,7 +14,7 @@ class Search extends ControllerBase
     {
         $this->smt->title = 'Search - ' . Config::$siteName;
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
 
         $data = [];
         $data['query'] = '';

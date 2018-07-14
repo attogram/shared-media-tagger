@@ -11,8 +11,8 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-<div class="white">
-
+<div class="row bg-white">
+    <div class="col-12">
     Site: <b><a href="./site"><?= Config::$siteName ?></a></b>
     <ul>
         <li><b><?= sizeof($this->smt->database->getTags()) ?></b> <a href="./tags">Tags</a></li>
@@ -56,5 +56,5 @@ use Attogram\SharedMedia\Tagger\Tools;
         <li><a target="c"
                href="<?= Tools::url('github_smt') ?>/blob/master/LICENSE.md">LICENSE</a></li>
     </ul>
-
+    </div>
 </div>

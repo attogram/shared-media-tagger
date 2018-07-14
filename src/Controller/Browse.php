@@ -191,7 +191,7 @@ class Browse extends ControllerBase
             . ', page #' . $currentPage . ' - ' . Config::$siteName;
 
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Browse'));
         $this->smt->includeFooter();

@@ -15,19 +15,19 @@ use Attogram\SharedMedia\Tagger\Tools;
 ?>
 
 <div class="row">
-    <div class="col-sm-7 grey text-center align-top">
-        <?= $this->smt->displayTags($pageid) ?>
+    <div class="col-sm-7 text-center align-top bg-secondary">
+        <?php $this->smt->includeTags($pageid) ?>
         <?= $this->smt->displayMedia($media) ?>
         <?php $this->smt->includeAdminMediaFunctions($media['pageid']); ?>
     </div>
-    <div class="col-sm-5 white align-top">
+    <div class="col-sm-5 bg-white align-top">
         <?php if ($media['imagedescriptionRows'] > 4) { ?>
-        <textarea class="h1" readonly rows="<?= $media['imagedescriptionRows'] ?>"
+        <textarea class="h2" readonly rows="<?= $media['imagedescriptionRows'] ?>"
             style="width:100%;font-size:130%; font-weight:bold;"><?=
             $media['imagedescriptionSafe']
         ?></textarea>
         <?php } else { ?>
-        <h1><?= $media['imagedescriptionSafe'] ?></h1>
+        <h2><?= $media['imagedescriptionSafe'] ?></h2>
         <?php } ?>
 
         <dl>
@@ -47,12 +47,12 @@ use Attogram\SharedMedia\Tagger\Tools;
             <li>ID: <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a></li>
             <li>Filename: <b><?= Tools::stripPrefix($media['title']) ?></b></li>
             <?php
-                $thumb = $this->smt->getThumbnail($media, 100);
+                $thumb = $this->smt->getThumbnail($media, 130);
             ?><li>Thumbnail: <a target="c" href="<?= $thumb['url']
                 ?>"><?= $thumb['width'] ?>x<?= $thumb['height'] ?> pixels
                 - <?= $media['thumbmime']; ?></a>
             </li>
-            <li>Medium size: <a target="c" href="<?= $media['thumburl']
+            <li>Preview: <a target="c" href="<?= $media['thumburl']
                 ?>"><?= $media['thumbwidth'] ?>x<?= $media['thumbheight'] ?> pixels
                 - <?= $media['thumbmime']; ?>
                 </a></li>

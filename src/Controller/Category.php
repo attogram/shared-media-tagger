@@ -77,7 +77,7 @@ class Category extends ControllerBase
         $categoryNameDisplay = Tools::stripPrefix($categoryName);
 
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
 
         $view = $this->getView('Category');
         /** @noinspection PhpIncludeInspection */

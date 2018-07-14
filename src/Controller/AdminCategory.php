@@ -12,19 +12,19 @@ class AdminCategory extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('AdminCategory');
-
-        $this->smt->title = 'Category Admin';
-        $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
-        $this->smt->includeAdminMenu();
-
         if (function_exists('set_time_limit')) {
             set_time_limit(1000);
         }
 
+        $this->smt->title = 'Category Admin';
+        $this->smt->includeHeader();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
+
+
         // Import images from a category
         if (isset($_GET['i']) && $_GET['i']) {
+            print '<div class="container-fluid bg-white">';
             $categoryName = Tools::categoryUrldecode($_GET['i']);
             $catUrl = '<a href="' . Tools::url('category')
                 . '/' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
@@ -39,6 +39,7 @@ class AdminCategory extends ControllerBase
         }
 
         if (isset($_POST['cats']) && $_POST['cats']) {
+            print '<div class="container-fluid bg-white">';
             $this->smt->importCategories($_POST['cats']);
             $this->smt->database->updateCategoriesLocalFilesCount();
             print '</div>';
@@ -47,6 +48,7 @@ class AdminCategory extends ControllerBase
         }
 
         if (isset($_GET['c']) && $_GET['c']) {
+            print '<div class="container-fluid bg-white">';
             if ($this->smt->database->saveCategoryInfo(urldecode($_GET['c']))) {
                 Tools::notice(
                     'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
@@ -60,6 +62,7 @@ class AdminCategory extends ControllerBase
         }
 
         if (isset($_GET['d']) && $_GET['d']) {
+            print '<div class="container-fluid bg-white">';
             $this->smt->database->deleteCategory($_GET['d']);
             $this->smt->database->updateCategoriesLocalFilesCount();
             print '</div>';
@@ -68,6 +71,7 @@ class AdminCategory extends ControllerBase
         }
 
         if (isset($_GET['scommons']) && $_GET['scommons']) {
+            print '<div class="container-fluid bg-white">';
             $this->smt->getSearchResults();
             print '</div>';
             $this->smt->includeFooter();
@@ -75,6 +79,7 @@ class AdminCategory extends ControllerBase
         }
 
         if (isset($_GET['sc']) && $_GET['sc']) {
+            print '<div class="container-fluid bg-white">';
             $this->smt->commons->getSubcats(Tools::categoryUrldecode($_GET['sc']));
             $this->smt->database->updateCategoriesLocalFilesCount();
             print '</div>';
@@ -85,6 +90,7 @@ class AdminCategory extends ControllerBase
         $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
 
         if (isset($_GET['g']) && $_GET['g']=='all') {
+            print '<div class="container-fluid bg-white">';
             Tools::notice('refresh Info for all categories');
             $toget = [];
             $cats = $this->smt->database->queryAsArray('SELECT * FROM category ' . $orderBy);
@@ -131,10 +137,8 @@ class AdminCategory extends ControllerBase
             $cats = [];
         }
 
-        $spacer = ' &nbsp; &nbsp; &nbsp; ';
-
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('AdminCategory'));
 
         $this->smt->includeFooter();
     }

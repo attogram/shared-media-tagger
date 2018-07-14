@@ -28,7 +28,7 @@ class Home extends ControllerBase
         $this->smt->title = Config::$siteName;
 
         $this->smt->includeHeader();
-        $this->smt->includeTemplate('MenuSmall');
+        $this->smt->includeTemplate('Menu');
         /** @noinspection PhpIncludeInspection */
         include($this->getView('Home'));
         $this->smt->includeFooter();

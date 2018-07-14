@@ -185,22 +185,16 @@ class Tagger
 
     /**
      * @param int|string $mediaId
-     * @return string
      */
-    public function displayTags($mediaId)
+    public function includeTags($mediaId)
     {
-        $tags = $this->database->getTags('DESC');
-        $response = '<div class="nobr" style="display:block; margin:auto;">';
-        foreach ($tags as $tag) {
-            $response .=  ''
-            . '<div class="tagbutton tag' . $tag['position'] . '">'
-            . '<a href="' . Tools::url('tag') . '?m=' . $mediaId
-                . '&amp;t=' . $tag['id'] . '" title="' . $tag['name'] . '">'
-            . $tag['display_name']
-            . '</a></div>';
+        $this->tags = $this->database->getTags('DESC');
+        foreach ($this->tags as $name => $tag) {
+            $this->tags[$name]['link'] = Tools::url('tag')
+                . '?m=' . $mediaId
+                . '&amp;t=' . $tag['id'];
         }
-
-        return $response . '</div>';
+        $this->includeTemplate('TagBar');
     }
 
     /**
