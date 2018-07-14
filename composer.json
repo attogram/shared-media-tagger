@@ -1,9 +1,19 @@
 {
     "name": "attogram/shared-media-tagger",
-    "description": "Shared Media Tagger",
-    "type": "library",
+    "description": "Shared Media Tagger is a crowdsourced ratings website for freely licensed images and media taken from Wikimedia Commons. PHP, SQLite, MediaWiki API, Curators backend.",
+    "type": "package",
     "license": "MIT",
     "homepage": "https://github.com/attogram/shared-media-tagger",
+    "authors": [
+        {
+            "name": "Shared Media Tagger Developer",
+            "homepage": "https://fosiper.com/smt/",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/attogram/shared-media-tagger"
+    },
     "require": {
         "php": ">=7.0",
         "attogram/router": "dev-master",
