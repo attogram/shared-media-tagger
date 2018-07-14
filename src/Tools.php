@@ -127,7 +127,11 @@ class Tools
      */
     public static function categoryUrldecode($category)
     {
-        return str_replace('_', ' ', urldecode($category));
+        $decoded = $category;
+        $decoded = str_replace('_', ' ', $decoded);
+        $decoded = urldecode($decoded);
+
+        return $decoded;
     }
 
     /**
@@ -136,7 +140,14 @@ class Tools
      */
     public static function categoryUrlencode($category)
     {
-        return str_replace('+', '_', str_replace('%3A', ':', urlencode($category)));
+        $encoded = $category;
+
+        $encoded = urlencode($encoded);
+        $encoded = str_replace('+', '_', $encoded);
+        $encoded = str_replace('%3A', ':', $encoded);
+        $encoded = str_replace('%2F', '/', $encoded);
+
+        return $encoded;
     }
 
     /**

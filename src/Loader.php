@@ -56,6 +56,9 @@ class Loader
         $this->router->allow('/', 'Home');
         $this->router->allow('/b', 'Browse');
         $this->router->allow('/c/?', 'Category');
+        $this->router->allow('/c/?/?', 'Category');
+        $this->router->allow('/c/?/?/?', 'Category');
+        $this->router->allow('/c/?/?/?/?', 'Category');
         $this->router->allow('/categories', 'Categories');
         $this->router->allow('/i/?', 'Info');
         $this->router->allow('/login', 'Login');

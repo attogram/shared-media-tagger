@@ -14,11 +14,14 @@ class Category extends ControllerBase
     protected function display()
     {
         $vars = $this->smt->router->getVars();
+
         if (empty($vars[0])) {
             $this->smt->fail404('404 Category Not Found');
         }
 
-        $categoryName = Tools::categoryUrldecode($vars[0]);
+        $categoryName = Tools::categoryUrldecode(
+            implode('/', $vars)
+        );
 
         $pageLimit = 20; // # of files per page
         $this->smt->title = $categoryName . ' - ' . Config::$siteName;
