@@ -38,7 +38,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <br />
     <br />
     <a href="<?= Tools::url('admin') ?>/category?v=1">[View&nbsp;Category&nbsp;List]</a>
-    &nbsp; &nbps;
+    &nbsp; &nbsp;
     <a href="<?= Tools::url('admin') ?>/category?g=all">[Import&nbsp;Category&nbsp;Info]</a>
 </p>
 </form>
