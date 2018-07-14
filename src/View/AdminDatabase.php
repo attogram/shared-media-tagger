@@ -1,11 +1,14 @@
 <?php
-declare(strict_types = 1);
 /**
  * Shared Media Tagger
  * Database Admin
  *
  * @var array $data
  */
+declare(strict_types = 1);
+
+use Attogram\SharedMedia\Tagger\Tools;
+
 ?>
 <div class="row bg-white">
     <div class="col-12 mb-4">
@@ -16,7 +19,7 @@ declare(strict_types = 1);
                 ? '✔️OK: WRITEABLE'
                 : '❌ERROR: READ ONLY' ?></li>
             <li>Size: <?= $data['databaseSize'] ?> bytes</li>
-            <li><a href="../reports/">Reports</a></li>
+            <li><a href="<?= Tools::url('admin') ?>/reports/">Reports</a></li>
         </ul>
         <pre class="error"><?= $data['result'] ?></pre>
         <div class="bg-warning mt-5 mb-5 pb-2 pl-2">
