@@ -49,8 +49,7 @@ class Category extends ControllerBase
                         . '&nbsp;' . ++$pageCount . '&nbsp;</span> ';
                     continue;
                 }
-                $pager .= '<a href="?o=' . $count . '&amp;c='
-                    . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
+                $pager .= '<a href="?o=' . $count . '">'
                     . '&nbsp;' . ++$pageCount . '&nbsp;</a> ';
             }
         }
