@@ -367,4 +367,42 @@ class Tools
         header('HTTP/1.1 301 Moved Permanently');
         self::redirect($url);
     }
+
+    /**
+     * realpath() for existing and non-existing files
+     *
+     * @param $dir
+     * @return string
+     */
+    public static function getRealPath($dir)
+    {
+        $directory = realpath($dir);
+        if ($directory) {
+            return $directory;
+        }
+        // for non-existing files
+        $directoryParts = array_filter(
+            explode(
+                DIRECTORY_SEPARATOR,
+                str_replace(
+                    ['/', '\\'],
+                    DIRECTORY_SEPARATOR,
+                    $dir
+                )
+            ),
+            'strlen'
+        );
+        $directory = [];
+        foreach ($directoryParts as $part) {
+            if ('.' == $part) {
+                continue;
+            }
+            if ('..' == $part) {
+                array_pop($directory);
+            } else {
+                $directory[] = $part;
+            }
+        }
+        return getcwd() . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $directory);
+    }
 }
