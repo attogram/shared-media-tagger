@@ -141,12 +141,12 @@ class Tools
     public static function categoryUrlencode($category)
     {
         $encoded = $category;
-
         $encoded = urlencode($encoded);
         $encoded = str_replace('+', '_', $encoded);
         $encoded = str_replace('%3A', ':', $encoded);
         $encoded = str_replace('%2F', '/', $encoded);
-
+        $encoded = str_replace('%28', '(', $encoded);
+        $encoded = str_replace('%29', ')', $encoded);
         return $encoded;
     }
 

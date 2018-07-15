@@ -23,7 +23,7 @@ use Attogram\SharedMedia\Tagger\Tools;
             <a href="<?= Tools::url('scores') ?>"><?= $data['countReviews']; ?> Scores</a>
         </p>
         <p>
-            <a href="<?= Tools::url('browse') ?>"><kbd>⊟</kbd></a>
+            <a href="<?= Tools::url('browse') ?>"><kbd>⊞</kbd></a>
             <a href="<?= Tools::url('browse') ?>"><?= $data['countFiles']; ?> Files</a>
         </p>
         <p>
