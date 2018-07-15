@@ -27,20 +27,41 @@ class DatabaseUpdater
      */
     public function createTables()
     {
+        if (!is_dir(Config::$databaseDirectory)) {
+            Tools::error(
+                'Database Directory Not Found.  Please create the directory <kbd>'
+                . Config::$databaseDirectory
+                . '</kbd> and make it writeable by the webserver.'
+            );
+
+            return;
+        }
+        if (!is_writable(Config::$databaseDirectory)) {
+            Tools::error(
+                'Database Directory Not Writeable.  Please make the directory <kbd>'
+                . realpath(Config::$databaseDirectory)
+                . '</kbd> writeable by the webserver.'
+            );
+
+            return;
+        }
+
         if (!file_exists($this->database->databaseName)) {
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
             if (!@touch($this->database->databaseName)) {
-                Tools::error('Can Not Create Database in ' . dirname($this->database->databaseName));
+                Tools::error(
+                    'Site Offline.  Unable to create database file: '
+                    . $this->database->databaseName
+                );
 
                 return;
             }
         }
-        //Tools::debug('New Database opened: ' . $this->database->databaseName);
 
         $sqlFile = file_get_contents(Config::$sourceDirectory . '/Sql/database.sql');
         $sqls = explode(';', $sqlFile);
         foreach ($sqls as $sql) {
             $this->database->queryAsBool($sql);
-            //Tools::debug('Table created:<br /><textarea rows="10" cols="70">' . $sql . '</textarea>');
         }
     }
 
@@ -53,7 +74,6 @@ class DatabaseUpdater
         $sqls = explode(';', $sqlFile);
         foreach ($sqls as $sql) {
             $this->database->queryAsBool($sql);
-            //Tools::debug('Demo seed:<br /><textarea rows="10" cols="70">' . $sql . '</textarea>');
         }
     }
 }
