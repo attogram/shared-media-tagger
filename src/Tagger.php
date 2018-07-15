@@ -68,23 +68,22 @@ class Tagger
      * @param string $thumbWidth
      * @return array
      */
-    public function getThumbnail(array $media, $thumbWidth = '')
+    public function getThumbnail(array $media = [], $thumbWidth = '')
     {
         if (!$thumbWidth || !Tools::isPositiveNumber($thumbWidth)) {
             $thumbWidth = Config::$sizeThumb;
         }
-        $default = [
-            'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
+        if (!$media) {
+            return [
+                'url' => 'data:image/gif;base64,R0lGOD lhCwAOAMQfAP////7+/vj4+Hh4eHd3d/v'
                     .'7+/Dw8HV1dfLy8ubm5vX19e3t7fr 6+nl5edra2nZ2dnx8fMHBwYODg/b29np6e'
                     . 'ujo6JGRkeHh4eTk5LCwsN3d3dfX 13Jycp2dnevr6////yH5BAEAAB8ALAAAAAA'
                     . 'LAA4AAAVq4NFw1DNAX/o9imAsB tKpxKRd1+YEWUoIiUoiEWEAApIDMLGoRCyWi'
                     . 'KThenkwDgeGMiggDLEXQkDoTh CKNLpQDgjeAsY7MHgECgx8YR8oHwNHfwADBACG'
                     . 'h4EDA4iGAYAEBAcQIg0Dk gcEIQA7',
-            'width' => $thumbWidth,
-            'height' => $thumbWidth
-        ];
-        if (!$media || !is_array($media)) {
-            return $default;
+                'width' => $thumbWidth,
+                'height' => $thumbWidth
+            ];
         }
         $width = !empty($media['width']) ? $media['width'] : null;
         if (!$width) {
@@ -198,32 +197,23 @@ class Tagger
     }
 
     /**
-     * @param array $reviews
+     * @param array $votes
      * @return string
      */
-    public function displayVotes(array $reviews)
+    public function displayVotes(array $votes)
     {
-        if (!$reviews || !is_array($reviews)) {
+        if (!$votes || !is_array($votes)) {
             return '- unreviewed';
         }
         $response = '';
-        foreach ($reviews as $review) {
-            $response .= '+ ' . $review['count'] . ' ' . $review['name'] . '</a><br />';
+        foreach ($votes as $vote) {
+            $response .= '+ ' . $vote['count'] . ' ' . $vote['name'] . '</a><br />';
         }
         if (empty($response)) {
             $response = '- unreviewed';
         }
 
         return $response;
-    }
-
-    /**
-     * @param int|string $categoryId
-     * @return string
-     */
-    public function getVotesPerCategory($categoryId)
-    {
-        return $this->displayVotes($this->database->getDbVotesPerCategory($categoryId));
     }
 
     /**

@@ -10,7 +10,7 @@ declare(strict_types = 1);
  * @var string $categoryNameDisplay
  * @var int|string $categorySize
  * @var string $pager
- * @var string $reviewsPerCategory
+ * @var string $votesPerCategory
  */
 
 use Attogram\SharedMedia\Tagger\Tools;
@@ -20,7 +20,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <div class="col-12">
 
     <div style="float:right; padding:0 20px 4px 0; font-size:80%;">
-        <?= $reviewsPerCategory ?>
+        <?= $votesPerCategory ?>
     </div>
     <h1><?= $categoryNameDisplay ?></h1>
     <b><?= $categorySize ?></b> files
