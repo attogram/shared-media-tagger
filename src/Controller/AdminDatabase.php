@@ -12,8 +12,6 @@ class AdminDatabase extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('AdminDatabase');
-
         $data = [];
         $data['action'] = !empty($_GET['a']) ? $_GET['a'] : '';
         $data['databaseName'] = realpath($this->smt->database->databaseName);
@@ -72,7 +70,7 @@ class AdminDatabase extends ControllerBase
         $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('AdminDatabase'));
 
         $this->smt->includeFooter();
     }

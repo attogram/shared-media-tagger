@@ -13,7 +13,6 @@ class Sitemap extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('Sitemap');
         $data = [];
         $data['protocol'] = Config::$protocol . '//' . Config::$server;
         $data['time'] = gmdate('Y-m-d');
@@ -25,8 +24,9 @@ class Sitemap extends ControllerBase
         $data['media'] = $this->smt->database->queryAsArray(
             'SELECT pageid FROM media'
         );
+
         header('Content-type: application/xml');
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('Sitemap'));
     }
 }

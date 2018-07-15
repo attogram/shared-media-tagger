@@ -71,41 +71,48 @@ class Config
     {
         self::$server = $_SERVER['SERVER_NAME'];
 
-        self::$publicDirectory = '../public';
-        if (!empty($config['publicDirectory'])) {
+        if (empty($config['publicDirectory'])) {
+            self::$publicDirectory = realpath('../public');
+        } else {
             self::$publicDirectory = $config['publicDirectory'];
         }
 
-        self::$sourceDirectory = '../src';
-        if (!empty($config['sourceDirectory'])) {
+        if (empty($config['sourceDirectory'])) {
+            self::$sourceDirectory = realpath('../src');
+        } else {
             self::$sourceDirectory = $config['sourceDirectory'];
         }
 
-        self::$databaseDirectory = '../src';
-        if (!empty($config['databaseDirectory'])) {
+        if (empty($config['databaseDirectory'])) {
+            self::$databaseDirectory = realpath('../src');
+        } else {
             self::$databaseDirectory = $config['databaseDirectory'];
         }
 
-        self::$adminConfigFile = './config.admin.php';
-        if (!empty($config['adminConfigFile'])) {
+        if (empty($config['adminConfigFile'])) {
+            self::$adminConfigFile = './config.admin.php';
+        } else {
             self::$adminConfigFile = $config['adminConfigFile'];
         }
 
-        self::$sizeMedium = 320;
-        if (!empty($config['sizeMedium'])) {
+        if (empty($config['sizeMedium'])) {
+            self::$sizeMedium = 320;
+        } else {
             self::$sizeMedium = $config['sizeMedium'];
         }
 
-        self::$sizeThumb = 130;
-        if (!empty($config['sizeThumb'])) {
+        if (empty($config['sizeThumb'])) {
+            self::$sizeThumb = 130;
+        } else {
             self::$sizeThumb = $config['sizeThumb'];
         }
 
-        self::$protocol = 'http:';
         if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
         ) {
             self::$protocol = 'https:';
+        } else {
+            self::$protocol = 'http:';
         }
 
         self::setLinks();

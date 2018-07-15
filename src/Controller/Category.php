@@ -81,9 +81,8 @@ class Category extends ControllerBase
         $this->smt->includeHeader();
         $this->smt->includeTemplate('Menu');
 
-        $view = $this->getView('Category');
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('Category'));
 
         $this->smt->includeFooter();
     }

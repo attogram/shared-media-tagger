@@ -21,9 +21,8 @@ class AdminMediaBlocked extends ControllerBase
         $this->smt->includeTemplate('Menu');
         $this->smt->includeTemplate('AdminMenu');
 
-        $view = $this->getView('AdminMediaBlocked');
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('AdminMediaBlocked'));
 
         $this->smt->includeFooter();
     }

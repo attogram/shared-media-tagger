@@ -12,8 +12,6 @@ class AdminMedia extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('AdminMedia');
-
         $data = [];
         $data['result'] = '';
 
@@ -40,7 +38,7 @@ class AdminMedia extends ControllerBase
         $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('AdminMedia'));
 
         $this->smt->includeFooter();
     }

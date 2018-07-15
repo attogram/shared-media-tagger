@@ -12,8 +12,6 @@ class Categories extends ControllerBase
 {
     protected function display()
     {
-        $view = $this->getView('Categories');
-
         $pageLimit = 1000;
 
         $search = false;
@@ -85,7 +83,7 @@ class Categories extends ControllerBase
         $this->smt->includeTemplate('Menu');
 
         /** @noinspection PhpIncludeInspection */
-        include($view);
+        include($this->getView('Categories'));
 
         $this->smt->includeFooter();
     }
