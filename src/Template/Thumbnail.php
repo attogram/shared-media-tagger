@@ -26,12 +26,12 @@ $thumb = $this->getThumbnail($this->media);
             htmlentities((string) (!empty($this->media['title']) ? $this->media['title'] : ''))
         ?>" />
     <br >
-    <div style="font-size:70%;">
-        <?= $this->getMediaName($this->media, 28) ?>
+    <div style="font-size:65%;">
+        <?= $this->getMediaName($this->media, 25) ?>
         <br />
-        &copy; <?= $this->getArtistName($this->media, 26) ?>
+        &copy; <?= $this->getArtistName($this->media, 22) ?>
         <br />
-        <?= $this->getLicenseName($this->media, 28) ?>
+        <?= $this->getLicenseName($this->media, 26) ?>
     </div>
     <?php $this->includeAdminMediaFunctions($this->media['pageid']); ?>
 </div>
