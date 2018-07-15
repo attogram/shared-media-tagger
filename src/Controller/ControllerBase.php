@@ -40,11 +40,8 @@ class ControllerBase
         return $view;
     }
 
-    /**
-     * display
-     */
     protected function display()
     {
-        //
+        // Overriden
     }
 }

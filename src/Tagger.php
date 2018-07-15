@@ -168,7 +168,7 @@ class Tagger
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        $cats = $this->database->getImageCategories($mediaId, $onlyHidden);
+        $cats = $this->database->getMediaCategories($mediaId, $onlyHidden);
         if (!$cats) {
             return '';
         }
@@ -201,7 +201,7 @@ class Tagger
      * @param array $reviews
      * @return string
      */
-    public function displayReviews(array $reviews)
+    public function displayVotes(array $reviews)
     {
         if (!$reviews || !is_array($reviews)) {
             return '- unreviewed';
@@ -221,9 +221,9 @@ class Tagger
      * @param int|string $categoryId
      * @return string
      */
-    public function getReviewsPerCategory($categoryId)
+    public function getVotesPerCategory($categoryId)
     {
-        return $this->displayReviews($this->database->getDbReviewsPerCategory($categoryId));
+        return $this->displayVotes($this->database->getDbVotesPerCategory($categoryId));
     }
 
     /**
@@ -236,7 +236,7 @@ class Tagger
         if (!empty($this->database->userId)) {
             $totalUserTags = $this->database->getUserTagCount($this->database->userId);
         }
-        $countFiles = $this->database->getImageCount();
+        $countFiles = $this->database->getFileCount();
         if ($totalUserTags && $countFiles) {
             $score = round((($totalUserTags / $countFiles)) * 100, 2);
         }

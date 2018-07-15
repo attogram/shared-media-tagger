@@ -1,8 +1,9 @@
-/vendor/
+/db/
 /public/config.php
 /public/config.admin.php
-/public/robots.txt
+/public/favicon.ico
 /public/phpliteadmin.php
 /public/phpliteadmin.config.php
-/db/
-/.idea
+/public/robots.txt
+/vendor/
+/.idea/

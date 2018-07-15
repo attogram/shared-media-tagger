@@ -32,7 +32,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 
         <dl>
             <dt>Scoring:</dt>
-            <dd><?= $this->smt->displayReviews($this->smt->database->getReviews($pageid)) ?></dd>
+            <dd><?= $this->smt->displayVotes($this->smt->database->getVotes($pageid)) ?></dd>
         </dl>
 
         <p>

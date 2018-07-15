@@ -74,7 +74,7 @@ class Category extends ControllerBase
         }
 
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $reviewsPerCategory = $this->smt->getReviewsPerCategory($categoryInfo['id']);
+        $reviewsPerCategory = $this->smt->getVotesPerCategory($categoryInfo['id']);
         /** @noinspection PhpUnusedLocalVariableInspection */
         $categoryNameDisplay = Tools::stripPrefix($categoryName);
 

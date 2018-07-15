@@ -37,7 +37,7 @@ class Database
     /** @var int */
     private $totalFilesReviewedCount;
     /** @var int */
-    private $totalReviewCount;
+    private $totalVotesCount;
 
     /**
      * Database constructor.
@@ -157,7 +157,6 @@ class Database
         return true;
     }
 
-    // Site
 
     /**
      * @return array
@@ -183,8 +182,6 @@ class Database
 
         return ['id' => 1, 'name' => 'Shared Media Tagger'];
     }
-
-    // Counts
 
     /**
      * @param bool $redo
@@ -221,7 +218,7 @@ class Database
      * @param bool $redo
      * @return int
      */
-    public function getImageCount($redo = false)
+    public function getFileCount($redo = false)
     {
         if (isset($this->imageCount) && !$redo) {
             return $this->imageCount;
@@ -281,20 +278,17 @@ class Database
     /**
      * @return int
      */
-    public function getTotalReviewCount()
+    public function getTotalVotesCount()
     {
-        if (isset($this->totalReviewCount)) {
-            return $this->totalReviewCount;
+        if (isset($this->totalVotesCount)) {
+            return $this->totalVotesCount;
         }
-        $response = $this->queryAsArray(
-            //'SELECT COUNT(DISTINCT media_pageid) AS total FROM tagging'
-            'SELECT COUNT(id) AS total FROM tagging'
-        );
+        $response = $this->queryAsArray('SELECT COUNT(id) AS total FROM tagging');
         if (isset($response[0]['total'])) {
-            return $this->totalReviewCount = $response[0]['total'];
+            return $this->totalVotesCount = $response[0]['total'];
         }
 
-        return $this->totalReviewCount = 0;
+        return $this->totalVotesCount = 0;
     }
 
     /**
@@ -313,41 +307,41 @@ class Database
             $where = "WHERE curated == '1'";
         }
 
-        $sql = 'SELECT *
-                FROM media ' . $where . '
-                ORDER BY RANDOM()
-                LIMIT :limit';
-        return $this->queryAsArray($sql, ['limit' => $limit]);
+        return $this->queryAsArray(
+            'SELECT * FROM media ' . $where . ' ORDER BY RANDOM() LIMIT :limit',
+            ['limit' => $limit]
+        );
     }
 
     /**
      * @param int $limit
      * @return array|bool
      */
-    public function getRandomUnreviewedMedia($limit = 1)
+    private function getRandomUnreviewedMedia($limit = 1)
     {
         $and = '';
         if (Config::$siteInfo['curation'] == 1) {
             $and = "AND curated == '1'";
         }
-        $sql = "
-            SELECT m.*
-            FROM media AS m
-            WHERE m.pageid NOT IN (
-                SELECT media_pageid
-                FROM tagging AS t
-                WHERE t.user_id = :user_id
-            )
-            $and
-            ORDER BY RANDOM()
-            LIMIT :limit";
-        return $this->queryAsArray($sql, [
+
+        $notIn = 'SELECT DISTICT(media_pageid) FROM tagging WHERE tagging.user_id = :user_id';
+        $sql = "SELECT * FROM media WHERE meddia.pageid NOT IN ($notIn) $and ORDER BY RANDOM() LIMIT :limit";
+
+        $bind = [
             'user_id' => $this->userId,
             'limit' => $limit
-        ]);
-    }
+        ];
 
-    // User
+        $unreviewed = $this->queryAsArray($sql, $bind); // Unreviewed by current user
+        if ($unreviewed) {
+            return $unreviewed;
+        }
+
+        $notIn = 'SELECT DISTINCT(media_pageid) FROM tagging';
+        $sql = "SELECT * FROM media WHERE meddia.pageid NOT IN ($notIn) $and ORDER BY RANDOM() LIMIT :limit";
+
+        return $this->queryAsArray($sql, $bind); // Unreviewed by all users
+    }
 
     /**
      * @param int $limit
@@ -432,8 +426,6 @@ class Database
         return false;
     }
 
-    // Category
-
     /**
      * @param string $name
      * @return array
@@ -479,29 +471,11 @@ class Database
     }
 
     /**
-     * @return array
-     * @TODO UNUSED
-     */
-    public function getCategoryList()
-    {
-        $response = $this->queryAsArray('SELECT name FROM category ORDER BY name');
-        $return = [];
-        if (!$response || !is_array($response)) {
-            return $return;
-        }
-        foreach ($response as $name) {
-            $return[] = $name['value']['name'];
-        }
-
-        return $return;
-    }
-
-    /**
      * @param $pageid
      * @param bool $onlyHidden
      * @return array
      */
-    public function getImageCategories($pageid, $onlyHidden = false)
+    public function getMediaCategories($pageid, $onlyHidden = false)
     {
         if (!$pageid|| !Tools::isPositiveNumber($pageid)) {
             return [];
@@ -624,8 +598,6 @@ class Database
         return false;
     }
 
-    // Tags
-
     /**
      * @param string $name
      * @return int
@@ -688,13 +660,11 @@ class Database
         return $this->tags = $tags;
     }
 
-    // Reviews
-
     /**
      * @param int|string $pageid
      * @return array
      */
-    public function getReviews($pageid)
+    public function getVotes($pageid)
     {
         return $this->queryAsArray(
             'SELECT count(t.id) AS count, t.tag_id, tag.*
@@ -713,7 +683,7 @@ class Database
      * @param int|string $categoryId
      * @return array
      */
-    public function getDbReviewsPerCategory($categoryId)
+    public function getDbVotesPerCategory($categoryId)
     {
         return $this->queryAsArray(
             'SELECT count(t.id) AS count, tag.*
@@ -746,8 +716,6 @@ class Database
 
         return $this->totalFilesReviewedCount = 0;
     }
-
-    // Media
 
     /**
      * @param int|string $pageid

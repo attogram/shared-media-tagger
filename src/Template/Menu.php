@@ -24,7 +24,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         </a>
         <a class="text-white text-nowrap pr-1 pl-1" href="<?= Tools::url('browse') ?>" title="All Files">
             ⊞
-            <div class="d-none d-md-inline"><?= $this->database->getImageCount() ?></div>
+            <div class="d-none d-md-inline"><?= $this->database->getFileCount() ?></div>
             <div class="d-none d-sm-inline mr-2">Files</div>
         </a>
         <a class="text-white text-nowrap pr-1 pl-1" href="<?= Tools::url('categories') ?>" title="Topics">
@@ -34,7 +34,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         </a>
         <a class="text-white text-nowrap pr-1 pl-1" href="<?= Tools::url('scores') ?>" title="Scores">
             ⊜
-            <div class="d-none d-md-inline"><?= $this->database->getTotalReviewCount() ?></div>
+            <div class="d-none d-md-inline"><?= $this->database->getTotalVotesCount() ?></div>
             <div class="d-none d-sm-inline">Scores</div>
         </a>
     </div>

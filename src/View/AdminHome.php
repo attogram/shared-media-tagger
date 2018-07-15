@@ -16,7 +16,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     Site: <b><a href="./site"><?= Config::$siteName ?></a></b>
     <ul>
         <li><b><?= sizeof($this->smt->database->getTags()) ?></b> <a href="./tags">Tags</a></li>
-        <li><b><?= number_format((float) $this->smt->database->getImageCount()) ?></b> Files</li>
+        <li><b><?= number_format((float) $this->smt->database->getFileCount()) ?></b> Files</li>
         <li><b><?= number_format((float) $this->smt->database->getBlockCount()) ?></b> Blocked Files</li>
         <li><b><?= number_format((float) $this->smt->database->getTotalFilesReviewedCount()) ?></b> Files reviewed</li>
         <li><b><?= number_format((float) $this->smt->database->getTaggingCount()) ?></b> Tagging Count</li>

@@ -15,7 +15,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         <h2 class="d-inline">Scores</h2>
         <small class="text-muted">
             &nbsp; <?= $data['scored'] ?> files
-            with <?= $this->smt->database->getTotalReviewCount() ?> scores total,
+            with <?= $this->smt->database->getTotalVotesCount() ?> scores total,
             on a scale of 1 to 5 / # of votes
         </small>
 
