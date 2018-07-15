@@ -9,22 +9,29 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 $thumb = $this->getThumbnail($this->media);
 
-$pageid = !empty($this->media['pageid']) ? $this->media['pageid'] : null;
-$title = !empty($this->media['title']) ? $this->media['title'] : null;
-
 ?>
-<div style="background-color:#eee;display:inline-block;text-align:center;vertical-align:top;margin:3px;padding:3px;">
-    <div style="display:inline-block;text-align:center;">
-        <a href="<?= Tools::url('info') ?>/<?= $pageid ?>">
-        <img src="<?= $thumb['url'] ?>"
-             width="<?= $thumb['width'] ?>"
-             height="<?= $thumb['height'] ?>"
-             title="<?= htmlentities((string) $title) ?>" /></a>
+<div class="d-inline-block align-top text-right m-1 p-1"
+     style="background-color:#eee;">
+    <a style="line-height:90%;" class="nohover" href="<?=
+        Tools::url('info')
+    ?>/<?=
+        (!empty($this->media['pageid']) ? $this->media['pageid'] : null)
+    ?>"><img src="<?=
+            $thumb['url']
+        ?>" width="<?=
+            $thumb['width']
+        ?>" height="<?=
+            $thumb['height']
+        ?>" title="<?=
+            htmlentities((string) (!empty($this->media['title']) ? $this->media['title'] : ''))
+        ?>" />
+    <br >
+    <div style="font-size:70%;">
+        <?= $this->getMediaName($this->media, 28) ?>
+        <br />
+        &copy; <?= $this->getArtistName($this->media, 26) ?>
+        <br />
+        <?= $this->getLicenseName($this->media, 28) ?>
     </div>
-    <?php
-        print str_replace(' / ', '<br />', $this->displayAttribution($this->media, 17, 21));
-    ?>
-    <?php
-        $this->includeAdminMediaFunctions($this->media['pageid']);
-    ?>
+    <?php $this->includeAdminMediaFunctions($this->media['pageid']); ?>
 </div>

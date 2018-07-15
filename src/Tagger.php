@@ -34,6 +34,8 @@ class Tagger
     public $mediaId;
     /** @var array */
     public $media;
+    /** @var array */
+    public $tags;
 
     /**
      * Tagger constructor.
@@ -336,10 +338,58 @@ class Tagger
 
     /**
      * @param array $media
+     * @param int|string $truncate
+     * @return string
+     */
+    public function getArtistName(array $media = [], $truncate = 42)
+    {
+        if (!$media || empty($media['artist'])) {
+            return 'Unknown';
+        }
+        $media['artist'] = strip_tags($media['artist']);
+        return Tools::truncate($media['artist'], $truncate);
+    }
+
+    /**
+     * @param array $media
+     * @param int $truncate
+     * @return string
+     */
+    public function getLicenseName(array $media = [], $truncate = 42)
+    {
+        if (!$media || empty($media['licenseshortname'])) {
+            return 'Unknown';
+        }
+        switch ($media['licenseshortname']) {
+            case 'No restrictions':
+            case 'Public domain':
+                $media['licenseshortname'] = 'Public Domain';
+                break;
+        }
+
+        return Tools::truncate($media['licenseshortname'], $truncate);
+    }
+
+    /**
+     * @param array $media
+     * @param int $truncate
+     * @return string
+     */
+    public function getMediaName(array $media = [], $truncate = 42)
+    {
+        if (!$media || empty($media['title'])) {
+            return 'Unknown';
+        }
+        $title = htmlspecialchars(Tools::stripPrefix($media['title']));
+        return Tools::truncate($title, $truncate);
+    }
+
+    /**
+     * @param array $media
      * @param int $artistTruncate
      * @return bool|string
      */
-    public function displayLicensing(array $media, $artistTruncate = 42)
+    public function getLicensing(array $media, $artistTruncate = 42)
     {
         if (!$media || !is_array($media)) {
             Tools::error('displayLicensing: Media Not Found');
@@ -367,6 +417,8 @@ class Tagger
     }
 
     /**
+     * @deprecated
+     *
      * @param array $media
      * @param int $titleTruncate
      * @param int $artistTruncate
@@ -383,7 +435,7 @@ class Tagger
         . '</a></div>'
         . '<div class="attribution center">'
         . '<a href="' . $infourl . '">'
-        . $this->displayLicensing($media, $artistTruncate)
+        . $this->getLicensing($media, $artistTruncate)
         . '</a></div>';
     }
 

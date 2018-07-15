@@ -20,6 +20,7 @@ a { text-decoration:none !important; color:darkblue; }
 a:hover { background-color:yellow; color:black !important; }
 video { border:1px solid black; background-color:white; background-clip:content-box; }
 audio { border:1px solid black; background-color:white; background-clip:content-box; }
+.nohover:hover { background-color:inherit; color:inherit; }
 .debug { color:black; background-color:yellow; font-size:90%; }
 .notice { color:black; background-color:lightsalmon; font-size:90%; }
 .error { color:black; background-color:yellow; font-size:90%; }
