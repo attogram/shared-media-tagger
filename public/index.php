@@ -15,6 +15,8 @@ if (empty($config) || !is_array($config)) {
     $config = [];
 }
 
+$config['publicDirectory'] = realpath(__DIR__);
+
 if (empty($config['autoload'])) {
     $config['autoload'] = '../vendor/autoload.php';
 }

@@ -7,9 +7,6 @@ $config = [];
 /** Path to Composer autoload file */
 $config['autoload'] = '../vendor/autoload.php';
 
-/** Path to the public directory, with NO tailing slash */
-$config['publicDirectory'] = '../public';
-
 /** Path to source directory, with NO trailing slash */
 $config['sourceDirectory'] = '../src';
 
