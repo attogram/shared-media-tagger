@@ -28,13 +28,13 @@ class DatabaseUpdater
     public function createTables()
     {
         if (!file_exists($this->database->databaseName)) {
-            if (!touch($this->database->databaseName)) {
-                Tools::error('ERROR: Database Creation Failed: ' . $this->database->databaseName);
+            if (!@touch($this->database->databaseName)) {
+                Tools::error('Can Not Create Database in ' . dirname($this->database->databaseName));
 
                 return;
             }
         }
-        Tools::debug('New Database opened: ' . $this->database->databaseName);
+        //Tools::debug('New Database opened: ' . $this->database->databaseName);
 
         $sqlFile = file_get_contents(Config::$sourceDirectory . '/Sql/database.sql');
         $sqls = explode(';', $sqlFile);

@@ -4,6 +4,5 @@
 /public/robots.txt
 /public/phpliteadmin.php
 /public/phpliteadmin.config.php
-/db/*.sqlite
-/db/*.sqlite-journal
+/db/
 /.idea

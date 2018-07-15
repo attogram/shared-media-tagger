@@ -75,7 +75,7 @@ class Database
         try {
             return $this->db = new PDO('sqlite:' . $this->databaseName);
         } catch (PDOException $error) {
-            Tools::error('Error Initalizing Database: ' . $error->getMessage());
+            //Tools::error('Error Initalizing Database: ' . $error->getMessage());
 
             return $this->db = false;
         }

@@ -84,7 +84,7 @@ class Config
         }
 
         if (empty($config['databaseDirectory'])) {
-            self::$databaseDirectory = realpath('../src');
+            self::$databaseDirectory = realpath('../db');
         } else {
             self::$databaseDirectory = $config['databaseDirectory'];
         }
