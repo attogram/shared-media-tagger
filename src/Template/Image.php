@@ -1,7 +1,7 @@
 <?php
 /**
  * Shared Media Tagger
- * Image Display Template
+ * Image Template
  *
  * @var array $data
  */

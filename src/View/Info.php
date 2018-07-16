@@ -22,7 +22,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         } elseif (in_array($media['mime'], Config::getMimeTypesAudio())) {
             print $this->smt->displayAudio($media);
         } else {
-            $this->smt->includeTemplate('ImageDisplay', $media);
+            $this->smt->includeTemplate('Image', $media);
         }
         ?>
         <?php $this->smt->includeAdminMediaFunctions($media['pageid']); ?>

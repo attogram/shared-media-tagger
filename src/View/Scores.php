@@ -16,7 +16,7 @@ declare(strict_types = 1);
             with <?= $this->smt->database->getTotalVotesCount() ?> scores total,
             on a scale of 1 to 5 / # of votes
         </small>
-        <?php $this->printPagination($data); ?>
+        <?php $this->smt->includeTemplate('Pagination', $data) ?>
     </div>
 </div>
 <div class="row bg-white">
@@ -34,6 +34,6 @@ declare(strict_types = 1);
 </div>
 <div class="row bg-white">
     <div class="col-12 mb-3">
-        <?php $this->printPagination($data); ?>
+        <?php $this->smt->includeTemplate('Pagination', $data) ?>
     </div>
 </div>

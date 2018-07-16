@@ -59,7 +59,7 @@ class TaggerAdmin extends Tagger
             . '<br />❌rule not found: sitemap: ' . $sitemapUrl
             ;
         }
-        $response .= '<br />✔️exists';
+        $response .= '<br />✅️exists';
         $content = file($robotstxt);
         if (!is_array($content)) {
             return $response . ''
@@ -76,12 +76,12 @@ class TaggerAdmin extends Tagger
         foreach ($content as $line) {
             if (strtolower(trim($line)) == 'sitemap: ' . $sitemapUrl) {
                 $sitemap = true;
-                $response .= '<br />✔️rule ok: sitemap: ' . $sitemapUrl;
+                $response .= '<br />✅rule ok: sitemap: ' . $sitemapUrl;
                 continue;
             }
             if (strtolower(trim($line)) == 'user-agent: *') {
                 $userAgentStar = true;
-                $response .= '<br />✔️rule ok: user-agent: *';
+                $response .= '<br />✅rule ok: user-agent: *';
                 continue;
             }
             if (!$userAgentStar) {
@@ -89,7 +89,7 @@ class TaggerAdmin extends Tagger
             }
             if (strtolower(trim($line)) == 'disallow: ' . $tagUrl) {
                 $tagDisallow = true;
-                $response .= '<br />✔️rule ok: disallow: ' . $tagUrl;
+                $response .= '<br />✅rule ok: disallow: ' . $tagUrl;
                 continue;
             }
         }

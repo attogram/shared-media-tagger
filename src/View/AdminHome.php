@@ -40,7 +40,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <ul>
         <li>/public/.htaccess:
             <?= (is_readable(Config::$publicDirectory . '/.htaccess')
-                ? '✔ACTIVE: '
+                ? '✅ACTIVE'
                 : '❌MISSING'
             ) ?></li>
         <li><a href="/robots.txt">/robots.txt</a>:
