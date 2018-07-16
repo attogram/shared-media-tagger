@@ -47,7 +47,7 @@ class TaggerAdmin extends Tagger
                 : ''
             ) . '/robots.txt';
         $tagUrl = str_replace('//'.Config::$server, '', Tools::url('tag'));
-        $sitemapUrl = Config::$protocol . '/' . Tools::url('sitemap');
+        $sitemapUrl = Config::$protocol . '//' . Config::$server . Tools::url('sitemap');
         $response = $robotstxt;
         if (!file_exists($robotstxt)) {
             return '<br />❌file not found: ' . $robotstxt

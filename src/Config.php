@@ -91,7 +91,7 @@ class Config
         }
 
         if (empty($config['sizeMedium'])) {
-            self::$sizeMedium = 320;
+            self::$sizeMedium = 640;
         } else {
             self::$sizeMedium = $config['sizeMedium'];
         }

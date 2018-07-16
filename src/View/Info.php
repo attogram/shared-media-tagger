@@ -5,19 +5,26 @@ declare(strict_types = 1);
 * Media Info
 *
 * @var \Attogram\SharedMedia\Tagger\Tagger $smt
-* @var int|string $pageid
 * @var array $media
-* @var array $data
 */
 
+use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
-
 <div class="row">
     <div class="col-sm-7 text-center align-top bg-secondary">
-        <?php $this->smt->includeTags($pageid) ?>
-        <?= $this->smt->displayMedia($media) ?>
+        <?php
+        $this->smt->includeTags($media['pageid']);
+
+        if (in_array($media['mime'], Config::getMimeTypesVideo())) {
+            print $this->smt->displayVideo($media);
+        } elseif (in_array($media['mime'], Config::getMimeTypesAudio())) {
+            print $this->smt->displayAudio($media);
+        } else {
+            $this->smt->includeTemplate('ImageDisplay', $media);
+        }
+        ?>
         <?php $this->smt->includeAdminMediaFunctions($media['pageid']); ?>
     </div>
     <div class="col-sm-5 bg-white align-top">
@@ -29,18 +36,15 @@ use Attogram\SharedMedia\Tagger\Tools;
         <?php } else { ?>
         <h2><?= $media['imagedescriptionSafe'] ?></h2>
         <?php } ?>
-
         <dl>
             <dt>Scoring:</dt>
-            <dd><?= $this->smt->displayVotes($this->smt->database->getVotes($pageid)) ?></dd>
+            <dd><?= $this->smt->displayVotes($this->smt->database->getVotes($media['pageid'])) ?></dd>
         </dl>
-
         <p>
             <em>Categories:</em>
             <br />
-            <?= $this->smt->displayCategories($pageid) ?>
+            <?= $this->smt->displayCategories($media['pageid']) ?>
         </p>
-
         <em>Download:</em>
         <ul>
             <li>Source: <a target="c" href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
@@ -67,7 +71,6 @@ use Attogram\SharedMedia\Tagger\Tools;
         }
         ?>
         </ul>
-
         <p>
             <em>Licensing:</em>
             <ul>
@@ -76,39 +79,17 @@ use Attogram\SharedMedia\Tagger\Tools;
                         : 'unknown')
                     ?></li>
             <?php
-            $fix = [
-                'Public domain'=>'Public Domain',
-                'CC-BY-SA-3.0'=>'CC BY-SA 3.0'
-            ];
-
-            foreach ($fix as $bad => $good) {
-                if ($media['usageterms'] == $bad) {
-                    $media['usageterms'] = $good;
-                }
-                if ($media['licensename'] == $bad) {
-                    $media['licensename'] = $good;
-                }
-                if ($media['licenseshortname'] == $bad) {
-                    $media['licenseshortname'] = $good;
-                }
-            }
-            $lics = [];
-            $lics[] = $media['licensename'];
-            $lics[] = $media['licenseshortname'];
-            $lics[] = $media['usageterms'];
-            $lics = array_unique($lics);
-
             if ($media['licenseuri'] && $media['licenseuri'] != 'false') {
                 print '<li>License: <a target="license" href="'
-                . $media['licenseuri'] . '">' . implode(', ', $lics)  . '</a></li>';
+                . $media['licenseuri'] . '">' . implode(', ', $media['licensing'])  . '</a></li>';
             } else {
-                print '<li>License: ' . implode(', ', $lics) . '</li>';
+                print '<li>License: ' . implode(', ', $media['licensing']) . '</li>';
             }
             if ($media['attributionrequired'] && $media['attributionrequired'] != 'false') {
                 print '<li>Attribution Required</li>';
             }
             if ($media['restrictions'] && $media['restrictions'] != 'false') {
-                print '<li>Restrictions: ' . $media['restrictions'] .'</li>';
+                print '<li>Restrictions: ' . $media['restrictions'] . '</li>';
             }
             ?>
             </ul>
@@ -127,7 +108,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         <p>
             <em>Technical Categories:</em>
             <br />
-            <small><?= $this->smt->displayCategories($pageid, true) ?></small>
+            <small><?= $this->smt->displayCategories($media['pageid'], true) ?></small>
         </p>
     </div>
 </div>

@@ -14,7 +14,7 @@ $config = [];
 // $config['databaseDirectory'] = '../db';
 
 // Default Medium width for media, in pixels
-// $config['sizeMedium'] = 320;
+// $config['sizeMedium'] = 640;
 
 // Default Thumb width for media, in pixels
 // $config['sizeThumb'] = 130;

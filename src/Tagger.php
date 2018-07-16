@@ -297,47 +297,6 @@ class Tagger
 
     /**
      * @param array $media
-     * @return bool|string
-     */
-    public function displayMedia(array $media)
-    {
-        if (!$media || !is_array($media)) {
-            Tools::error('displayImage: ERROR: no image array');
-
-            return false;
-        }
-        $mime = !empty($media['mime']) ? $media['mime'] : null;
-        if (in_array($mime, Config::getMimeTypesVideo())) {
-            return $this->displayVideo($media);
-        }
-        if (in_array($mime, Config::getMimeTypesAudio())) {
-            return $this->displayAudio($media);
-        }
-
-        $url = $media['thumburl'];
-        $height = $media['thumbheight'];
-        $width = $media['thumbwidth'];
-
-        $aspectRatio = 1;
-        if ($width && $height) {
-            $aspectRatio = $width / $height;
-        }
-        if ($aspectRatio < 1) { // Tall media
-            $width = round($aspectRatio * 100);
-        }
-        if ($width > 100) {
-            $width = 100;
-        }
-        $style = 'height:100%; width:' . $width . '%;';
-
-        return  '<div>'
-            . '<img src="' . $url .'" style="' . $style . '" alt="">'
-            . $this->displayAttribution($media)
-            . '</div>';
-    }
-
-    /**
-     * @param array $media
      * @param int|string $truncate
      * @return string
      */
@@ -477,8 +436,9 @@ class Tagger
 
     /**
      * @param $name
+     * @param array $data
      */
-    public function includeTemplate($name)
+    public function includeTemplate($name, array $data = [])
     {
         $view = Config::$sourceDirectory . '/Template/' . $name . '.php';
         if (!is_readable($view)) {
