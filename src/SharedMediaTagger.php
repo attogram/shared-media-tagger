@@ -57,6 +57,7 @@ class SharedMediaTagger
         $this->router->allow('/categories', 'Categories');
         $this->router->allow('/i/?', 'Info');
         $this->router->allow('/login', 'Login');
+        $this->router->allow('/logoff', 'Logout');
         $this->router->allow('/logout', 'Logout');
         $this->router->allow('/random', 'Random');
         $this->router->allow('/scores', 'Scores');

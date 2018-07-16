@@ -12,7 +12,10 @@ use Attogram\SharedMedia\Tagger\Tools;
 <div class="row text-white bg-dark small pb-2 pt-2">
     <div class="col-7 col-sm-5 text-left">
         <a class="text-white" href="<?= Tools::url('home') ?>"><?= Config::$siteName ?></a>
-        <span class="text-info ml-2" title="Percentage Completed"><?= $this->getUserScore() ?>%</span>
+        <span class="text-info ml-2 font-bold" title="Percentage Completed"><?=
+            $this->getUserScore()
+            ?>%</span>
+        <div class="d-none d-md-inline mr-2 text-info">completed</div>
     </div>
     <div class="col-5 col-sm-7 text-right">
         <a class="text-white pr-1 pl-1" href="<?= Tools::url('random') ?>" title="Random File">
@@ -37,5 +40,10 @@ use Attogram\SharedMedia\Tagger\Tools;
             <div class="d-none d-md-inline"><?= $this->database->getTotalVotesCount() ?></div>
             <div class="d-none d-sm-inline">Scores</div>
         </a>
+        <?php if (Tools::isAdmin()) { ?>
+            <a class="text-white text-nowrap pl-1" href="<?= Tools::url('admin') ?>" title="Admin">
+                🔧
+            </a>
+        <?php } ?>
     </div>
 </div>

@@ -25,6 +25,8 @@ class TaggerAdmin extends Tagger
     {
         parent::__construct($router, $config);
 
+
+
         if (empty($_SESSION['user'])) {
             header('Location: ' . Tools::url('login'));
         }
@@ -32,6 +34,7 @@ class TaggerAdmin extends Tagger
         ini_set('user_agent', 'Shared Media Tagger v' . SHARED_MEDIA_TAGGER);
         $this->commons = new Commons();
         $this->database = new DatabaseAdmin();
+        $this->database->getUser();
         $this->commons->setDatabase($this->database);
         $this->database->setCommons($this->commons);
     }
