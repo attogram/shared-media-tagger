@@ -33,5 +33,6 @@ $thumb = $this->getThumbnail($this->media);
         <br />
         <?= $this->getLicenseName($this->media, 26) ?>
     </div>
+    </a>
     <?php $this->includeAdminMediaFunctions($this->media['pageid']); ?>
 </div>
