@@ -1,7 +1,7 @@
 -- Shared Media Tagger Demo Seed v1.0.4
 
 INSERT OR REPLACE INTO site (id, name, about)
-VALUES (1, 'Shared Media Tagger', '<p>Welcome to the Shared Media Tagger demo website.</p><p>Setup your installation now in the <a href="admin/">Curator Backend</a> (user/pass:  admin1)</p>');
+VALUES (1, 'Shared Media Tagger', '<p>Welcome to the Shared Media Tagger demo website.</p><p>Setup your installation now in the <a href="login/">Curator Backend</a> (user/pass:  admin1)</p>');
 
 INSERT OR REPLACE INTO tag (id, position, score, name, display_name)
 VALUES (1, 1, 5, '😊 Best', '😊');
