@@ -25,11 +25,14 @@ use Attogram\SharedMedia\Tagger\Tools;
     <hr />
     Installation:
     <ul>
-        <li>Server: <?= Config::$server ?></li>
-        <li>Site Name: <?= Config::$siteName ?></li>
-        <li>URL: <a href="<?= Tools::url('home') ?>"><?= Tools::url('home') ?></a></li>
-        <li>Protocol: <?= Config::$protocol ?></li>
-        <li>Source Directory: <?= Config::$sourceDirectory ?></li>
+        <li>server: <kbd><?= Config::$server ?></kbd></li>
+        <li>siteName: <kbd><?= Config::$siteName ?></kbd></li>
+        <li>home: <a href="<?= Tools::url('home') ?>"><?= Tools::url('home') ?></a></li>
+        <li>protocol: <kbd><?= Config::$protocol ?></kbd></li>
+        <li>siteUrl: <kbd><?= Config::$siteUrl ?></kbd></li>
+        <li>sourceDirectory: <kbd><?= Config::$sourceDirectory ?></kbd></li>
+        <li>databaseDirectory: <kbd><?= Config::$databaseDirectory ?></kbd></li>
+        <li>adminConfigFile: <kbd><?= Config::$adminConfigFile ?></kbd></li>
     </ul>
 
     <hr />
@@ -40,10 +43,10 @@ use Attogram\SharedMedia\Tagger\Tools;
                 ? '✔ACTIVE: '
                 : '❌MISSING'
             ) ?></li>
-        <li><a href="<?= Tools::url('sitemap') ?>">sitemap.xml</a></li>
-        <li><a href="<?= Tools::url('home') ?>robots.txt">robots.txt</a>:
+        <li><a href="/robots.txt">/robots.txt</a>:
             <span style="font-family:monospace;"><?= $this->smt->checkRobotstxt() ?></span>
         </li>
+        <li><a href="<?= Tools::url('sitemap') ?>">sitemap.xml</a></li>
     </ul>
 
     <hr />

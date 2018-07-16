@@ -38,6 +38,9 @@ class Database
     private $totalFilesReviewedCount;
     /** @var int */
     private $totalVotesCount;
+    /** @var bool */
+    private $noSqlite = false;
+
 
     /**
      * Database constructor.
@@ -68,7 +71,10 @@ class Database
     private function initDatabase()
     {
         if (!in_array('sqlite', PDO::getAvailableDrivers())) {
-            Tools::error('::initDatabase: ERROR: no sqlite Driver');
+            if ($this->noSqlite) {
+                Tools::error('ERROR: sqlite Driver Not Found');
+            }
+            $this->noSqlite = true;
 
             return $this->db = false;
         }
@@ -319,28 +325,38 @@ class Database
      */
     private function getRandomUnreviewedMedia($limit = 1)
     {
-        $and = '';
+        $curationAnd = '';
+        $curationWhere = '';
         if (Config::$siteInfo['curation'] == 1) {
-            $and = "AND curated == '1'";
+            $curationAnd = "AND curated == '1'";
+            $curationWhere = "WHERE curated == '1'";
         }
 
-        $notIn = 'SELECT DISTICT(media_pageid) FROM tagging WHERE tagging.user_id = :user_id';
-        $sql = "SELECT * FROM media WHERE meddia.pageid NOT IN ($notIn) $and ORDER BY RANDOM() LIMIT :limit";
+        $bind = [];
+        $bind[':limit'] = $limit;
 
-        $bind = [
-            'user_id' => $this->userId,
-            'limit' => $limit
-        ];
+        $sqlPre = 'SELECT * FROM media WHERE media.pageid NOT IN (';
+        $sqlPost =") $curationAnd ORDER BY RANDOM() LIMIT :limit";
 
-        $unreviewed = $this->queryAsArray($sql, $bind); // Unreviewed by current user
+        // Unreviewed by all users
+        $notIn = 'SELECT DISTINCT(media_pageid) FROM tagging';
+        $unreviewed = $this->queryAsArray($sqlPre . $notIn . $sqlPost, $bind);
         if ($unreviewed) {
             return $unreviewed;
         }
 
-        $notIn = 'SELECT DISTINCT(media_pageid) FROM tagging';
-        $sql = "SELECT * FROM media WHERE meddia.pageid NOT IN ($notIn) $and ORDER BY RANDOM() LIMIT :limit";
+        // Unreviwed by current user
+        $notIn .= ' WHERE tagging.user_id = :user_id';
+        $bind[':user_id'] = $this->userId;
+        $unreviewed = $this->queryAsArray($sqlPre . $notIn . $sqlPost, $bind);
+        if ($unreviewed) {
+            return $unreviewed;
+        }
 
-        return $this->queryAsArray($sql, $bind); // Unreviewed by all users
+        // Just Random
+        unset($bind[':user_id']);
+        $sql = "SELECT * FROM media $curationWhere ORDER BY RANDOM() LIMIT :limit";
+        return $this->queryAsArray($sql, $bind);
     }
 
     /**

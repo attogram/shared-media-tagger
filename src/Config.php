@@ -70,21 +70,16 @@ class Config
     public static function setup(array $config = [])
     {
         self::$server = $_SERVER['SERVER_NAME'];
-
-        if (empty($config['publicDirectory'])) {
-            self::$publicDirectory = realpath('../public');
-        } else {
-            self::$publicDirectory = $config['publicDirectory'];
-        }
+        self::$publicDirectory = $config['publicDirectory'];
 
         if (empty($config['sourceDirectory'])) {
-            self::$sourceDirectory = realpath('../src');
+            self::$sourceDirectory = '../src';
         } else {
             self::$sourceDirectory = $config['sourceDirectory'];
         }
 
         if (empty($config['databaseDirectory'])) {
-            self::$databaseDirectory = realpath('../db');
+            self::$databaseDirectory = '../db';
         } else {
             self::$databaseDirectory = $config['databaseDirectory'];
         }
@@ -144,5 +139,48 @@ class Config
         if (!isset(self::$siteInfo['curation'])) {
             self::$siteInfo['curation'] = 0;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMimeTypesAudio()
+    {
+        return [
+            'audio/mpeg',
+            'audio/x-flac',
+            'audio/midi',
+            'audio/wav',
+            'audio/webm',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMimeTypesImage()
+    {
+        return [
+            'image/jpeg',
+            'image/png',
+            'image/svg+xml',
+            'image/tiff',
+            'image/gif',
+            'image/vnd.djvu',
+            'image/x-xcf',
+            'image/webp',
+            'application/pdf',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMimeTypesVideo()
+    {
+        return [
+            'application/ogg',
+            'video/webm',
+        ];
     }
 }

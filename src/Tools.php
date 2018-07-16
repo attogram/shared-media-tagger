@@ -161,7 +161,7 @@ class Tools
             return $string;
         }
 
-        return substr($string, 0, $length-2) . '..';
+        return mb_strimwidth($string, 0, $length - 2) . '..';
     }
 
     /**
@@ -290,28 +290,21 @@ class Tools
     {
         switch ($type) {
             case 'debug':
-                $class = 'debug';
-                $head = '';
-                break;
             case 'notice':
-                $class = 'notice';
-                $head = '';
+                $class = 'bg-info text-white';
                 break;
             case 'error':
-                $class = 'error';
-                $head = 'ERROR:';
-                break;
             case 'fail':
-                $class = 'fail';
-                $head = 'GURU MEDITATION FAILURE:';
+                $class = 'bg-danger text-white';
                 break;
             default:
-                return;
+                $class = 'bg-secondary text-white';
+                break;
         }
         if (is_array($message)) {
             $message = '<pre>' . htmlentities((string) print_r($message, true)) . '</pre>';
         }
-        print '<div class="message ' . $class . '"><b>' . $head . '</b> ' . $message . '</div>';
+        print '<div class="' . $class . ' p-1">' . $message . '</div>';
     }
 
     /**
@@ -366,43 +359,5 @@ class Tools
     {
         header('HTTP/1.1 301 Moved Permanently');
         self::redirect($url);
-    }
-
-    /**
-     * realpath() for existing and non-existing files
-     *
-     * @param $dir
-     * @return string
-     */
-    public static function getRealPath($dir)
-    {
-        $directory = realpath($dir);
-        if ($directory) {
-            return $directory;
-        }
-        // for non-existing files
-        $directoryParts = array_filter(
-            explode(
-                DIRECTORY_SEPARATOR,
-                str_replace(
-                    ['/', '\\'],
-                    DIRECTORY_SEPARATOR,
-                    $dir
-                )
-            ),
-            'strlen'
-        );
-        $directory = [];
-        foreach ($directoryParts as $part) {
-            if ('.' == $part) {
-                continue;
-            }
-            if ('..' == $part) {
-                array_pop($directory);
-            } else {
-                $directory[] = $part;
-            }
-        }
-        return getcwd() . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $directory);
     }
 }

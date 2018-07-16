@@ -18,13 +18,9 @@ integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e
 body { background-color:#343a40; }
 a { text-decoration:none !important; color:darkblue; }
 a:hover { background-color:yellow; color:black !important; }
-video { border:1px solid black; background-color:white; background-clip:content-box; }
 audio { border:1px solid black; background-color:white; background-clip:content-box; }
+video { border:1px solid black; background-color:white; background-clip:content-box; }
 .nohover:hover { background-color:inherit; color:inherit; }
-.debug { color:black; background-color:yellow; font-size:90%; }
-.notice { color:black; background-color:lightsalmon; font-size:90%; }
-.error { color:black; background-color:yellow; font-size:90%; }
-.fail { color:black; background-color:yellow; font-size:110%; }
 .mediatitle { font-size:80%; }
 .attribution { font-size:65%; }
 </style>

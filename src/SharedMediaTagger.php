@@ -8,13 +8,10 @@ use Attogram\Router\Router;
 /**
  * Route request, configure, and load Shared Media Tagger
  */
-class Loader
+class SharedMediaTagger
 {
     /** @var array - Site Configuration */
     private $config = [];
-
-    /** @var bool */
-    private $isAdminRoute = false;
 
     /** @var Router */
     private $router;
@@ -39,18 +36,16 @@ class Loader
         $this->setPublicRoutes();
         $this->show();
 
-        $this->isAdminRoute = true;
-        $this->setAdminRoutes();
-        $this->show();
+        if (Tools::isAdmin()) {
+            $this->setAdminRoutes();
+            $this->show();
+        }
 
         $this->redirects();
 
         Tools::error404('Page Not Found');
     }
 
-    /**
-     * Set Public Routes
-     */
     private function setPublicRoutes()
     {
         $this->router->allow('/', 'Home');
@@ -71,9 +66,6 @@ class Loader
         $this->router->allow('/tag', 'Tag');
     }
 
-    /**
-     * Set Admin Routes
-     */
     private function setAdminRoutes()
     {
         $this->router->allow('/admin/', 'AdminHome');
@@ -88,9 +80,6 @@ class Loader
         $this->router->allow('/admin/user', 'AdminUser');
     }
 
-    /**
-     * Show a page if there is a match
-     */
     private function show()
     {
         $page = $this->router->match();
@@ -98,13 +87,13 @@ class Loader
             return;
         }
 
-        if ($this->isAdminRoute) {
+        if (Tools::isAdmin()) {
             $smt = new TaggerAdmin($this->router, $this->config);
         } else {
             $smt = new Tagger($this->router, $this->config);
         }
 
-        $control = Config::$sourceDirectory . '/Controller/' . $page . '.php';
+        $control = Config::$sourceDirectory . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . $page . '.php';
         if (is_readable($control)) {
             $class = 'Attogram\\SharedMedia\\Tagger\\Controller\\' . $page;
             if (class_exists($class)) {
@@ -113,7 +102,7 @@ class Loader
             }
         }
 
-        $view = Config::$sourceDirectory . '/View/' . $page . '.php';
+        $view = Config::$sourceDirectory . DIRECTORY_SEPARATOR . 'View' . DIRECTORY_SEPARATOR . $page . '.php';
         if (is_readable($view)) {
             /** @noinspection PhpIncludeInspection */
             include $view;

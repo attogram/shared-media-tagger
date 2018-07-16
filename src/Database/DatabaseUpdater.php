@@ -30,18 +30,17 @@ class DatabaseUpdater
         if (!is_dir(Config::$databaseDirectory)) {
             Tools::error('Database Directory Not Found');
             Tools::debug(
-                'Please enable this site by creating the directory <kbd>'
-                . Tools::getRealPath(Config::$databaseDirectory)
-                . '</kbd> and making it writeable by the webserver.'
+                'Please create the directory <kbd>'
+                . Config::$databaseDirectory
+                . '</kbd> and make it writeable by the webserver.'
             );
 
             return;
         }
         if (!is_writable(Config::$databaseDirectory)) {
-            Tools::error('Database Directory Not Writeable');
-            Tools::debug(
-                'Please make the directory <kbd>'
-                . Tools::getRealPath(Config::$databaseDirectory)
+            Tools::error(
+                'Database Directory Not Writeable.  Please make the directory <kbd>'
+                . realpath(Config::$databaseDirectory)
                 . '</kbd> writeable by the webserver.'
             );
 

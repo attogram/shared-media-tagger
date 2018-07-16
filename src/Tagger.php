@@ -307,10 +307,10 @@ class Tagger
             return false;
         }
         $mime = !empty($media['mime']) ? $media['mime'] : null;
-        if (in_array($mime, Config::$mimeTypesVideo)) {
+        if (in_array($mime, Config::getMimeTypesVideo())) {
             return $this->displayVideo($media);
         }
-        if (in_array($mime, Config::$mimeTypesAudio)) {
+        if (in_array($mime, Config::getMimeTypesAudio())) {
             return $this->displayAudio($media);
         }
 

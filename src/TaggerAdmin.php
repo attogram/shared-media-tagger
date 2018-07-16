@@ -41,9 +41,13 @@ class TaggerAdmin extends Tagger
      */
     public function checkRobotstxt()
     {
-        $robotstxt = Config::$publicDirectory . '/robots.txt';
+        $robotstxt = (
+            !empty($_SERVER['DOCUMENT_ROOT'])
+                ? $_SERVER['DOCUMENT_ROOT']
+                : ''
+            ) . '/robots.txt';
         $tagUrl = str_replace('//'.Config::$server, '', Tools::url('tag'));
-        $sitemapUrl = Config::$protocol . Tools::url('sitemap');
+        $sitemapUrl = Config::$protocol . '/' . Tools::url('sitemap');
         $response = $robotstxt;
         if (!file_exists($robotstxt)) {
             return '<br />❌file not found: ' . $robotstxt

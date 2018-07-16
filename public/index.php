@@ -4,7 +4,7 @@
  */
 declare(strict_types = 1);
 
-use Attogram\SharedMedia\Tagger\Loader;
+use Attogram\SharedMedia\Tagger\SharedMediaTagger;
 
 if (is_readable('config.php')) {
     include('config.php');
@@ -31,4 +31,4 @@ if (!is_readable($config['autoload'])) {
 /** @noinspection PhpIncludeInspection */
 require_once $config['autoload'];
 
-new Loader($config);
+new SharedMediaTagger($config);

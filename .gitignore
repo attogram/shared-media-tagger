@@ -1,9 +1,8 @@
 /db/
+/database/
 /public/config.php
 /public/config.admin.php
 /public/favicon.ico
-/public/phpliteadmin.php
-/public/phpliteadmin.config.php
 /public/robots.txt
 /vendor/
 /.idea/
