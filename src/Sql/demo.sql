@@ -1,8 +1,37 @@
--- Shared Media Tagger Demo Seed v1.0.4
+-- Shared Media Tagger Demo Seed v1.1.4
 
-INSERT OR REPLACE INTO site (id, name, about)
-VALUES (1, 'Shared Media Tagger', '<p>Welcome to the Shared Media Tagger demo website.</p><p>Setup your installation now in the <a href="login/">Curator Backend</a> (user/pass:  admin1)</p>');
+-- Demo Site
+INSERT OR REPLACE INTO site (id, name, about) VALUES (
+1,
+'Shared Media Tagger',
+'<p>Welcome to your new website, powered by the <b>Shared Media Tagger</b>.</p>' ||
+'<p>How to complete your installation:' ||
+  '<ol>' ||
+    '<li>Create config file in <code>public/</code> directory: ' ||
+      '<code>cp config.example.php config.php</code>' ||
+    '<li>Edit <code>public/config.php</code>: Uncomment <code>$config[''adminConfigFile'']</code> ' ||
+      'and point it to a <b>secure</b> location</li>' ||
+    '<li>Create admin config file in your secure location: ' ||
+        '<code>cp config.admin.example.php /secure/location/config.admin.php</code></li>' ||
+    '<li>Edit <code>config.admin.php</code>: create your admin username/password logins.  ' ||
+      'Default logins are: admin1/admin1, admin2/admin2</li>' ||
+    '<li><a href="login/">Login to the Curators Backend</a></li>' ||
+  '</ol>' ||
+'</p>' ||
+'<p>Setup your site:' ||
+  '<ul>' ||
+    '<li><a href="admin/site">SITE admin</a>: site name, this about message, headers, footers, curation mode on/off</li>' ||
+    '<li><a href="admin/category">CATEGORY admin</a>: find categories, import category info, import media from category, and more</li>' ||
+    '<li><a href="admin/tag">TAGS admin</a>: voting tag bar settings</li>' ||
+    '<li><a href="admin/media">MEDIA admin</a>: add media, and more</li>' ||
+    '<li><a href="admin/curate">CURATE admin</a>: Lightboard curation tool</li>' ||
+    '<li><a href="admin/user">USER admin</a>: view and delete users</li>' ||
+    '<li><a href="admin/database">DATABASE admin</a>: db tools</li>' ||
+  '</ul>' ||
+'</p>'
+);
 
+-- Tag Set
 INSERT OR REPLACE INTO tag (id, position, score, name, display_name)
 VALUES (1, 1, 5, '😊 Best', '😊');
 
@@ -17,9 +46,3 @@ VALUES (4, 4, 2, '🙁 Unsure', '🙁');
 
 INSERT OR REPLACE INTO tag (id, position, score, name, display_name)
 VALUES (5, 5, 1, '☹️ Bad', '☹️');
-
-INSERT INTO "media" ("pageid","curated","title","url","descriptionurl","descriptionshorturl","imagedescription","artist","datetimeoriginal","licenseuri","licensename","licenseshortname","usageterms","attributionrequired","restrictions","size","width","height","sha1","mime","thumburl","thumbwidth","thumbheight","thumbmime","user","userid","duration","timestamp","updated") VALUES ('4327183','0','File:First TV TestCard.svg','https://upload.wikimedia.org/wikipedia/commons/7/7b/First_TV_TestCard.svg','https://commons.wikimedia.org/wiki/File:First_TV_TestCard.svg','https://commons.wikimedia.org/w/index.php?curid=4327183','In 1934 the first testcard "Tuning Signals" was broadcast by BBC 1, the earliest being a simple line and circle broadcast using Baird''s 30 line system, and used to synchronise the mechanical scanning system.','<a href="//commons.wikimedia.org/wiki/User:Alex:D" title="User:Alex:D">Alex:D</a>','','https://creativecommons.org/publicdomain/mark/1.0/','Public Domain','Public domain','Public domain','false','','1139','800','600','b1ddc20d8a121d285b793bdca5291d49a58a0fe4','image/svg+xml','https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/First_TV_TestCard.svg/325px-First_TV_TestCard.svg.png','325','244','image/png','Alex:D','52170','','2008-07-05T16:17:02Z','2018-07-07 18:08:57');
-INSERT INTO "media" ("pageid","curated","title","url","descriptionurl","descriptionshorturl","imagedescription","artist","datetimeoriginal","licenseuri","licensename","licenseshortname","usageterms","attributionrequired","restrictions","size","width","height","sha1","mime","thumburl","thumbwidth","thumbheight","thumbmime","user","userid","duration","timestamp","updated") VALUES ('6824470','0','File:EIA Resolution Chart 1956.svg','https://upload.wikimedia.org/wikipedia/commons/2/2b/EIA_Resolution_Chart_1956.svg','https://commons.wikimedia.org/wiki/File:EIA_Resolution_Chart_1956.svg','https://commons.wikimedia.org/w/index.php?curid=6824470','EIA Resolution Chart','Self painted','2009-05-20','https://creativecommons.org/publicdomain/mark/1.0/','Public Domain','Public domain','Public domain','false','','54369','990','765','aff940472c505aaff174adbf5f32c6c572b4f5f9','image/svg+xml','https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/EIA_Resolution_Chart_1956.svg/325px-EIA_Resolution_Chart_1956.svg.png','325','251','image/png','BPK','681987','','2009-05-20T13:12:47Z','2018-07-07 18:11:21');
-INSERT INTO "media" ("pageid","curated","title","url","descriptionurl","descriptionshorturl","imagedescription","artist","datetimeoriginal","licenseuri","licensename","licenseshortname","usageterms","attributionrequired","restrictions","size","width","height","sha1","mime","thumburl","thumbwidth","thumbheight","thumbmime","user","userid","duration","timestamp","updated") VALUES ('11108315','0','File:Test card.png','https://upload.wikimedia.org/wikipedia/commons/b/bf/Test_card.png','https://commons.wikimedia.org/wiki/File:Test_card.png','https://commons.wikimedia.org/w/index.php?curid=11108315','<p>Test card</p>','<span lang="en">Unknown</span>','Unknown date','https://creativecommons.org/publicdomain/mark/1.0/','Public Domain','Public domain','Public domain','false','','26271','640','360','2e95a28d7449fea6a0b6b8610a43f89859153eee','image/png','https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Test_card.png/325px-Test_card.png','325','183','image/png','Galzigler','1242770','','2010-08-06T21:59:56Z','2018-07-07 18:06:36');
-INSERT INTO "media" ("pageid","curated","title","url","descriptionurl","descriptionshorturl","imagedescription","artist","datetimeoriginal","licenseuri","licensename","licenseshortname","usageterms","attributionrequired","restrictions","size","width","height","sha1","mime","thumburl","thumbwidth","thumbheight","thumbmime","user","userid","duration","timestamp","updated") VALUES ('64636701','0','File:1000x1000Pixel mit Gitter.png','https://upload.wikimedia.org/wikipedia/commons/d/d0/1000x1000Pixel_mit_Gitter.png','https://commons.wikimedia.org/wiki/File:1000x1000Pixel_mit_Gitter.png','https://commons.wikimedia.org/w/index.php?curid=64636701','1000x1000 pixel image with square grid','<a href="//commons.wikimedia.org/wiki/User:Pd4u" title="User:Pd4u">Pd4u</a>','','http://creativecommons.org/publicdomain/zero/1.0/','CC0','CC0','Creative Commons Zero, Public Domain Dedication','false','','234236','1000','1000','0f043cca5ea1efd4e8090b840cad937c2b133e49','image/png','https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/1000x1000Pixel_mit_Gitter.png/325px-1000x1000Pixel_mit_Gitter.png','325','325','image/png','Pd4u','2883823','','2017-12-06T13:53:07Z','2018-07-07 18:08:02');
-INSERT INTO "media" ("pageid","curated","title","url","descriptionurl","descriptionshorturl","imagedescription","artist","datetimeoriginal","licenseuri","licensename","licenseshortname","usageterms","attributionrequired","restrictions","size","width","height","sha1","mime","thumburl","thumbwidth","thumbheight","thumbmime","user","userid","duration","timestamp","updated") VALUES ('64651233','0','File:TestChart similar to old TV testscreens.svg','https://upload.wikimedia.org/wikipedia/commons/b/b0/TestChart_similar_to_old_TV_testscreens.svg','https://commons.wikimedia.org/wiki/File:TestChart_similar_to_old_TV_testscreens.svg','https://commons.wikimedia.org/w/index.php?curid=64651233','TV testscreen colors adapted','pd4u','2017-12','http://creativecommons.org/publicdomain/zero/1.0/','CC0','CC0','Creative Commons Zero, Public Domain Dedication','false','','91779','512','320','029423cfaaf6d5d6721c2641763ceb27af4c9900','image/svg+xml','https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/TestChart_similar_to_old_TV_testscreens.svg/325px-TestChart_similar_to_old_TV_testscreens.svg.png','325','203','image/png','Pd4u','2883823','','2017-12-06T21:46:03Z','2018-07-07 18:10:08');

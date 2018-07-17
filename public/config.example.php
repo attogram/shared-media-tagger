@@ -13,12 +13,6 @@ $config = [];
 // Path to database directory, with NO trailing slash
 // $config['databaseDirectory'] = '../db';
 
-// Default Medium width for media, in pixels
-// $config['sizeMedium'] = 640;
-
-// Default Thumb width for media, in pixels
-// $config['sizeThumb'] = 130;
-
 // Backend Admin config file - required for admin functions
 // !-!-! contains passwords, put in a safe place !-!-!
 // $config['adminConfigFile'] = './config.admin.php';

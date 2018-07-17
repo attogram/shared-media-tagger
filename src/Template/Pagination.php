@@ -33,7 +33,7 @@ if ($data['pages'] < 2) {
             Tools::url($data['urlName']) . '/2'
             ?>">2</a></li>
         <?php for ($page = 3; $page <= $data['pages']; $page++) {
-            if ($data['pages'] > 20) {
+            if ($data['pages'] > 10) {
                 $diff = abs($data['page'] - $page);
                 if ($diff > 8) {
                     continue;

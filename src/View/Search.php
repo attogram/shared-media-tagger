@@ -21,7 +21,7 @@ declare(strict_types = 1);
                        : ''
                     ?>">
             <button type="submit" class="btn btn-primary mt-3 mb-3 ml-2 mr-2">Search</button>
-            <?php if (!empty($data['results'])) {
+            <?php if (!empty($_GET['q'])) {
                 echo count($data['results']) ?> results
             <?php } ?>
         </form>

@@ -63,6 +63,7 @@ class Tagger
         Config::setSiteInfo($siteInfo);
 
         $this->database->getUser();
+
     }
 
     /**
@@ -253,21 +254,14 @@ class Tagger
     {
         $mime = $media['mime'];
         $url = $media['url'];
-        $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        $divwidth = $width = $media['thumbwidth'];
-        if ($divwidth < Config::$sizeMedium) {
-            $divwidth = Config::$sizeMedium;
-        }
-
-        return '<div style="width:' . $divwidth . 'px; margin:auto;">'
-        . '<video width="'. $divwidth . '" height="' . $height . '" poster="' . $poster
-        . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
-        . '<source src="' . $url . '" type="' . $mime . '">'
-        . '</video>'
-        . $this->displayAttribution($media)
-        . '</div>';
+        return '<video style="width:320px;" '
+            . 'poster="' . $poster . '" '
+            . 'onclick="this.paused ? this.play() : this.pause();" controls loop>'
+            . '<source src="' . $url . '" type="' . $mime . '">'
+            . '</video>'
+            . $this->displayAttribution($media);
     }
 
     /**
@@ -278,21 +272,14 @@ class Tagger
     {
         $mime = $media['mime'];
         $url = $media['url'];
-        $height = $media['thumbheight'];
         $poster = $media['thumburl'];
 
-        $divwidth = $width = $media['thumbwidth'];
-        if ($divwidth < Config::$sizeMedium) {
-            $divwidth = Config::$sizeMedium;
-        }
-
-        return '<div style="width:' . $divwidth . 'px; margin:auto;">'
-        . '<audio width="'. $width . '" height="' . $height . '" poster="' . $poster
-        . '" onclick="this.paused ? this.play() : this.pause();" controls loop>'
-        . '<source src="' . $url . '" type="' . $mime . '">'
-        . '</audio>'
-        . $this->displayAttribution($media)
-        . '</div>';
+        return '<audio style="width:320px;" '
+            . 'poster="' . $poster . '" '
+            . 'onclick="this.paused ? this.play() : this.pause();" controls loop>'
+            . '<source src="' . $url . '" type="' . $mime . '">'
+            . '</audio>'
+            . $this->displayAttribution($media);
     }
 
     /**

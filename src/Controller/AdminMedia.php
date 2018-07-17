@@ -12,6 +12,11 @@ class AdminMedia extends ControllerBase
 {
     protected function display()
     {
+        $this->smt->title = 'Media Admin';
+        $this->smt->includeHeader();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
+
         $data = [];
         $data['result'] = '';
 
@@ -31,11 +36,6 @@ class AdminMedia extends ControllerBase
             $data['result'] = $this->deleteMediaInCategory(Tools::categoryUrldecode($_GET['dc']));
             $this->smt->database->updateCategoriesLocalFilesCount();
         }
-
-        $this->smt->title = 'Media Admin';
-        $this->smt->includeHeader();
-        $this->smt->includeTemplate('Menu');
-        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
         include($this->getView('AdminMedia'));

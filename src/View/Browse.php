@@ -51,7 +51,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         </select>
         <input type="submit" value="Browse" />
     </form>
-    <?= number_format((float) $resultSize) ?> <?=
+    <?= count($medias) ?> <?=
         $this->sort == 'random'
             ? '<a href="">Random</a> '
             : ''

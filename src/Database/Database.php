@@ -41,7 +41,6 @@ class Database
     /** @var bool */
     private $noSqlite = false;
 
-
     /**
      * Database constructor.
      */
@@ -71,7 +70,7 @@ class Database
     private function initDatabase()
     {
         if (!in_array('sqlite', PDO::getAvailableDrivers())) {
-            if ($this->noSqlite) {
+            if (!$this->noSqlite) {
                 Tools::error('ERROR: sqlite Driver Not Found');
             }
             $this->noSqlite = true;
