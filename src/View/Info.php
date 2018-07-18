@@ -111,5 +111,12 @@ use Attogram\SharedMedia\Tagger\Tools;
             <small><?= $this->smt->displayCategories($media['pageid'], true) ?></small>
         </p>
     </div>
+    <?php if (Tools::isAdmin()) { ?>
+        <div class="row bg-white">
+            <div class="col">
+                <pre><?= htmlentities(print_r($media, true)) ?></pre>
+            </div>
+        </div>
+    <?php } ?>
 </div>
 
