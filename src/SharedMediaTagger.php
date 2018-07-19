@@ -22,7 +22,7 @@ class SharedMediaTagger
      */
     public function __construct(array $config = [])
     {
-        define('SHARED_MEDIA_TAGGER', '1.1.5');
+        define('SHARED_MEDIA_TAGGER', '1.1.6');
 
         ob_start('ob_gzhandler');
 
