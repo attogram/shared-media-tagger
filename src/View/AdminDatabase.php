@@ -16,9 +16,10 @@ use Attogram\SharedMedia\Tagger\Tools;
         <ul>
             <li>File: <kbd><?= $data['databaseName'] ?></kbd></li>
             <li>Permissions: <?= $data['databaseWriteable']
-                ? '✅️OK: WRITEABLE'
-                : '❌ERROR: READ ONLY' ?></li>
+                ? '✅ OK'
+                : '❌ ERROR: READ ONLY' ?></li>
             <li>Size: <?= $data['databaseSize'] ?> bytes</li>
+            <li><a href="<?= Tools::url('admin') ?>/database/download">Download Database</a></li>
             <li><a href="<?= Tools::url('admin') ?>/reports/">Reports</a></li>
         </ul>
         <pre class="error"><?= $data['result'] ?></pre>

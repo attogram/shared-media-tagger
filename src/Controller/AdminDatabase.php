@@ -12,6 +12,11 @@ class AdminDatabase extends ControllerBase
 {
     protected function display()
     {
+        $this->smt->title = 'Database Admin';
+        $this->smt->includeHeader();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
+
         $data = [];
         $data['action'] = !empty($_GET['a']) ? $_GET['a'] : '';
         $data['databaseName'] = realpath($this->smt->database->databaseName);
@@ -63,11 +68,6 @@ class AdminDatabase extends ControllerBase
                     break;
             }
         }
-
-        $this->smt->title = 'Database Admin';
-        $this->smt->includeHeader();
-        $this->smt->includeTemplate('Menu');
-        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
         include($this->getView('AdminDatabase'));

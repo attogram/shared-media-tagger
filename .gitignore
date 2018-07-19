@@ -1,8 +1,5 @@
-/db/
-/database/
+/db/*.sqlite
 /public/config.php
 /public/config.admin.php
-/public/favicon.ico
-/public/robots.txt
 /vendor/
 /.idea/
