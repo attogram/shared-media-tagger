@@ -301,7 +301,7 @@ class Tools
                 $class = 'bg-secondary text-white';
                 break;
         }
-        if (is_array($message)) {
+        if (is_array($message) || is_object($message)) {
             $message = '<pre>' . htmlentities((string) print_r($message, true)) . '</pre>';
         }
         print '<div class="' . $class . ' p-1">' . $message . '</div>';

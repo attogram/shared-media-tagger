@@ -60,7 +60,7 @@ class Category extends ControllerBase
                 AND m.pageid = c2m.media_pageid
                 AND c.name = :category_name';
 
-        if (Config::$siteInfo['curation'] == 1 && !Tools::isAdmin()) {
+        if (Config::$siteInfo['curation'] == 1) {
             $sql .= " AND m.curated ='1'";
         }
         $sql .= " ORDER BY m.pageid ASC $sqlLimit";
@@ -70,7 +70,7 @@ class Category extends ControllerBase
         $category = $this->smt->database->queryAsArray($sql, $bind);
 
         if (!Tools::isAdmin() && (!$category || !is_array($category))) {
-            $this->smt->fail404('404 Category On Hold');
+            $this->smt->fail404('404 Category Not Found');
         }
 
         /** @noinspection PhpUnusedLocalVariableInspection */
