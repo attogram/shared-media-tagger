@@ -256,6 +256,7 @@ class TaggerAdmin extends Tagger
     public function saveSiteInfo()
     {
         $bind = $set = [];
+        $checkedCuration = false;
         foreach ($_POST as $name => $value) {
             switch ($name) {
                 case 'id':
@@ -274,8 +275,13 @@ class TaggerAdmin extends Tagger
                     } else {
                         $set[] = "curation = '0'";
                     }
+                    $checkedCuration = true;
                     break;
             }
+        }
+
+        if (!$checkedCuration) {
+            $set[] = "curation = '0'"; // unchecked curation box
         }
 
         $set[] = "updated = '" . gmdate('Y-m-d H:i:s') . "'";

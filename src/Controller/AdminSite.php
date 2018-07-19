@@ -11,7 +11,7 @@ class AdminSite extends ControllerBase
     protected function display()
     {
         header('X-XSS-Protection:0');
-        if (isset($_POST) && $_POST) {
+        if (!empty($_POST)) {
             $this->smt->saveSiteInfo();
         }
         $site = $this->smt->database->getSite();
