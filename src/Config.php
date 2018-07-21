@@ -49,8 +49,8 @@ class Config
         self::$links = [
             'admin'         => self::$siteUrl . 'admin',
             'browse'        => self::$siteUrl . 'b',
-            'categories'    => self::$siteUrl . 'categories',
-            'category'      => self::$siteUrl . 'c',
+            'topics'        => self::$siteUrl . 'topics',
+            'topic'         => self::$siteUrl . 'c',
             'home'          => self::$siteUrl . '',
             'info'          => self::$siteUrl . 'i',
             'login'         => self::$siteUrl . 'login',

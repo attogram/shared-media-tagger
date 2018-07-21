@@ -5,8 +5,6 @@
  */
 declare(strict_types = 1);
 
-use Attogram\SharedMedia\Tagger\Tools;
-
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -18,8 +16,7 @@ integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e
 body { background-color:#343a40; }
 a { text-decoration:none !important; color:darkblue; }
 a:hover { background-color:yellow; color:black !important; }
-audio { border:1px solid black; background-color:white; background-clip:content-box; }
-video { border:1px solid black; background-color:white; background-clip:content-box; }
+.hovery:hover { background-color:yellow !important; color:black !important; }
 .nohover:hover { background-color:inherit; color:inherit; }
 .mediatitle { font-size:80%; }
 .attribution { font-size:65%; }
@@ -34,11 +31,6 @@ integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/
 </head>
 <body>
 <div class="container-fluid">
-    <?php if (!empty($this->customSiteHeader)) { ?>
-    <div class="row">
-        <div class="col-12">
-            <?= $this->customSiteHeader ?>
-        </div>
-    </div>
-    <?php } ?>
-
+<?php if (!empty($this->customSiteHeader)) { ?>
+<div class="row"><div class="col"><?= $this->customSiteHeader ?></div></div>
+<?php } ?>

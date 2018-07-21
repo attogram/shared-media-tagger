@@ -6,9 +6,9 @@ namespace Attogram\SharedMedia\Tagger\Controller;
 use Attogram\SharedMedia\Tagger\Config;
 
 /**
- * Class Categories
+ * Class Topics
  */
-class Categories extends ControllerBase
+class Topics extends ControllerBase
 {
     protected function display()
     {
@@ -24,17 +24,17 @@ class Categories extends ControllerBase
             $hidden = 1;
         }
 
-        $categorySize = $this->smt->database->getCategoriesCount(false, $hidden);
-        // @TODO get real selection size, not full category count
+        $topicSize = $this->smt->database->getTopicsCount(false, $hidden);
+        // @TODO get real selection size, not full topic count
 
         $pager = '';
         $sqlLimit = '';
-        if ($categorySize > $pageLimit) {
+        if ($topicSize > $pageLimit) {
             $offset = isset($_GET['o']) ? $_GET['o'] : 0;
             $sqlLimit = " LIMIT $pageLimit OFFSET $offset";
             $pageCount = 0;
             $pager = ': ';
-            for ($count = 0; $count < $categorySize; $count += $pageLimit) {
+            for ($count = 0; $count < $topicSize; $count += $pageLimit) {
                 if ($count == $offset) {
                     $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
                         . '&nbsp;' . ++$pageCount . '&nbsp;</span> ';
@@ -46,8 +46,8 @@ class Categories extends ControllerBase
                     . '">&nbsp;' . ++$pageCount . '&nbsp;</a> ';
             }
         }
-        $pager = '<b>' . number_format((float) $categorySize) . '</b> '
-            . ($hidden ? 'Technical' : 'Active') . ' Categories' . $pager;
+        $pager = '<b>' . number_format((float) $topicSize) . '</b> '
+            . ($hidden ? 'Technical' : 'Active') . ' Topics' . $pager;
 
         $bind = [];
         $sql = 'SELECT id, name, local_files, hidden
@@ -65,15 +65,15 @@ class Categories extends ControllerBase
         $sql .= ' ORDER BY local_files DESC, name ';
         $sql .= $sqlLimit;
 
-        $categories = $this->smt->database->queryAsArray($sql, $bind);
+        $topics = $this->smt->database->queryAsArray($sql, $bind);
 
-        $pageName = number_format((float) $categorySize);
+        $pageName = number_format((float) $topicSize);
         if ($hidden) {
             $pageName .= ' Technical';
         } else {
             $pageName .= ' Active';
         }
-        $pageName .= ' Categories';
+        $pageName .= ' Topics';
         if (isset($pagerCount)) {
             $pageName .= ', page #' . $pagerCount;
         }
@@ -83,7 +83,7 @@ class Categories extends ControllerBase
         $this->smt->includeTemplate('Menu');
 
         /** @noinspection PhpIncludeInspection */
-        include($this->getView('Categories'));
+        include($this->getView('Topics'));
 
         $this->smt->includeFooter();
     }

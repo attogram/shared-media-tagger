@@ -14,13 +14,13 @@ class Info extends ControllerBase
     {
         $vars = $this->smt->router->getVars();
         if (empty($vars[0]) || !Tools::isPositiveNumber($vars[0])) {
-            $this->smt->fail404('404 Media Request Not Found');
+            $this->smt->fail404('Media Request Not Found');
         }
         $pageid = (int) $vars[0];
 
         $media = $this->smt->database->getMedia($pageid);
         if (!$media || !isset($media[0]) || !is_array($media[0])) {
-            $this->smt->fail404('404 Media Not Found');
+            $this->smt->fail404('Media Not Found');
         }
         $media = $media[0];
         $media['imagedescriptionSafe'] = !empty($media['imagedescription'])

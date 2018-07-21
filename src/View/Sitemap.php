@@ -17,15 +17,15 @@ use Attogram\SharedMedia\Tagger\Tools;
     <lastmod><?= $data['time'] ?></lastmod>
     <changefreq>always</changefreq>
 </url>
-<url><loc><?= $data['protocol'] . Tools::url('categories') ?></loc></url>
+<url><loc><?= $data['protocol'] . Tools::url('topics') ?></loc></url>
 <url><loc><?= $data['protocol'] . Tools::url('browse') ?></loc></url>
 <url><loc><?= $data['protocol'] . Tools::url('scores') ?></loc></url>
 <?php
 
-foreach ($data['categories'] as $category) {
+foreach ($data['topics'] as $category) {
     print '<url><loc>' . $data['protocol']
-        . Tools::url('category') . '/'
-        . Tools::categoryUrlencode(Tools::stripPrefix($category['name']))
+        . Tools::url('topic') . '/'
+        . Tools::topicUrlencode(Tools::stripPrefix($category['name']))
         . '</loc></url>';
 }
 

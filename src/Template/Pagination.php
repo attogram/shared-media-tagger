@@ -35,7 +35,7 @@ if ($data['pages'] < 2) {
         <?php for ($page = 3; $page <= $data['pages']; $page++) {
             if ($data['pages'] > 10) {
                 $diff = abs($data['page'] - $page);
-                if ($diff > 8) {
+                if ($diff > 9) {
                     continue;
                 }
             }

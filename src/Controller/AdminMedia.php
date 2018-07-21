@@ -22,19 +22,19 @@ class AdminMedia extends ControllerBase
 
         if (!empty($_GET['am'])) {
             $data['result'] = $this->smt->addMedia($_GET['am']);
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->database->updateTopicsLocalFilesCount();
         }
         if (!empty($_GET['media'])) {
             $data['result'] = $this->multiDeleteMedia($_GET['media']);
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->database->updateTopicsLocalFilesCount();
         }
         if (!empty($_GET['dm'])) {
             $data['result'] = $this->smt->database->deleteMedia($_GET['dm']);
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->database->updateTopicsLocalFilesCount();
         }
         if (!empty($_GET['dc'])) {
-            $data['result'] = $this->deleteMediaInCategory(Tools::categoryUrldecode($_GET['dc']));
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $data['result'] = $this->deleteMediaInTopic(Tools::topicUrldecode($_GET['dc']));
+            $this->smt->database->updateTopicsLocalFilesCount();
         }
 
         /** @noinspection PhpIncludeInspection */
@@ -62,17 +62,17 @@ class AdminMedia extends ControllerBase
     }
 
     /**
-     * @param string $category_name
+     * @param string $topic_name
      * @return string
      */
-    public function deleteMediaInCategory($category_name)
+    public function deleteMediaInTopic($topic_name)
     {
-        if (!$category_name || !is_string($category_name)) {
-            return 'Invalid Category Name';
+        if (!$topic_name || !is_string($topic_name)) {
+            return 'Invalid Topic Name';
         }
-        $return = '<br />Deleting Media in <b>' . $category_name . '</b>';
-        $media = $this->smt->database->getMediaInCategory($category_name);
-        $return .= '<br /><b>' . count($media) . '</b> Media files found in Category';
+        $return = '<br />Deleting Media in <b>' . $topic_name . '</b>';
+        $media = $this->smt->database->getMediaInTopic($topic_name);
+        $return .= '<br /><b>' . count($media) . '</b> Media files found in Topic';
         foreach ($media as $pageid) {
             $return .= '<br />Deleting #' . $pageid;
             $return .= $this->smt->database->deleteMedia($pageid, true);

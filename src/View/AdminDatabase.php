@@ -11,7 +11,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="row bg-white">
-    <div class="col-12 mb-4">
+    <div class="col mb-4">
         <p>Database Admin</p>
         <ul>
             <li>File: <kbd><?= $data['databaseName'] ?></kbd></li>
@@ -43,8 +43,8 @@ use Attogram\SharedMedia\Tagger\Tools;
                        class="text-dark" href="?a=eu">EMPTY User tables</a></li>
                 <li><a onclick="return confirm('Confirm: EMPTY Media tables?');"
                        class="text-dark" href="?a=em">EMPTY Media tables</a></li>
-                <li><a onclick="return confirm('Confirm: EMPTY Category tables?');"
-                       class="text-dark" href="?a=ec">EMPTY Category tables</a></li>
+                <li><a onclick="return confirm('Confirm: EMPTY Topic tables?');"
+                       class="text-dark" href="?a=ec">EMPTY Topic tables</a></li>
                 <li><a onclick="return confirm('Confirm: DROP tables?');"
                        class="text-dark" href="?a=d">DROP ALL tables</a></li>
             </ul>

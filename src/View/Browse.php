@@ -18,7 +18,7 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="row bg-white">
-    <div class="col-12">
+    <div class="col">
     <form class="form-inline">
         Browse Files -
         <select name="s">
@@ -77,7 +77,7 @@ if (Tools::isAdmin()) {
             }
             print '</span><br />';
         }
-        $this->smt->includeThumbnailBox($media);
+        $this->smt->includeTemplate('Thumbnail', $media);
         if (isset($extra)) {
             print '</div>';
         }

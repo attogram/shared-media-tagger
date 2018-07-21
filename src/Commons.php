@@ -16,7 +16,7 @@ class Commons
     private $database;
     private $propImageinfo;
 
-    public $categories;
+    public $topics;
     public $commonsApiUrl;
     public $totalHits;
     public $continue;
@@ -124,18 +124,18 @@ class Commons
      * @param $category
      * @return array
      */
-    public function getApiCategorymembers($category)
+    public function getApiTopicmembers($topic)
     {
         $url = $this->commonsApiUrl . '?action=query&format=json'
             . '&list=categorymembers'
             . '&cmtype=file'
             . '&cmprop=ids'
             . '&cmlimit=500'
-            . '&cmtitle=' . urlencode($category);
+            . '&cmtitle=' . urlencode($topic);
         if (!$this->callCommons($url, 'categorymembers')
             || !isset($this->response['query']['categorymembers'])
         ) {
-            Tools::error('getApiCategorymembers: ERROR: call');
+            Tools::error('getApiTopicmembers: ERROR: call');
 
             return [];
         }
@@ -202,10 +202,10 @@ class Commons
      * @param int|string $pageid
      * @return bool
      */
-    public function getCategoriesFromMedia($pageid)
+    public function getTopicsFromMedia($pageid)
     {
         if (!$pageid || !Tools::isPositiveNumber($pageid)) {
-            Tools::error('getCategoriesFromMedia: invalid pageid');
+            Tools::error('getTopicsFromMedia: invalid pageid');
 
             return false;
         }
@@ -214,11 +214,11 @@ class Commons
             . '&pageids=' . $pageid
         ;
         if (!$this->callCommons($call, 'pages')) {
-            Tools::error('getCategoriesFromMedia: nothing found');
+            Tools::error('getTopicsFromMedia: nothing found');
 
             return false;
         }
-        $this->categories = !empty($this->response['query']['pages'][$pageid]['categories'])
+        $this->topics = !empty($this->response['query']['pages'][$pageid]['categories'])
             ? $this->response['query']['pages'][$pageid]['categories']
             : null;
 
@@ -229,24 +229,24 @@ class Commons
      * @param string $category
      * @return array
      */
-    public function getCategoryInfo($category)
+    public function getTopicInfo($category)
     {
         if (!$category || $category=='' || !is_string($category)) {
-            Tools::error('getCategoryInfo: no category');
+            Tools::error('getTopicInfo: no category');
 
             return [];
         }
         $call = $this->commonsApiUrl
             . '?action=query&format=json&prop=categoryinfo&titles=' . urlencode($category); // @TODO cicontinue
         if (!$this->callCommons($call, 'pages')) {
-            Tools::error('getCategoryInfo: API: nothing found');
+            Tools::error('getTopicInfo: API: nothing found');
 
             return [];
         }
         if (isset($this->response['query']['pages'])) {
             return $this->response['query']['pages'];
         }
-        Tools::error('getCategoryInfo: API: no pages');
+        Tools::error('getTopicInfo: API: no pages');
 
         return [];
     }
@@ -278,7 +278,7 @@ class Commons
             return false;
         }
         foreach ($this->response['query']['categorymembers'] as $subcat) {
-            $this->database->insertCategory($subcat['title']);
+            $this->database->insertTopic($subcat['title']);
         }
 
         return true;
@@ -288,21 +288,21 @@ class Commons
      * @param string $search
      * @return bool
      */
-    public function findCategories($search = '')
+    public function findTopics($search = '')
     {
         if (!$search || $search == '' || !is_string($search)) {
-            Tools::error('findCategories: invalid search string: ' . $search);
+            Tools::error('findTopics: invalid search string: ' . $search);
 
             return false;
         }
         $call = $this->commonsApiUrl . '?action=query&format=json'
             . '&list=search'
-            . '&srnamespace=14' // 6 = File   14 = Category
+            . '&srnamespace=14' // 6 = File   14 = Topic
             . '&srprop=size|snippet' // titlesnippet|timestamp|title
             . '&srlimit=500'
             . '&srsearch=' . urlencode($search);
         if (!$this->callCommons($call, 'search')) {
-            Tools::error('findCategories: nothing found');
+            Tools::error('findTopics: nothing found');
 
             return false;
         }

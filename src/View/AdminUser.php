@@ -11,7 +11,7 @@ declare(strict_types = 1);
 ?>
 <form method="POST">
 <div class="row bg-white">
-    <div class="col-12 mb-4">
+    <div class="col mb-4">
         <p>
             <b><?= count($users) ?></b> Users
         </p>

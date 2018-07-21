@@ -12,14 +12,14 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="row bg-white">
-    <div class="col-12">
+    <div class="col">
         <p>
             <b><?= sizeof($data['blocks']) ?></b> Blocked Media
         </p>
     </div>
 </div>
 <div class="row bg-white">
-    <div class="col-12">
+    <div class="col">
         <?php
 
         $thumbSize = 57;

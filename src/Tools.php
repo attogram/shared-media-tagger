@@ -122,12 +122,12 @@ class Tools
     }
 
     /**
-     * @param string $category
+     * @param string $topic
      * @return string
      */
-    public static function categoryUrldecode($category)
+    public static function topicUrldecode($topic)
     {
-        $decoded = $category;
+        $decoded = $topic;
         $decoded = str_replace('_', ' ', $decoded);
         $decoded = urldecode($decoded);
 
@@ -135,12 +135,12 @@ class Tools
     }
 
     /**
-     * @param string $category
+     * @param string $topic
      * @return string
      */
-    public static function categoryUrlencode($category)
+    public static function topicUrlencode($topic)
     {
-        $encoded = $category;
+        $encoded = $topic;
         $encoded = urlencode($encoded);
         $encoded = str_replace('+', '_', $encoded);
         $encoded = str_replace('%3A', ':', $encoded);

@@ -2,12 +2,12 @@
 declare(strict_types = 1);
 /**
  * Shared Media Tagger
- * Categories
+ * Topics
  *
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
  * @var bool $hidden
  * @var string $search
- * @var array $categories
+ * @var array $topics
  * @var string $pager
  * @var string $search
  */
@@ -15,11 +15,11 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="row bg-white">
-    <div class="col-12">
+    <div class="col">
         <div style="padding:10px 0 10px 0;float:right;">
             <form method="GET">
-                <a href="<?php print Tools::url('categories'); ?>" style="font-size:80%;">Active</a> &nbsp;
-                <a href="<?php print Tools::url('categories'); ?>?h=1" style="font-size:80%;">Tech</a> &nbsp;
+                <a href="<?php print Tools::url('topics'); ?>" style="font-size:80%;">Active</a> &nbsp;
+                <a href="<?php print Tools::url('topics'); ?>?h=1" style="font-size:80%;">Tech</a> &nbsp;
                 <?php
                 if ($hidden) {
                     print '<input type="hidden" name="h" value="1">';
@@ -37,20 +37,20 @@ use Attogram\SharedMedia\Tagger\Tools;
             <thead>
                 <tr>
                     <th scope="col">Files</th>
-                    <th scope="col">Category</th>
+                    <th scope="col">Topic</th>
                 </tr>
             </thead>
             <tbody>
             <?php
-            foreach ($categories as $category) {
+            foreach ($topics as $category) {
                 if (!isset($category['name'])) {
                     continue;
                 }
                 if (!isset($category['local_files'])) {
                     $category['local_files'] = 0;
                 }
-                $localUrl = Tools::url('category') . '/'
-                    . Tools::categoryUrlencode(Tools::stripPrefix($category['name']));
+                $localUrl = Tools::url('topic') . '/'
+                    . Tools::topicUrlencode(Tools::stripPrefix($category['name']));
                 ?>
                 <tr data-href="<?= $localUrl ?>">
                     <th scope="row"><?=  number_format((float) $category['local_files']) ?></th>
@@ -65,8 +65,8 @@ use Attogram\SharedMedia\Tagger\Tools;
             <?= $pager ?>
         </p>
         <p class="center" style="padding:10px;">
-            <a href="<?= Tools::url('categories') ?>">Active Categories</a>
-            -  <a href="<?= Tools::url('categories') ?>?h=1">Technical Categories</a>
+            <a href="<?= Tools::url('topics') ?>">Active Topics</a>
+            -  <a href="<?= Tools::url('topics') ?>?h=1">Technical Topics</a>
         </p>
     </div>
 </div>

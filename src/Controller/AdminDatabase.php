@@ -55,8 +55,8 @@ class AdminDatabase extends ControllerBase
                     $data['result'] = 'Emptied Media Tables';
                     break;
                 case 'ec':
-                    $this->smt->database->emptyCategoryTables();
-                    $data['result'] = 'Emptied Category Tables';
+                    $this->smt->database->emptyTopicTables();
+                    $data['result'] = 'Emptied Topic Tables';
                     break;
                 case 'et':
                     $this->smt->database->emptyTaggingTables();

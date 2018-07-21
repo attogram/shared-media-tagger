@@ -193,7 +193,7 @@ class Database
      * @param int $hidden
      * @return int
      */
-    public function getCategoriesCount($redo = false, $hidden = 0)
+    public function getTopicsCount($redo = false, $hidden = 0)
     {
         if (isset($this->categoryCount) && !$redo) {
             return $this->categoryCount;
@@ -445,7 +445,7 @@ class Database
      * @param string $name
      * @return array
      */
-    public function getCategory($name)
+    public function getTopic($name)
     {
         $response = $this->queryAsArray(
             'SELECT * FROM category WHERE name = :name',
@@ -462,7 +462,7 @@ class Database
      * @param string $categoryName
      * @return int
      */
-    public function getCategorySize($categoryName)
+    public function getTopicSize($categoryName)
     {
         $sql = 'SELECT count(c2m.id) AS size
                 FROM category2media AS c2m, category AS c
@@ -480,7 +480,7 @@ class Database
         if (isset($response[0]['size'])) {
             return $response[0]['size'];
         }
-        Tools::error("getCategorySize($categoryName) ERROR: 0 size");
+        Tools::error("getTopicSize($categoryName) ERROR: 0 size");
 
         return 0;
     }
@@ -490,7 +490,7 @@ class Database
      * @param bool $onlyHidden
      * @return array
      */
-    public function getMediaCategories($pageid, $onlyHidden = false)
+    public function getMediaTopics($pageid, $onlyHidden = false)
     {
         if (!$pageid|| !Tools::isPositiveNumber($pageid)) {
             return [];
@@ -510,19 +510,19 @@ class Database
         if (!isset($response[0]['name'])) {
             return [];
         }
-        $categories = [];
+        $topics = [];
         foreach ($response as $category) {
-            $categories[] = $category['name'];
+            $topics[] = $category['name'];
         }
 
-        return $categories;
+        return $topics;
     }
 
     /**
      * @param string $categoryName
      * @return int
      */
-    public function getCategoryIdFromName($categoryName)
+    public function getTopicIdFromName($categoryName)
     {
         $response = $this->queryAsArray(
             'SELECT id FROM category WHERE name = :name',
@@ -539,11 +539,11 @@ class Database
      * @param string $categoryName
      * @return array
      */
-    public function getMediaInCategory($categoryName)
+    public function getMediaInTopic($categoryName)
     {
-        $categoryId = $this->getCategoryIdFromName($categoryName);
+        $categoryId = $this->getTopicIdFromName($categoryName);
         if (!$categoryId) {
-            Tools::error('getMediaInCategory: No ID found for: ' . $categoryName);
+            Tools::error('getMediaInTopic: No ID found for: ' . $categoryName);
 
             return [];
         }
@@ -573,10 +573,10 @@ class Database
      * @return int
      * @TODO UNUSED
      */
-    public function getCountLocalFilesPerCategory($categoryIdArray)
+    public function getCountLocalFilesPerTopic($categoryIdArray)
     {
         if (!is_array($categoryIdArray)) {
-            Tools::error('getCountLocalFilesPerCategory: invalid category array');
+            Tools::error('getCountLocalFilesPerTopic: invalid category array');
 
             return 0;
         }
@@ -597,7 +597,7 @@ class Database
      * @param string $categoryName
      * @return bool
      */
-    public function isHiddenCategory($categoryName)
+    public function isHiddenTopic($categoryName)
     {
         if (!$categoryName) {
             return false;
@@ -698,7 +698,7 @@ class Database
      * @param int|string $categoryId
      * @return array
      */
-    public function getDbVotesPerCategory($categoryId)
+    public function getDbVotesPerTopic($categoryId)
     {
         return $this->queryAsArray(
             'SELECT count(t.id) AS count, tag.*

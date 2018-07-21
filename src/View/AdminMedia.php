@@ -8,7 +8,7 @@ declare(strict_types = 1);
  */
 ?>
 <div class="row bg-white">
-    <div class="col-12 mb-4">
+    <div class="col mb-4">
     <p>
         Media Admin:
     </p>
@@ -30,9 +30,9 @@ declare(strict_types = 1);
     <br />
     <br />
     <form action="" method="GET">
-        * Delete &amp; Block All Media in Category:
+        * Delete &amp; Block All Media in Topic:
         <input type="text" name="dc" value="" size="30" />
-        <input type="submit" value="  Delete via Category Name  "/>
+        <input type="submit" value="  Delete via Topic Name  "/>
     </form>
     <p>
         * <a href="./media-blocked">View/Edit Blocked Media</a>

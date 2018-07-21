@@ -6,9 +6,9 @@ namespace Attogram\SharedMedia\Tagger\Controller;
 use Attogram\SharedMedia\Tagger\Tools;
 
 /**
- * Class AdminCategory
+ * Class AdminTopic
  */
-class AdminCategory extends ControllerBase
+class AdminTopic extends ControllerBase
 {
     protected function display()
     {
@@ -16,22 +16,22 @@ class AdminCategory extends ControllerBase
             set_time_limit(1000);
         }
 
-        $this->smt->title = 'Category Admin';
+        $this->smt->title = 'Topic Admin';
         $this->smt->includeHeader();
         $this->smt->includeTemplate('Menu');
         $this->smt->includeTemplate('AdminMenu');
 
 
-        // Import images from a category
+        // Import images from a topic
         if (isset($_GET['i']) && $_GET['i']) {
             print '<div class="container-fluid bg-white">';
-            $categoryName = Tools::categoryUrldecode($_GET['i']);
-            $catUrl = '<a href="' . Tools::url('category')
-                . '/' . Tools::categoryUrlencode(Tools::stripPrefix($categoryName)) . '">'
-                . htmlentities((string) Tools::stripPrefix($categoryName)) . '</a>';
+            $topicName = Tools::topicUrldecode($_GET['i']);
+            $catUrl = '<a href="' . Tools::url('topic')
+                . '/' . Tools::topicUrlencode(Tools::stripPrefix($topicName)) . '">'
+                . htmlentities((string) Tools::stripPrefix($topicName)) . '</a>';
             Tools::debug('Importing media from <b>' . $catUrl . '</b>');
-            $this->smt->database->getMediaFromCategory($categoryName);
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->database->getMediaFromTopic($topicName);
+            $this->smt->database->updateTopicsLocalFilesCount();
             Tools::debug('Imported media from <b>' . $catUrl . '</b>');
             print '</div>';
             $this->smt->includeFooter();
@@ -40,8 +40,8 @@ class AdminCategory extends ControllerBase
 
         if (isset($_POST['cats']) && $_POST['cats']) {
             print '<div class="container-fluid bg-white">';
-            $this->smt->importCategories($_POST['cats']);
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->importTopics($_POST['cats']);
+            $this->smt->database->updateTopicsLocalFilesCount();
             print '</div>';
             $this->smt->includeFooter();
             Tools::shutdown();
@@ -49,11 +49,11 @@ class AdminCategory extends ControllerBase
 
         if (isset($_GET['c']) && $_GET['c']) {
             print '<div class="container-fluid bg-white">';
-            if ($this->smt->database->saveCategoryInfo(urldecode($_GET['c']))) {
+            if ($this->smt->database->saveTopicInfo(urldecode($_GET['c']))) {
                 Tools::notice(
-                    'OK: Refreshed Category Info: <b><a href="' . Tools::url('category')
-                    . '/' . Tools::stripPrefix(Tools::categoryUrlencode($_GET['c'])) . '">'
-                    . htmlentities((string) Tools::categoryUrldecode($_GET['c'])) . '</a></b>'
+                    'OK: Refreshed Topic: <b><a href="' . Tools::url('topic')
+                    . '/' . Tools::stripPrefix(Tools::topicUrlencode($_GET['c'])) . '">'
+                    . htmlentities((string) Tools::topicUrldecode($_GET['c'])) . '</a></b>'
                 );
             }
             print '</div>';
@@ -63,8 +63,8 @@ class AdminCategory extends ControllerBase
 
         if (isset($_GET['d']) && $_GET['d']) {
             print '<div class="container-fluid bg-white">';
-            $this->smt->database->deleteCategory($_GET['d']);
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->database->deleteTopic($_GET['d']);
+            $this->smt->database->updateTopicsLocalFilesCount();
             print '</div>';
             $this->smt->includeFooter();
             Tools::shutdown();
@@ -80,8 +80,8 @@ class AdminCategory extends ControllerBase
 
         if (isset($_GET['sc']) && $_GET['sc']) {
             print '<div class="container-fluid bg-white">';
-            $this->smt->commons->getSubcats(Tools::categoryUrldecode($_GET['sc']));
-            $this->smt->database->updateCategoriesLocalFilesCount();
+            $this->smt->commons->getSubcats(Tools::topicUrldecode($_GET['sc']));
+            $this->smt->database->updateTopicsLocalFilesCount();
             print '</div>';
             $this->smt->includeFooter();
             Tools::shutdown();
@@ -91,9 +91,9 @@ class AdminCategory extends ControllerBase
 
         if (isset($_GET['g']) && $_GET['g']=='all') {
             print '<div class="container-fluid bg-white">';
-            Tools::notice('refresh Info for all categories');
+            Tools::notice('refresh Info for all topics');
             $toget = [];
-            $cats = $this->smt->database->queryAsArray('SELECT * FROM category ' . $orderBy);
+            $cats = $this->smt->database->queryAsArray('SELECT * FROM topic ' . $orderBy);
             foreach ($cats as $cat) {
                 if ($cat['subcats'] != '' && $cat['files'] != '' && $cat['pageid'] != '') {
                     continue;
@@ -105,10 +105,10 @@ class AdminCategory extends ControllerBase
             }
             $_GET['c'] = implode('|', $toget);
             //Tools::notice('refreshing: ' . $_GET['c']);
-            $categoryInfo = $this->smt->commons->getCategoryInfo($_GET['c']);
-            //Tools::debug('got categoryInfo: <pre>' . print_r($categoryInfo, true) . '</pre>');
+            $topicInfo = $this->smt->commons->getTopicInfo($_GET['c']);
+            //Tools::debug('got topicInfo: <pre>' . print_r($topicInfo, true) . '</pre>');
 
-            Tools::error('@TODO - import categoryInfo to DB');
+            Tools::error('@TODO - import topicInfo to DB');
             print '</div>';
             $this->smt->includeFooter();
             Tools::shutdown();
@@ -117,14 +117,14 @@ class AdminCategory extends ControllerBase
 
         if (isset($_GET['sca']) && $_GET['sca']=='all') {
             $sql = 'SELECT * FROM category WHERE subcats > 0 ' . $orderBy;
-            Tools::notice('SHOWING only categories with subcategories');
+            Tools::notice('SHOWING only topics with subtopics');
         } elseif (isset($_GET['wf'])) {
             $sql = 'SELECT * FROM category WHERE files > 0 ' . $orderBy;
-            Tools::notice('SHOWING only categories with files');
+            Tools::notice('SHOWING only topics with files');
         } elseif (isset($_GET['s'])) {
             $sql = 'SELECT * FROM category WHERE name LIKE :search ' . $orderBy;
             $bind = [':search'=>'%' . $_GET['s']. '%'];
-            Tools::notice('SHOWING only categories with search text: ' . $_GET['s']);
+            Tools::notice('SHOWING only topics with search text: ' . $_GET['s']);
         } else {
             $sql = 'SELECT * FROM category ' . $orderBy;
         }
@@ -138,7 +138,7 @@ class AdminCategory extends ControllerBase
         }
 
         /** @noinspection PhpIncludeInspection */
-        include($this->getView('AdminCategory'));
+        include($this->getView('AdminTopic'));
 
         $this->smt->includeFooter();
     }

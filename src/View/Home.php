@@ -20,15 +20,15 @@ use Attogram\SharedMedia\Tagger\Tools;
         </p>
         <p>
             <a href="<?= Tools::url('scores') ?>"><kbd>⊜</kbd></a>
-            <a href="<?= Tools::url('scores') ?>"><?= $data['countVotes']; ?> Scores</a>
+            <a href="<?= Tools::url('scores') ?>"><?= $data['countVotes']; ?> Votes</a>
         </p>
         <p>
             <a href="<?= Tools::url('browse') ?>"><kbd>⊞</kbd></a>
             <a href="<?= Tools::url('browse') ?>"><?= $data['countFiles']; ?> Files</a>
         </p>
         <p>
-            <a href="<?= Tools::url('categories') ?>"><kbd>⋈</kbd></a>
-            <a href="<?= Tools::url('categories') ?>"><?= $data['countCategories']; ?> Topics</a>
+            <a href="<?= Tools::url('topics') ?>"><kbd>⋈</kbd></a>
+            <a href="<?= Tools::url('topics') ?>"><?= $data['countTopics']; ?> Topics</a>
         </p>
         <form method="GET" action="<?= Tools::url('search') ?>">
         <p>
@@ -45,7 +45,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <div class="col-6">
         <?php
         foreach ($data['random'] as $media) {
-            $this->smt->includeThumbnailBox($media);
+            $this->smt->includeTemplate('Thumbnail', $media);
         }
         ?>
     </div>

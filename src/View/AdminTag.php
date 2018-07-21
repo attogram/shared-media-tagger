@@ -16,22 +16,18 @@ $smt->includeHeader();
 $smt->includeTemplate('Menu');
 $smt->includeTemplate('AdminMenu');
 
+if (isset($_GET['tagid']) && Tools::isPositiveNumber($_GET['tagid'])) {
+    $smt->saveTag();
+}
+
 $tags = $smt->database->getTags();
 ?>
 <div class="row bg-white">
-    <div class="col-12 mb-4">
-        <?php
-        if (isset($_GET['tagid']) && Tools::isPositiveNumber($_GET['tagid'])) {
-            $smt->saveTag();
-            $tags = $smt->database->getTags();
-        }
-        ?>
-        <br />
+    <div class="col mb-4">
         <em>Tags preview:</em>
         <div class="bg-secondary">
             <?php $smt->includeTags(0); ?>
         </div>
-
         <br />
         <em>Tags setup:</em>
         <table border="1" style="margin:0;">

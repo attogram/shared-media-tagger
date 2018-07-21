@@ -21,7 +21,7 @@ class Home extends ControllerBase
         $data['name'] = !empty($data['name']) ? $data['name'] : 'Shared Media Tagger';
         $data['random'] = $this->smt->database->getRandomMedia(4);
         $data['countFiles'] = number_format((float) $this->smt->database->getFileCount());
-        $data['countCategories'] = number_format((float) $this->smt->database->getCategoriesCount());
+        $data['countTopics'] = number_format((float) $this->smt->database->getTopicsCount());
         $data['countVotes'] = number_format((float) $this->smt->database->getTotalVotesCount());
         $this->smt->title = Config::$siteName;
         $this->smt->includeHeader();

@@ -29,11 +29,9 @@ class Tagger
     /** @var string */
     public $customSiteHeader;
     /** @var string */
-    public $category;
+    public $topic;
     /** @var int|string */
     public $mediaId;
-    /** @var array */
-    public $media;
     /** @var array */
     public $tags;
 
@@ -63,7 +61,6 @@ class Tagger
         Config::setSiteInfo($siteInfo);
 
         $this->database->getUser();
-
     }
 
     /**
@@ -143,21 +140,21 @@ class Tagger
     }
 
     /**
-     * @param string $categoryName
+     * @param string $topicName
      */
-    public function includeAdminCategoryFunctions(string $categoryName)
+    public function includeAdminTopicFunctions(string $topicName)
     {
         if (!Tools::isAdmin()) {
             return;
         }
-        $this->category = $this->database->getCategory($categoryName);
-        if (!$this->category) {
-            Tools::error('ADMIN: category not in database');
+        $this->topic = $this->database->getTopic($topicName);
+        if (!$this->topic) {
+            Tools::error('ADMIN: topic not in database');
 
             return;
         }
 
-        $this->includeTemplate('AdminCategoryFunctions');
+        $this->includeTemplate('AdminTopicFunctions');
     }
 
     /**
@@ -165,24 +162,24 @@ class Tagger
      * @param bool $onlyHidden
      * @return string
      */
-    public function displayCategories($mediaId, $onlyHidden = false)
+    public function displayTopics($mediaId, $onlyHidden = false)
     {
         if (!$mediaId || !Tools::isPositiveNumber($mediaId)) {
             return '';
         }
-        $cats = $this->database->getMediaCategories($mediaId, $onlyHidden);
+        $cats = $this->database->getMediaTopics($mediaId, $onlyHidden);
         if (!$cats) {
             return '';
         }
         $response = '';
         foreach ($cats as $cat) {
             $response .= ''
-            . '&nbsp;&nbsp; + <a href="' . Tools::url('category')
-            . '/' . Tools::categoryUrlencode(Tools::stripPrefix($cat)) . '">'
+            . '&nbsp;&nbsp; + <a href="' . Tools::url('topic')
+            . '/' . Tools::topicUrlencode(Tools::stripPrefix($cat)) . '">'
             . Tools::stripPrefix($cat) . '</a><br />';
         }
 
-        return $response; // . '</div>';
+        return $response;
     }
 
     /**
@@ -235,15 +232,6 @@ class Tagger
         }
 
         return $score;
-    }
-
-    /**
-     * @param array $media
-     */
-    public function includeThumbnailBox(array $media)
-    {
-        $this->media = $media;
-        $this->includeTemplate('Thumbnail');
     }
 
     /**
@@ -428,14 +416,14 @@ class Tagger
     public function includeTemplate($name, array $data = [])
     {
         $view = Config::$sourceDirectory . '/Template/' . $name . '.php';
-        if (!is_readable($view)) {
-            Tools::error('Template Not Found: ' . $name);
+        if (is_readable($view)) {
+            /** @noinspection PhpIncludeInspection */
+            include($view);
 
             return;
         }
 
-        /** @noinspection PhpIncludeInspection */
-        include($view);
+        Tools::error('Template Not Found: ' . $name);
     }
 
     /**
@@ -447,9 +435,9 @@ class Tagger
         header('HTTP/1.0 404 Not Found');
         $this->includeHeader(false);
         if (!$message || !is_string($message)) {
-            $message = '404 Not Found';
+            $message = 'Page Not Found';
         }
-        print '<div class="center" style="background-color:yellow; color:black;">'
+        print '<div class="bg-black text-white text-center p-5">'
             . '<h1>' . $message . '</h1>';
         if ($extra && is_string($extra)) {
             print '<br />' . $extra;

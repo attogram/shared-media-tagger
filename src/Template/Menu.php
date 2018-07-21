@@ -16,6 +16,9 @@ use Attogram\SharedMedia\Tagger\Tools;
             $this->getUserScore()
             ?>%</span>
         <div class="d-none d-md-inline mr-2 text-info">completed</div>
+        <?php if (Tools::isAdmin()) { ?>
+            <a class="text-white ml-3" href="<?= Tools::url('admin') ?>" title="Admin">🔧</a>
+        <?php } ?>
     </div>
     <div class="col-5 col-sm-7 text-right">
         <a class="text-white pr-1 pl-1" href="<?= Tools::url('random') ?>" title="Random File">
@@ -30,20 +33,15 @@ use Attogram\SharedMedia\Tagger\Tools;
             <div class="d-none d-md-inline"><?= $this->database->getFileCount() ?></div>
             <div class="d-none d-sm-inline mr-2">Files</div>
         </a>
-        <a class="text-white text-nowrap pr-1 pl-1" href="<?= Tools::url('categories') ?>" title="Topics">
+        <a class="text-white text-nowrap pr-1 pl-1" href="<?= Tools::url('topics') ?>" title="Topics">
             ⋈
-            <div class="d-none d-md-inline"><?= $this->database->getCategoriesCount() ?></div>
+            <div class="d-none d-md-inline"><?= $this->database->getTopicsCount() ?></div>
             <div class="d-none d-sm-inline mr-2">Topics</div>
         </a>
         <a class="text-white text-nowrap pr-1 pl-1" href="<?= Tools::url('scores') ?>" title="Scores">
             ⊜
             <div class="d-none d-md-inline"><?= $this->database->getTotalVotesCount() ?></div>
-            <div class="d-none d-sm-inline">Scores</div>
+            <div class="d-none d-sm-inline">Votes</div>
         </a>
-        <?php if (Tools::isAdmin()) { ?>
-            <a class="text-white text-nowrap pl-1" href="<?= Tools::url('admin') ?>" title="Admin">
-                🔧
-            </a>
-        <?php } ?>
     </div>
 </div>

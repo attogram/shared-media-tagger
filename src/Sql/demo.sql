@@ -15,18 +15,20 @@ INSERT OR REPLACE INTO site (id, name, about) VALUES (
         '<code>cp config.admin.example.php /secure/location/config.admin.php</code></li>' ||
     '<li>Edit <code>config.admin.php</code>: create your admin username/password logins.  ' ||
       'Default logins are: admin1/admin1, admin2/admin2</li>' ||
-    '<li><a href="login/">Login to the Curators Backend</a></li>' ||
+    '<li>Login system is now enabled and you may <a href="login/">login to the 🔧 Curators Backend</a></li>' ||
   '</ol>' ||
 '</p>' ||
-'<p>Setup your site:' ||
+'<p>Setup your site in the <a href="login/">🔧 Curators Backend</a>:' ||
   '<ul>' ||
-    '<li><a href="admin/site">SITE admin</a>: site name, this about message, headers, footers, curation mode on/off</li>' ||
-    '<li><a href="admin/category">CATEGORY admin</a>: find categories, import category info, import media from category, and more</li>' ||
-    '<li><a href="admin/tag">TAGS admin</a>: voting tag bar settings</li>' ||
-    '<li><a href="admin/media">MEDIA admin</a>: add media, and more</li>' ||
-    '<li><a href="admin/curate">CURATE admin</a>: Lightboard curation tool</li>' ||
-    '<li><a href="admin/user">USER admin</a>: view and delete users</li>' ||
-    '<li><a href="admin/database">DATABASE admin</a>: db tools</li>' ||
+    '<li><a href="admin/">Dashboard</a>: info on installation, site stats, discovery files</li>' ||
+    '<li><a href="admin/site">SITE</a>: site name, about message, headers, footers, curation mode</li>' ||
+    '<li><a href="admin/add">ADD</a>: find topics and media to add to collection' ||
+    '<li><a href="admin/topic">TOPICS</a>: deprecated - find topics, import topic info, import media from topic, and more</li>' ||
+    '<li><a href="admin/tag">TAGS</a>: voting tag bar settings</li>' ||
+    '<li><a href="admin/media">MEDIA</a>: add media, and more</li>' ||
+    '<li><a href="admin/curate">CURATE</a>:curation tool</li>' ||
+    '<li><a href="admin/user">USERS</a>: view and delete users</li>' ||
+    '<li><a href="admin/database">DATABASE</a>: info and tools, download database,</li>' ||
   '</ul>' ||
 '</p>'
 );

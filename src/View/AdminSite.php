@@ -9,7 +9,7 @@ declare(strict_types = 1);
 ?>
 <form action="" method="POST">
 <div class="row bg-white">
-    <div class="col-12 mb-4">
+    <div class="col mb-4">
         <input type="hidden" name="id" value="<?= $site['id'] ?>">
         <input type="submit" value="           Save Site Setup           ">
         <br />

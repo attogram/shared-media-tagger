@@ -13,6 +13,11 @@ class AdminCurate extends ControllerBase
 {
     protected function display()
     {
+        $this->smt->title = 'Curation Admin';
+        $this->smt->includeHeader();
+        $this->smt->includeTemplate('Menu');
+        $this->smt->includeTemplate('AdminMenu');
+
         $data = [];
 
         if (isset($_GET) && $_GET) {
@@ -45,7 +50,7 @@ class AdminCurate extends ControllerBase
             $data['medias'] = $this->smt->database->queryAsArray($sql);
         }
 
-        $data['menu'] = '<div style="background-color:#ddd; color:black; padding-left:10px;">'
+        $data['menu'] = '<div class="bg-info p-1">'
             . '<input type="submit" value="          Curate Marked Files        " />'
             . ' <span style="display:inline-block; font-size:90%;">Mark ALL '
             . ' <a href="javascript:mark_all_keep();">[KEEP]</a>'
@@ -54,11 +59,6 @@ class AdminCurate extends ControllerBase
             . ' - <a href="./curate?l=' . $pageLimit.'">' . $pageLimit . '</a> of '
             . number_format((float) $uncuratedCount) . ' in que'
             . '</div>';
-
-        $this->smt->title = 'Curation Admin';
-        $this->smt->includeHeader();
-        $this->smt->includeTemplate('Menu');
-        $this->smt->includeTemplate('AdminMenu');
 
         /** @noinspection PhpIncludeInspection */
         include($this->getView('AdminCurate'));
@@ -115,7 +115,7 @@ class AdminCurate extends ControllerBase
             $smt->database->deleteMedia($pageid);
         }
         Tools::notice('Curate: DELETE ' . sizeof($id_array));
-        $smt->database->updateCategoriesLocalFilesCount();
+        $smt->database->updateTopicsLocalFilesCount();
 
         return true;
     }

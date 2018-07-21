@@ -22,12 +22,12 @@ $smt->includeTemplate('AdminMenu');
 ?>
 
 <div class="row bg-white">
-    <div class="col-12 mb-4">
+    <div class="col mb-4">
         <p>
             <a href="<?= Tools::url('admin') ?>/reports"><?= $smt->title ?></a>
         </p>
         <ul>
-            <li><a href="<?= Tools::url('admin') ?>/reports?r=localfiles">update_categories_local_files_count()</a></li>
+            <li><a href="<?= Tools::url('admin') ?>/reports?r=localfiles">update_topics_local_files_count()</a></li>
             <li><a href="<?= Tools::url('admin') ?>/reports?r=category2media">Check: category2media</a>
             <li><a href="<?= Tools::url('admin') ?>/reports?r=catclean">Check/Clean: category</a></li>
         </ul>
@@ -45,7 +45,7 @@ switch ($_GET['r']) {
         print '<p>Please choose a report above</p>';
         break;
     case 'localfiles':
-        $smt->database->updateCategoriesLocalFilesCount();
+        $smt->database->updateTopicsLocalFilesCount();
         break;
     case 'catclean':
         catClean($smt);
@@ -67,11 +67,11 @@ function category2media(TaggerAdmin $smt)
     $c2ms = $smt->database->queryAsArray('SELECT * FROM category2media');
     print '<p>' . number_format((float) sizeof($c2ms)) . ' category2media</p>';
 
-    $categoriesRaw = $smt->database->queryAsArray('SELECT id FROM category');
-    print '<p>' . number_format((float) sizeof($categoriesRaw)) . ' Categories</p>';
-    $categories = [];
-    foreach ($categoriesRaw as $cats) {
-        $categories[$cats['id']] = true;
+    $topicsRaw = $smt->database->queryAsArray('SELECT id FROM category');
+    print '<p>' . number_format((float) sizeof($topicsRaw)) . ' Topics</p>';
+    $topics = [];
+    foreach ($topicsRaw as $cats) {
+        $topics[$cats['id']] = true;
     }
 
     $mediaRaw = $smt->database->queryAsArray('SELECT pageid FROM media');
@@ -86,9 +86,9 @@ function category2media(TaggerAdmin $smt)
     print '<pre>';
     foreach ($c2ms as $c2m) {
         $checked++;
-        if (!isset($categories[$c2m['category_id']])) {
+        if (!isset($topics[$c2m['category_id']])) {
             $errors[] = $c2m['id'];
-            print '<br />c2m_id:' . $c2m['id'] . ' CATEGORY NOT FOUND'
+            print '<br />c2m_id:' . $c2m['id'] . ' TOPIC NOT FOUND'
             . ' c:' . $c2m['category_id']
             . ' m:' . $c2m['media_pageid'];
         }
@@ -120,21 +120,21 @@ function catClean(TaggerAdmin $smt)
         $checkerLimit = (int) $_GET['checker'];
     }
 
-    print '<p>Clean Category Table:</p>'
+    print '<p>Clean Topic Table:</p>'
     . '<p><a href="?r=catclean&amp;cleaner=1">RUN CLEANER</a>'
         . ' (updates: local_files, sanitizes: hidden, missing.  No API calls.)</p>'
-    . '<p><a href="?r=catclean&amp;checker=' . $checkerLimit . '">RUN CATEGORY-INFO CHECKER x'
+    . '<p><a href="?r=catclean&amp;checker=' . $checkerLimit . '">RUN TOPIC-INFO CHECKER x'
     . $checkerLimit. '</a>  (updates ALL category info.  Remote API calls.)</p>';
 
     if (isset($_GET['cleaner'])) {
-        $categories = $smt->database->queryAsArray('SELECT * FROM category');
+        $topics = $smt->database->queryAsArray('SELECT * FROM category');
         //print '<p>START: CLEANER</p>';
         $smt->database->vacuum();
         $result = '';
-        foreach ($categories as $category) {
+        foreach ($topics as $category) {
             //$result .= ' ' . $category['id'];
             $bind = [];
-            $bind[':local_files'] = $smt->database->getCategorySize($category['name']);
+            $bind[':local_files'] = $smt->database->getTopicSize($category['name']);
             $bind[':hidden'] = 0;
             if ($category['hidden'] == 1) {
                 $bind[':hidden'] = 1;
@@ -160,36 +160,36 @@ function catClean(TaggerAdmin $smt)
     }
 
     if (isset($_GET['checker'])) {
-        $categories = $smt->database->queryAsArray(
+        $topics = $smt->database->queryAsArray(
             'SELECT * FROM category ORDER BY updated ASC LIMIT ' . $checkerLimit
         );
-        //print '<p>START: CATEGORY-INFO CHECKER x' . $checker_limit . '</p>';
+        //print '<p>START: TOPIC-INFO CHECKER x' . $checker_limit . '</p>';
         $smt->database->vacuum();
         $result = '';
-        foreach ($categories as $category) {
+        foreach ($topics as $category) {
             $result .= ' ' . $category['id'];
-            if ($smt->database->saveCategoryInfo($category['name'])) {
+            if ($smt->database->saveTopicInfo($category['name'])) {
                 continue;
             }
             $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
         }
         $smt->database->commit();
         $smt->database->vacuum();
-        print '<p>OK: RAN: CATEGORY-INFO CHECKER: <span style="font-size:80%;">' . $result . '</span></p>';
+        print '<p>OK: RAN: TOPIC-INFO CHECKER: <span style="font-size:80%;">' . $result . '</span></p>';
     }
 
-    $categories = $smt->database->queryAsArray(
+    $topics = $smt->database->queryAsArray(
         'SELECT * FROM category ORDER BY hidden ASC, local_files DESC, name ASC'
     );
-    print '<p><b>' . number_format((float) sizeof($categories)) . '</b> Categories</p>';
+    print '<p><b>' . number_format((float) sizeof($topics)) . '</b> Topics</p>';
 
     print '<pre>'
     . '<b>LOCAL' . $tab
     . 'COM' . $tab
     . 'H M ID' . $tab
     . 'Last Updated' . $tab . $tab
-    . 'Category</b><br />';
-    foreach ($categories as $category) {
+    . 'Topic</b><br />';
+    foreach ($topics as $category) {
         print ''
         . number_format((float) $category['local_files']) . $tab
         . number_format((float) $category['files']) . $tab
@@ -197,8 +197,8 @@ function catClean(TaggerAdmin $smt)
         . $category['missing'] . ' '
         . $category['id'] . $tab
         . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00') . $tab
-        . '<a target="site" href="' . Tools::url('category') . '/'
-        . Tools::categoryUrlencode(Tools::stripPrefix($category['name']))
+        . '<a target="site" href="' . Tools::url('topic') . '/'
+        . Tools::topicUrlencode(Tools::stripPrefix($category['name']))
         . '">' . $category['name'] . '</a>'
         . '<br />';
     }

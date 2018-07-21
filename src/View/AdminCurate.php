@@ -18,12 +18,11 @@ use Attogram\SharedMedia\Tagger\Tools;
 .curation_que { border:12px solid grey; }
 </style>
 <div class="row bg-secondary">
-    <div class="col-12 mb-4">
+    <div class="col mb-4">
         <form name="media" action="" method="GET">
             <?= $data['menu'] ?>
             <div class="curation_container">
         <?php
-
         foreach ($data['medias'] as $media) {
             $thumb = $this->smt->getThumbnail($media);
             $url = $thumb['url'];
@@ -47,12 +46,10 @@ use Attogram\SharedMedia\Tagger\Tools;
                 . '<input style="display:none;" type="checkbox" name="delete[]" id="delete' . $pageid
                 . '" value="' . $pageid . '">';
         }
-
         ?>
+        </div>
         <br />
         <?= $data['menu'] ?>
-    </div>
-
         </form>
     </div>
 </div>

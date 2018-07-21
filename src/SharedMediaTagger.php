@@ -22,7 +22,7 @@ class SharedMediaTagger
      */
     public function __construct(array $config = [])
     {
-        define('SHARED_MEDIA_TAGGER', '1.1.6');
+        define('SHARED_MEDIA_TAGGER', '1.1.7');
 
         ob_start('ob_gzhandler');
 
@@ -50,11 +50,11 @@ class SharedMediaTagger
     {
         $this->router->allow('/', 'Home');
         $this->router->allow('/b', 'Browse');
-        $this->router->allow('/c/?', 'Category');
-        $this->router->allow('/c/?/?', 'Category');
-        $this->router->allow('/c/?/?/?', 'Category');
-        $this->router->allow('/c/?/?/?/?', 'Category');
-        $this->router->allow('/categories', 'Categories');
+        $this->router->allow('/c/?', 'Topic');
+        $this->router->allow('/c/?/?', 'Topic');
+        $this->router->allow('/c/?/?/?', 'Topic');
+        $this->router->allow('/c/?/?/?/?', 'Topic');
+        $this->router->allow('/topics', 'Topics');
         $this->router->allow('/i/?', 'Info');
         $this->router->allow('/login', 'Login');
         $this->router->allow('/logoff', 'Logout');
@@ -70,7 +70,8 @@ class SharedMediaTagger
     private function setAdminRoutes()
     {
         $this->router->allow('/admin/', 'AdminHome');
-        $this->router->allow('/admin/category', 'AdminCategory');
+        $this->router->allow('/admin/add', 'AdminAdd');
+        $this->router->allow('/admin/topic', 'AdminTopic');
         $this->router->allow('/admin/curate', 'AdminCurate');
         $this->router->allow('/admin/database', 'AdminDatabase');
         $this->router->allow('/admin/database/download', 'AdminDatabaseDownload');
@@ -115,7 +116,7 @@ class SharedMediaTagger
     }
 
     /**
-     * Redirect old v.0 urls
+     * Redirect old urls
      */
     private function redirects()
     {
@@ -131,15 +132,16 @@ class SharedMediaTagger
                 $redirect = Tools::url('home');
                 break;
             case '/categories.php':
-                $redirect = Tools::url('categories');
+            case '/categories':
+                $redirect = Tools::url('topics');
                 break;
             case '/category.php':
-                print "HI!";
+            case '/category':
                 if (!empty($_GET['c'])) {
-                    $redirect = Tools::url('category') . '/' . $_GET['c'];
+                    $redirect = Tools::url('topic') . '/' . $_GET['c'];
                     break;
                 }
-                $redirect = Tools::url('categories');
+                $redirect = Tools::url('topics');
                 break;
             case '/contact.php':
                 if (!empty($_GET['r']) && Tools::isPositiveNumber($_GET['r'])) {

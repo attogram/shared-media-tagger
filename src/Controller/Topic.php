@@ -7,43 +7,46 @@ use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Tools;
 
 /**
- * Class Category
+ * Class Topic
  */
-class Category extends ControllerBase
+class Topic extends ControllerBase
 {
     protected function display()
     {
         $vars = $this->smt->router->getVars();
-
         if (empty($vars[0])) {
-            $this->smt->fail404('404 Category Not Found');
+            $this->smt->fail404('Page Not Found');
         }
 
-        $categoryName = Tools::categoryUrldecode(
+        $topicName = Tools::topicUrldecode(
             implode('/', $vars)
         );
 
-        $pageLimit = 20; // # of files per page
-        $this->smt->title = $categoryName . ' - ' . Config::$siteName;
-        $categoryName = 'Category:' . $categoryName;
+        $this->smt->title = $topicName . ' - ' . Config::$siteName;
+        $this->smt->includeHeader();
+        $this->smt->includeTemplate('Menu');
 
-        $categoryInfo = $this->smt->database->getCategory($categoryName);
+        $topicName = 'Category:' . $topicName;
 
-        if (!$categoryInfo) {
-            $this->smt->fail404('404 Category Not Found');
+        $pageLimit = 20;
+
+        $topicInfo = $this->smt->database->getTopic($topicName);
+
+        if (!$topicInfo) {
+            $this->smt->fail404('Not Found');
         }
 
-        $categorySize = $this->smt->database->getCategorySize($categoryName);
+        $topicSize = $this->smt->database->getTopicSize($topicName);
 
         /** @noinspection PhpUnusedLocalVariableInspection */
         $pager = '';
         $sqlLimit = '';
-        if ($categorySize > $pageLimit) {
+        if ($topicSize > $pageLimit) {
             $offset = isset($_GET['o']) ? $_GET['o'] : 0;
             $sqlLimit = " LIMIT $pageLimit OFFSET $offset";
             $pageCount = 0;
             $pager = 'pages: ';
-            for ($count = 0; $count < $categorySize; $count+=$pageLimit) {
+            for ($count = 0; $count < $topicSize; $count+=$pageLimit) {
                 if ($count == $offset) {
                     $pager .= '<span style="font-weight:bold; background-color:darkgrey; color:white;">'
                         . '&nbsp;' . ++$pageCount . '&nbsp;</span> ';
@@ -58,34 +61,31 @@ class Category extends ControllerBase
                 FROM category2media AS c2m, category AS c, media AS m
                 WHERE c2m.category_id = c.id
                 AND m.pageid = c2m.media_pageid
-                AND c.name = :category_name';
+                AND c.name = :topic_name';
 
         if (Config::$siteInfo['curation'] == 1) {
             $sql .= " AND m.curated ='1'";
         }
         $sql .= " ORDER BY m.pageid ASC $sqlLimit";
 
-        $bind = [':category_name'=>$categoryName];
+        $bind = [':topic_name' => $topicName];
 
-        $category = $this->smt->database->queryAsArray($sql, $bind);
+        $topic = $this->smt->database->queryAsArray($sql, $bind);
 
-        if (!Tools::isAdmin() && (!$category || !is_array($category))) {
-            $this->smt->fail404('404 Category Not Found');
+        if (!Tools::isAdmin() && (!$topic || !is_array($topic))) {
+            $this->smt->fail404('Topic Not Found');
         }
 
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $votesPerCategory = $this->smt->displayVotes(
-            $this->smt->database->getDbVotesPerCategory($categoryInfo['id'])
+        $votesPerTopic = $this->smt->displayVotes(
+            $this->smt->database->getDbVotesPerTopic($topicInfo['id'])
         );
 
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $categoryNameDisplay = Tools::stripPrefix($categoryName);
-
-        $this->smt->includeHeader();
-        $this->smt->includeTemplate('Menu');
+        $topicNameDisplay = Tools::stripPrefix($topicName);
 
         /** @noinspection PhpIncludeInspection */
-        include($this->getView('Category'));
+        include($this->getView('Topic'));
 
         $this->smt->includeFooter();
     }

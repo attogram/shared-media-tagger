@@ -41,9 +41,9 @@ use Attogram\SharedMedia\Tagger\Tools;
             <dd><?= $this->smt->displayVotes($this->smt->database->getVotes($media['pageid'])) ?></dd>
         </dl>
         <p>
-            <em>Categories:</em>
+            <em>Topics:</em>
             <br />
-            <?= $this->smt->displayCategories($media['pageid']) ?>
+            <?= $this->smt->displayTopics($media['pageid']) ?>
         </p>
         <em>Download:</em>
         <ul>
@@ -106,17 +106,19 @@ use Attogram\SharedMedia\Tagger\Tools;
             </ul>
         </p>
         <p>
-            <em>Technical Categories:</em>
+            <em>Technical Topics:</em>
             <br />
-            <small><?= $this->smt->displayCategories($media['pageid'], true) ?></small>
+            <small><?= $this->smt->displayTopics($media['pageid'], true) ?></small>
         </p>
     </div>
     <?php if (Tools::isAdmin()) { ?>
-        <div class="row bg-white">
-            <div class="col">
-                <pre><?= htmlentities(print_r($media, true)) ?></pre>
-            </div>
+    <div class="row bg-white small p-2">
+        <div class="col">
+            <textarea cols="100" rows="10"><?=
+                htmlentities(print_r($media, true))
+            ?></textarea>
         </div>
+    </div>
     <?php } ?>
 </div>
 

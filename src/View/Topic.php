@@ -2,28 +2,28 @@
 declare(strict_types = 1);
 /**
  * Shared Media Tagger
- * Category
+ * Topic
  *
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
- * @var array $categoryInfo
- * @var string $categoryName
- * @var string $categoryNameDisplay
- * @var int|string $categorySize
- * @var string $pager
- * @var string $votesPerCategory
+ * @var array   $topicInfo
+ * @var string  $topicName
+ * @var string  $topicNameDisplay
+ * @var int|string $topicSize
+ * @var string  $pager
+ * @var string  $votesPerTopic
  */
 
 use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="row bg-white">
-    <div class="col-12">
+    <div class="col">
 
     <div style="float:right; padding:0 20px 4px 0; font-size:80%;">
-        <?= $votesPerCategory ?>
+        <?= $votesPerTopic ?>
     </div>
-    <h1><?= $categoryNameDisplay ?></h1>
-    <b><?= $categorySize ?></b> files
+    <h1><?= $topicNameDisplay ?></h1>
+    <b><?= $topicSize ?></b> files
     <?= $pager ? ', '.$pager : '' ?>
     <br clear="all" />
     <?php
@@ -32,8 +32,8 @@ use Attogram\SharedMedia\Tagger\Tools;
             . '/media" method="GET" name="media">';
     }
 
-    foreach ($category as $media) {
-        $this->smt->includeThumbnailBox($media);
+    foreach ($topic as $media) {
+        $this->smt->includeTemplate('Thumbnail', $media);
     }
 
     if ($pager) {
@@ -41,7 +41,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     }
 
     if (Tools::isAdmin()) {
-        print $this->smt->includeAdminCategoryFunctions($categoryName);
+        print $this->smt->includeAdminTopicFunctions($topicName);
     }
     ?>
     </div>

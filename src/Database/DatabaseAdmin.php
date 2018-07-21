@@ -11,7 +11,7 @@ use Attogram\SharedMedia\Tagger\Tools;
  */
 class DatabaseAdmin extends Database
 {
-    public $categoryId;
+    public $topicId;
 
     /** @var Commons */
     private $commons;
@@ -31,8 +31,6 @@ class DatabaseAdmin extends Database
     {
         $this->commons = $commons;
     }
-
-    // Media
 
     /**
      * @param array $media
@@ -134,8 +132,8 @@ class DatabaseAdmin extends Database
             }
             Tools::notice('SAVED MEDIA: ' . $new[':pageid'] . ' = <a href="' . Tools::url('info')
                 . '/' . $new[':pageid'] . '">' . Tools::stripPrefix($new[':title']) . '</a>');
-            if (!$this->linkMediaCategories($new[':pageid'])) {
-                Tools::error('::: FAILED to link media categories - p:' . $new[':pageid']);
+            if (!$this->linkMediaTopics($new[':pageid'])) {
+                Tools::error('::: FAILED to link media topics - p:' . $new[':pageid']);
             }
         }
         $this->commit();
@@ -148,44 +146,44 @@ class DatabaseAdmin extends Database
     }
 
     /**
-     * @param string $category
+     * @param string $topic
      * @return bool
      */
-    public function getMediaFromCategory($category = '')
+    public function getMediaFromTopic($topic = '')
     {
-        $category = trim($category);
-        if (!$category) {
+        $topic = trim($topic);
+        if (!$topic) {
             return false;
         }
-        $category = ucfirst($category);
-        if (!preg_match('/^[Category:]/i', $category)) {
-            $category = 'Category:' . $category;
+        $topic = ucfirst($topic);
+        if (!preg_match('/^[Category:]/i', $topic)) {
+            $topic = 'Topic:' . $topic;
         }
-        $categorymembers = $this->commons->getApiCategorymembers($category);
-        if (!$categorymembers) {
-            Tools::error('::getMediaFromCategory: No Media Found');
+        $topicmembers = $this->commons->getApiTopicmembers($topic);
+        if (!$topicmembers) {
+            Tools::error('::getMediaFromTopic: No Media Found');
 
             return false;
         }
         $blocked = $this->queryAsArray(
             'SELECT pageid FROM block WHERE pageid IN ('
-            . implode($categorymembers, ',')
+            . implode($topicmembers, ',')
             . ')'
         );
         if ($blocked) {
             Tools::error('ERROR: ' . sizeof($blocked) . ' BLOCKED MEDIA FILES');
             foreach ($blocked as $bpageid) {
-                if (($key = array_search($bpageid['pageid'], $categorymembers)) !== false) {
-                    unset($categorymembers[$key]);
+                if (($key = array_search($bpageid['pageid'], $topicmembers)) !== false) {
+                    unset($topicmembers[$key]);
                 }
             }
         }
-        $chunks = array_chunk($categorymembers, 50);
+        $chunks = array_chunk($topicmembers, 50);
         foreach ($chunks as $chunk) {
             $this->saveMediaToDatabase($this->commons->getApiImageinfo($chunk));
         }
-        $this->updateCategoryLocalFilesCount($category);
-        $this->saveCategoryInfo($category);
+        $this->updateTopicLocalFilesCount($topic);
+        $this->saveTopicInfo($topic);
 
         return true;
     }
@@ -243,42 +241,42 @@ class DatabaseAdmin extends Database
      * @param int|string $pageid
      * @return bool
      */
-    public function linkMediaCategories($pageid)
+    public function linkMediaTopics($pageid)
     {
         if (!$pageid || !Tools::isPositiveNumber($pageid)) {
-            Tools::error('link_media_categories: invalid pageid');
+            Tools::error('link_media_topics: invalid pageid');
 
             return false;
         }
-        if (!$this->commons->getCategoriesFromMedia($pageid)) {
-            Tools::error('linkMediaCategories: unable to get categories from API');
+        if (!$this->commons->getTopicsFromMedia($pageid)) {
+            Tools::error('linkMediaTopics: unable to get topics from API');
 
             return false;
         }
-        // Remove any old category links for this media
+        // Remove any old topic links for this media
         $this->queryAsBool(
             'DELETE FROM category2media WHERE media_pageid = :pageid',
             [':pageid' => $pageid]
         );
-        foreach ($this->commons->categories as $category) {
-            if (!isset($category['title']) || !$category['title']) {
-                Tools::error('linkMediaCategories: ERROR: missing category title');
+        foreach ($this->commons->topics as $topic) {
+            if (!isset($topic['title']) || !$topic['title']) {
+                Tools::error('linkMediaTopics: ERROR: missing topic title');
                 continue;
             }
-            if (!isset($category['ns']) || $category['ns'] != '14') {
-                Tools::error('linkMediaCategories: ERROR: invalid category namespace');
+            if (!isset($topic['ns']) || $topic['ns'] != '14') {
+                Tools::error('linkMediaTopics: ERROR: invalid topic namespace');
                 continue;
             }
-            $categoryId = $this->getCategoryIdFromName($category['title']);
-            if (!$categoryId) {
-                if (!$this->insertCategory($category['title'], true, 1)) {
-                    Tools::error('linkMediaCategories: FAILED to insert ' . $category['title']);
+            $topicId = $this->getTopicIdFromName($topic['title']);
+            if (!$topicId) {
+                if (!$this->insertTopic($topic['title'], true, 1)) {
+                    Tools::error('linkMediaTopics: FAILED to insert ' . $topic['title']);
                     continue;
                 }
-                $categoryId = $this->categoryId;
+                $topicId = $this->topicId;
             }
-            if (!$this->linkMediaToCategory($pageid, $categoryId)) {
-                Tools::error('linkMediaCategories: FAILED to link category');
+            if (!$this->linkMediaToTopic($pageid, $topicId)) {
+                Tools::error('linkMediaTopics: FAILED to link topic');
                 continue;
             }
         }
@@ -288,14 +286,14 @@ class DatabaseAdmin extends Database
 
     /**
      * @param int|string $pageid
-     * @param int|string $categoryId
+     * @param int|string $topicId
      * @return bool
      */
-    private function linkMediaToCategory($pageid, $categoryId)
+    private function linkMediaToTopic($pageid, $topicId)
     {
         $response = $this->queryAsBool(
-            'INSERT INTO category2media (category_id, media_pageid) VALUES (:category_id, :pageid)',
-            ['category_id' => $categoryId, 'pageid' => $pageid]
+            'INSERT INTO category2media (category_id, media_pageid) VALUES (:topic_id, :pageid)',
+            ['topic_id' => $topicId, 'pageid' => $pageid]
         );
         if (!$response) {
             return false;
@@ -304,18 +302,16 @@ class DatabaseAdmin extends Database
         return true;
     }
 
-    // Category
-
     /**
      * @param string $name
      * @param bool $fillInfo
      * @param int $localFiles
      * @return bool
      */
-    public function insertCategory($name = '', $fillInfo = true, $localFiles = 0)
+    public function insertTopic($name = '', $fillInfo = true, $localFiles = 0)
     {
         if (!$name) {
-            Tools::error('insert_category: no name found');
+            Tools::error('insert_topic: no name found');
 
             return false;
         }
@@ -334,18 +330,18 @@ class DatabaseAdmin extends Database
             ]
         )
         ) {
-            Tools::error('insert_category: FAILED to insert: ' . $name);
+            Tools::error('insert_topic: FAILED to insert: ' . $name);
 
             return false;
         }
-        $this->categoryId = $this->lastInsertId;
+        $this->topicId = $this->lastInsertId;
         if ($fillInfo) {
-            $this->saveCategoryInfo($name);
+            $this->saveTopicInfo($name);
         }
         Tools::notice(
-            'SAVED CATEGORY: ' . $this->categoryId . ' = +<a href="'
-            . Tools::url('category') . '/'
-            . Tools::categoryUrlencode(Tools::stripPrefix($name))
+            'SAVED TOPIC: ' . $this->topicId . ' = +<a href="'
+            . Tools::url('topic') . '/'
+            . Tools::topicUrlencode(Tools::stripPrefix($name))
             . '">' . htmlentities((string) Tools::stripPrefix($name)) . '</a>'
         );
 
@@ -353,52 +349,51 @@ class DatabaseAdmin extends Database
     }
 
     /**
-     * @param string $categoryName
+     * @param string $topicName
      * @return bool
      */
-    public function saveCategoryInfo($categoryName)
+    public function saveTopicInfo($topicName)
     {
-        $categoryName = Tools::categoryUrldecode($categoryName);
-        $categoryRow = $this->getCategory($categoryName);
-        if (!$categoryRow) {
-            if (!$this->insertCategory($categoryName, false, 1)) {
-                Tools::error('saveCategoryInfo: new category INSERT FAILED: ' . $categoryName);
+        $topicName = Tools::topicUrldecode($topicName);
+        $topicRow = $this->getTopic($topicName);
+        if (!$topicRow) {
+            if (!$this->insertTopic($topicName, false, 1)) {
+                Tools::error('saveTopicInfo: new topic INSERT FAILED: ' . $topicName);
 
                 return false;
             }
-            Tools::notice('saveCategoryInfo: NEW CATEGORY: '  . $categoryName);
-            $categoryRow = $this->getCategory($categoryName);
+            Tools::notice('saveTopicInfo: NEW TOPIC: '  . $topicName);
+            $topicRow = $this->getTopic($topicName);
         }
-        $categoryInfo = $this->commons->getCategoryInfo($categoryName);
-        foreach ($categoryInfo as $onesy) {
-            $categoryInfo = $onesy; // is always just 1 result
+        $topicInfo = $this->commons->getTopicInfo($topicName);
+        foreach ($topicInfo as $onesy) {
+            $topicInfo = $onesy; // is always just 1 result
         }
         $bind = [];
-        if (!empty($categoryInfo['pageid']) && ($categoryInfo['pageid'] != $categoryRow['pageid'])) {
-            $bind[':pageid'] = $categoryInfo['pageid'];
+        if (!empty($topicInfo['pageid']) && ($topicInfo['pageid'] != $topicRow['pageid'])) {
+            $bind[':pageid'] = $topicInfo['pageid'];
         }
-        if ($categoryInfo['categoryinfo']['files'] != $categoryRow['files']) {
-            $bind[':files'] = $categoryInfo['categoryinfo']['files'];
+        if ($topicInfo['categoryinfo']['files'] != $topicRow['files']) {
+            $bind[':files'] = $topicInfo['categoryinfo']['files'];
         }
-        if ($categoryInfo['categoryinfo']['subcats'] != $categoryRow['subcats']) {
-            $bind[':subcats'] = $categoryInfo['categoryinfo']['subcats'];
+        if ($topicInfo['categoryinfo']['subcats'] != $topicRow['subcats']) {
+            $bind[':subcats'] = $topicInfo['categoryinfo']['subcats'];
         }
         $hidden = 0;
-        if (isset($categoryInfo['categoryinfo']['hidden'])) {
+        if (isset($topicInfo['categoryinfo']['hidden'])) {
             $hidden = 1;
         }
-        if ($hidden != $categoryRow['hidden']) {
+        if ($hidden != $topicRow['hidden']) {
             $bind[':hidden'] = $hidden;
         }
         $missing = 0;
-        if (isset($categoryInfo['categoryinfo']['missing'])) {
+        if (isset($topicInfo['categoryinfo']['missing'])) {
             $missing = 1;
         }
-        if ($missing != $categoryRow['missing']) {
+        if ($missing != $topicRow['missing']) {
             $bind[':missing'] = $missing;
         }
         if (!$bind) {
-            //Tools::debug('saveCategoryInfo: Category OK. nothing to update');
             return true;
         }
         $sql = 'UPDATE category SET ';
@@ -408,51 +403,51 @@ class DatabaseAdmin extends Database
         }
         $sql .= implode($sets, ', ');
         $sql .= ' WHERE id = :id';
-        $bind[':id'] = $categoryRow['id'];
+        $bind[':id'] = $topicRow['id'];
         $result = $this->queryAsBool($sql, $bind);
         if ($result) {
             return true;
         }
         Tools::error(
-            'saveCategoryInfo: UPDATE/INSERT FAILED: ' . print_r($this->lastError, true)
+            'saveTopicInfo: UPDATE/INSERT FAILED: ' . print_r($this->lastError, true)
         );
 
         return false;
     }
 
     /**
-     * @param string $categoryName
+     * @param string $topicName
      * @return bool
      */
-    public function updateCategoryLocalFilesCount($categoryName)
+    public function updateTopicLocalFilesCount($topicName)
     {
         $sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
-        $bind[':local_files'] = $this->getCategorySize($categoryName);
-        if (is_int($categoryName)) {
-            $bind['id'] = $categoryName;
+        $bind[':local_files'] = $this->getTopicSize($topicName);
+        if (is_int($topicName)) {
+            $bind['id'] = $topicName;
         } else {
-            $bind[':id'] = $this->getCategoryIdFromName($categoryName);
+            $bind[':id'] = $this->getTopicIdFromName($topicName);
         }
 
         if (!$bind[':id']) {
-            Tools::error("update_category_local_files_count( $categoryName ) - Category Not Found in Database");
+            Tools::error("update_topic_local_files_count( $topicName ) - Topic Not Found in Database");
 
             return false;
         }
         if ($this->queryAsBool($sql, $bind)) {
-            Tools::notice('UPDATE CATEGORY SIZE: ' . $bind[':local_files'] . ' files in ' . $categoryName);
+            Tools::notice('UPDATE TOPIC SIZE: ' . $bind[':local_files'] . ' files in ' . $topicName);
 
             return true;
         }
-        Tools::error("update_category_local_files_count( $categoryName ) - UPDATE ERROR");
+        Tools::error("update_topic_local_files_count( $topicName ) - UPDATE ERROR");
 
         return false;
     }
 
     /**
-     * updateCategoriesLocalFilesCount
+     * updateTopicsLocalFilesCount
      */
-    public function updateCategoriesLocalFilesCount()
+    public function updateTopicsLocalFilesCount()
     {
         $sql = '
             SELECT c.id, c.local_files, count(c2m.category_id) AS size
@@ -461,39 +456,39 @@ class DatabaseAdmin extends Database
             GROUP BY c.id
             ORDER by c.local_files ASC';
 
-        $categoryNewSizes = $this->queryAsArray($sql);
-        if (!$categoryNewSizes) {
-            Tools::error('NOT FOUND: Updated 0 Categories Local Files count');
+        $topicNewSizes = $this->queryAsArray($sql);
+        if (!$topicNewSizes) {
+            Tools::error('NOT FOUND: Updated 0 Topics Local Files count');
 
             return;
         }
         $updates = 0;
         $this->beginTransaction();
-        foreach ($categoryNewSizes as $cat) {
+        foreach ($topicNewSizes as $cat) {
             if ($cat['local_files'] == $cat['size']) {
                 continue;
             }
-            if ($this->insertCategoryLocalFilesCount($cat['id'], $cat['size'])) {
+            if ($this->insertTopicLocalFilesCount($cat['id'], $cat['size'])) {
                 $updates++;
             } else {
-                Tools::error('ERROR: UPDATE FAILED: Category ID:' . $cat['id'] . ' local_files=' . $cat['size']);
+                Tools::error('ERROR: UPDATE FAILED: Topic ID:' . $cat['id'] . ' local_files=' . $cat['size']);
             }
         }
         $this->commit();
-        Tools::notice('Updated ' . $updates . ' Categories Local Files count');
+        Tools::notice('Updated ' . $updates . ' Topics Local Files count');
         $this->vacuum();
     }
 
     /**
-     * @param int|string $categoryId
-     * @param int|string $categorySize
+     * @param int|string $topicId
+     * @param int|string $topicSize
      * @return bool
      */
-    private function insertCategoryLocalFilesCount($categoryId, $categorySize)
+    private function insertTopicLocalFilesCount($topicId, $topicSize)
     {
-        $sql = 'UPDATE category SET local_files = :category_size WHERE id = :category_id';
-        $bind[':category_size'] = $categorySize;
-        $bind[':category_id'] = $categoryId;
+        $sql = 'UPDATE category SET local_files = :topic_size WHERE id = :topic_id';
+        $bind[':topic_size'] = $topicSize;
+        $bind[':topic_id'] = $topicId;
         if ($this->queryAsBool($sql, $bind)) {
             return true;
         }
@@ -502,26 +497,26 @@ class DatabaseAdmin extends Database
     }
 
     /**
-     * @param int|string $categoryId
+     * @param int|string $topicId
      * @return bool
      */
-    public function deleteCategory($categoryId)
+    public function deleteTopic($topicId)
     {
-        if (!Tools::isPositiveNumber($categoryId)) {
+        if (!Tools::isPositiveNumber($topicId)) {
             return false;
         }
-        $bind = [':category_id' => $categoryId];
-        if ($this->queryAsBool('DELETE FROM category WHERE id = :category_id', $bind)) {
-            Tools::notice('DELETED Category #' . $categoryId);
+        $bind = [':topic_id' => $topicId];
+        if ($this->queryAsBool('DELETE FROM category WHERE id = :topic_id', $bind)) {
+            Tools::notice('DELETED Topic #' . $topicId);
         } else {
-            Tools::error('UNABLE to delete category #' . $categoryId);
+            Tools::error('UNABLE to delete topic #' . $topicId);
 
             return false;
         }
-        if ($this->queryAsBool('DELETE FROM category2media WHERE category_id = :category_id', $bind)) {
-            Tools::notice('DELETED Links to Category #' . $categoryId);
+        if ($this->queryAsBool('DELETE FROM category2media WHERE category_id = :topic_id', $bind)) {
+            Tools::notice('DELETED Links to Topic #' . $topicId);
         } else {
-            Tools::error('UNABLE to delete links to category #' . $categoryId);
+            Tools::error('UNABLE to delete links to topic #' . $topicId);
 
             return false;
         }
@@ -553,7 +548,7 @@ class DatabaseAdmin extends Database
     /**
      * @return array
      */
-    public function emptyCategoryTables()
+    public function emptyTopicTables()
     {
         return $this->runSqls(
             [

@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 ?>
 <div class="row bg-white">
-    <div clas="col-12">
+    <div clas="col">
         <form class="form-inline">
             <input type="text"
                    class="form-control mt-3 mb-3 ml-3"
@@ -29,10 +29,10 @@ declare(strict_types = 1);
 </div>
 <?php if (!empty($data['results'])) { ?>
 <div class="row bg-white">
-    <div clas="col-12">
+    <div clas="col">
         <?php
         foreach ($data['results'] as $media) {
-            $this->smt->includeThumbnailBox($media);
+            $this->smt->includeTemplate('Thumbnail', $media);
         } ?>
     </div>
 </div>

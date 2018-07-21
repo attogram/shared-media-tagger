@@ -12,32 +12,30 @@ use Attogram\SharedMedia\Tagger\Tools;
 
 ?>
 <div class="row bg-white">
-    <div class="col-12">
-    Site: <b><a href="./site"><?= Config::$siteName ?></a></b>
+    <div class="col">
+    Settings:
     <ul>
-        <li><b><?= sizeof($this->smt->database->getTags()) ?></b> <a href="./tags">Tags</a></li>
-        <li><b><?= number_format((float) $this->smt->database->getFileCount()) ?></b> Files</li>
-        <li><b><?= number_format((float) $this->smt->database->getBlockCount()) ?></b> Blocked Files</li>
-        <li><b><?= number_format((float) $this->smt->database->getTotalFilesReviewedCount()) ?></b> Files reviewed</li>
-        <li><b><?= number_format((float) $this->smt->database->getTaggingCount()) ?></b> Tagging Count</li>
+        <li>Site Name: <kbd><?= Config::$siteName ?></kbd></li>
+        <li>Curation Mode: <kbd><?= Config::$siteInfo['curation']
+                ? '✅ON'
+                : '❌OFF'
+                ?></kbd></li>
+        <li>Site Url: <kbd><?= Config::$siteUrl ?></kbd></li>
+        <li>Protocol: <kbd><?= Config::$protocol ?></kbd></li>
+        <li>Server: <kbd><?= Config::$server ?></kbd></li>
     </ul>
-
     <hr />
-    Installation:
+    Directories:
     <ul>
-        <li>server: <kbd><?= Config::$server ?></kbd></li>
-        <li>siteName: <kbd><?= Config::$siteName ?></kbd></li>
-        <li>home: <a href="<?= Tools::url('home') ?>"><?= Tools::url('home') ?></a></li>
-        <li>protocol: <kbd><?= Config::$protocol ?></kbd></li>
-        <li>siteUrl: <kbd><?= Config::$siteUrl ?></kbd></li>
+        <li>cwd: <kbd><?= getcwd() ?></kbd></li>
         <li>sourceDirectory: <kbd><?= Config::$sourceDirectory ?></kbd></li>
         <li>databaseDirectory: <kbd><?= Config::$databaseDirectory ?></kbd></li>
         <li>adminConfigFile: <kbd><?= Config::$adminConfigFile ?></kbd></li>
     </ul>
-
     <hr />
     Discovery:
     <ul>
+        <li><a href="<?= Tools::url('sitemap') ?>">sitemap.xml</a></li>
         <li>/public/.htaccess:
             <?= (is_readable(Config::$publicDirectory . '/.htaccess')
                 ? '✅ACTIVE'
@@ -46,7 +44,7 @@ use Attogram\SharedMedia\Tagger\Tools;
         <li><a href="/robots.txt">/robots.txt</a>:
             <span style="font-family:monospace;"><?= $this->smt->checkRobotstxt() ?></span>
         </li>
-        <li><a href="<?= Tools::url('sitemap') ?>">sitemap.xml</a></li>
+
     </ul>
 
     <hr />

@@ -137,14 +137,14 @@ class TaggerAdmin extends Tagger
         $response .= '<p>OK: Saved media: <b><a href="' . Tools::url('info')
         . '/' . $pageid . '">info/' . $pageid . '</a></b></p>';
 
-        if (!$this->commons->categories) {
-            return $response . '<p>No Categories Found</p></div>';
+        if (!$this->commons->topics) {
+            return $response . '<p>No Topics Found</p></div>';
         }
-        foreach ($this->commons->categories as $category) {
+        foreach ($this->commons->topics as $topic) {
             $response .= '+'
-            . '<a href="' . Tools::url('category')
-            . '/' . Tools::categoryUrlencode(Tools::stripPrefix($category['title']))
-            . '">' . Tools::stripPrefix($category['title']) . '</a><br />';
+            . '<a href="' . Tools::url('topic')
+            . '/' . Tools::topicUrlencode(Tools::stripPrefix($topic['title']))
+            . '">' . Tools::stripPrefix($topic['title']) . '</a><br />';
         }
         $response .= '</div>';
 
@@ -152,15 +152,15 @@ class TaggerAdmin extends Tagger
     }
 
     /**
-     * @param $categoryNameArray
+     * @param $topicNameArray
      */
-    public function importCategories($categoryNameArray)
+    public function importTopics($topicNameArray)
     {
-        Tools::notice("import_categories( category_name_array )");
+        Tools::notice("import_topics( topic_name_array )");
         $this->database->beginTransaction();
-        foreach ($categoryNameArray as $categoryName) {
-            $categoryName = Tools::categoryUrldecode($categoryName);
-            $this->database->insertCategory($categoryName);
+        foreach ($topicNameArray as $topicName) {
+            $topicName = Tools::topicUrldecode($topicName);
+            $this->database->insertTopic($topicName);
         }
         $this->database->commit();
         $this->database->vacuum();
@@ -173,8 +173,8 @@ class TaggerAdmin extends Tagger
     {
         $search = urldecode($_GET['scommons']);
 
-        if (!$this->commons->findCategories($search)) {
-            Tools::notice('Error: no categories found');
+        if (!$this->commons->findTopics($search)) {
+            Tools::notice('Error: no topics found');
 
             return;
         }
@@ -182,12 +182,12 @@ class TaggerAdmin extends Tagger
             ? $this->commons->response['query']['search']
             : null;
         if (!$cats || !is_array($cats)) {
-            Tools::notice('Error: no categories returned');
+            Tools::notice('Error: no topics returned');
 
             return;
         }
         print '<p>Searched "' . $search . '": showing <b>' . sizeof($cats) . '</b> of <b>'
-            . $this->commons->totalHits . '</b> categories</p>';
+            . $this->commons->totalHits . '</b> topics</p>';
         print '
     <script type="text/javascript" language="javascript">// <![CDATA[
     function checkAll(formname, checktoggle)
@@ -213,7 +213,7 @@ class TaggerAdmin extends Tagger
                 . $cat['title']
                 . '</strong><small> '
                 . '<a target="c" href="https://commons.wikimedia.org/wiki/'
-                . Tools::categoryUrlencode($cat['title']) . '">(view)</a> '
+                . Tools::topicUrlencode($cat['title']) . '">(view)</a> '
                 . ' (' . $cat['snippet'] . ')'
                 . ' (size:' . $cat['size'] . ')</small><br />';
         }
