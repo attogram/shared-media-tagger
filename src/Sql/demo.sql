@@ -23,7 +23,7 @@ INSERT OR REPLACE INTO site (id, name, about) VALUES (
     '<li><a href="admin/">Dashboard</a>: info on installation, site stats, discovery files</li>' ||
     '<li><a href="admin/site">SITE</a>: site name, about message, headers, footers, curation mode</li>' ||
     '<li><a href="admin/add">ADD</a>: find topics and media to add to collection' ||
-    '<li><a href="admin/topic">TOPICS</a>: deprecated - find topics, import topic info, import media from topic, and more</li>' ||
+    '<li><a href="admin/topic">TOPICS</a>: topic list and tools</li>' ||
     '<li><a href="admin/tag">TAGS</a>: voting tag bar settings</li>' ||
     '<li><a href="admin/media">MEDIA</a>: add media, and more</li>' ||
     '<li><a href="admin/curate">CURATE</a>:curation tool</li>' ||

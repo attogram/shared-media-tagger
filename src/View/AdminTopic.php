@@ -15,21 +15,6 @@ use Attogram\SharedMedia\Tagger\Tools;
 ?>
 <div class="row bg-white">
     <div class="col mb-4">
-<ul>
-    <li><b><?=
-        number_format((float) $this->smt->database->getTopicsCount())
-    ?></b> Active Topics</li>
-    <li><b>?</b> Technical Topics</li>
-    <li><b>?</b> Empty Topics</li>
-</ul>
-<form action="" method="GET">
-<p>
-
-        <input name="scommons" type="text" size="35" value="">
-        <input type="submit" value="   Find Topics on COMMONS  ">
-
-</p>
-</form>
 <form action="" method="GET">
 <p>
     <input type="hidden" name="v" value="1">
@@ -38,12 +23,9 @@ use Attogram\SharedMedia\Tagger\Tools;
     <br />
     <br />
     <a href="<?= Tools::url('admin') ?>/topic?v=1">[View&nbsp;Topic&nbsp;List]</a>
-    &nbsp; &nbsp;
-    <a href="<?= Tools::url('admin') ?>/topic?g=all">[Import&nbsp;Topic&nbsp;Info]</a>
 </p>
 </form>
 <?php
-
 if (($this->smt->database->getTopicsCount() > 1000)
     && isset($_GET['v']) && ($_GET['v'] != 1)
 ) {
@@ -51,7 +33,6 @@ if (($this->smt->database->getTopicsCount() > 1000)
     $this->smt->includeFooter();
     Tools::shutdown();
 }
-
 ?>
 <table border="1">
     <tr style="background-color:lightblue;font-style:italic;">
@@ -60,7 +41,7 @@ if (($this->smt->database->getTopicsCount() > 1000)
         <td><small><a href="?wf=1">Com<br/>files</a></small></td>
         <td><small><a href="?sca=all">Sub<br />cats</a></small></td>
         <td>view</td>
-        <td><a href="?g=all">info</a></td>
+        <td>refresh</td>
         <td>import</td>
         <td>Clear</td>
         <td>Delete</td>
@@ -68,12 +49,9 @@ if (($this->smt->database->getTopicsCount() > 1000)
 <?php
 
 reset($cats);
-
 $commonFilesCount = $localFilesCount = 0;
-
 foreach ($cats as $cat) {
     $commonFilesCount += $cat['files'];
-
     print '<tr>'
     . '<td><b><a href="' . Tools::url('topic') . '/'
     . Tools::topicUrlencode(Tools::stripPrefix($cat['name']))
@@ -113,8 +91,9 @@ foreach ($cats as $cat) {
     print ''
     . '<td style="padding:0 10px 0 10px;"><a target="c" href="https://commons.wikimedia.org/wiki/'
         . Tools::topicUrlencode($cat['name']) . '">View</a></td>'
-    . '<td style="padding:0 10px 0 10px;"><a href="?c='
-        . Tools::topicUrlencode($cat['name']) . '">Info</a></td>'
+    . '<td style="padding:0 10px 0 10px;"><a href="'
+        . Tools::url('admin') . '/add/?s=topic&amp;t' . $cat['pageid'] . '=on">'
+        . 'Refresh</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="?i=' . Tools::topicUrlencode($cat['name']) . '">Import</a></td>'
     . '<td style="padding:0 10px 0 10px;"><a href="./media?dc='
         . Tools::topicUrlencode($cat['name']) . '">Clear</a></td>'

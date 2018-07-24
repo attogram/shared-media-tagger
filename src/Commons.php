@@ -121,7 +121,7 @@ class Commons
 
     /**
      * @see https://www.mediawiki.org/wiki/API:Categorymembers
-     * @param $category
+     * @param $topic
      * @return array
      */
     public function getApiTopicmembers($topic)
@@ -226,18 +226,18 @@ class Commons
     }
 
     /**
-     * @param string $category
+     * @param string $topic
      * @return array
      */
-    public function getTopicInfo($category)
+    public function getTopicInfo($topic)
     {
-        if (!$category || $category=='' || !is_string($category)) {
+        if (!$topic || $topic=='' || !is_string($topic)) {
             Tools::error('getTopicInfo: no category');
 
             return [];
         }
         $call = $this->commonsApiUrl
-            . '?action=query&format=json&prop=categoryinfo&titles=' . urlencode($category); // @TODO cicontinue
+            . '?action=query&format=json&prop=categoryinfo&titles=' . urlencode($topic); // @TODO cicontinue
         if (!$this->callCommons($call, 'pages')) {
             Tools::error('getTopicInfo: API: nothing found');
 
@@ -252,23 +252,23 @@ class Commons
     }
 
     /**
-     * @param string $category
+     * @param string $topic
      * @return bool
      */
-    public function getSubcats($category)
+    public function getSubcats($topic)
     {
-        if (!$category || $category=='' || !is_string($category)) {
+        if (!$topic || $topic=='' || !is_string($topic)) {
             Tools::error('getSubcats: ERROR - no category');
 
             return false;
         }
-        Tools::notice('getSubcats: ' . $category);
+        Tools::notice('getSubcats: ' . $topic);
         $call = $this->commonsApiUrl . '?action=query&format=json&cmlimit=50'
             . '&list=categorymembers'
             . '&cmtype=subcat'
             . '&cmprop=title'
             . '&cmlimit=500'
-            . '&cmtitle=' . urlencode($category) ;
+            . '&cmtitle=' . urlencode($topic) ;
         if (!$this->callCommons($call, 'categorymembers')
             || !isset($this->response['query']['categorymembers'])
             || !is_array($this->response['query']['categorymembers'])

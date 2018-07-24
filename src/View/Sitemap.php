@@ -22,10 +22,10 @@ use Attogram\SharedMedia\Tagger\Tools;
 <url><loc><?= $data['protocol'] . Tools::url('scores') ?></loc></url>
 <?php
 
-foreach ($data['topics'] as $category) {
+foreach ($data['topics'] as $topic) {
     print '<url><loc>' . $data['protocol']
         . Tools::url('topic') . '/'
-        . Tools::topicUrlencode(Tools::stripPrefix($category['name']))
+        . Tools::topicUrlencode(Tools::stripPrefix($topic['name']))
         . '</loc></url>';
 }
 

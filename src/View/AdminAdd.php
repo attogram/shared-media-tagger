@@ -11,11 +11,7 @@ declare(strict_types = 1);
 <form>
     <div class="row bg-info pt-3 pb-2">
         <div class="col-8">
-            <input class="form-control"
-                   id="q"
-                   name="q"
-                   type="text"
-                   value="<?=
+            <input class="form-control" id="q" name="q" type="text" value="<?=
                     !empty($data['query'])
                        ? htmlentities($data['query'])
                        : ''

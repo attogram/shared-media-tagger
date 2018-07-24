@@ -131,19 +131,19 @@ function catClean(TaggerAdmin $smt)
         //print '<p>START: CLEANER</p>';
         $smt->database->vacuum();
         $result = '';
-        foreach ($topics as $category) {
-            //$result .= ' ' . $category['id'];
+        foreach ($topics as $topic) {
+            //$result .= ' ' . $topic['id'];
             $bind = [];
-            $bind[':local_files'] = $smt->database->getTopicSize($category['name']);
+            $bind[':local_files'] = $smt->database->getTopicSize($topic['name']);
             $bind[':hidden'] = 0;
-            if ($category['hidden'] == 1) {
+            if ($topic['hidden'] == 1) {
                 $bind[':hidden'] = 1;
             }
             $bind[':missing'] = 0;
-            if ($category['missing'] == 1) {
+            if ($topic['missing'] == 1) {
                 $bind[':missing'] = 1;
             }
-            $bind[':id'] = $category['id'];
+            $bind[':id'] = $topic['id'];
             $upd = $smt->database->queryAsBool('UPDATE category SET
                     local_files = :local_files,
                     hidden = :hidden,
@@ -152,7 +152,7 @@ function catClean(TaggerAdmin $smt)
             if ($upd) {
                 continue;
             }
-            $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
+            $result .= '<span style="color:red;">ERR:' . $topic['id'] . '</span>';
         }
         $smt->database->commit();
         $smt->database->vacuum();
@@ -166,12 +166,12 @@ function catClean(TaggerAdmin $smt)
         //print '<p>START: TOPIC-INFO CHECKER x' . $checker_limit . '</p>';
         $smt->database->vacuum();
         $result = '';
-        foreach ($topics as $category) {
-            $result .= ' ' . $category['id'];
-            if ($smt->database->saveTopicInfo($category['name'])) {
+        foreach ($topics as $topic) {
+            $result .= ' ' . $topic['id'];
+            if ($smt->database->saveTopicInfo($topic['name'])) {
                 continue;
             }
-            $result .= '<span style="color:red;">ERR:' . $category['id'] . '</span>';
+            $result .= '<span style="color:red;">ERR:' . $topic['id'] . '</span>';
         }
         $smt->database->commit();
         $smt->database->vacuum();
@@ -189,17 +189,17 @@ function catClean(TaggerAdmin $smt)
     . 'H M ID' . $tab
     . 'Last Updated' . $tab . $tab
     . 'Topic</b><br />';
-    foreach ($topics as $category) {
+    foreach ($topics as $topic) {
         print ''
-        . number_format((float) $category['local_files']) . $tab
-        . number_format((float) $category['files']) . $tab
-        . $category['hidden'] . ' '
-        . $category['missing'] . ' '
-        . $category['id'] . $tab
-        . ($category['updated'] ? $category['updated'] : '0000-00-00 00:00:00') . $tab
+        . number_format((float) $topic['local_files']) . $tab
+        . number_format((float) $topic['files']) . $tab
+        . $topic['hidden'] . ' '
+        . $topic['missing'] . ' '
+        . $topic['id'] . $tab
+        . ($topic['updated'] ? $topic['updated'] : '0000-00-00 00:00:00') . $tab
         . '<a target="site" href="' . Tools::url('topic') . '/'
-        . Tools::topicUrlencode(Tools::stripPrefix($category['name']))
-        . '">' . $category['name'] . '</a>'
+        . Tools::topicUrlencode(Tools::stripPrefix($topic['name']))
+        . '">' . $topic['name'] . '</a>'
         . '<br />';
     }
     print '<br />END or report.</pre>';

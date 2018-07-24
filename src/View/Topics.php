@@ -42,19 +42,19 @@ use Attogram\SharedMedia\Tagger\Tools;
             </thead>
             <tbody>
             <?php
-            foreach ($topics as $category) {
-                if (!isset($category['name'])) {
+            foreach ($topics as $topic) {
+                if (!isset($topic['name'])) {
                     continue;
                 }
-                if (!isset($category['local_files'])) {
-                    $category['local_files'] = 0;
+                if (!isset($topic['local_files'])) {
+                    $topic['local_files'] = 0;
                 }
                 $localUrl = Tools::url('topic') . '/'
-                    . Tools::topicUrlencode(Tools::stripPrefix($category['name']));
+                    . Tools::topicUrlencode(Tools::stripPrefix($topic['name']));
                 ?>
                 <tr data-href="<?= $localUrl ?>">
-                    <th scope="row"><?=  number_format((float) $category['local_files']) ?></th>
-                    <td><a href="<?= $localUrl ?>"><?= Tools::stripPrefix($category['name']) ?></a></td>
+                    <th scope="row"><?=  number_format((float) $topic['local_files']) ?></th>
+                    <td><a href="<?= $localUrl ?>"><?= Tools::stripPrefix($topic['name']) ?></a></td>
                 </tr>
                 <?php
             }

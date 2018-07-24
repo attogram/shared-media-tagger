@@ -111,14 +111,4 @@ use Attogram\SharedMedia\Tagger\Tools;
             <small><?= $this->smt->displayTopics($media['pageid'], true) ?></small>
         </p>
     </div>
-    <?php if (Tools::isAdmin()) { ?>
-    <div class="row bg-white small p-2">
-        <div class="col">
-            <textarea cols="100" rows="10"><?=
-                htmlentities(print_r($media, true))
-            ?></textarea>
-        </div>
-    </div>
-    <?php } ?>
 </div>
-

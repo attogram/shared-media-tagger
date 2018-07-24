@@ -38,41 +38,10 @@ class AdminTopic extends ControllerBase
             Tools::shutdown();
         }
 
-        if (isset($_POST['cats']) && $_POST['cats']) {
-            print '<div class="container-fluid bg-white">';
-            $this->smt->importTopics($_POST['cats']);
-            $this->smt->database->updateTopicsLocalFilesCount();
-            print '</div>';
-            $this->smt->includeFooter();
-            Tools::shutdown();
-        }
-
-        if (isset($_GET['c']) && $_GET['c']) {
-            print '<div class="container-fluid bg-white">';
-            if ($this->smt->database->saveTopicInfo(urldecode($_GET['c']))) {
-                Tools::notice(
-                    'OK: Refreshed Topic: <b><a href="' . Tools::url('topic')
-                    . '/' . Tools::stripPrefix(Tools::topicUrlencode($_GET['c'])) . '">'
-                    . htmlentities((string) Tools::topicUrldecode($_GET['c'])) . '</a></b>'
-                );
-            }
-            print '</div>';
-            $this->smt->includeFooter();
-            Tools::shutdown();
-        }
-
         if (isset($_GET['d']) && $_GET['d']) {
             print '<div class="container-fluid bg-white">';
             $this->smt->database->deleteTopic($_GET['d']);
             $this->smt->database->updateTopicsLocalFilesCount();
-            print '</div>';
-            $this->smt->includeFooter();
-            Tools::shutdown();
-        }
-
-        if (isset($_GET['scommons']) && $_GET['scommons']) {
-            print '<div class="container-fluid bg-white">';
-            $this->smt->getSearchResults();
             print '</div>';
             $this->smt->includeFooter();
             Tools::shutdown();
@@ -88,32 +57,6 @@ class AdminTopic extends ControllerBase
         }
 
         $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
-
-        if (isset($_GET['g']) && $_GET['g']=='all') {
-            print '<div class="container-fluid bg-white">';
-            Tools::notice('refresh Info for all topics');
-            $toget = [];
-            $cats = $this->smt->database->queryAsArray('SELECT * FROM topic ' . $orderBy);
-            foreach ($cats as $cat) {
-                if ($cat['subcats'] != '' && $cat['files'] != '' && $cat['pageid'] != '') {
-                    continue;
-                }
-                if (sizeof($toget) == 50) { // @TODO split into blocks
-                    break;
-                }
-                $toget[] = $cat['name'];
-            }
-            $_GET['c'] = implode('|', $toget);
-            //Tools::notice('refreshing: ' . $_GET['c']);
-            $topicInfo = $this->smt->commons->getTopicInfo($_GET['c']);
-            //Tools::debug('got topicInfo: <pre>' . print_r($topicInfo, true) . '</pre>');
-
-            Tools::error('@TODO - import topicInfo to DB');
-            print '</div>';
-            $this->smt->includeFooter();
-            Tools::shutdown();
-        }
-
 
         if (isset($_GET['sca']) && $_GET['sca']=='all') {
             $sql = 'SELECT * FROM category WHERE subcats > 0 ' . $orderBy;

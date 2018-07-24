@@ -24,7 +24,7 @@ function checkAll(formname, checktoggle) {
     <input type="submit" value="Delete selected media">
     &nbsp;
     <a onclick="javascript:checkAll('media', true);" href="javascript:void();">check all</a>
-    &nbsp;&nbsp;
+    &nbsp; &nbsp;
     <a onclick="javascript:checkAll('media', false);" href="javascript:void();">uncheck all</a>
     <br />
     <br />
@@ -33,9 +33,9 @@ function checkAll(formname, checktoggle) {
     ?>">VIEW ON COMMONS</a>
     <br />
     <br />
-    <a href="<?= Tools::url('admin') ?>/topic/?c=<?=
-        Tools::topicUrlencode($this->topic['name'])
-    ?>">Get Topic Info</a>
+    <a href="<?= Tools::url('admin') ?>/add/?s=topic&amp;t<?=
+        Tools::topicUrlencode($this->topic['pageid'])
+    ?>=on">Refresh Topic Info</a>
     <br />
     <br />
     <a href="<?= Tools::url('admin') ?>/topic/?i=<?=

@@ -5,6 +5,7 @@ declare(strict_types = 1);
  * Topic
  *
  * @var \Attogram\SharedMedia\Tagger\Tagger $smt
+ * @var array   $topic
  * @var array   $topicInfo
  * @var string  $topicName
  * @var string  $topicNameDisplay

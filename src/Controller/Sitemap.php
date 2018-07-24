@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Attogram\SharedMedia\Tagger\Controller;
 
 use Attogram\SharedMedia\Tagger\Config;
-use Attogram\SharedMedia\Tagger\Tools;
 
 /**
  * Class Sitemap
