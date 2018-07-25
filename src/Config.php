@@ -55,6 +55,7 @@ class Config
             'info'          => self::$siteUrl . 'i',
             'login'         => self::$siteUrl . 'login',
             'logout'        => self::$siteUrl . 'logout',
+            'me'            => self::$siteUrl . 'me',
             'random'        => self::$siteUrl . 'random',
             'scores'        => self::$siteUrl . 'scores',
             'search'        => self::$siteUrl . 'search',

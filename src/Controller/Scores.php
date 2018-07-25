@@ -11,12 +11,6 @@ use Attogram\SharedMedia\Tagger\Tools;
  */
 class Scores extends ControllerBase
 {
-    /** @var int - Thumbnails per page */
-    private $limit = 20;
-
-    /** @var int - Current Page # */
-    private $page;
-
     protected function display()
     {
         $this->page = 1;

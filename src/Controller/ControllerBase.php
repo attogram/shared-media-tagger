@@ -16,6 +16,12 @@ class ControllerBase
     /** @var Tagger|TaggerAdmin */
     public $smt;
 
+    /** @var int - Current Page Number */
+    public $page;
+
+    /** @var int - Number of Thumbnails Per Page */
+    public $limit = 20;
+
     /**
      * Base constructor.
      * @param Tagger|TaggerAdmin $smt

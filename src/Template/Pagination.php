@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 use Attogram\SharedMedia\Tagger\Tools;
 
-if ($data['pages'] < 2) {
+if (empty($data['pages']) || empty($data['page']) || $data['pages'] < 2) {
     return;
 }
 

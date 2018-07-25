@@ -47,49 +47,53 @@ use Attogram\SharedMedia\Tagger\Tools;
         </p>
         <em>Download:</em>
         <ul>
-            <li>Source: <a target="c" href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a></li>
-            <li>ID: <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a></li>
-            <li>Filename: <b><?= Tools::stripPrefix($media['title']) ?></b></li>
+            <li>
+                <small>Source:</small>
+                <a target="c"
+                   href="<?= $media['descriptionurl'] ?>">commons.wikimedia.org</a>
+                    # <a target="c" href="<?= $media['descriptionshorturl'] ?>"><?= $media['pageid']; ?></a>
+            </li>
+            <li><small>Filename:</small> <b><?= Tools::stripPrefix($media['title']) ?></b></li>
             <?php
                 $thumb = $this->smt->getThumbnail($media, 130);
-            ?><li>Thumbnail: <a target="c" href="<?= $thumb['url']
+            ?><li><small>Thumbnail:</small> <a target="c" href="<?= $thumb['url']
                 ?>"><?= $thumb['width'] ?>x<?= $thumb['height'] ?> pixels
                 - <?= $media['thumbmime']; ?></a>
             </li>
-            <li>Preview: <a target="c" href="<?= $media['thumburl']
+            <li><small>Preview:</small> <a target="c" href="<?= $media['thumburl']
                 ?>"><?= $media['thumbwidth'] ?>x<?= $media['thumbheight'] ?> pixels
                 - <?= $media['thumbmime']; ?>
                 </a></li>
-            <li>Full size: <a target="c" href="<?= $media['url']
+            <li><small>Full size:</small> <a target="c" href="<?= $media['url']
                 ?>"><?= $media['width'] ?>x<?= $media['height'] ?> pixels
                 - <?= $media['mime']; ?>
                 - <?= number_format((float) $media['size']) ?> bytes
                 </a></li>
         <?php
         if ($media['duration'] > 0) {
-            print '<li>Duration: ' . Tools::secondsToTime($media['duration']) . '</li>';
+            print '<li><small>Duration:</small> ' . Tools::secondsToTime($media['duration']) . '</li>';
         }
         ?>
         </ul>
         <p>
             <em>Licensing:</em>
             <ul>
-            <li>Artist: <?= ($media['artist']
+            <li><small>Artist:</small> <?= ($media['artist']
                         ? htmlentities(strip_tags($media['artist']))
                         : 'unknown')
                     ?></li>
             <?php
             if ($media['licenseuri'] && $media['licenseuri'] != 'false') {
-                print '<li>License: <a target="license" href="'
+                print '<li><small>License:</small> <a target="license" href="'
                 . $media['licenseuri'] . '">' . implode(', ', $media['licensing'])  . '</a></li>';
             } else {
-                print '<li>License: ' . implode(', ', $media['licensing']) . '</li>';
+                print '<li><small>License:</small> ' . implode(', ', $media['licensing']) . '</li>';
             }
             if ($media['attributionrequired'] && $media['attributionrequired'] != 'false') {
                 print '<li>Attribution Required</li>';
             }
             if ($media['restrictions'] && $media['restrictions'] != 'false') {
-                print '<li>Restrictions: ' . $media['restrictions'] . '</li>';
+                print '<li><small>Restrictions:</small> ' . $media['restrictions'] . '</li>';
             }
             ?>
             </ul>
@@ -98,11 +102,11 @@ use Attogram\SharedMedia\Tagger\Tools;
             <style>li { margin-bottom:6px; }</style>
             <em>Media information:</em>
             <ul>
-                <li>Original datetime: <?= $media['datetimeoriginal'] ?></li>
-                <li>Upload datetime: <?= $media['timestamp'] ?></li>
-                <li>Upload by: User:<?= $media['user'] ?></li>
-                <li>SHA1: <small><?= $media['sha1'] ?></small></li>
-                <li>Last refresh: <?= $media['updated'] ?> UTC</li>
+                <li><small>Original datetime:</small> <?= $media['datetimeoriginal'] ?></li>
+                <li><small>Upload datetime:</small> <?= $media['timestamp'] ?></li>
+                <li><small>Uploader:</small> User:<?= $media['user'] ?></li>
+                <li><small>SHA1:</small> <small><?= $media['sha1'] ?></small></li>
+                <li><small>Refreshed:</small> <?= $media['updated'] ?> UTC</li>
             </ul>
         </p>
         <p>
