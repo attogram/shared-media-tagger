@@ -74,6 +74,7 @@ class SharedMediaTagger
         $this->router->allow('/admin/', 'AdminHome');
         $this->router->allow('/admin/add', 'AdminAdd');
         $this->router->allow('/admin/topic', 'AdminTopic');
+        $this->router->allow('/admin/topic/mass', 'AdminTopicMass');
         $this->router->allow('/admin/curate', 'AdminCurate');
         $this->router->allow('/admin/database', 'AdminDatabase');
         $this->router->allow('/admin/database/download', 'AdminDatabaseDownload');
@@ -114,7 +115,7 @@ class SharedMediaTagger
             Tools::shutdown();
         }
 
-        Tools::error404('Page Not found');
+        Tools::error404('Page Not Found');
     }
 
     /**

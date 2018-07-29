@@ -22,7 +22,7 @@ class AdminTopic extends ControllerBase
         $this->smt->includeTemplate('AdminMenu');
 
 
-        // Import images from a topic
+        // Import Media From Topic
         if (isset($_GET['i']) && $_GET['i']) {
             print '<div class="container-fluid bg-white">';
             $topicName = Tools::topicUrldecode($_GET['i']);
@@ -38,6 +38,7 @@ class AdminTopic extends ControllerBase
             Tools::shutdown();
         }
 
+        // Delete Topic
         if (isset($_GET['d']) && $_GET['d']) {
             print '<div class="container-fluid bg-white">';
             $this->smt->database->deleteTopic($_GET['d']);
@@ -47,6 +48,7 @@ class AdminTopic extends ControllerBase
             Tools::shutdown();
         }
 
+        // Import Subtopics from Topic
         if (isset($_GET['sc']) && $_GET['sc']) {
             print '<div class="container-fluid bg-white">';
             $this->smt->commons->getSubcats(Tools::topicUrldecode($_GET['sc']));
@@ -58,25 +60,15 @@ class AdminTopic extends ControllerBase
 
         $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
 
-        if (isset($_GET['sca']) && $_GET['sca']=='all') {
-            $sql = 'SELECT * FROM category WHERE subcats > 0 ' . $orderBy;
-            Tools::notice('SHOWING only topics with subtopics');
-        } elseif (isset($_GET['wf'])) {
-            $sql = 'SELECT * FROM category WHERE files > 0 ' . $orderBy;
-            Tools::notice('SHOWING only topics with files');
-        } elseif (isset($_GET['s'])) {
-            $sql = 'SELECT * FROM category WHERE name LIKE :search ' . $orderBy;
-            $bind = [':search'=>'%' . $_GET['s']. '%'];
-            Tools::notice('SHOWING only topics with search text: ' . $_GET['s']);
-        } else {
-            $sql = 'SELECT * FROM category ' . $orderBy;
-        }
+        $sql = 'SELECT * FROM category ' . $orderBy;
+
         if (!isset($bind)) {
             $bind = [];
         }
         $cats = $this->smt->database->queryAsArray($sql, $bind);
 
         if (!is_array($cats)) {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $cats = [];
         }
 

@@ -239,12 +239,16 @@ class AdminAdd extends ControllerBase
             Tools::debug(
                 'Refreshed Topic: <a href="'
                 . Tools::url('topic') . '/' . Tools::topicUrlencode($topicName)
-                . '">c/' . $topicName . '</a>'
+                . '">c/' . $topicName . '</a>: <pre>'
+                . print_r($bind, true) . '</pre>'
             );
 
             return true;
         }
-        Tools::error('Update Topic FAILED');
+        Tools::error(
+            'Update Topic FAILED: '
+            . print_r($this->smt->database->lastError, true)
+        );
 
         return false;
     }
@@ -278,6 +282,7 @@ class AdminAdd extends ControllerBase
             }
             $bind[$bindField] = $topic[$field];
         }
+        $bind['updated'] = Tools::timeNow();
 
         return $bind;
     }
@@ -309,6 +314,4 @@ class AdminAdd extends ControllerBase
             Tools::debug($subcat);
         }
     }
-
-
 }
