@@ -52,9 +52,9 @@ $subTopics = empty($data['subcats'])
         <?= $subTopics ?> <small>subs</small>
     </div>
     <div class="col border border-black small text-right">
-        <a href="<?= Tools::url('admin') ?>/add/?s=topic&amp;t<?=
+        <a href="<?= Tools::url('admin') ?>/add/?ti[]=<?=
             $data['pageid']
-        ?>=on"><?=
+        ?>"><?=
             $data['updated']
         ?></a>
         <br />
@@ -64,6 +64,13 @@ $subTopics = empty($data['subcats'])
     </div>
     <div class="col border border-black small text-right">
         # <?= $data['pageid'] ?>
+        <?php
+        if (empty($data['pageid'])
+            || !empty($data['missing']) && $data['missing'] == 1
+        ) {
+            ?><span class="bg-danger text-white pr-1 pl-1">MISSING</span><?php
+        }
+        ?>
         <br />
         <a onclick="return confirm('\nConfirm Deletion:\n\nReally Delete All <?=
             $localFiles

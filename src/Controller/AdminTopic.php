@@ -21,7 +21,6 @@ class AdminTopic extends ControllerBase
         $this->smt->includeTemplate('Menu');
         $this->smt->includeTemplate('AdminMenu');
 
-
         // Import Media From Topic
         if (isset($_GET['i']) && $_GET['i']) {
             print '<div class="container-fluid bg-white">';
@@ -58,14 +57,16 @@ class AdminTopic extends ControllerBase
             Tools::shutdown();
         }
 
-        $orderBy = ' ORDER BY hidden ASC, local_files DESC, files DESC, name ASC ';
 
-        $sql = 'SELECT * FROM category ' . $orderBy;
-
-        if (!isset($bind)) {
-            $bind = [];
-        }
-        $cats = $this->smt->database->queryAsArray($sql, $bind);
+        $cats = $this->smt->database->queryAsArray(
+            'SELECT * 
+            FROM category
+            WHERE hidden != "1"
+            ORDER BY local_files DESC, 
+                     files DESC, 
+                     name ASC
+            LIMIT 500'
+        );
 
         if (!is_array($cats)) {
             /** @noinspection PhpUnusedLocalVariableInspection */

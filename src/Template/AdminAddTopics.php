@@ -19,7 +19,6 @@ use Attogram\SharedMedia\Tagger\Tools;
     <div class="col-4 col-sm-2">Add Media</div>
     <div class="col-4 col-sm-2">Add Subcats</div>
 </div>
-<input type="hidden" name="s" value="topics" />
 <?php foreach ($data as $topic) { ?>
 <div class="row border border-light bg-white hovery">
     <div class="col-12 col-sm-6 font-weight-bold">
@@ -29,13 +28,13 @@ use Attogram\SharedMedia\Tagger\Tools;
     </div>
     <div class="col-4 col-sm-2">
         <div class="form-check form-check-inline font-weight-bold">
-            <input type="checkbox" name="t<?= $topic['pageid'] ?>" />
+            <input type="checkbox" name="ti[]" value="<?= $topic['pageid'] ?>" />
         </div>
     </div>
     <div class="col-4 col-sm-2">
         <?php if (!empty($topic['files'])) { ?>
         <div class="form-check form-check-inline">
-            <input type="checkbox" name="a<?= $topic['pageid'] ?>" />
+            <input type="checkbox" name="tm[]" value="<?= $topic['pageid'] ?>" />
             <?= $topic['files'] ?>
         </div>
         <?php } ?>
@@ -43,7 +42,7 @@ use Attogram\SharedMedia\Tagger\Tools;
     <div class="col-4 col-sm-2">
         <?php if (!empty($topic['subcats'])) { ?>
         <div class="form-check form-check-inline">
-            <input type="checkbox" name="b<?= $topic['pageid'] ?>" />
+            <input type="checkbox" name="ts[]" value="<?= $topic['pageid'] ?>" />
             <?= $topic['subcats'] ?>
         </div>
         <?php } ?>

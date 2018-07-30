@@ -6,7 +6,6 @@ declare(strict_types = 1);
 
 ?>
 <form>
-<input type="hidden" name="s" value="media" />
 <div class="row bg-white pb-3">
     <div class="col">
         <?php

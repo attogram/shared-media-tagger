@@ -19,8 +19,8 @@ class AdminTopicMass extends ControllerBase
         $data['topics'] = $this->smt->database->queryAsArray(
             'SELECT * FROM category ORDER BY updated ASC, pageid DESC LIMIT 50'
         );
-        $data['refresh'] = Tools::url('admin') . '/add?s=topics&amp;t'
-            . implode('&amp;t', array_column($data['topics'], 'pageid'));
+        $data['refresh'] = Tools::url('admin') . '/add?ti[]='
+            . implode('&amp;ti[]=', array_column($data['topics'], 'pageid'));
 
         $this->smt->title = 'Topic Mass Admin';
         $this->smt->includeHeader();

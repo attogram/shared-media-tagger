@@ -19,7 +19,11 @@ class AdminAdd extends ControllerBase
         $this->smt->includeTemplate('Menu');
         $this->smt->includeTemplate('AdminMenu');
 
-        if (!empty($_GET['s'])) {
+        if (!empty($_GET['ti'])      // add topic info
+            || !empty($_GET['tm'])  // add media from topic
+            || !empty($_GET['ts'])  // add subtopics from topic
+            || !empty($_GET['m'])   // add media
+        ) {
             $this->doSubmit();
         }
 
@@ -93,41 +97,24 @@ class AdminAdd extends ControllerBase
 
     private function doSubmit()
     {
-        $media = [];
-        $topic = [];
-        $subtopicFromTopic = [];
-        $mediaFromTopic = [];
-
-        foreach ($_GET as $name => $value) {
-            $type = $name[0];
-            $pageid = substr($name, 1);
-            switch ($type) {
-                case 'a':
-                    $mediaFromTopic[] = $pageid;
-                    break;
-                case 'b':
-                    $subtopicFromTopic[] = $pageid;
-                    break;
-                case 'm':
-                    $media[] = $pageid;
-                    break;
-                case 't':
-                    $topic[] = $pageid;
-                    break;
-            }
+        // ti[] - Add Topic Info (via array of Pageids)
+        if (!empty($_GET['ti'])) {
+            $this->addTopics($_GET['ti']);
         }
 
-        if (!empty($topic)) {
-            $this->addTopics($topic);
+        // tm[] - Add Media From Topic (via Pageid)
+        if (!empty($_GET['tm'])) {
+            $this->addMediaFromTopic($_GET['tm']);
         }
-        if (!empty($media)) {
-            $this->addMedia($media);
+
+        // ts[] - Add Subtopics From Topic (via Pageid)
+        if (!empty($_GET['ts'])) {
+            $this->addSubtopicsFromTopic($_GET['ts']);
         }
-        if (!empty($mediaFromTopic)) {
-            $this->addMediaFromTopic($mediaFromTopic);
-        }
-        if (!empty($subtopicFromTopic)) {
-            $this->addSubtopicsFromTopic($subtopicFromTopic);
+
+        // m[] - Add Media (via Pageid)
+        if (!empty($_GET['m'])) {
+            $this->addMedia($_GET['m']);
         }
 
         $this->smt->database->updateTopicsLocalFilesCount();
@@ -174,9 +161,26 @@ class AdminAdd extends ControllerBase
     public function saveTopic(array $topic = [])
     {
         if (empty($topic['title'])) {
-            Tools::error('saveTopic: Topic Title Not Found');
+            Tools::error('saveTopic: Title Not Found: ' . print_r($topic, true));
 
-            return false;
+            if (empty($topic['pageid'])) {
+                return false;
+            }
+
+            // get topic with this pageid
+            $missingTopic = $this->smt->database->queryAsArray(
+                'SELECT * FROM category WHERE pageid = :pageid',
+                [':pageid' => $topic['pageid']]
+            );
+            if (empty($missingTopic[0])) {
+                return false;
+            }
+            Tools::debug('missingTopic: ' . print_r($missingTopic[0], true));
+
+            $topic = $missingTopic[0];
+            $topic['missing'] = 1;
+            $topic['title'] = $topic['name'];
+            $topic['updated'] = Tools::timeNow();
         }
         $topicName = $topic['title'];
         $topicCurrent = $this->smt->database->getTopic($topicName);
@@ -239,8 +243,7 @@ class AdminAdd extends ControllerBase
             Tools::debug(
                 'Refreshed Topic: <a href="'
                 . Tools::url('topic') . '/' . Tools::topicUrlencode($topicName)
-                . '">c/' . $topicName . '</a>: <pre>'
-                . print_r($bind, true) . '</pre>'
+                . '">c/' . $topicName . '</a>'
             );
 
             return true;

@@ -11,7 +11,7 @@ $thumb = $this->getThumbnail($data);
 
 ?>
 <div class="d-inline-block align-top text-center">
-    <input type="checkbox" name="m<?= $data['pageid'] ?>" class="form-check-input" />
+    <input type="checkbox" name="m[]" value="<?= $data['pageid'] ?>" class="form-check-input" />
     <br />
     <a target="commons"
        href="<?=$data['descriptionurl'] ?>"><img

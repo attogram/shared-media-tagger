@@ -6,7 +6,6 @@
  * @var array $data
  */
 declare(strict_types = 1);
-
 ?>
 <form>
     <div class="row bg-info pt-3 pb-2">
@@ -25,7 +24,6 @@ declare(strict_types = 1);
         </div>
     </div>
 </form>
-
 <?php
 if (count($data['results'])) {
     switch ($data['type']) {
