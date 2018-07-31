@@ -63,6 +63,8 @@ $subTopics = empty($data['subcats'])
         <?= empty($data['primary']) ? 'secondary' : 'primary' ?>
     </div>
     <div class="col border border-black small text-right">
+        <a href="<?= Tools::url('admin') ?>/add/?t=topics&amp;q=<?= urlencode($topicName) ?>">add</a>
+        &nbsp;
         # <?= $data['pageid'] ?>
         <?php
         if (empty($data['pageid'])
