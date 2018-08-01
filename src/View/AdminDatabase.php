@@ -20,7 +20,6 @@ use Attogram\SharedMedia\Tagger\Tools;
                 : '❌ ERROR: READ ONLY' ?></li>
             <li>Size: <?= $data['databaseSize'] ?> bytes</li>
             <li><a href="<?= Tools::url('admin') ?>/database/download">Download Database (zip)</a></li>
-            <li><a href="<?= Tools::url('admin') ?>/reports/">Reports</a></li>
         </ul>
         <pre class="error"><?= $data['result'] ?></pre>
         <div class="bg-warning mt-5 mb-5 pb-2 pl-2">
