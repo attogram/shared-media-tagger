@@ -80,7 +80,6 @@ class SharedMediaTagger
         $this->router->allow('/admin/database/download', 'AdminDatabaseDownload');
         $this->router->allow('/admin/media', 'AdminMedia');
         $this->router->allow('/admin/media-blocked', 'AdminMediaBlocked');
-        $this->router->allow('/admin/reports', 'AdminReports');
         $this->router->allow('/admin/site', 'AdminSite');
         $this->router->allow('/admin/tag', 'AdminTag');
         $this->router->allow('/admin/user', 'AdminUser');
