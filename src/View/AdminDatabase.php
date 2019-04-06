@@ -21,17 +21,27 @@ use Attogram\SharedMedia\Tagger\Tools;
             <li>Size: <?= $data['databaseSize'] ?> bytes</li>
             <li><a href="<?= Tools::url('admin') ?>/database/download">Download Database (zip)</a></li>
         </ul>
-        <pre class="error"><?= $data['result'] ?></pre>
+
+        <?php if (!empty($data['result'])) { ?>
+            <pre class="border border-success p-4"><?= $data['result'] ?></pre>
+        <?php } ?>
+
         <div class="bg-warning mt-5 mb-5 pb-2 pl-2">
             <h3>
                 WARNING ZONE
             </h3>
+
+            <p>Database Migrations</p>
+            <ul>
+                <li><a href="<?= Tools::url('admin') ?>/database?a=migrate&migrate=001">001</a></li>
+            </ul>
+            <p>Setup</p>
             <ul>
                 <li><a class="text-dark" href="?a=create">CREATE tables</a></li>
                 <li><a class="text-dark" href="?a=seed">SEED demo setup</a></li>
             </ul>
         </div>
-        <div class="bg-danger mt-5 mb-5 pb-2 pl-2">
+        <div class="bg-danger mt-5 mb-3 pb-2 pl-2">
             <h3>
                 DANGER ZONE
             </h3>

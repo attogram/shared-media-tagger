@@ -232,7 +232,7 @@ class Commons
     public function getTopicInfo($topic)
     {
         if (!$topic || $topic=='' || !is_string($topic)) {
-            Tools::error('getTopicInfo: no category');
+            Tools::error('getTopicInfo: no topic');
 
             return [];
         }

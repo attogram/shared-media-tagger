@@ -169,7 +169,7 @@ class AdminAdd extends ControllerBase
 
             // get topic with this pageid
             $missingTopic = $this->smt->database->queryAsArray(
-                'SELECT * FROM category WHERE pageid = :pageid',
+                'SELECT * FROM topic WHERE pageid = :pageid',
                 [':pageid' => $topic['pageid']]
             );
             if (empty($missingTopic[0])) {
@@ -207,7 +207,7 @@ class AdminAdd extends ControllerBase
         }
         $fields = implode(', ', $fieldsArray);
         $values = implode(', ', $valuesArray);
-        $sql = "INSERT INTO category ($fields) VALUES ($values)";
+        $sql = "INSERT INTO topic ($fields) VALUES ($values)";
         if ($this->smt->database->queryAsBool($sql, $bind)) {
             $topicName = Tools::stripPrefix($bind[':name']);
             Tools::debug(
@@ -237,7 +237,7 @@ class AdminAdd extends ControllerBase
             $bind[":$name"] = $value;
         }
         $sets = implode(', ', $setArray);
-        $sql = "UPDATE category SET $sets WHERE id = :id";
+        $sql = "UPDATE topic SET $sets WHERE id = :id";
         if ($this->smt->database->queryAsBool($sql, $bind)) {
             $topicName = Tools::stripPrefix($bind[':name']);
             Tools::debug(

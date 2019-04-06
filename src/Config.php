@@ -21,6 +21,7 @@ class Config
     public static $sizeMedium;
     public static $sizeThumb;
     public static $sourceDirectory;
+    public static $useCDN;
     public static $mimeTypesAudio = [
         'audio/mpeg',
         'audio/x-flac',
@@ -109,6 +110,11 @@ class Config
             self::$protocol = 'https:';
         } else {
             self::$protocol = 'http:';
+        }
+
+        self::$useCDN = true;
+        if (isset($config['useCDN']) && !$config['useCDN']) {
+            self::$useCDN = false;
         }
 
         self::setLinks();

@@ -360,4 +360,16 @@ class Tools
         header('HTTP/1.1 301 Moved Permanently');
         self::redirect($url);
     }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    public static function safeString(string $string = '')
+    {
+        $string = urldecode($string);
+        $string = htmlentities($string);
+
+        return $string;
+    }
 }

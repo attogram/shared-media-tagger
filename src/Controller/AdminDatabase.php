@@ -3,7 +3,9 @@ declare(strict_types = 1);
 
 namespace Attogram\SharedMedia\Tagger\Controller;
 
+use Attogram\SharedMedia\Tagger\Config;
 use Attogram\SharedMedia\Tagger\Database\DatabaseUpdater;
+use Attogram\SharedMedia\Tagger\Tools;
 
 /**
  * Class AdminDatabase
@@ -66,6 +68,9 @@ class AdminDatabase extends ControllerBase
                     $this->smt->database->emptyUserTables();
                     $data['result'] = 'Emptied User tables';
                     break;
+                case 'migrate':
+                    $data['result'] = $this->migration();
+                    break;
             }
         }
 
@@ -73,5 +78,29 @@ class AdminDatabase extends ControllerBase
         include($this->getView('AdminDatabase'));
 
         $this->smt->includeFooter();
+    }
+
+    /**
+     * @return string
+     */
+    private function migration()
+    {
+        if (empty($_GET['migrate'])) {
+            return 'ERROR: Migration Not Found';
+        }
+        $migrationNumber = Tools::safeString($_GET['migrate']);
+
+
+        $namespace = 'Attogram\\SharedMedia\\Tagger\\Database\\';
+        $migrationClass = $namespace . 'Migration' . $migrationNumber;
+
+        if (!class_exists($migrationClass)) {
+            return 'ERROR: Migration Class Not Found: ' . $migrationClass;
+        }
+
+        $class = new $migrationClass();
+        $result = $class->migrate($this->smt->database);
+
+        return $result;
     }
 }

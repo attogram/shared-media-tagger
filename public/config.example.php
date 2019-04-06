@@ -16,3 +16,7 @@ $config = [];
 // Backend Admin config file - required for admin functions
 // !-!-! contains passwords, put in a safe place !-!-!
 // $config['adminConfigFile'] = './config.admin.php';
+
+// Use CDN for Bootstrap and jQuery
+// $config['useCDN'] = true;
+//$config['useCDN'] = false;

@@ -197,13 +197,13 @@ class Database
             return $this->categoryCount;
         }
         $sql = 'SELECT count(distinct(c2m.category_id)) AS count
-                FROM category2media AS c2m, category AS c
+                FROM topic2media AS c2m, topic AS c
                 WHERE c.id = c2m.category_id
                 AND c.hidden = ' . ($hidden ? '1' : '0');
         if (Config::$siteInfo['curation'] == 1) {
             $hidden = $hidden ? '1' : '0';
             $sql = "SELECT count(distinct(c2m.category_id)) AS count
-                    FROM category2media AS c2m, category AS c, media AS m
+                    FROM topic2media AS c2m, topic AS c, media AS m
                     WHERE c.id = c2m.category_id
                     AND c.hidden = '$hidden'
                     AND c2m.media_pageid = m.pageid
@@ -446,7 +446,7 @@ class Database
     public function getTopic($name)
     {
         $response = $this->queryAsArray(
-            'SELECT * FROM category WHERE name = :name',
+            'SELECT * FROM topic WHERE name = :name',
             [':name' => $name]
         );
         if (!isset($response[0]['id'])) {
@@ -463,12 +463,12 @@ class Database
     public function getTopicSize($topicName)
     {
         $sql = 'SELECT count(c2m.id) AS size
-                FROM category2media AS c2m, category AS c
+                FROM topic2media AS c2m, topic AS c
                 WHERE c.name = :name
                 AND c2m.category_id = c.id';
         if (Config::$siteInfo['curation'] == 1) {
             $sql = "SELECT count(c2m.id) AS size
-                    FROM category2media AS c2m, category AS c, media as m
+                    FROM topic2media AS c2m, topic AS c, media as m
                     WHERE c.name = :name
                     AND c2m.category_id = c.id
                     AND m.pageid = c2m.media_pageid
@@ -494,12 +494,12 @@ class Database
             return [];
         }
         $response = $this->queryAsArray(
-            'SELECT category.name
-            FROM category, category2media
-            WHERE category.hidden = :hidden
-            AND category2media.category_id = category.id
-            AND category2media.media_pageid = :pageid
-            ORDER BY category.name',
+            'SELECT topic.name
+            FROM topic, topic2media
+            WHERE topic.hidden = :hidden
+            AND topic2media.category_id = topic.id
+            AND topic2media.media_pageid = :pageid
+            ORDER BY topic.name',
             [
                 ':pageid' => $pageid,
                 ':hidden' => ($onlyHidden ? 1 : 0),
@@ -523,7 +523,7 @@ class Database
     public function getTopicIdFromName($topicName)
     {
         $response = $this->queryAsArray(
-            'SELECT id FROM category WHERE name = :name',
+            'SELECT id FROM topic WHERE name = :name',
             [':name' => $topicName]
         );
         if (!isset($response[0]['id'])) {
@@ -546,7 +546,7 @@ class Database
             return [];
         }
         $sql = 'SELECT media_pageid
-                FROM category2media
+                FROM topic2media
                 WHERE category_id = :category_id
                 ORDER BY media_pageid';
         $response = $this->queryAsArray($sql, [':category_id' => $topicId]);
@@ -574,13 +574,13 @@ class Database
     public function getCountLocalFilesPerTopic($topicIdArray)
     {
         if (!is_array($topicIdArray)) {
-            Tools::error('getCountLocalFilesPerTopic: invalid category array');
+            Tools::error('getCountLocalFilesPerTopic: invalid topic array');
 
             return 0;
         }
         $locals = $this->queryAsArray(
             'SELECT count(category_id) AS count
-            FROM category2media
+            FROM topic2media
             WHERE category_id IN ( :category_id )',
             [':category_id' => implode($topicIdArray, ', ')]
         );
@@ -601,8 +601,8 @@ class Database
             return false;
         }
         if ($this->queryAsArray(
-            'SELECT id FROM category WHERE hidden = 1 AND name = :category_name',
-            [':category_name' => $topicName]
+            'SELECT id FROM topic WHERE hidden = 1 AND name = :name',
+            [':name' => $topicName]
         )
         ) {
             return true;
@@ -702,7 +702,7 @@ class Database
             'SELECT count(t.id) AS count, tag.*
             FROM tagging AS t,
                  tag,
-                 category2media AS c2m
+                 topic2media AS c2m
             WHERE tag.id = t.tag_id
             AND c2m.media_pageid = t.media_pageid
             AND c2m.category_id = :category_id

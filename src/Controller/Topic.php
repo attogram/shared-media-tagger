@@ -58,7 +58,7 @@ class Topic extends ControllerBase
         }
 
         $sql = 'SELECT m.*
-                FROM category2media AS c2m, category AS c, media AS m
+                FROM topic2media AS c2m, topic AS c, media AS m
                 WHERE c2m.category_id = c.id
                 AND m.pageid = c2m.media_pageid
                 AND c.name = :topic_name';

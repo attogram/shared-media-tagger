@@ -17,7 +17,7 @@ class AdminTopicMass extends ControllerBase
         }
         $data = [];
         $data['topics'] = $this->smt->database->queryAsArray(
-            'SELECT * FROM category ORDER BY updated ASC, pageid DESC LIMIT 50'
+            'SELECT * FROM topic ORDER BY updated ASC, pageid DESC LIMIT 50'
         );
         $data['refresh'] = Tools::url('admin') . '/add?ti[]='
             . implode('&amp;ti[]=', array_column($data['topics'], 'pageid'));

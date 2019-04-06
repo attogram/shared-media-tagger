@@ -1,4 +1,4 @@
--- Shared Media Tagger Database v1.0.4
+-- Shared Media Tagger Database v1.1
 
 CREATE TABLE IF NOT EXISTS "block" (
   'pageid'  INTEGER PRIMARY KEY,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "block" (
   'updated' TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "category" (
+CREATE TABLE IF NOT EXISTS "category" ( -- CREATE TABLE IF NOT EXISTS "topic" (
   'id'            INTEGER PRIMARY KEY,
   'name'          TEXT,
   'curated'       BOOLEAN NOT NULL DEFAULT '0',
@@ -23,12 +23,12 @@ CREATE TABLE IF NOT EXISTS "category" (
   CONSTRAINT cu UNIQUE (name)
 );
 
-CREATE TABLE IF NOT EXISTS "category2media" (
+CREATE TABLE IF NOT EXISTS "category2media" ( -- CREATE TABLE IF NOT EXISTS "topic2media" (
   'id'           INTEGER PRIMARY KEY,
-  'category_id'  INTEGER,
+  'category_id'  INTEGER,   -- 'topic_id'  INTEGER,
   'media_pageid' INTEGER,
   'updated'      TEXT DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT tmu UNIQUE (category_id, media_pageid)
+  CONSTRAINT tmu UNIQUE (category_id, media_pageid) -- CONSTRAINT tmu UNIQUE (topic_id, media_pageid)
 );
 
 CREATE TABLE IF NOT EXISTS "media" (

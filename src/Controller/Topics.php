@@ -51,7 +51,7 @@ class Topics extends ControllerBase
 
         $bind = [];
         $sql = 'SELECT id, name, local_files, hidden
-        FROM category
+        FROM topic
         WHERE local_files > 0';
         if ($hidden) {
             $sql .= ' AND hidden > 0';

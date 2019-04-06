@@ -60,7 +60,7 @@ class AdminTopic extends ControllerBase
 
         $cats = $this->smt->database->queryAsArray(
             'SELECT * 
-            FROM category
+            FROM topic
             WHERE hidden != "1"
             ORDER BY local_files DESC, 
                      files DESC, 

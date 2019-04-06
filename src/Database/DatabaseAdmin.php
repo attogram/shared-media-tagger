@@ -209,7 +209,7 @@ class DatabaseAdmin extends Database
         }
         $sqls = [];
         $sqls[] = 'DELETE FROM media WHERE pageid = :pageid';
-        $sqls[] = 'DELETE FROM category2media WHERE media_pageid = :pageid';
+        $sqls[] = 'DELETE FROM topic2media WHERE media_pageid = :pageid';
         $sqls[] = 'DELETE FROM tagging WHERE media_pageid = :pageid';
         $bind = [':pageid' => $pageid];
         foreach ($sqls as $sql) {
@@ -255,7 +255,7 @@ class DatabaseAdmin extends Database
         }
         // Remove any old topic links for this media
         $this->queryAsBool(
-            'DELETE FROM category2media WHERE media_pageid = :pageid',
+            'DELETE FROM topic2media WHERE media_pageid = :pageid',
             [':pageid' => $pageid]
         );
         foreach ($this->commons->topics as $topic) {
@@ -292,7 +292,7 @@ class DatabaseAdmin extends Database
     private function linkMediaToTopic($pageid, $topicId)
     {
         $response = $this->queryAsBool(
-            'INSERT INTO category2media (category_id, media_pageid) VALUES (:topic_id, :pageid)',
+            'INSERT INTO topic2media (category_id, media_pageid) VALUES (:topic_id, :pageid)',
             ['topic_id' => $topicId, 'pageid' => $pageid]
         );
         if (!$response) {
@@ -317,7 +317,7 @@ class DatabaseAdmin extends Database
         }
 
         if (!$this->queryAsBool(
-            'INSERT INTO category (
+            'INSERT INTO topic (
                 name, local_files, hidden, missing
             ) VALUES (
                 :name, :local_files, :hidden, :missing
@@ -396,7 +396,7 @@ class DatabaseAdmin extends Database
         if (!$bind) {
             return true;
         }
-        $sql = 'UPDATE category SET ';
+        $sql = 'UPDATE topic SET ';
         $sets = [];
         foreach (array_keys($bind) as $set) {
             $sets[] = str_replace(':', '', $set) . ' = ' . $set;
@@ -421,7 +421,7 @@ class DatabaseAdmin extends Database
      */
     public function updateTopicLocalFilesCount($topicName)
     {
-        $sql = 'UPDATE category SET local_files = :local_files WHERE id = :id';
+        $sql = 'UPDATE topic SET local_files = :local_files WHERE id = :id';
         $bind[':local_files'] = $this->getTopicSize($topicName);
         if (is_int($topicName)) {
             $bind['id'] = $topicName;
@@ -451,8 +451,8 @@ class DatabaseAdmin extends Database
     {
         $sql = '
             SELECT c.id, c.local_files, count(c2m.category_id) AS size
-            FROM category AS c
-            LEFT JOIN category2media AS c2m ON c.id = c2m.category_id
+            FROM topic AS c
+            LEFT JOIN topic2media AS c2m ON c.id = c2m.category_id
             GROUP BY c.id
             ORDER by c.local_files ASC';
 
@@ -486,7 +486,7 @@ class DatabaseAdmin extends Database
      */
     private function insertTopicLocalFilesCount($topicId, $topicSize)
     {
-        $sql = 'UPDATE category SET local_files = :topic_size WHERE id = :topic_id';
+        $sql = 'UPDATE topic SET local_files = :topic_size WHERE id = :topic_id';
         $bind[':topic_size'] = $topicSize;
         $bind[':topic_id'] = $topicId;
         if ($this->queryAsBool($sql, $bind)) {
@@ -506,14 +506,14 @@ class DatabaseAdmin extends Database
             return false;
         }
         $bind = [':topic_id' => $topicId];
-        if ($this->queryAsBool('DELETE FROM category WHERE id = :topic_id', $bind)) {
+        if ($this->queryAsBool('DELETE FROM topic WHERE id = :topic_id', $bind)) {
             Tools::notice('DELETED Topic #' . $topicId);
         } else {
             Tools::error('UNABLE to delete topic #' . $topicId);
 
             return false;
         }
-        if ($this->queryAsBool('DELETE FROM category2media WHERE category_id = :topic_id', $bind)) {
+        if ($this->queryAsBool('DELETE FROM topic2media WHERE category_id = :topic_id', $bind)) {
             Tools::notice('DELETED Links to Topic #' . $topicId);
         } else {
             Tools::error('UNABLE to delete links to topic #' . $topicId);
@@ -552,8 +552,8 @@ class DatabaseAdmin extends Database
     {
         return $this->runSqls(
             [
-                'DELETE FROM category2media',
-                'DELETE FROM category',
+                'DELETE FROM topic2media',
+                'DELETE FROM topic',
             ]
         );
     }
@@ -578,7 +578,7 @@ class DatabaseAdmin extends Database
         return $this->runSqls(
             [
                 'DELETE FROM tagging',
-                'DELETE FROM category2media',
+                'DELETE FROM topic2media',
                 'DELETE FROM media',
                 'DELETE FROM block',
             ]
@@ -606,8 +606,8 @@ class DatabaseAdmin extends Database
         return $this->runSqls(
             [
                 'DROP TABLE IF EXISTS block',
-                'DROP TABLE IF EXISTS category',
-                'DROP TABLE IF EXISTS category2media',
+                'DROP TABLE IF EXISTS topic',
+                'DROP TABLE IF EXISTS topic2media',
                 'DROP TABLE IF EXISTS media',
                 'DROP TABLE IF EXISTS site',
                 'DROP TABLE IF EXISTS tag',
