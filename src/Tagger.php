@@ -45,7 +45,7 @@ class Tagger
         $this->router = $router;
         $this->config = $config;
 
-        Config::setSiteUrl($router->getUriBase() . '/');
+        Config::setSiteUrl($router->getHome());
         Config::setup($this->config);
 
         $this->database = new Database();

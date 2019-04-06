@@ -22,7 +22,7 @@ class SharedMediaTagger
      */
     public function __construct(array $config = [])
     {
-        define('SHARED_MEDIA_TAGGER', '1.1.11');
+        define('SHARED_MEDIA_TAGGER', '1.2.0.pre.0');
 
         ob_start('ob_gzhandler');
 
@@ -54,7 +54,6 @@ class SharedMediaTagger
         $this->router->allow('/c/?/?', 'Topic');
         $this->router->allow('/c/?/?/?', 'Topic');
         $this->router->allow('/c/?/?/?/?', 'Topic');
-        $this->router->allow('/topics', 'Topics');
         $this->router->allow('/i/?', 'Info');
         $this->router->allow('/login', 'Login');
         $this->router->allow('/logoff', 'Logout');
@@ -67,6 +66,7 @@ class SharedMediaTagger
         $this->router->allow('/search', 'Search');
         $this->router->allow('/sitemap.xml', 'Sitemap');
         $this->router->allow('/tag', 'Tag');
+        $this->router->allow('/topics', 'Topics');
     }
 
     private function setAdminRoutes()
@@ -122,10 +122,10 @@ class SharedMediaTagger
      */
     private function redirects()
     {
-        Config::setSiteUrl($this->router->getUriBase() . '/');
+        Config::setSiteUrl($this->router->getHome());
         Config::setLinks();
         $redirect = false;
-        switch ($this->router->getUriRelative()) {
+        switch ($this->router->getCurrent()) {
             case '/info.php':
                 if (!empty($_GET['i']) && Tools::isPositiveNumber($_GET['i'])) {
                     $redirect = Tools::url('info') . '/' . $_GET['i'];

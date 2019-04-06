@@ -13,15 +13,22 @@ class Topic extends ControllerBase
 {
     protected function display()
     {
-        $vars = $this->smt->router->getVars();
-        if (empty($vars[0])) {
-            $this->smt->fail404('Page Not Found');
+        $topicName = $this->smt->router->getVar(0);
+        if (!$topicName) {
+            $this->smt->fail404('Topic Not Found');
         }
 
-        $topicName = Tools::topicUrldecode(
-            implode('/', $vars)
-        );
+        if ($this->smt->router->getVar(1)) {
+            $topicName .= '/' . $this->smt->router->getVar(1);
+        }
+        if ($this->smt->router->getVar(2)) {
+            $topicName .= '/' . $this->smt->router->getVar(2);
+        }
+        if ($this->smt->router->getVar(3)) {
+            $topicName .= '/' . $this->smt->router->getVar(3);
+        }
 
+        $topicName = Tools::topicUrldecode($topicName);
         $this->smt->title = $topicName . ' - ' . Config::$siteName;
         $this->smt->includeHeader();
         $this->smt->includeTemplate('Menu');
@@ -33,7 +40,7 @@ class Topic extends ControllerBase
         $topicInfo = $this->smt->database->getTopic($topicName);
 
         if (!$topicInfo) {
-            $this->smt->fail404('Not Found');
+            $this->smt->fail404('Topic Not Found');
         }
 
         $topicSize = $this->smt->database->getTopicSize($topicName);

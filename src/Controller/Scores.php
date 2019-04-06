@@ -13,10 +13,9 @@ class Scores extends ControllerBase
 {
     protected function display()
     {
-        $this->page = 1;
-        $vars = $this->smt->router->getVars();
-        if (!empty($vars[0]) && Tools::isPositiveNumber($vars[0])) {
-            $this->page = (int) $vars[0];
+        $this->page = $this->smt->router->getVar(0);
+        if (empty($this->page) || !Tools::isPositiveNumber($this->page)) {
+            $this->page = 1;
         }
 
         $data = [];
