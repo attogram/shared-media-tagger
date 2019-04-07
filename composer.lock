@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "attogram/router",
-            "version": "v4.0.2",
+            "version": "v4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/attogram/router.git",
-                "reference": "ff47783961374a490270aaa94897d63945760161"
+                "reference": "1d0ef41801f49b4e3f6ecf8d52438129fe82dda9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/attogram/router/zipball/ff47783961374a490270aaa94897d63945760161",
-                "reference": "ff47783961374a490270aaa94897d63945760161",
+                "url": "https://api.github.com/repos/attogram/router/zipball/1d0ef41801f49b4e3f6ecf8d52438129fe82dda9",
+                "reference": "1d0ef41801f49b4e3f6ecf8d52438129fe82dda9",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
                 "php 7",
                 "router"
             ],
-            "time": "2019-04-06T22:07:25+00:00"
+            "time": "2019-04-07T17:59:05+00:00"
         },
         {
             "name": "attogram/shared-media-api",
